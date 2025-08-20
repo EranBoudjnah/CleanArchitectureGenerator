@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -euo pipefail
+
+REPOSITORY_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "${REPOSITORY_ROOT}" ]; then
+  echo "❌ Error: not inside a Git repository; cannot run pre-commit hook." >&2
+  exit 1
+fi
+
+GRADLEW="${REPOSITORY_ROOT}/gradlew"
+
+if [ ! -x "${GRADLEW}" ]; then
+  echo "❌ Error: gradlew not found or not executable at: ${GRADLEW}" >&2
+  exit 1
+fi
+
+echo "Running ktlintCheck..."
+"${GRADLEW}" -p "${REPOSITORY_ROOT}" ktlintCheck || {
+  echo "\n❌ ktlint violations detected. To fix, run:" >&2
+  echo "  \"${GRADLEW}\" -p \"${REPOSITORY_ROOT}\" ktlintFormat" >&2
+  exit 1
+}
+
+echo "\n✅ ktlint checks passed!"
+
+exit 0
+
+
