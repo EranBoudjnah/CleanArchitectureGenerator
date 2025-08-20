@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
@@ -17,7 +19,13 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        create("IC", "2025.1")
+        val localIdePath =
+            project.readLocalProperty("intellij.localPath")
+                ?: error(
+                    "❌ Please define 'intellij.localPath' in local.properties " +
+                        "(e.g., /Users/USERNAME/Applications/Android Studio.app/Contents)",
+                )
+        local(localIdePath)
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
 }
@@ -25,7 +33,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "251"
+            sinceBuild = "241"
         }
 
         changeNotes =
@@ -66,7 +74,7 @@ ktlint {
     }
 }
 
-fun Project.installGitHookFromAutomation() {
+private fun Project.installGitHookFromAutomation() {
     val projectRootDirectory = rootProject.rootDir
     val gitDirectory = File(projectRootDirectory, ".git")
     val gitHooksDirectory = File(gitDirectory, "hooks")
@@ -88,6 +96,14 @@ fun Project.installGitHookFromAutomation() {
     if (!scriptDestinationFile.setExecutable(true)) {
         logger.lifecycle("⚠\uFE0F Failed to make pre-commit git hook script executable")
     }
+}
+
+private fun Project.readLocalProperty(propertyName: String): String? {
+    val localPropertiesFile = File(rootProject.rootDir, "local.properties")
+    if (!localPropertiesFile.exists()) return null
+    val properties = Properties()
+    localPropertiesFile.inputStream().use { properties.load(it) }
+    return properties.getProperty(propertyName)
 }
 
 gradle.projectsEvaluated {

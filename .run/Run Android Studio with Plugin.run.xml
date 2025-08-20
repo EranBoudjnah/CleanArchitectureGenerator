@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="Run IDE with Plugin" type="GradleRunConfiguration" factoryName="Gradle">
+    <configuration default="false" name="Run Android Studio with Plugin" type="GradleRunConfiguration" factoryName="Gradle">
         <log_file alias="idea.log" path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log"/>
         <ExternalSystemSettings>
             <option name="executionName"/>
             <option name="externalProjectPath" value="$PROJECT_DIR$"/>
             <option name="externalSystemIdString" value="GRADLE"/>
-            <option name="scriptParameters" value="-Dorg.gradle.project.intellij.localPath=&quot;/Applications/Android Studio.app/Contents&quot; -Didea.platform.prefix=AndroidStudio"/>
+            <option name="scriptParameters" value=""/>
             <option name="taskDescriptions">
                 <list/>
             </option>
