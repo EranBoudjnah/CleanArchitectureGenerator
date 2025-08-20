@@ -7,10 +7,17 @@ import com.intellij.openapi.ui.Messages
 class CreateCleanArchitectureFeatureAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project
-        Messages.showInfoMessage(
-            project,
-            CleanArchitectureGeneratorBundle.message("info.feature.generator.body"),
-            CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
-        )
+        val dialog = CreateCleanArchitectureFeatureDialog(project)
+        if (dialog.showAndGet()) {
+            val featureName = dialog.featureName
+            Messages.showInfoMessage(
+                project,
+                CleanArchitectureGeneratorBundle.message(
+                    "info.feature.generator.confirmation",
+                    featureName
+                ),
+                CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
+            )
+        }
     }
 }
