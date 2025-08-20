@@ -23,7 +23,7 @@ dependencies {
             project.readLocalProperty("intellij.localPath")
                 ?: error(
                     "❌ Please define 'intellij.localPath' in local.properties " +
-                        "(e.g., /Users/USERNAME/Applications/Android Studio.app/Contents)",
+                        "(e.g., /Users/USERNAME/Applications/Android Studio.app/Contents)"
                 )
         local(localIdePath)
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
