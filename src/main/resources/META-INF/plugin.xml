@@ -10,6 +10,8 @@
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor url="https://uk.linkedin.com/in/eranboudjnah">Mitteloupe Limited</vendor>
 
+    <resource-bundle>messages.CleanArchitectureGeneratorBundle</resource-bundle>
+
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
@@ -28,9 +30,7 @@
     </extensions>
     <actions>
         <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
-                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
-                text="Clean Architecture Feature"
-                description="Create a new Clean Architecture feature...">
+                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
     </actions>
