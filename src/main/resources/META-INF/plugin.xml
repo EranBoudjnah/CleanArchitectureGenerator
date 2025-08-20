@@ -26,4 +26,12 @@
     <extensions defaultExtensionNs="com.intellij">
 
     </extensions>
+    <actions>
+        <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
+                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
+                text="Clean Architecture Feature"
+                description="Create a new Clean Architecture feature...">
+            <add-to-group group-id="NewGroup" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>
