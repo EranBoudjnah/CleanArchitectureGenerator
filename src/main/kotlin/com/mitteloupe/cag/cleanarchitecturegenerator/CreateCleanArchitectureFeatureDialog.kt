@@ -8,23 +8,34 @@ import com.intellij.util.ui.FormBuilder
 import javax.swing.JComponent
 import javax.swing.JPanel
 
+private const val PLACEHOLDER = "FEATURE_NAME"
+
 class CreateCleanArchitectureFeatureDialog(
     project: Project?,
     defaultPrefix: String? = null
 ) : DialogWrapper(project) {
+    private val defaultPackageName =
+        if (defaultPrefix == null) {
+            null
+        } else {
+            "${defaultPrefix}feature.$PLACEHOLDER"
+        }
+
+    private val featurePackageTextField = JBTextField()
     private val featureNameTextField = JBTextField()
 
     val featureName: String
-        get() = featureNameTextField.text.trim()
+        get() = featurePackageTextField.text.trim()
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
         init()
-        if (!defaultPrefix.isNullOrBlank()) {
-            val placeholder = "FEATURE_NAME"
-            featureNameTextField.text = "${defaultPrefix}feature.$placeholder"
-            val endOfModuleIndex = featureNameTextField.text.length
-            featureNameTextField.select(endOfModuleIndex - placeholder.length, endOfModuleIndex)
+        featureNameTextField.text = PLACEHOLDER
+        featureNameTextField.selectAll()
+        if (!defaultPackageName.isNullOrBlank()) {
+            featurePackageTextField.text = defaultPackageName
+            val endOfModuleIndex = featurePackageTextField.text.length
+            featurePackageTextField.select(endOfModuleIndex - PLACEHOLDER.length, endOfModuleIndex)
         }
     }
 
@@ -37,6 +48,12 @@ class CreateCleanArchitectureFeatureDialog(
                     1,
                     false
                 )
+                .addLabeledComponent(
+                    CleanArchitectureGeneratorBundle.message("dialog.feature.package.label"),
+                    featurePackageTextField,
+                    1,
+                    false
+                )
                 .panel
 
         return formPanel
@@ -46,7 +63,7 @@ class CreateCleanArchitectureFeatureDialog(
         if (featureName.isEmpty()) {
             return ValidationInfo(
                 CleanArchitectureGeneratorBundle.message("validation.feature.name.required"),
-                featureNameTextField
+                featurePackageTextField
             )
         }
         return null
