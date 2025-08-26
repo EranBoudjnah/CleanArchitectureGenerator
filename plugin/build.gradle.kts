@@ -1,5 +1,4 @@
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
-import java.util.Properties
 
 plugins {
     id("java")
@@ -19,15 +18,12 @@ dependencies {
     implementation(project(":core"))
 
     intellijPlatform {
-        val localIdePath =
-            project.readLocalProperty("intellij.localPath")
-                ?: error(
-                    "❌ Please define 'intellij.localPath' in local.properties " +
-                        "(e.g., /Users/USERNAME/Applications/Android Studio.app/Contents)"
-                )
-        local(localIdePath)
+        androidStudio("2025.1.4.2")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
+
+    testImplementation("io.mockk:mockk:1.13.11")
+    testImplementation("junit:junit:4.13.2")
 }
 
 intellijPlatform {
@@ -72,12 +68,4 @@ ktlint {
         include("**/*.kt")
         include("**/*.kts")
     }
-}
-
-private fun Project.readLocalProperty(propertyName: String): String? {
-    val localPropertiesFile = File(rootProject.rootDir, "local.properties")
-    if (!localPropertiesFile.exists()) return null
-    val properties = Properties()
-    localPropertiesFile.inputStream().use { properties.load(it) }
-    return properties.getProperty(propertyName)
 }
