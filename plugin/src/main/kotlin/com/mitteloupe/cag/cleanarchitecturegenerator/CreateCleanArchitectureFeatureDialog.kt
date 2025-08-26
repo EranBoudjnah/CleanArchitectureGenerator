@@ -21,11 +21,11 @@ class CreateCleanArchitectureFeatureDialog(
             "${defaultPrefix}feature.$PLACEHOLDER"
         }
 
-    private val featurePackageTextField = JBTextField()
     private val featureNameTextField = JBTextField()
+    private val featurePackageTextField = JBTextField()
 
     val featureName: String
-        get() = featurePackageTextField.text.trim()
+        get() = featureNameTextField.text.trim()
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
@@ -63,7 +63,7 @@ class CreateCleanArchitectureFeatureDialog(
         if (featureName.isEmpty()) {
             ValidationInfo(
                 CleanArchitectureGeneratorBundle.message("validation.feature.name.required"),
-                featurePackageTextField
+                featureNameTextField
             )
         } else {
             null
