@@ -24,7 +24,10 @@ class CreateCleanArchitectureFeatureDialog(
     private var lastFeatureName: String = PLACEHOLDER
 
     val featureName: String
-        get() = featureNameTextField.text.trim()
+        get() = featureNameTextField.text
+
+    val featurePackageName: String
+        get() = featurePackageTextField.text.trim()
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
@@ -50,6 +53,9 @@ class CreateCleanArchitectureFeatureDialog(
                 lastFeatureName = featureName
             }
         )
+
+        (featurePackageTextField.document as AbstractDocument).documentFilter =
+            PredicateDocumentFilter { !it.isWhitespace() }
 
         featurePackageTextField.document.addDocumentListener(
             OnChangeDocumentListener {
