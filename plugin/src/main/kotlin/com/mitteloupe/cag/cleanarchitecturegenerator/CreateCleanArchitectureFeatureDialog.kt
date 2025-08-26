@@ -5,11 +5,10 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
+import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import javax.swing.text.AbstractDocument
 
 private const val PLACEHOLDER = "FEATURE_NAME"
@@ -48,34 +47,22 @@ class CreateCleanArchitectureFeatureDialog(
         }
 
         featureNameTextField.document.addDocumentListener(
-            object : DocumentListener {
-                override fun insertUpdate(e: DocumentEvent) = onNameChanged()
-
-                override fun removeUpdate(e: DocumentEvent) = onNameChanged()
-
-                override fun changedUpdate(e: DocumentEvent) = onNameChanged()
-
-                private fun onNameChanged() {
-                    if (defaultPackagePrefix.isNullOrBlank()) return
-
-                    if (isFollowingDefaultPackage(lastFeatureName)) {
-                        featurePackageTextField.text = defaultPackagePrefix + featureName
-                    }
-                    lastFeatureName = featureName
+            OnChangeDocumentListener {
+                if (defaultPackagePrefix.isNullOrBlank()) {
+                    return@OnChangeDocumentListener
                 }
+
+                if (isFollowingDefaultPackage(lastFeatureName)) {
+                    featurePackageTextField.text = defaultPackagePrefix + featureName
+                }
+                lastFeatureName = featureName
             }
         )
 
         featurePackageTextField.document.addDocumentListener(
-            object : DocumentListener {
-                override fun insertUpdate(e: DocumentEvent) = onPackageChanged()
-
-                override fun removeUpdate(e: DocumentEvent) = onPackageChanged()
-
-                override fun changedUpdate(e: DocumentEvent) = onPackageChanged()
-
-                private fun onPackageChanged() {
-                    if (defaultPackagePrefix.isNullOrBlank()) return
+            OnChangeDocumentListener {
+                if (defaultPackagePrefix.isNullOrBlank()) {
+                    return@OnChangeDocumentListener
                 }
             }
         )
