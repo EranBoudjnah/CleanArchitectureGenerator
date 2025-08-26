@@ -1,0 +1,45 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+    id("application")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.jlleitschuh.gradle.ktlint")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":core"))
+    implementation(kotlin("stdlib"))
+}
+
+application {
+    mainClass.set("com.mitteloupe.cag.cli.MainKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("all")
+    mergeServiceFiles()
+}
+
+ktlint {
+    android.set(false)
+    ignoreFailures.set(false)
+    filter {
+        exclude("**/build/**")
+        include("**/*.kt")
+        include("**/*.kts")
+    }
+}

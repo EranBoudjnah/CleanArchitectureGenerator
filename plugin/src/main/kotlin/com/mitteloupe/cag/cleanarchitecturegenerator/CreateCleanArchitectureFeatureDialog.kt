@@ -59,13 +59,13 @@ class CreateCleanArchitectureFeatureDialog(
         return formPanel
     }
 
-    override fun doValidate(): ValidationInfo? {
+    override fun doValidate(): ValidationInfo? =
         if (featureName.isEmpty()) {
-            return ValidationInfo(
+            ValidationInfo(
                 CleanArchitectureGeneratorBundle.message("validation.feature.name.required"),
                 featurePackageTextField
             )
+        } else {
+            null
         }
-        return null
-    }
 }

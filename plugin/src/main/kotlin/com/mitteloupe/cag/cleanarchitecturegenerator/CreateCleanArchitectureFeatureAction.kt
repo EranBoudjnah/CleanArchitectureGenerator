@@ -64,8 +64,8 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
 
         val regexes =
             listOf(
-                Regex("""(?s)android\s*\{[\n\r\s\S]*?namespace\s*=\s*['"]([^'"]+)['"]"""),
-                Regex("""(?s)android\s*\{[\n\r\s\S]*?namespace\s+['"]([^'"]+)['"]""")
+                Regex("""(?s)android\s*\{[\n\r\s\S]*?namespace\s*=\s*['"]([^'"])['"]"""),
+                Regex("""(?s)android\s*\{[\n\r\s\S]*?namespace\s+['"]([^'"])['"]""")
             )
         val match = regexes.asSequence().mapNotNull { it.find(fileContents) }.firstOrNull()
         return match?.groupValues?.get(1)?.trim()
