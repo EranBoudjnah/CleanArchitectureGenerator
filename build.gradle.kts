@@ -1,8 +1,8 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.0" apply false
-    id("org.jetbrains.intellij.platform") version "2.5.0" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.intellij.platform) apply false
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.shadow) apply false
 }
 
 group = "com.mitteloupe.cag"

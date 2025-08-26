@@ -1,8 +1,8 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlin.jvm)
     id("application")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.ktlint)
 }
 
 repositories {

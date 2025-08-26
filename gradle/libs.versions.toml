@@ -1,0 +1,18 @@
+[versions]
+kotlin = "2.1.0"
+intellijPlatform = "2.5.0"
+ktlint = "12.1.1"
+shadow = "8.1.1"
+mockk = "1.13.11"
+junit4 = "4.13.2"
+androidStudio = "2025.1.4.2"
+
+[libraries]
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+
+[plugins]
+"kotlin-jvm" = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+"intellij-platform" = { id = "org.jetbrains.intellij.platform", version.ref = "intellijPlatform" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

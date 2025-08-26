@@ -1,7 +1,7 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlin.jvm)
     id("java-library")
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.ktlint)
 }
 
 repositories {
