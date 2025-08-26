@@ -2,6 +2,7 @@ package com.mitteloupe.cag.cli
 
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.DefaultGenerator
+import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import java.nio.file.Paths
 
 fun main(args: Array<String>) {
@@ -18,6 +19,11 @@ fun main(args: Array<String>) {
         }
     println("Package: ${packageName ?: "<not found>" }")
     val generator = DefaultGenerator()
-    val result = generator.generateFeature(featureName)
+    val request =
+        GenerateFeatureRequestBuilder()
+            .featureName(featureName)
+            .featurePackageName(packageName)
+            .build()
+    val result = generator.generateFeature(request)
     println(result)
 }
