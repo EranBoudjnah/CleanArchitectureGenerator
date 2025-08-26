@@ -18,12 +18,6 @@ class CreateCleanArchitectureFeatureDialog(
     defaultPrefix: String? = null
 ) : DialogWrapper(project) {
     private val defaultPackagePrefix = defaultPrefix?.let { "${it}feature." }
-    private val defaultPackageName =
-        if (defaultPrefix == null) {
-            null
-        } else {
-            "${defaultPrefix}feature.$PLACEHOLDER"
-        }
 
     private val featureNameTextField = JBTextField()
     private val featurePackageTextField = JBTextField()
@@ -40,10 +34,8 @@ class CreateCleanArchitectureFeatureDialog(
 
         (featureNameTextField.document as AbstractDocument).documentFilter =
             PredicateDocumentFilter { !it.isWhitespace() }
-        if (!defaultPackageName.isNullOrBlank()) {
-            featurePackageTextField.text = defaultPackageName
-            val endOfModuleIndex = featurePackageTextField.text.length
-            featurePackageTextField.select(endOfModuleIndex - PLACEHOLDER.length, endOfModuleIndex)
+        if (!defaultPrefix.isNullOrBlank()) {
+            updateTemplatedPackageName()
         }
 
         featureNameTextField.document.addDocumentListener(
@@ -52,8 +44,8 @@ class CreateCleanArchitectureFeatureDialog(
                     return@OnChangeDocumentListener
                 }
 
-                if (isFollowingDefaultPackage(lastFeatureName)) {
-                    featurePackageTextField.text = defaultPackagePrefix + featureName
+                if (isFollowingFeatureName(lastFeatureName)) {
+                    updateTemplatedPackageName(currentPackagePrefix() + ".")
                 }
                 lastFeatureName = featureName
             }
@@ -66,6 +58,12 @@ class CreateCleanArchitectureFeatureDialog(
                 }
             }
         )
+    }
+
+    private fun updateTemplatedPackageName(packagePrefix: String? = defaultPackagePrefix) {
+        featurePackageTextField.text = "$packagePrefix${featureName.lowercase()}"
+        val endOfModuleIndex = featurePackageTextField.text.length
+        featurePackageTextField.select(endOfModuleIndex - featureName.length, endOfModuleIndex)
     }
 
     override fun createCenterPanel(): JComponent {
@@ -98,5 +96,8 @@ class CreateCleanArchitectureFeatureDialog(
             null
         }
 
-    private fun isFollowingDefaultPackage(lastFeatureName: String) = featurePackageTextField.text == defaultPackagePrefix + lastFeatureName
+    private fun isFollowingFeatureName(lastFeatureName: String) =
+        featurePackageTextField.text.substringAfterLast('.') == lastFeatureName.lowercase()
+
+    private fun currentPackagePrefix() = featurePackageTextField.text.substringBeforeLast('.')
 }
