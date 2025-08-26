@@ -5,8 +5,10 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
+import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.text.AbstractDocument
 
 private const val PLACEHOLDER = "FEATURE_NAME"
 
@@ -32,6 +34,9 @@ class CreateCleanArchitectureFeatureDialog(
         init()
         featureNameTextField.text = PLACEHOLDER
         featureNameTextField.selectAll()
+
+        (featureNameTextField.document as AbstractDocument).documentFilter =
+            PredicateDocumentFilter { !it.isWhitespace() }
         if (!defaultPackageName.isNullOrBlank()) {
             featurePackageTextField.text = defaultPackageName
             val endOfModuleIndex = featurePackageTextField.text.length
