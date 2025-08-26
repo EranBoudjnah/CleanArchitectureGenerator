@@ -21,9 +21,6 @@ dependencies {
         androidStudio(libs.versions.androidStudio.get())
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
-
-    testImplementation(libs.mockk)
-    testImplementation(libs.junit4)
 }
 
 intellijPlatform {

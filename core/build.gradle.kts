@@ -21,6 +21,9 @@ kotlin {
 
 dependencies {
     compileOnly(kotlin("stdlib"))
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit4)
 }
 
 ktlint {
