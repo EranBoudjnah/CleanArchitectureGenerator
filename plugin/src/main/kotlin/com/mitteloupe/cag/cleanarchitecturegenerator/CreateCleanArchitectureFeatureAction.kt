@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.core.BasePackageResolver
+import com.mitteloupe.cag.core.DefaultGenerator
 
 class CreateCleanArchitectureFeatureAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
@@ -13,11 +14,14 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
         val dialog = CreateCleanArchitectureFeatureDialog(project, defaultPrefix)
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
+            val generator = DefaultGenerator()
+            val result = generator.generateFeature(featureName)
             Messages.showInfoMessage(
                 project,
                 CleanArchitectureGeneratorBundle.message(
                     "info.feature.generator.confirmation",
-                    featureName
+                    featureName,
+                    result
                 ),
                 CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
             )

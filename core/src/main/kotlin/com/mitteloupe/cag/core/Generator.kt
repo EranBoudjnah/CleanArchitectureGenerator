@@ -6,6 +6,6 @@ interface Generator {
 
 class DefaultGenerator : Generator {
     override fun generateFeature(featureName: String): String {
-        return "Generated feature: $featureName"
+        return "Success!"
     }
 }
