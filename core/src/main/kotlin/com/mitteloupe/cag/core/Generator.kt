@@ -21,6 +21,7 @@ class DefaultGenerator : Generator {
         }
 
         val featureNameLowerCase = request.featureName.lowercase()
+        updateVersionCatalogIfPresent(request.destinationRootDir)?.let { return it }
         val featureRoot = File(request.destinationRootDir, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
@@ -57,6 +58,138 @@ class DefaultGenerator : Generator {
         } else {
             "${ERROR_PREFIX}Failed to create directories for package '$packageName'."
         }
+    }
+
+    private fun updateVersionCatalogIfPresent(projectRootDir: File): String? {
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        if (!catalogFile.exists()) return null
+
+        val originalText =
+            runCatching { catalogFile.readText() }
+                .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
+
+        val updatedText = updateCatalogText(originalText)
+        if (updatedText == originalText) return null
+
+        return runCatching { catalogFile.writeText(updatedText) }
+            .exceptionOrNull()
+            ?.let { "${ERROR_PREFIX}Failed to update version catalog: ${it.message}" }
+    }
+
+    private fun updateCatalogText(catalog: String): String {
+        val lines = catalog.split('\n').toMutableList()
+
+        fun findSectionBounds(header: String): Pair<Int, Int>? {
+            val startIndex = lines.indexOfFirst { it.trim() == "[$header]" }
+            if (startIndex == -1) {
+                return null
+            }
+            var endIndexExclusive = lines.size
+            for (i in startIndex + 1 until lines.size) {
+                val trimmed = lines[i].trim()
+                if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+                    endIndexExclusive = i
+                    break
+                }
+            }
+            return startIndex to endIndexExclusive
+        }
+
+        fun hasKeyInRange(
+            keyRegex: Regex,
+            range: IntRange
+        ): Boolean = range.any { idx -> keyRegex.containsMatchIn(lines[idx]) }
+
+        fun insertAt(
+            index: Int,
+            newLines: List<String>
+        ) {
+            lines.addAll(index, newLines)
+        }
+
+        val versionsBounds = findSectionBounds("versions")
+        val needAddVersionsSection = versionsBounds == null
+        val versionsRange: IntRange =
+            if (versionsBounds == null) {
+                IntRange(0, -1)
+            } else {
+                val (start, end) = versionsBounds
+                (start + 1) until end
+            }
+
+        val versionsToAdd =
+            buildList {
+                if (needAddVersionsSection) {
+                    add("[versions]")
+                }
+                val hasCompileSdk =
+                    !needAddVersionsSection && hasKeyInRange(Regex("^\\s*compileSdk\\s*="), versionsRange)
+                if (!hasCompileSdk) {
+                    add("compileSdk = \"35\"")
+                }
+                val hasMinSdk =
+                    !needAddVersionsSection && hasKeyInRange(Regex("^\\s*minSdk\\s*="), versionsRange)
+                if (!hasMinSdk) {
+                    add("minSdk = \"24\"")
+                }
+                val hasAgpVersion =
+                    !needAddVersionsSection && hasKeyInRange(Regex("^\\s*androidGradlePlugin\\s*="), versionsRange)
+                if (!hasAgpVersion) {
+                    add("androidGradlePlugin = \"8.7.3\"")
+                }
+            }
+
+        if (versionsToAdd.isNotEmpty()) {
+            if (needAddVersionsSection) {
+                insertAt(0, versionsToAdd + "")
+            } else {
+                val (_, end) = versionsBounds
+                insertAt(end, listOf("") + versionsToAdd)
+            }
+        }
+
+        val pluginsBounds = findSectionBounds("plugins")
+        val needAddPluginsSection = pluginsBounds == null
+        val pluginsRange: IntRange =
+            if (pluginsBounds == null) {
+                IntRange(0, -1)
+            } else {
+                val (start, end) = pluginsBounds
+                (start + 1) until end
+            }
+
+        val pluginsToAdd =
+            buildList {
+                if (needAddPluginsSection) {
+                    add("[plugins]")
+                }
+                val hasKotlinJvm = !needAddPluginsSection && hasKeyInRange(Regex("^\\s*kotlin-jvm\\s*="), pluginsRange)
+                if (!hasKotlinJvm) {
+                    add("kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }")
+                }
+                val hasKotlinAndroid =
+                    !needAddPluginsSection && hasKeyInRange(Regex("^\\s*kotlin-android\\s*="), pluginsRange)
+                if (!hasKotlinAndroid) {
+                    add("kotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }")
+                }
+                val hasAndroidLibrary =
+                    !needAddPluginsSection && hasKeyInRange(Regex("^\\s*android-library\\s*="), pluginsRange)
+                if (!hasAndroidLibrary) {
+                    add("android-library = { id = \"com.android.library\", version.ref = \"androidGradlePlugin\" }")
+                }
+            }
+
+        if (pluginsToAdd.isNotEmpty()) {
+            if (needAddPluginsSection) {
+                if (lines.isNotEmpty() && lines.last().isNotEmpty()) lines.add("")
+                lines.addAll(pluginsToAdd)
+            } else {
+                val (_, end) = pluginsBounds
+                insertAt(end, listOf("") + pluginsToAdd)
+            }
+        }
+
+        return lines.joinToString("\n")
     }
 
     private fun populateDomainModule(featureRoot: File): String? =
