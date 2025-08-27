@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core
 
+import com.mitteloupe.cag.core.syntax.toSegments
 import java.io.File
 
 private const val ERROR_PREFIX = "Error: "
@@ -15,7 +16,7 @@ class DefaultGenerator : Generator {
             return "${ERROR_PREFIX}Feature package name is missing."
         }
 
-        val pathSegments = featurePackageName.split('.').filter { it.isNotBlank() }
+        val pathSegments = featurePackageName.toSegments()
         if (pathSegments.isEmpty()) {
             return "${ERROR_PREFIX}Feature package name is invalid."
         }
@@ -340,32 +341,19 @@ dependencies {
         projectNamespace: String,
         featurePackageName: String
     ): String? {
-        val domainSourceRoot = File(featureRoot, "domain/src/main/java")
-        val packageSegments =
-            featurePackageName.split('.')
-                .filter { it.isNotBlank() }
-        val basePackageDirectory = buildPackageDirectory(domainSourceRoot, packageSegments)
-        val useCaseDirectory = File(File(basePackageDirectory, "domain"), "usecase")
-        if (!useCaseDirectory.exists()) {
-            val created = runCatching { useCaseDirectory.mkdirs() }.getOrElse { false }
-            if (!created) {
-                return "${ERROR_PREFIX}Failed to create domain use case directory."
-            }
-        }
-
-        val useCaseFile = File(useCaseDirectory, "PerformActionUseCase.kt")
-        if (!useCaseFile.exists()) {
-            val content =
-                buildDomainUseCaseKotlinFile(
-                    projectNamespace = projectNamespace,
-                    featurePackageName = featurePackageName
-                )
-            runCatching { useCaseFile.writeText(content) }
-                .onFailure {
-                    return "${ERROR_PREFIX}Failed to create domain use case file: ${it.message}"
-                }
-        }
-        return null
+        val content =
+            buildDomainUseCaseKotlinFile(
+                projectNamespace = projectNamespace,
+                featurePackageName = featurePackageName
+            )
+        return writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "domain",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "usecase",
+            fileName = "PerformActionUseCase.kt",
+            content = content
+        )
     }
 
     private fun buildDomainUseCaseKotlinFile(
@@ -392,28 +380,15 @@ class PerformActionUseCase(
         featureRoot: File,
         featurePackageName: String
     ): String? {
-        val domainSourceRoot = File(featureRoot, "domain/src/main/java")
-        val packageSegments =
-            featurePackageName.split('.')
-                .filter { it.isNotBlank() }
-        val basePackageDirectory = buildPackageDirectory(domainSourceRoot, packageSegments)
-        val repositoryDirectory = File(File(basePackageDirectory, "domain"), "repository")
-        if (!repositoryDirectory.exists()) {
-            val created = runCatching { repositoryDirectory.mkdirs() }.getOrElse { false }
-            if (!created) {
-                return "${ERROR_PREFIX}Failed to create domain repository directory."
-            }
-        }
-
-        val repositoryFile = File(repositoryDirectory, "PerformExampleRepository.kt")
-        if (!repositoryFile.exists()) {
-            val content = buildDomainRepositoryKotlinFile(featurePackageName)
-            runCatching { repositoryFile.writeText(content) }
-                .onFailure {
-                    return "${ERROR_PREFIX}Failed to create domain repository file: ${it.message}"
-                }
-        }
-        return null
+        val content = buildDomainRepositoryKotlinFile(featurePackageName)
+        return writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "domain",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "repository",
+            fileName = "PerformExampleRepository.kt",
+            content = content
+        )
     }
 
     private fun buildDomainRepositoryKotlinFile(featurePackageName: String): String =
@@ -423,4 +398,36 @@ interface PerformExampleRepository {
     fun perform(input: Unit): Unit
 }
 """
+
+    private fun writeKotlinFileInLayer(
+        featureRoot: File,
+        layer: String,
+        featurePackageName: String,
+        relativePackageSubPath: String,
+        fileName: String,
+        content: String
+    ): String? {
+        val sourceRoot = File(featureRoot, "$layer/src/main/java")
+        val packageSegments = featurePackageName.toSegments()
+        val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments)
+        val targetDirectory =
+            (listOf(layer) + relativePackageSubPath.toSegments())
+                .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
+
+        if (!targetDirectory.exists()) {
+            val created = runCatching { targetDirectory.mkdirs() }.getOrElse { false }
+            if (!created) {
+                return "${ERROR_PREFIX}Failed to create directory: ${targetDirectory.absolutePath}"
+            }
+        }
+
+        val targetFile = File(targetDirectory, fileName)
+        if (!targetFile.exists()) {
+            runCatching { targetFile.writeText(content) }
+                .onFailure {
+                    return "${ERROR_PREFIX}Failed to create file: ${targetFile.absolutePath}: ${it.message}"
+                }
+        }
+        return null
+    }
 }
