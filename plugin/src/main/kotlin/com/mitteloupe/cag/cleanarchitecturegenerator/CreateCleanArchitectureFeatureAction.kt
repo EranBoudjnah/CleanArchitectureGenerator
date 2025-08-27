@@ -18,10 +18,10 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
             val generator = DefaultGenerator()
-            val moduleRootDir = IntellijProjectModel(event).selectedModuleRootDir()
+            val projectRootDir = event.project?.basePath?.let { File(it) }
             val request =
                 GenerateFeatureRequestBuilder(
-                    destinationRootDir = moduleRootDir ?: File("."),
+                    destinationRootDir = projectRootDir ?: File("."),
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
                     .build()
