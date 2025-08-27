@@ -1,3 +1,3 @@
-package com.mitteloupe.cag.core.syntax
+package com.mitteloupe.cag.core.kotlinpackage
 
 fun String.toSegments() = split('.').filter { it.isNotBlank() }

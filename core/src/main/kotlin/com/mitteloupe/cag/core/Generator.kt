@@ -1,9 +1,9 @@
 package com.mitteloupe.cag.core
 
-import com.mitteloupe.cag.core.syntax.toSegments
+import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-private const val ERROR_PREFIX = "Error: "
+const val ERROR_PREFIX = "Error: "
 
 interface Generator {
     fun generateFeature(request: GenerateFeatureRequest): String
@@ -346,7 +346,7 @@ dependencies {
                 projectNamespace = projectNamespace,
                 featurePackageName = featurePackageName
             )
-        return writeKotlinFileInLayer(
+        return KotlinFileCreator().writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
@@ -381,7 +381,7 @@ class PerformActionUseCase(
         featurePackageName: String
     ): String? {
         val content = buildDomainRepositoryKotlinFile(featurePackageName)
-        return writeKotlinFileInLayer(
+        return KotlinFileCreator().writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
@@ -398,36 +398,4 @@ interface PerformExampleRepository {
     fun perform(input: Unit): Unit
 }
 """
-
-    private fun writeKotlinFileInLayer(
-        featureRoot: File,
-        layer: String,
-        featurePackageName: String,
-        relativePackageSubPath: String,
-        fileName: String,
-        content: String
-    ): String? {
-        val sourceRoot = File(featureRoot, "$layer/src/main/java")
-        val packageSegments = featurePackageName.toSegments()
-        val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments)
-        val targetDirectory =
-            (listOf(layer) + relativePackageSubPath.toSegments())
-                .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
-
-        if (!targetDirectory.exists()) {
-            val created = runCatching { targetDirectory.mkdirs() }.getOrElse { false }
-            if (!created) {
-                return "${ERROR_PREFIX}Failed to create directory: ${targetDirectory.absolutePath}"
-            }
-        }
-
-        val targetFile = File(targetDirectory, fileName)
-        if (!targetFile.exists()) {
-            runCatching { targetFile.writeText(content) }
-                .onFailure {
-                    return "${ERROR_PREFIX}Failed to create file: ${targetFile.absolutePath}: ${it.message}"
-                }
-        }
-        return null
-    }
 }
