@@ -15,7 +15,6 @@ private val androidAppPluginApplyRegex =
 private val namespaceRegex = """(?s)android\s*\{[\n\r\s\S]*?namespace(?:\s*=\s*|\s+)['"]([^'"]+)['"]""".toRegex()
 private val versionCatalogEntryRegex =
     """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bid\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
-private const val MAXIMUM_DIRECTORY_SEARCH_DEPTH = 6
 private const val PLUGINS_SECTION_MARKER = "[plugins]"
 
 class BasePackageResolver() {
@@ -99,17 +98,11 @@ class BasePackageResolver() {
             }
         }
 
-    private fun findNearestVersionCatalog(startDirectory: File): File? {
-        var currentDirectory: File? = startDirectory
-        var steps = 0
-        while (currentDirectory != null && steps < MAXIMUM_DIRECTORY_SEARCH_DEPTH) {
-            val catalog = File(File(currentDirectory, "gradle"), "libs.versions.toml")
-            if (catalog.exists()) return catalog
-            currentDirectory = currentDirectory.parentFile
-            steps++
-        }
-        return null
-    }
+    private fun findNearestVersionCatalog(startDirectory: File): File? =
+        DirectoryFinder().findDirectory(startDirectory) { currentDirectory ->
+            val catalog = currentDirectory.versionCatalogFile()
+            catalog.exists()
+        }?.versionCatalogFile()
 
     private fun extractPluginsSection(toml: String): String? {
         val startIndex = toml.indexOf(PLUGINS_SECTION_MARKER)
@@ -131,4 +124,6 @@ class BasePackageResolver() {
             val id = match.groupValues[2].trim()
             alias to id
         }
+
+    private fun File.versionCatalogFile() = File(File(this, "gradle"), "libs.versions.toml")
 }
