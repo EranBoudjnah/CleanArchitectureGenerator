@@ -45,6 +45,10 @@ class DefaultGenerator : Generator {
                 }
             }.all { it }
 
+        if (allCreated) {
+            populateDataModule(featureRoot, featureNameLower)?.let { return it }
+        }
+
         return if (allCreated) {
             "Success!"
         } else {
@@ -52,8 +56,37 @@ class DefaultGenerator : Generator {
         }
     }
 
+    private fun populateDataModule(
+        featureRoot: File,
+        featureNameLower: String
+    ): String? {
+        val dataModuleDirectory = File(featureRoot, "data")
+        val dataBuildGradleFile = File(dataModuleDirectory, "build.gradle.kts")
+        if (!dataBuildGradleFile.exists()) {
+            val gradleScript = buildDataGradleScript(featureNameLower)
+            runCatching { dataBuildGradleFile.writeText(gradleScript) }
+                .onFailure { return "${ERROR_PREFIX}Failed to create data/build.gradle.kts: ${it.message}" }
+        }
+        return null
+    }
+
     private fun buildPackageDirectory(
         root: File,
         packageSegments: List<String>
     ): File = packageSegments.fold(root) { parent, segment -> File(parent, segment) }
+
+    private fun buildDataGradleScript(featureNameLowerCase: String): String =
+        """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.features.$featureNameLowerCase.domain)
+    implementation(projects.architecture.domain)
+
+    implementation(projects.datasource.architecture)
+    implementation(projects.datasource.source)
+}
+"""
 }
