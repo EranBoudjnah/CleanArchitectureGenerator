@@ -15,10 +15,8 @@ private const val PLACEHOLDER = "FEATURE_NAME"
 
 class CreateCleanArchitectureFeatureDialog(
     project: Project?,
-    defaultPrefix: String? = null
+    private val defaultPackagePrefix: String? = null
 ) : DialogWrapper(project) {
-    private val defaultPackagePrefix = defaultPrefix?.let { "${it}feature." }
-
     private val featureNameTextField = JBTextField()
     private val featurePackageTextField = JBTextField()
     private var lastFeatureName: String = PLACEHOLDER
@@ -37,7 +35,7 @@ class CreateCleanArchitectureFeatureDialog(
 
         (featureNameTextField.document as AbstractDocument).documentFilter =
             PredicateDocumentFilter { !it.isWhitespace() }
-        if (!defaultPrefix.isNullOrBlank()) {
+        if (!defaultPackagePrefix.isNullOrBlank()) {
             updateTemplatedPackageName()
         }
 
