@@ -1,5 +1,11 @@
 package com.mitteloupe.cag.core
 
+import com.mitteloupe.cag.core.content.buildDataGradleScript
+import com.mitteloupe.cag.core.content.buildDomainGradleScript
+import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
+import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
+import com.mitteloupe.cag.core.content.buildPresentationGradleScript
+import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
@@ -253,89 +259,6 @@ class DefaultGenerator : Generator {
             }
     }
 
-    private fun buildDataGradleScript(featureNameLowerCase: String): String =
-        """plugins {
-    id("project-java-library")
-    alias(libs.plugins.kotlin.jvm)
-}
-
-dependencies {
-    implementation(projects.features.$featureNameLowerCase.domain)
-    implementation(projects.architecture.domain)
-
-    implementation(projects.datasource.architecture)
-    implementation(projects.datasource.source)
-}
-"""
-
-    private fun buildPresentationGradleScript(featureNameLowerCase: String): String =
-        """plugins {
-    id("project-java-library")
-    alias(libs.plugins.kotlin.jvm)
-}
-
-dependencies {
-    implementation(projects.features.$featureNameLowerCase.domain)
-    implementation(projects.architecture.presentation)
-    implementation(projects.architecture.domain)
-}
-"""
-
-    private fun buildDomainGradleScript(): String =
-        """plugins {
-    id("project-java-library")
-    alias(libs.plugins.kotlin.jvm)
-}
-
-dependencies {
-    implementation(projects.architecture.domain)
-}
-"""
-
-    private fun buildUiGradleScript(
-        featurePackageName: String,
-        featureNameLowerCase: String
-    ): String =
-        """plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-}
-
-android {
-    namespace = "$featurePackageName.ui"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-dependencies {
-    implementation(projects.features.$featureNameLowerCase.presentation)
-    implementation(projects.architecture.ui)
-    implementation(projects.architecture.presentation)
-}
-"""
-
     private fun writeDomainUseCaseFile(
         featureRoot: File,
         projectNamespace: String,
@@ -356,26 +279,6 @@ dependencies {
         )
     }
 
-    private fun buildDomainUseCaseKotlinFile(
-        projectNamespace: String,
-        featurePackageName: String
-    ): String =
-        """package $featurePackageName.domain.usecase
-
-import ${projectNamespace}architecture.domain.usecase.UseCase
-import $featurePackageName.domain.repository.PerformExampleRepository
-
-class PerformActionUseCase(
-    private val performExampleRepository: PerformExampleRepository
-) : UseCase<Unit, Unit>(
-    coroutineContextProvider
-) {
-    override fun execute(input: Unit, onResult: (Unit) -> Unit) {
-        onResult(performExampleRepository.perform(input))
-    }
-}
-"""
-
     private fun writeDomainRepositoryInterface(
         featureRoot: File,
         featurePackageName: String
@@ -390,12 +293,4 @@ class PerformActionUseCase(
             content = content
         )
     }
-
-    private fun buildDomainRepositoryKotlinFile(featurePackageName: String): String =
-        """package $featurePackageName.domain.repository
-
-interface PerformExampleRepository {
-    fun perform(input: Unit): Unit
-}
-"""
 }
