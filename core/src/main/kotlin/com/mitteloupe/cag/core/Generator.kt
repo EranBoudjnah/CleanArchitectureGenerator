@@ -47,6 +47,7 @@ class DefaultGenerator : Generator {
 
         if (allCreated) {
             populateDomainModule(featureRoot)?.let { return it }
+            populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
         }
 
@@ -72,6 +73,16 @@ class DefaultGenerator : Generator {
             featureRoot = featureRoot,
             layer = "data",
             content = buildDataGradleScript(featureNameLowerCase)
+        )
+
+    private fun populatePresentationModule(
+        featureRoot: File,
+        featureNameLowerCase: String
+    ): String? =
+        writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            content = buildPresentationGradleScript(featureNameLowerCase)
         )
 
     private fun buildPackageDirectory(
@@ -105,6 +116,19 @@ dependencies {
 
     implementation(projects.datasource.architecture)
     implementation(projects.datasource.source)
+}
+"""
+
+    private fun buildPresentationGradleScript(featureNameLowerCase: String): String =
+        """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.features.$featureNameLowerCase.domain)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
 }
 """
 
