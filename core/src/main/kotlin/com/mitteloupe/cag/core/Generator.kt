@@ -6,6 +6,7 @@ import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
+import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
@@ -172,11 +173,6 @@ class DefaultGenerator : Generator {
             layer = "ui",
             content = buildUiGradleScript(featurePackageName, featureNameLowerCase)
         )
-
-    private fun buildPackageDirectory(
-        root: File,
-        packageSegments: List<String>
-    ): File = packageSegments.fold(root) { parent, segment -> File(parent, segment) }
 
     private fun writeGradleFileIfMissing(
         featureRoot: File,
