@@ -20,9 +20,10 @@ fun main(args: Array<String>) {
     println("Package: ${packageName ?: "<not found>" }")
     val generator = DefaultGenerator()
     val request =
-        GenerateFeatureRequestBuilder()
-            .featureName(featureName)
-            .featurePackageName(packageName)
+        GenerateFeatureRequestBuilder(
+            destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot,
+            featureName = featureName
+        ).featurePackageName(packageName)
             .build()
     val result = generator.generateFeature(request)
     println(result)

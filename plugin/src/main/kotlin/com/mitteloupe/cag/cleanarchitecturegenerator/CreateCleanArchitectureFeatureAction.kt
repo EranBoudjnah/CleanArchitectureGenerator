@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.DefaultGenerator
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
+import java.io.File
 
 class CreateCleanArchitectureFeatureAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
@@ -17,10 +18,12 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
             val generator = DefaultGenerator()
+            val moduleRootDir = IntellijProjectModel(event).selectedModuleRootDir()
             val request =
-                GenerateFeatureRequestBuilder()
-                    .featureName(featureName)
-                    .featurePackageName(featurePackageName)
+                GenerateFeatureRequestBuilder(
+                    destinationRootDir = moduleRootDir ?: File("."),
+                    featureName = featureName
+                ).featurePackageName(featurePackageName)
                     .build()
             val result = generator.generateFeature(request)
             Messages.showInfoMessage(
