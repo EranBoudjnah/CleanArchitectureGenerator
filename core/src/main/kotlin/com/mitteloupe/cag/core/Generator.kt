@@ -22,27 +22,38 @@ class DefaultGenerator : Generator {
 
         val featureNameLower = request.featureName.lowercase()
         val featureRoot = File(request.destinationRootDir, "features/$featureNameLower")
-        val sourceRoot = File(featureRoot, "src/main/java")
-        val destinationDirectory = pathSegments.fold(sourceRoot) { parent, segment -> File(parent, segment) }
 
-        if (destinationDirectory.exists()) {
+        if (featureRoot.exists()) {
             return ERROR_PREFIX +
-                if (destinationDirectory.isDirectory) {
+                if (featureRoot.isDirectory) {
                     "The feature directory already exists."
                 } else {
                     "A file with the feature name exists where the feature directory should be created."
                 }
         }
-        val createdOrExists =
-            if (destinationDirectory.exists()) {
-                destinationDirectory.isDirectory
-            } else {
-                destinationDirectory.mkdirs()
-            }
-        return if (createdOrExists) {
+
+        val layers = listOf("ui", "presentation", "domain", "data")
+
+        val allCreated =
+            layers.map { layerName ->
+                val layerSourceRoot = File(featureRoot, "$layerName/src/main/java")
+                val destinationDirectory = buildPackageDirectory(layerSourceRoot, pathSegments)
+                if (destinationDirectory.exists()) {
+                    destinationDirectory.isDirectory
+                } else {
+                    destinationDirectory.mkdirs()
+                }
+            }.all { it }
+
+        return if (allCreated) {
             "Success!"
         } else {
             "${ERROR_PREFIX}Failed to create directories for package '$packageName'."
         }
     }
+
+    private fun buildPackageDirectory(
+        root: File,
+        packageSegments: List<String>
+    ): File = packageSegments.fold(root) { parent, segment -> File(parent, segment) }
 }
