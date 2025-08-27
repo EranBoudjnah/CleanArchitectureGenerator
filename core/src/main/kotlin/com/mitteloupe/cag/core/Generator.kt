@@ -6,21 +6,33 @@ interface Generator {
     fun generateFeature(request: GenerateFeatureRequest): String
 }
 
+private const val ERROR_PREFIX = "Error: "
+
 class DefaultGenerator : Generator {
     override fun generateFeature(request: GenerateFeatureRequest): String {
         val packageName = request.featurePackageName?.trim()
         if (packageName.isNullOrEmpty()) {
-            return "Error: Feature package name is missing."
+            return "${ERROR_PREFIX}Feature package name is missing."
         }
 
         val pathSegments = packageName.split('.').filter { it.isNotBlank() }
         if (pathSegments.isEmpty()) {
-            return "Error: Feature package name is invalid."
+            return "${ERROR_PREFIX}Feature package name is invalid."
         }
 
-        val sourceRoot = resolveSourceRoot(request.destinationRootDir)
+        val featureNameLower = request.featureName.lowercase()
+        val featureRoot = File(request.destinationRootDir, "features/$featureNameLower")
+        val sourceRoot = File(featureRoot, "src/main/java")
         val destinationDirectory = pathSegments.fold(sourceRoot) { parent, segment -> File(parent, segment) }
 
+        if (destinationDirectory.exists()) {
+            return ERROR_PREFIX +
+                if (destinationDirectory.isDirectory) {
+                    "The feature directory already exists."
+                } else {
+                    "A file with the feature name exists where the feature directory should be created."
+                }
+        }
         val createdOrExists =
             if (destinationDirectory.exists()) {
                 destinationDirectory.isDirectory
@@ -30,15 +42,7 @@ class DefaultGenerator : Generator {
         return if (createdOrExists) {
             "Success!"
         } else {
-            "Error: Failed to create directories for package '$packageName'."
+            "${ERROR_PREFIX}Failed to create directories for package '$packageName'."
         }
-    }
-
-    private fun resolveSourceRoot(moduleRoot: File): File {
-        val kotlinDir = File(moduleRoot, "src/main/kotlin")
-        if (kotlinDir.exists()) return kotlinDir
-        val javaDir = File(moduleRoot, "src/main/java")
-        if (javaDir.exists()) return javaDir
-        return moduleRoot
     }
 }
