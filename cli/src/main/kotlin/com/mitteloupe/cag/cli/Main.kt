@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
     val request =
         GenerateFeatureRequestBuilder(
             destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot,
+            projectNamespace = basePackage ?: "com.unknown.app.",
             featureName = featureName
         ).featurePackageName(packageName)
             .build()

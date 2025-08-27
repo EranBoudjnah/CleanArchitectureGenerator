@@ -22,6 +22,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val request =
                 GenerateFeatureRequestBuilder(
                     destinationRootDir = projectRootDir ?: File("."),
+                    projectNamespace = defaultPrefix ?: "com.unknown.app.",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
                     .build()

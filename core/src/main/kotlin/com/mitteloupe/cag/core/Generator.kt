@@ -10,12 +10,12 @@ interface Generator {
 
 class DefaultGenerator : Generator {
     override fun generateFeature(request: GenerateFeatureRequest): String {
-        val packageName = request.featurePackageName?.trim()
-        if (packageName.isNullOrEmpty()) {
+        val featurePackageName = request.featurePackageName?.trim()
+        if (featurePackageName.isNullOrEmpty()) {
             return "${ERROR_PREFIX}Feature package name is missing."
         }
 
-        val pathSegments = packageName.split('.').filter { it.isNotBlank() }
+        val pathSegments = featurePackageName.split('.').filter { it.isNotBlank() }
         if (pathSegments.isEmpty()) {
             return "${ERROR_PREFIX}Feature package name is invalid."
         }
@@ -48,16 +48,21 @@ class DefaultGenerator : Generator {
 
         if (allCreated) {
             populateDomainModule(featureRoot)?.let { return it }
+            writeDomainUseCaseFile(
+                featureRoot = featureRoot,
+                projectNamespace = request.projectNamespace,
+                featurePackageName = featurePackageName
+            )?.let { return it }
             populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
-            populateUiModule(featureRoot, packageName, featureNameLowerCase)?.let { return it }
+            populateUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
             updateProjectSettingsIfPresent(request.destinationRootDir, featureNameLowerCase)?.let { return it }
         }
 
         return if (allCreated) {
             "Success!"
         } else {
-            "${ERROR_PREFIX}Failed to create directories for package '$packageName'."
+            "${ERROR_PREFIX}Failed to create directories for package '$featurePackageName'."
         }
     }
 
@@ -323,6 +328,59 @@ dependencies {
     implementation(projects.features.$featureNameLowerCase.presentation)
     implementation(projects.architecture.ui)
     implementation(projects.architecture.presentation)
+}
+"""
+
+    private fun writeDomainUseCaseFile(
+        featureRoot: File,
+        projectNamespace: String,
+        featurePackageName: String
+    ): String? {
+        val domainSourceRoot = File(featureRoot, "domain/src/main/java")
+        val packageSegments =
+            featurePackageName.split('.')
+                .filter { it.isNotBlank() }
+        val basePackageDirectory = buildPackageDirectory(domainSourceRoot, packageSegments)
+        val useCaseDirectory = File(File(basePackageDirectory, "domain"), "usecase")
+        if (!useCaseDirectory.exists()) {
+            val created = runCatching { useCaseDirectory.mkdirs() }.getOrElse { false }
+            if (!created) {
+                return "${ERROR_PREFIX}Failed to create domain use case directory."
+            }
+        }
+
+        val useCaseFile = File(useCaseDirectory, "PerformActionUseCase.kt")
+        if (!useCaseFile.exists()) {
+            val content =
+                buildDomainUseCaseKotlinFile(
+                    projectNamespace = projectNamespace,
+                    featurePackageName = featurePackageName
+                )
+            runCatching { useCaseFile.writeText(content) }
+                .onFailure {
+                    return "${ERROR_PREFIX}Failed to create domain use case file: ${it.message}"
+                }
+        }
+        return null
+    }
+
+    private fun buildDomainUseCaseKotlinFile(
+        projectNamespace: String,
+        featurePackageName: String
+    ): String =
+        """package $featurePackageName.domain.usecase
+
+import ${projectNamespace}architecture.domain.usecase.UseCase
+import $featurePackageName.domain.repository.PerformExampleRepository
+
+class PerformActionUseCase(
+    private val performExampleRepository: PerformExampleRepository
+) : UseCase<Unit, Unit>(
+    coroutineContextProvider
+) {
+    override fun execute(input: Unit, onResult: (Unit) -> Unit) {
+        onResult(Unit)
+    }
 }
 """
 }
