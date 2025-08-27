@@ -48,6 +48,10 @@ class DefaultGenerator : Generator {
 
         if (allCreated) {
             populateDomainModule(featureRoot)?.let { return it }
+            writeDomainRepositoryInterface(
+                featureRoot = featureRoot,
+                featurePackageName = featurePackageName
+            )?.let { return it }
             writeDomainUseCaseFile(
                 featureRoot = featureRoot,
                 projectNamespace = request.projectNamespace,
@@ -379,8 +383,44 @@ class PerformActionUseCase(
     coroutineContextProvider
 ) {
     override fun execute(input: Unit, onResult: (Unit) -> Unit) {
-        onResult(Unit)
+        onResult(performExampleRepository.perform(input))
     }
+}
+"""
+
+    private fun writeDomainRepositoryInterface(
+        featureRoot: File,
+        featurePackageName: String
+    ): String? {
+        val domainSourceRoot = File(featureRoot, "domain/src/main/java")
+        val packageSegments =
+            featurePackageName.split('.')
+                .filter { it.isNotBlank() }
+        val basePackageDirectory = buildPackageDirectory(domainSourceRoot, packageSegments)
+        val repositoryDirectory = File(File(basePackageDirectory, "domain"), "repository")
+        if (!repositoryDirectory.exists()) {
+            val created = runCatching { repositoryDirectory.mkdirs() }.getOrElse { false }
+            if (!created) {
+                return "${ERROR_PREFIX}Failed to create domain repository directory."
+            }
+        }
+
+        val repositoryFile = File(repositoryDirectory, "PerformExampleRepository.kt")
+        if (!repositoryFile.exists()) {
+            val content = buildDomainRepositoryKotlinFile(featurePackageName)
+            runCatching { repositoryFile.writeText(content) }
+                .onFailure {
+                    return "${ERROR_PREFIX}Failed to create domain repository file: ${it.message}"
+                }
+        }
+        return null
+    }
+
+    private fun buildDomainRepositoryKotlinFile(featurePackageName: String): String =
+        """package $featurePackageName.domain.repository
+
+interface PerformExampleRepository {
+    fun perform(input: Unit): Unit
 }
 """
 }
