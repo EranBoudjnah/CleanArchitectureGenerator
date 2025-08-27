@@ -20,8 +20,8 @@ class DefaultGenerator : Generator {
             return "${ERROR_PREFIX}Feature package name is invalid."
         }
 
-        val featureNameLower = request.featureName.lowercase()
-        val featureRoot = File(request.destinationRootDir, "features/$featureNameLower")
+        val featureNameLowerCase = request.featureName.lowercase()
+        val featureRoot = File(request.destinationRootDir, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
             return ERROR_PREFIX +
@@ -46,7 +46,8 @@ class DefaultGenerator : Generator {
             }.all { it }
 
         if (allCreated) {
-            populateDataModule(featureRoot, featureNameLower)?.let { return it }
+            populateDomainModule(featureRoot)?.let { return it }
+            populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
         }
 
         return if (allCreated) {
@@ -56,24 +57,41 @@ class DefaultGenerator : Generator {
         }
     }
 
+    private fun populateDomainModule(featureRoot: File): String? =
+        writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = "domain",
+            content = buildDomainGradleScript()
+        )
+
     private fun populateDataModule(
         featureRoot: File,
-        featureNameLower: String
-    ): String? {
-        val dataModuleDirectory = File(featureRoot, "data")
-        val dataBuildGradleFile = File(dataModuleDirectory, "build.gradle.kts")
-        if (!dataBuildGradleFile.exists()) {
-            val gradleScript = buildDataGradleScript(featureNameLower)
-            runCatching { dataBuildGradleFile.writeText(gradleScript) }
-                .onFailure { return "${ERROR_PREFIX}Failed to create data/build.gradle.kts: ${it.message}" }
-        }
-        return null
-    }
+        featureNameLowerCase: String
+    ): String? =
+        writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = "data",
+            content = buildDataGradleScript(featureNameLowerCase)
+        )
 
     private fun buildPackageDirectory(
         root: File,
         packageSegments: List<String>
     ): File = packageSegments.fold(root) { parent, segment -> File(parent, segment) }
+
+    private fun writeGradleFileIfMissing(
+        featureRoot: File,
+        layer: String,
+        content: String
+    ): String? {
+        val moduleDirectory = File(featureRoot, layer)
+        val buildGradleFile = File(moduleDirectory, "build.gradle.kts")
+        if (!buildGradleFile.exists()) {
+            runCatching { buildGradleFile.writeText(content) }
+                .onFailure { return "${ERROR_PREFIX}Failed to create $layer/build.gradle.kts: ${it.message}" }
+        }
+        return null
+    }
 
     private fun buildDataGradleScript(featureNameLowerCase: String): String =
         """plugins {
@@ -87,6 +105,17 @@ dependencies {
 
     implementation(projects.datasource.architecture)
     implementation(projects.datasource.source)
+}
+"""
+
+    private fun buildDomainGradleScript(): String =
+        """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.architecture.domain)
 }
 """
 }
