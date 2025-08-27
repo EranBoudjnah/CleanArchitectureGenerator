@@ -49,6 +49,7 @@ class DefaultGenerator : Generator {
             populateDomainModule(featureRoot)?.let { return it }
             populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
+            populateUiModule(featureRoot, packageName, featureNameLowerCase)?.let { return it }
         }
 
         return if (allCreated) {
@@ -83,6 +84,17 @@ class DefaultGenerator : Generator {
             featureRoot = featureRoot,
             layer = "presentation",
             content = buildPresentationGradleScript(featureNameLowerCase)
+        )
+
+    private fun populateUiModule(
+        featureRoot: File,
+        featurePackageName: String,
+        featureNameLowerCase: String
+    ): String? =
+        writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = "ui",
+            content = buildUiGradleScript(featurePackageName, featureNameLowerCase)
         )
 
     private fun buildPackageDirectory(
@@ -140,6 +152,50 @@ dependencies {
 
 dependencies {
     implementation(projects.architecture.domain)
+}
+"""
+
+    private fun buildUiGradleScript(
+        featurePackageName: String,
+        featureNameLowerCase: String
+    ): String =
+        """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "$featurePackageName.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation(projects.features.$featureNameLowerCase.presentation)
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
 }
 """
 }
