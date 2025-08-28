@@ -41,3 +41,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 /local.properties
+
+# Local IDE caches
+.intellijPlatform/
+.kotlin/
