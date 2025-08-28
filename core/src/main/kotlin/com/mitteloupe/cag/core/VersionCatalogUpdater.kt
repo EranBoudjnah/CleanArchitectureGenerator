@@ -79,25 +79,20 @@ class VersionCatalogUpdater() {
             when (sectionTransaction.insertPositionIfMissing) {
                 InsertPosition.START -> {
                     updatedLines.addAll(0, linesToAdd + "")
-                    // Collapse multiple empty lines immediately following the newly added section to a single one
-                    val afterIndex = linesToAdd.size
-                    var i = afterIndex + 1
-                    while (i < updatedLines.size && updatedLines[i].isEmpty()) {
-                        updatedLines.removeAt(i)
+                    val blankLineIndex = linesToAdd.size + 1
+                    while (blankLineIndex < updatedLines.size && updatedLines[blankLineIndex].isEmpty()) {
+                        updatedLines.removeAt(blankLineIndex)
                     }
                 }
                 InsertPosition.END -> {
                     if (updatedLines.isNotEmpty() && updatedLines.last().isNotEmpty()) {
-                        // Ensure a single blank line between the previous section and this new one
                         updatedLines.add("")
                     }
                     updatedLines.addAll(linesToAdd)
-                    // Ensure exactly one empty line after the newly added section
                     if (updatedLines.isNotEmpty()) {
                         if (updatedLines.last().isNotEmpty()) {
                             updatedLines.add("")
                         } else {
-                            // Collapse multiple trailing empty lines to a single one
                             while (updatedLines.size >= 2 && updatedLines[updatedLines.lastIndex - 1].isEmpty()) {
                                 updatedLines.removeAt(updatedLines.lastIndex)
                             }
@@ -107,23 +102,20 @@ class VersionCatalogUpdater() {
             }
         } else {
             val (start, endExclusive) = sectionBounds
-            // Insert new entries just before any trailing blank lines that precede the next section header
             var insertionIndex = endExclusive
             while (insertionIndex - 1 > start && updatedLines[insertionIndex - 1].isEmpty()) {
                 insertionIndex--
             }
             updatedLines.addAll(insertionIndex, linesToAdd)
 
-            // Ensure there is exactly one empty line separating the section from the next header/content
-            val afterIndex = insertionIndex + linesToAdd.size
-            if (afterIndex < updatedLines.size) {
-                if (updatedLines[afterIndex].isNotEmpty()) {
-                    updatedLines.add(afterIndex, "")
+            val afterInsertionIndex = insertionIndex + linesToAdd.size
+            if (afterInsertionIndex < updatedLines.size) {
+                if (updatedLines[afterInsertionIndex].isNotEmpty()) {
+                    updatedLines.add(afterInsertionIndex, "")
                 } else {
-                    // Collapse multiple empty lines to a single one
-                    var i = afterIndex + 1
-                    while (i < updatedLines.size && updatedLines[i].isEmpty()) {
-                        updatedLines.removeAt(i)
+                    val blankLineIndex = afterInsertionIndex + 1
+                    while (blankLineIndex < updatedLines.size && updatedLines[blankLineIndex].isEmpty()) {
+                        updatedLines.removeAt(blankLineIndex)
                     }
                 }
             }
