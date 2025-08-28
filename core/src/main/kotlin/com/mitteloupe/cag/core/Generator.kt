@@ -12,6 +12,7 @@ import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
 import com.mitteloupe.cag.core.generation.SectionRequirement
 import com.mitteloupe.cag.core.generation.SectionTransaction
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
+import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
 import com.mitteloupe.cag.core.generation.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
@@ -96,6 +97,11 @@ class Generator {
                     featureName = request.featureName
                 )?.let { return it }
             createUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
+            UiLayerContentGenerator()
+                .generate(
+                    featureRoot = featureRoot,
+                    featurePackageName = featurePackageName
+                )?.let { return it }
             SettingsFileUpdater().updateProjectSettingsIfPresent(
                 request.destinationRootDir,
                 featureNameLowerCase
