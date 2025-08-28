@@ -12,12 +12,8 @@ import java.io.File
 
 const val ERROR_PREFIX = "Error: "
 
-interface Generator {
-    fun generateFeature(request: GenerateFeatureRequest): String
-}
-
-class DefaultGenerator : Generator {
-    override fun generateFeature(request: GenerateFeatureRequest): String {
+class Generator {
+    fun generateFeature(request: GenerateFeatureRequest): String {
         val featurePackageName = request.featurePackageName?.trim()
         if (featurePackageName.isNullOrEmpty()) {
             return "${ERROR_PREFIX}Feature package name is missing."

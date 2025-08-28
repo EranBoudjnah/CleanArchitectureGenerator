@@ -4,8 +4,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.core.BasePackageResolver
-import com.mitteloupe.cag.core.DefaultGenerator
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
+import com.mitteloupe.cag.core.Generator
 import java.io.File
 
 class CreateCleanArchitectureFeatureAction : AnAction() {
@@ -17,7 +17,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
-            val generator = DefaultGenerator()
+            val generator = Generator()
             val projectRootDir = event.project?.basePath?.let { File(it) }
             val request =
                 GenerateFeatureRequestBuilder(

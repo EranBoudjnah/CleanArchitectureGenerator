@@ -1,9 +1,9 @@
 package com.mitteloupe.cag.cli
 
 import com.mitteloupe.cag.core.BasePackageResolver
-import com.mitteloupe.cag.core.DefaultGenerator
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
+import com.mitteloupe.cag.core.Generator
 import java.io.File
 import java.nio.file.Paths
 
@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
             "$basePackage${featureName.lowercase()}"
         }
     println("Package: ${packageName ?: "<not found>" }")
-    val generator = DefaultGenerator()
+    val generator = Generator()
     val request =
         GenerateFeatureRequestBuilder(
             destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot,
