@@ -1,5 +1,6 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.ERROR_PREFIX
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File

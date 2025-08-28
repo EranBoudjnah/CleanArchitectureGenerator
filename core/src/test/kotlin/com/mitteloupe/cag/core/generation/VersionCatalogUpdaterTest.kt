@@ -1,8 +1,8 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertNull
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -29,7 +29,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
+        Assert.assertNull(result)
     }
 
     @Test
@@ -72,8 +72,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), equalTo(expected))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -121,8 +121,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), equalTo(expected))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -172,8 +172,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), equalTo(expected))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -225,8 +225,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), equalTo(expected))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -279,8 +279,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), equalTo(expected))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     private fun createProjectWithCatalog(initialContent: String): Pair<File, File> {

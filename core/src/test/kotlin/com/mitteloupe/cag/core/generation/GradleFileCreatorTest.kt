@@ -1,12 +1,9 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.startsWith
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import com.mitteloupe.cag.core.ERROR_PREFIX
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -39,8 +36,8 @@ class GradleFileCreatorTest {
         val targetFile = File(moduleDir, "build.gradle.kts")
 
         // Then
-        assertNull(result)
-        assertEquals(givenContent, targetFile.readText())
+        Assert.assertNull(result)
+        Assert.assertEquals(givenContent, targetFile.readText())
     }
 
     @Test
@@ -61,11 +58,11 @@ class GradleFileCreatorTest {
         val targetFile = File(moduleDir, "build.gradle.kts")
 
         // Then
-        assertNotNull(result)
+        Assert.assertNotNull(result)
         checkNotNull(result)
-        assertThat(result, startsWith(ERROR_PREFIX))
-        assertThat(result, containsString("$givenLayer/build.gradle.kts"))
-        assertFalse(targetFile.exists())
+        MatcherAssert.assertThat(result, CoreMatchers.startsWith(ERROR_PREFIX))
+        MatcherAssert.assertThat(result, CoreMatchers.containsString("$givenLayer/build.gradle.kts"))
+        Assert.assertFalse(targetFile.exists())
     }
 
     @Test
@@ -89,7 +86,7 @@ class GradleFileCreatorTest {
             )
 
         // Then
-        assertNull(result)
-        assertEquals(initialContent, targetFile.readText())
+        Assert.assertNull(result)
+        Assert.assertEquals(initialContent, targetFile.readText())
     }
 }

@@ -1,5 +1,6 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.ERROR_PREFIX
 import java.io.File
 
 class GradleFileCreator {

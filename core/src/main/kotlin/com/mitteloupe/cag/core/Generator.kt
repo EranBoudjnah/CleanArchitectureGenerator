@@ -6,6 +6,13 @@ import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
+import com.mitteloupe.cag.core.generation.CatalogInsertPosition
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.KotlinFileCreator
+import com.mitteloupe.cag.core.generation.SectionRequirement
+import com.mitteloupe.cag.core.generation.SectionTransaction
+import com.mitteloupe.cag.core.generation.SettingsFileUpdater
+import com.mitteloupe.cag.core.generation.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File

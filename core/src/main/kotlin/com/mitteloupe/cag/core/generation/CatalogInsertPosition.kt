@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
 sealed interface CatalogInsertPosition {
     fun insertAtMissingSection(

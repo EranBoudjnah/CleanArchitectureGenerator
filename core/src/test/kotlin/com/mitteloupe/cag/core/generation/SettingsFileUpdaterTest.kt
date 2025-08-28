@@ -1,9 +1,8 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.generation
 
-import org.hamcrest.CoreMatchers.endsWith
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -30,7 +29,7 @@ class SettingsFileUpdaterTest {
             )
 
         // Then
-        assertNull(result)
+        Assert.assertNull(result)
     }
 
     @Test
@@ -58,8 +57,8 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
-        assertThat(content, endsWith("\n$expectedTail\n"))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(content, CoreMatchers.endsWith("\n$expectedTail\n"))
     }
 
     @Test
@@ -88,8 +87,8 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
-        assertEquals(expectedNewlineBeforeIncludes, content)
+        Assert.assertNull(result)
+        Assert.assertEquals(expectedNewlineBeforeIncludes, content)
     }
 
     @Test
@@ -115,8 +114,8 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
-        assertEquals(initial, content)
+        Assert.assertNull(result)
+        Assert.assertEquals(initial, content)
     }
 
     @Test
@@ -144,8 +143,8 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle").readText()
 
         // Then
-        assertNull(result)
-        assertThat(content, endsWith("\n$expectedTail\n"))
+        Assert.assertNull(result)
+        MatcherAssert.assertThat(content, CoreMatchers.endsWith("\n$expectedTail\n"))
     }
 
     private fun createProjectWithKotlinSettings(initialContent: String): Pair<File, File> {
