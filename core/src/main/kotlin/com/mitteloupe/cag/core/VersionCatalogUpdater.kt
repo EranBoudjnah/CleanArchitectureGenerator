@@ -46,7 +46,7 @@ class VersionCatalogUpdater() {
             ensureSectionEntries(currentLines, sectionTransaction)
         }.joinToString("\n")
 
-    fun ensureSectionEntries(
+    private fun ensureSectionEntries(
         catalogContentLines: List<String>,
         sectionTransaction: SectionTransaction
     ): List<String> {
