@@ -68,7 +68,10 @@ class DefaultGenerator : Generator {
             populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
-            updateProjectSettingsIfPresent(request.destinationRootDir, featureNameLowerCase)?.let { return it }
+            SettingsFileUpdater().updateProjectSettingsIfPresent(
+                request.destinationRootDir,
+                featureNameLowerCase
+            )?.let { return it }
         }
 
         return if (allCreated) {
@@ -186,73 +189,6 @@ class DefaultGenerator : Generator {
                 .onFailure { return "${ERROR_PREFIX}Failed to create $layer/build.gradle.kts: ${it.message}" }
         }
         return null
-    }
-
-    private fun updateProjectSettingsIfPresent(
-        startDirectory: File,
-        featureNameLowerCase: String
-    ): String? {
-        val projectRoot =
-            DirectoryFinder()
-                .findDirectory(startDirectory) { currentDirectory ->
-                    File(currentDirectory, "settings.gradle.kts").exists() ||
-                        File(currentDirectory, "settings.gradle").exists()
-                }
-                ?: return null
-
-        val ktsFile = File(projectRoot, "settings.gradle.kts")
-        val groovyFile = File(projectRoot, "settings.gradle")
-
-        val settingsFile =
-            when {
-                ktsFile.exists() -> ktsFile
-                groovyFile.exists() -> groovyFile
-                else -> null
-            }
-                ?: return null
-
-        return updateSettingsFile(settingsFile, featureNameLowerCase)
-    }
-
-    private fun updateSettingsFile(
-        settingsFile: File,
-        featureNameLowerCase: String
-    ): String? {
-        val original =
-            runCatching { settingsFile.readText() }
-                .getOrElse {
-                    return "${ERROR_PREFIX}Failed to read ${settingsFile.name}: ${it.message}"
-                }
-
-        val modulePaths =
-            listOf("ui", "presentation", "domain", "data")
-                .map { layer -> ":features:$featureNameLowerCase:$layer" }
-
-        val missingIncludes =
-            modulePaths.filterNot { path ->
-                original.contains("include(\"$path\")") || original.contains("include '$path'")
-            }
-
-        if (missingIncludes.isEmpty()) return null
-
-        val toAppend =
-            buildString {
-                if (!original.endsWith("\n")) {
-                    append('\n')
-                }
-                missingIncludes.forEach { path ->
-                    append("include(\"$path\")\n")
-                }
-            }
-
-        val updated =
-            original + toAppend
-
-        return runCatching { settingsFile.writeText(updated) }
-            .exceptionOrNull()
-            ?.let {
-                "${ERROR_PREFIX}Failed to update ${settingsFile.name}: ${it.message}"
-            }
     }
 
     private fun writeDomainUseCaseFile(
