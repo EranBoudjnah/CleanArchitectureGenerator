@@ -31,12 +31,12 @@ class Generator {
                 listOf(
                     SectionTransaction(
                         sectionHeader = "versions",
-                        insertPositionIfMissing = InsertPosition.START,
+                        insertPositionIfMissing = CatalogInsertPosition.Start,
                         requirements = versionCatalogVersionRequirements()
                     ),
                     SectionTransaction(
                         sectionHeader = "plugins",
-                        insertPositionIfMissing = InsertPosition.END,
+                        insertPositionIfMissing = CatalogInsertPosition.End,
                         requirements = versionCatalogPluginRequirements()
                     )
                 )

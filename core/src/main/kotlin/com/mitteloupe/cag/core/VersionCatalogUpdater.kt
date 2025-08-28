@@ -5,13 +5,11 @@ import kotlin.text.trim
 
 data class SectionTransaction(
     val sectionHeader: String,
-    val insertPositionIfMissing: InsertPosition,
+    val insertPositionIfMissing: CatalogInsertPosition,
     val requirements: List<SectionRequirement>
 )
 
 data class SectionRequirement(val keyRegex: Regex, val lineToAdd: String)
-
-enum class InsertPosition { START, END }
 
 class VersionCatalogUpdater() {
     fun updateVersionCatalogIfPresent(
@@ -67,7 +65,9 @@ class VersionCatalogUpdater() {
                 if (needToAddSection) add("[${sectionTransaction.sectionHeader}]")
                 for (req in sectionTransaction.requirements) {
                     val exists = !needToAddSection && updatedLines.hasKeyInRange(req.keyRegex, sectionLinesRange)
-                    if (!exists) add(req.lineToAdd)
+                    if (!exists) {
+                        add(req.lineToAdd)
+                    }
                 }
             }
 
@@ -76,29 +76,10 @@ class VersionCatalogUpdater() {
         }
 
         if (needToAddSection) {
-            when (sectionTransaction.insertPositionIfMissing) {
-                InsertPosition.START -> {
-                    updatedLines.addAll(0, linesToAdd + "")
-                    val blankLineIndex = linesToAdd.size + 1
-                    while (blankLineIndex < updatedLines.size && updatedLines[blankLineIndex].isEmpty()) {
-                        updatedLines.removeAt(blankLineIndex)
-                    }
-                }
-                InsertPosition.END -> {
-                    if (updatedLines.isNotEmpty() && updatedLines.last().isNotEmpty()) {
-                        updatedLines.add("")
-                    }
-                    updatedLines.addAll(linesToAdd)
-                    if (updatedLines.isNotEmpty()) {
-                        if (updatedLines.last().isNotEmpty()) {
-                            updatedLines.add("")
-                        } else {
-                            while (updatedLines.size >= 2 && updatedLines[updatedLines.lastIndex - 1].isEmpty()) {
-                                updatedLines.removeAt(updatedLines.lastIndex)
-                            }
-                        }
-                    }
-                }
+            val modifiedLines = sectionTransaction.insertPositionIfMissing.insertAtMissingSection(updatedLines, linesToAdd)
+            if (modifiedLines != updatedLines) {
+                updatedLines.clear()
+                updatedLines.addAll(modifiedLines)
             }
         } else {
             val (start, endExclusive) = sectionBounds

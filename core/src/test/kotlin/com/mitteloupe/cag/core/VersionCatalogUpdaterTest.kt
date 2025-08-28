@@ -46,7 +46,7 @@ class VersionCatalogUpdaterTest {
         val section =
             SectionTransaction(
                 sectionHeader = "versions",
-                insertPositionIfMissing = InsertPosition.START,
+                insertPositionIfMissing = CatalogInsertPosition.Start,
                 requirements =
                     listOf(
                         SectionRequirement("^\\s*compileSdk\\s*=.*$".toRegex(), "compileSdk = \"35\""),
@@ -95,7 +95,7 @@ class VersionCatalogUpdaterTest {
         val section =
             SectionTransaction(
                 sectionHeader = "versions",
-                insertPositionIfMissing = InsertPosition.START,
+                insertPositionIfMissing = CatalogInsertPosition.Start,
                 requirements =
                     listOf(
                         SectionRequirement("^\\s*compileSdk\\s*=.*$".toRegex(), "compileSdk = \"35\""),
@@ -140,7 +140,7 @@ class VersionCatalogUpdaterTest {
         val section =
             SectionTransaction(
                 sectionHeader = "plugins",
-                insertPositionIfMissing = InsertPosition.END,
+                insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
                         SectionRequirement(
@@ -193,7 +193,7 @@ class VersionCatalogUpdaterTest {
         val section =
             SectionTransaction(
                 sectionHeader = "plugins",
-                insertPositionIfMissing = InsertPosition.END,
+                insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
                         SectionRequirement(
@@ -247,7 +247,7 @@ class VersionCatalogUpdaterTest {
         val section =
             SectionTransaction(
                 sectionHeader = "plugins",
-                insertPositionIfMissing = InsertPosition.END,
+                insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
                         SectionRequirement(
