@@ -1,7 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.content.buildPresentationMapperKotlinFile
+import com.mitteloupe.cag.core.content.buildDomainToPresentationMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationModelKotlinFile
+import com.mitteloupe.cag.core.content.buildPresentationToDomainMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewStateKotlinFile
 import java.io.File
 
@@ -14,7 +15,8 @@ class PresentationLayerContentGenerator(
         featureName: String
     ): String? {
         writePresentationModelFile(featureRoot, featurePackageName)?.let { return it }
-        writePresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
+        writeDomainToPresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
+        writePresentationToDomainMapperFile(featureRoot, featurePackageName)?.let { return it }
         return writePresentationViewState(featureRoot, featurePackageName, featureName)
     }
 
@@ -50,7 +52,7 @@ class PresentationLayerContentGenerator(
                 buildPresentationModelKotlinFile(featurePackageName)
         )
 
-    private fun writePresentationMapperFile(
+    private fun writeDomainToPresentationMapperFile(
         featureRoot: File,
         featurePackageName: String
     ): String? =
@@ -60,6 +62,19 @@ class PresentationLayerContentGenerator(
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
             fileName = "StubDomainToPresentationMapper.kt",
-            content = buildPresentationMapperKotlinFile(featurePackageName)
+            content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
+        )
+
+    private fun writePresentationToDomainMapperFile(
+        featureRoot: File,
+        featurePackageName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "mapper",
+            fileName = "StubDomainToPresentationMapper.kt",
+            content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
         )
 }
