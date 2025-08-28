@@ -1,7 +1,9 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.content.buildPresentationToUiMapperKotlinFile
+import com.mitteloupe.cag.core.content.buildUiDiKotlinFile
 import com.mitteloupe.cag.core.content.buildUiModelKotlinFile
+import com.mitteloupe.cag.core.content.capitalized
 import java.io.File
 
 class UiLayerContentGenerator(
@@ -9,10 +11,13 @@ class UiLayerContentGenerator(
 ) {
     fun generate(
         featureRoot: File,
-        featurePackageName: String
+        projectNamespace: String,
+        featurePackageName: String,
+        featureName: String
     ): String? {
         writeUiModelFile(featureRoot, featurePackageName)?.let { return it }
-        return writePresentationToUiMapperFile(featureRoot, featurePackageName)
+        writePresentationToUiMapperFile(featureRoot, featurePackageName)?.let { return it }
+        return writeUiDiFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
     private fun writeUiModelFile(
@@ -39,5 +44,20 @@ class UiLayerContentGenerator(
             relativePackageSubPath = "mapper",
             fileName = "StubUiMapper.kt",
             content = buildPresentationToUiMapperKotlinFile(featurePackageName)
+        )
+
+    private fun writeUiDiFile(
+        featureRoot: File,
+        projectNamespace: String,
+        featurePackageName: String,
+        featureName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "ui",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "di",
+            fileName = "${featureName.capitalized}Dependencies.kt",
+            content = buildUiDiKotlinFile(projectNamespace, featurePackageName, featureName)
         )
 }

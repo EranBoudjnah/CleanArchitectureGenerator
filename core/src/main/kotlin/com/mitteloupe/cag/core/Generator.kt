@@ -100,7 +100,9 @@ class Generator {
             UiLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
-                    featurePackageName = featurePackageName
+                    projectNamespace = request.projectNamespace,
+                    featurePackageName = featurePackageName,
+                    featureName = request.featureName
                 )?.let { return it }
             SettingsFileUpdater().updateProjectSettingsIfPresent(
                 request.destinationRootDir,
