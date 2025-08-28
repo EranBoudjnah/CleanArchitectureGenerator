@@ -71,16 +71,16 @@ class Generator {
             }.all { it }
 
         if (allCreated) {
-            populateDomainModule(featureRoot)?.let { return it }
+            createDomainModule(featureRoot)?.let { return it }
             DomainLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
                 )?.let { return it }
-            populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
-            populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
-            populateUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
+            createPresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
+            createDataModule(featureRoot, featureNameLowerCase)?.let { return it }
+            createUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
             SettingsFileUpdater().updateProjectSettingsIfPresent(
                 request.destinationRootDir,
                 featureNameLowerCase
@@ -117,14 +117,14 @@ class Generator {
             )
         )
 
-    private fun populateDomainModule(featureRoot: File): String? =
+    private fun createDomainModule(featureRoot: File): String? =
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "domain",
             content = buildDomainGradleScript()
         )
 
-    private fun populateDataModule(
+    private fun createDataModule(
         featureRoot: File,
         featureNameLowerCase: String
     ): String? =
@@ -134,7 +134,7 @@ class Generator {
             content = buildDataGradleScript(featureNameLowerCase)
         )
 
-    private fun populatePresentationModule(
+    private fun createPresentationModule(
         featureRoot: File,
         featureNameLowerCase: String
     ): String? =
@@ -144,7 +144,7 @@ class Generator {
             content = buildPresentationGradleScript(featureNameLowerCase)
         )
 
-    private fun populateUiModule(
+    private fun createUiModule(
         featureRoot: File,
         featurePackageName: String,
         featureNameLowerCase: String
