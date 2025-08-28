@@ -12,7 +12,7 @@ import $featurePackageName.domain.repository.PerformExampleRepository
 
 class PerformActionUseCase(
     private val performExampleRepository: PerformExampleRepository
-) : UseCase<Unit, Unit> {
+) : UseCase<$DOMAIN_MODEL_NAME, $DOMAIN_MODEL_NAME> {
     override fun execute(input: $DOMAIN_MODEL_NAME, onResult: ($DOMAIN_MODEL_NAME) -> Unit) {
         onResult(performExampleRepository.perform(input))
     }
