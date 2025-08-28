@@ -2,6 +2,7 @@ package com.mitteloupe.cag.core
 
 import com.mitteloupe.cag.core.content.buildDataGradleScript
 import com.mitteloupe.cag.core.content.buildDomainGradleScript
+import com.mitteloupe.cag.core.content.buildDomainModelKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
@@ -74,6 +75,10 @@ class Generator {
 
         if (allCreated) {
             populateDomainModule(featureRoot)?.let { return it }
+            writeDomainModelFile(
+                featureRoot = featureRoot,
+                featurePackageName = featurePackageName
+            )?.let { return it }
             writeDomainRepositoryInterface(
                 featureRoot = featureRoot,
                 featurePackageName = featurePackageName
@@ -191,6 +196,21 @@ class Generator {
             featurePackageName = featurePackageName,
             relativePackageSubPath = "repository",
             fileName = "PerformExampleRepository.kt",
+            content = content
+        )
+    }
+
+    private fun writeDomainModelFile(
+        featureRoot: File,
+        featurePackageName: String
+    ): String? {
+        val content = buildDomainModelKotlinFile(featurePackageName)
+        return KotlinFileCreator().writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "domain",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "model",
+            fileName = "StubDomainModel.kt",
             content = content
         )
     }

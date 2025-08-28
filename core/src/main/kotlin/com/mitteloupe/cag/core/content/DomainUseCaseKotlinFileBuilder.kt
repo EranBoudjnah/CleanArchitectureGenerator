@@ -7,6 +7,7 @@ fun buildDomainUseCaseKotlinFile(
     """package $featurePackageName.domain.usecase
 
 import ${projectNamespace}architecture.domain.usecase.UseCase
+import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME
 import $featurePackageName.domain.repository.PerformExampleRepository
 
 class PerformActionUseCase(
@@ -14,7 +15,7 @@ class PerformActionUseCase(
 ) : UseCase<Unit, Unit>(
     coroutineContextProvider
 ) {
-    override fun execute(input: Unit, onResult: (Unit) -> Unit) {
+    override fun execute(input: $DOMAIN_MODEL_NAME, onResult: ($DOMAIN_MODEL_NAME) -> Unit) {
         onResult(performExampleRepository.perform(input))
     }
 }
