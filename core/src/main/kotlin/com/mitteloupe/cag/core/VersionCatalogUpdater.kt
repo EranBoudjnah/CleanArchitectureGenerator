@@ -1,22 +1,58 @@
 package com.mitteloupe.cag.core
 
+import java.io.File
 import kotlin.text.trim
+
+data class SectionTransaction(
+    val sectionHeader: String,
+    val insertPositionIfMissing: InsertPosition,
+    val requirements: List<SectionRequirement>
+)
 
 data class SectionRequirement(val keyRegex: Regex, val lineToAdd: String)
 
 enum class InsertPosition { START, END }
 
-class VersionCatalogUpdater(catalogContent: String) {
-    private val lines = catalogContent.split('\n').toMutableList()
+class VersionCatalogUpdater() {
+    fun updateVersionCatalogIfPresent(
+        projectRootDir: File,
+        sectionRequirements: List<SectionTransaction>
+    ): String? {
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        if (!catalogFile.exists()) {
+            return null
+        }
 
-    fun asString() = lines.joinToString("\n")
+        val catalogContent =
+            runCatching { catalogFile.readText() }
+                .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
+        val catalogContentLines = catalogContent.split('\n').toMutableList()
+
+        val updatedContent = updateCatalogText(catalogContentLines, sectionRequirements)
+        if (updatedContent == catalogContent) {
+            return null
+        }
+
+        return runCatching { catalogFile.writeText(updatedContent) }
+            .exceptionOrNull()
+            ?.let { "${ERROR_PREFIX}Failed to update version catalog: ${it.message}" }
+    }
+
+    private fun updateCatalogText(
+        contentLines: List<String>,
+        sectionTransactions: List<SectionTransaction>
+    ): String =
+        sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
+            ensureSectionEntries(currentLines, sectionTransaction)
+        }.joinToString("\n")
 
     fun ensureSectionEntries(
-        header: String,
-        requirements: List<SectionRequirement>,
-        insertPositionIfMissing: InsertPosition
-    ) {
-        val sectionBounds = findSectionBounds(header)
+        catalogContentLines: List<String>,
+        sectionTransaction: SectionTransaction
+    ): List<String> {
+        val updatedLines = catalogContentLines.toMutableList()
+        val sectionBounds =
+            findSectionBounds(catalogContentLines, sectionTransaction.sectionHeader)
         val needToAddSection = sectionBounds == null
         val sectionLinesRange: IntRange =
             if (sectionBounds == null) {
@@ -28,58 +64,56 @@ class VersionCatalogUpdater(catalogContent: String) {
 
         val linesToAdd =
             buildList {
-                if (needToAddSection) add("[$header]")
-                for (req in requirements) {
-                    val exists = !needToAddSection && hasKeyInRange(req.keyRegex, sectionLinesRange)
+                if (needToAddSection) add("[${sectionTransaction.sectionHeader}]")
+                for (req in sectionTransaction.requirements) {
+                    val exists = !needToAddSection && updatedLines.hasKeyInRange(req.keyRegex, sectionLinesRange)
                     if (!exists) add(req.lineToAdd)
                 }
             }
 
         if (linesToAdd.isEmpty()) {
-            return
+            return updatedLines
         }
 
         if (needToAddSection) {
-            when (insertPositionIfMissing) {
-                InsertPosition.START -> insertAt(0, linesToAdd + "")
+            when (sectionTransaction.insertPositionIfMissing) {
+                InsertPosition.START -> updatedLines.addAll(0, linesToAdd + "")
                 InsertPosition.END -> {
-                    if (lines.isNotEmpty() && lines.last().isNotEmpty()) {
-                        lines.add("")
+                    if (updatedLines.isNotEmpty() && updatedLines.last().isNotEmpty()) {
+                        updatedLines.add("")
                     }
-                    lines.addAll(linesToAdd)
+                    updatedLines.addAll(linesToAdd)
                 }
             }
         } else {
             val (_, end) = sectionBounds
-            insertAt(end, listOf("") + linesToAdd)
+            updatedLines.addAll(end, listOf("") + linesToAdd)
         }
+
+        return updatedLines
     }
 
-    private fun findSectionBounds(header: String): Pair<Int, Int>? {
-        val startIndex = lines.indexOfFirst { it.trim() == "[$header]" }
+    private fun findSectionBounds(
+        contentLines: List<String>,
+        header: String
+    ): Pair<Int, Int>? {
+        val startIndex = contentLines.indexOfFirst { it.trim() == "[$header]" }
         if (startIndex == -1) {
             return null
         }
-        var endIndexExclusive = lines.size
-        for (i in startIndex + 1 until lines.size) {
-            val trimmedLine = lines[i].trim()
+        var endIndexExclusive = contentLines.size
+        for (index in startIndex + 1 until contentLines.size) {
+            val trimmedLine = contentLines[index].trim()
             if (trimmedLine.startsWith("[") && trimmedLine.endsWith("]")) {
-                endIndexExclusive = i
+                endIndexExclusive = index
                 break
             }
         }
         return startIndex to endIndexExclusive
     }
 
-    private fun hasKeyInRange(
+    private fun List<String>.hasKeyInRange(
         keyRegex: Regex,
         range: IntRange
-    ): Boolean = range.any { idx -> keyRegex.containsMatchIn(lines[idx]) }
-
-    private fun insertAt(
-        index: Int,
-        newLines: List<String>
-    ) {
-        lines.addAll(index, newLines)
-    }
+    ): Boolean = range.any { idx -> keyRegex.containsMatchIn(this[idx]) }
 }

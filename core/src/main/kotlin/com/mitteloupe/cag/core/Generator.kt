@@ -25,7 +25,22 @@ class Generator {
         }
 
         val featureNameLowerCase = request.featureName.lowercase()
-        updateVersionCatalogIfPresent(request.destinationRootDir)?.let { return it }
+        VersionCatalogUpdater().updateVersionCatalogIfPresent(
+            projectRootDir = request.destinationRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        sectionHeader = "versions",
+                        insertPositionIfMissing = InsertPosition.START,
+                        requirements = versionCatalogVersionRequirements()
+                    ),
+                    SectionTransaction(
+                        sectionHeader = "plugins",
+                        insertPositionIfMissing = InsertPosition.END,
+                        requirements = versionCatalogPluginRequirements()
+                    )
+                )
+        )?.let { return it }
         val featureRoot = File(request.destinationRootDir, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
@@ -76,41 +91,6 @@ class Generator {
             "${ERROR_PREFIX}Failed to create directories for package '$featurePackageName'."
         }
     }
-
-    private fun updateVersionCatalogIfPresent(projectRootDir: File): String? {
-        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
-        if (!catalogFile.exists()) {
-            return null
-        }
-
-        val originalText =
-            runCatching { catalogFile.readText() }
-                .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
-
-        val updatedText = updateCatalogText(originalText)
-        if (updatedText == originalText) {
-            return null
-        }
-
-        return runCatching { catalogFile.writeText(updatedText) }
-            .exceptionOrNull()
-            ?.let { "${ERROR_PREFIX}Failed to update version catalog: ${it.message}" }
-    }
-
-    private fun updateCatalogText(catalog: String): String =
-        VersionCatalogUpdater(catalog).apply {
-            ensureSectionEntries(
-                header = "versions",
-                requirements = versionCatalogVersionRequirements(),
-                insertPositionIfMissing = InsertPosition.START
-            )
-
-            ensureSectionEntries(
-                header = "plugins",
-                requirements = versionCatalogPluginRequirements(),
-                insertPositionIfMissing = InsertPosition.END
-            )
-        }.asString()
 
     private fun versionCatalogVersionRequirements(): List<SectionRequirement> =
         listOf(
