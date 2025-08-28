@@ -2,6 +2,7 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.content.buildDomainToPresentationMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationModelKotlinFile
+import com.mitteloupe.cag.core.content.buildPresentationNavigationEventKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationToDomainMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewModelKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewStateKotlinFile
@@ -21,6 +22,7 @@ class PresentationLayerContentGenerator(
         writeDomainToPresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
         writePresentationToDomainMapperFile(featureRoot, featurePackageName)?.let { return it }
         writePresentationViewState(featureRoot, featurePackageName, featureName)?.let { return it }
+        writePresentationNavigationEvent(featureRoot, projectNamespace, featurePackageName, featureName)?.let { return it }
         return writePresentationViewModelFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
@@ -96,6 +98,26 @@ class PresentationLayerContentGenerator(
             fileName = "${featureName.capitalized}ViewModel.kt",
             content =
                 buildPresentationViewModelKotlinFile(
+                    projectNamespace = projectNamespace,
+                    featurePackageName = featurePackageName,
+                    featureName = featureName.capitalized
+                )
+        )
+
+    private fun writePresentationNavigationEvent(
+        featureRoot: File,
+        projectNamespace: String,
+        featurePackageName: String,
+        featureName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "navigation",
+            fileName = "${featureName.capitalized}PresentationNavigationEvent.kt",
+            content =
+                buildPresentationNavigationEventKotlinFile(
                     projectNamespace = projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = featureName.capitalized
