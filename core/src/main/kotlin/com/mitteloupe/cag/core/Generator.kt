@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.content.buildDomainGradleScript
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.CatalogInsertPosition
+import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
@@ -88,6 +89,12 @@ class Generator {
                     featureName = request.featureName
                 )?.let { return it }
             createDataModule(featureRoot, featureNameLowerCase)?.let { return it }
+            DataLayerContentGenerator()
+                .generate(
+                    featureRoot = featureRoot,
+                    featurePackageName = featurePackageName,
+                    featureName = request.featureName
+                )?.let { return it }
             createUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
             SettingsFileUpdater().updateProjectSettingsIfPresent(
                 request.destinationRootDir,
