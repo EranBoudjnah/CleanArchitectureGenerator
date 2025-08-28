@@ -26,7 +26,7 @@ class VersionCatalogUpdater() {
         val catalogContent =
             runCatching { catalogFile.readText() }
                 .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
-        val catalogContentLines = catalogContent.split('\n').toMutableList()
+        val catalogContentLines = catalogContent.split('\n')
 
         val updatedContent = updateCatalogText(catalogContentLines, sectionRequirements)
         if (updatedContent == catalogContent) {
