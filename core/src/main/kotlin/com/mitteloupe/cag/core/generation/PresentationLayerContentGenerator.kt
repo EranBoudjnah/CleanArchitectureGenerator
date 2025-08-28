@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.content.buildPresentationMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationModelKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewStateKotlinFile
 import java.io.File
@@ -13,6 +14,7 @@ class PresentationLayerContentGenerator(
         featureName: String
     ): String? {
         writePresentationModelFile(featureRoot, featurePackageName)?.let { return it }
+        writePresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
         return writePresentationViewState(featureRoot, featurePackageName, featureName)
     }
 
@@ -46,5 +48,18 @@ class PresentationLayerContentGenerator(
             fileName = "StubPresentationModel.kt",
             content =
                 buildPresentationModelKotlinFile(featurePackageName)
+        )
+
+    private fun writePresentationMapperFile(
+        featureRoot: File,
+        featurePackageName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "mapper",
+            fileName = "StubDomainToPresentationMapper.kt",
+            content = buildPresentationMapperKotlinFile(featurePackageName)
         )
 }
