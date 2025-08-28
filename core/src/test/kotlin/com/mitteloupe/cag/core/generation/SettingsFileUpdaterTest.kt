@@ -1,8 +1,10 @@
 package com.mitteloupe.cag.core.generation
 
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.junit.Assert
+import org.hamcrest.CoreMatchers.endsWith
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -29,11 +31,11 @@ class SettingsFileUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
+        assertNull(result)
     }
 
     @Test
-    fun `Given kotlin settings file with newline when updateProjectSettingsIfPresent then appends includes`() {
+    fun `Given kotlin settings file with newline when updateProjectSettingsIfPresent then appends grouped includes`() {
         // Given
         val (projectRoot, startDirectory) =
             createProjectWithKotlinSettings(
@@ -42,10 +44,14 @@ class SettingsFileUpdaterTest {
         val givenFeatureNameLowerCase = "feature"
         val expectedTail =
             """
-            include(":features:$givenFeatureNameLowerCase:ui")
-            include(":features:$givenFeatureNameLowerCase:presentation")
-            include(":features:$givenFeatureNameLowerCase:domain")
-            include(":features:$givenFeatureNameLowerCase:data")
+            setOf(
+                "ui",
+                "presentation",
+                "domain",
+                "data"
+            ).forEach { module ->
+                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+            }
             """.trimIndent()
 
         // When
@@ -57,12 +63,12 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(content, CoreMatchers.endsWith("\n$expectedTail\n"))
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
     }
 
     @Test
-    fun `Given kotlin settings file without newline when updateProjectSettingsIfPresent then inserts newline before includes`() {
+    fun `Given kotlin settings file without newline when updateProjectSettingsIfPresent then inserts newline before grouped includes`() {
         // Given
         val (projectRoot, startDirectory) =
             createProjectWithKotlinSettings(
@@ -71,12 +77,16 @@ class SettingsFileUpdaterTest {
         val givenFeatureNameLowerCase = "feat"
         val expectedTail =
             """
-            include(":features:$givenFeatureNameLowerCase:ui")
-            include(":features:$givenFeatureNameLowerCase:presentation")
-            include(":features:$givenFeatureNameLowerCase:domain")
-            include(":features:$givenFeatureNameLowerCase:data")
+            setOf(
+                "ui",
+                "presentation",
+                "domain",
+                "data"
+            ).forEach { module ->
+                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+            }
             """.trimIndent()
-        val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail\n"
+        val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
 
         // When
         val result =
@@ -87,8 +97,8 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        Assert.assertNull(result)
-        Assert.assertEquals(expectedNewlineBeforeIncludes, content)
+        assertNull(result)
+        assertThat(content, endsWith(expectedNewlineBeforeIncludes))
     }
 
     @Test
@@ -98,10 +108,14 @@ class SettingsFileUpdaterTest {
         val initial =
             """
             rootProject.name = "app"
-            include(":features:$givenFeatureNameLowerCase:ui")
-            include(":features:$givenFeatureNameLowerCase:presentation")
-            include(":features:$givenFeatureNameLowerCase:domain")
-            include(":features:$givenFeatureNameLowerCase:data")
+            setOf(
+                "ui",
+                "presentation",
+                "domain",
+                "data"
+            ).forEach { module ->
+                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+            }
             """.trimIndent() + "\n"
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
@@ -114,12 +128,12 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        Assert.assertNull(result)
-        Assert.assertEquals(initial, content)
+        assertNull(result)
+        assertEquals(initial, content)
     }
 
     @Test
-    fun `Given groovy settings file when updateProjectSettingsIfPresent then appends includes`() {
+    fun `Given groovy settings file when updateProjectSettingsIfPresent then appends grouped includes`() {
         // Given
         val (projectRoot, startDirectory) =
             createProjectWithGroovySettings(
@@ -128,10 +142,14 @@ class SettingsFileUpdaterTest {
         val givenFeatureNameLowerCase = "testfeature"
         val expectedTail =
             """
-            include(":features:$givenFeatureNameLowerCase:ui")
-            include(":features:$givenFeatureNameLowerCase:presentation")
-            include(":features:$givenFeatureNameLowerCase:domain")
-            include(":features:$givenFeatureNameLowerCase:data")
+            [
+                'ui',
+                'presentation',
+                'domain',
+                'data'
+            ].each { module ->
+                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+            }
             """.trimIndent()
 
         // When
@@ -143,8 +161,148 @@ class SettingsFileUpdaterTest {
         val content = File(projectRoot, "settings.gradle").readText()
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(content, CoreMatchers.endsWith("\n$expectedTail\n"))
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given kotlin settings file with partial includes when updateProjectSettingsIfPresent then replaces with grouped includes`() {
+        // Given
+        val givenFeatureNameLowerCase = "feat"
+        val initial =
+            """
+            rootProject.name = "app"
+            include(":features:$givenFeatureNameLowerCase:ui")
+            include(":features:$givenFeatureNameLowerCase:domain")
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
+
+        val expectedTail =
+            """
+            setOf(
+                "ui",
+                "presentation",
+                "domain",
+                "data"
+            ).forEach { module ->
+                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateProjectSettingsIfPresent(
+                startDirectory = startDirectory,
+                featureNameLowerCase = givenFeatureNameLowerCase
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+        assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:ui\")") })
+        assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:domain\")") })
+    }
+
+    @Test
+    fun `Given groovy settings file with partial includes when updateProjectSettingsIfPresent then replaces with grouped includes`() {
+        // Given
+        val givenFeatureNameLowerCase = "feat"
+        val initial =
+            """
+            rootProject.name = 'app'
+            include ":features:$givenFeatureNameLowerCase:ui"
+            include ":features:$givenFeatureNameLowerCase:domain"
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
+
+        val expectedTail =
+            """
+            [
+                'ui',
+                'presentation',
+                'domain',
+                'data'
+            ].each { module ->
+                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateProjectSettingsIfPresent(
+                startDirectory = startDirectory,
+                featureNameLowerCase = givenFeatureNameLowerCase
+            )
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+        assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:ui\"") })
+        assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:domain\"") })
+    }
+
+    @Test
+    fun `Given grouped includes already present in Kotlin when updateProjectSettingsIfPresent then does nothing`() {
+        // Given
+        val givenFeatureNameLowerCase = "feat"
+        val initial =
+            """
+            rootProject.name = "app"
+            setOf(
+                "ui",
+                "presentation",
+                "domain",
+                "data"
+            ).forEach { module ->
+                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+            }
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
+
+        // When
+        val result =
+            classUnderTest.updateProjectSettingsIfPresent(
+                startDirectory = startDirectory,
+                featureNameLowerCase = givenFeatureNameLowerCase
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertEquals(initial, content)
+    }
+
+    @Test
+    fun `Given grouped includes already present in Groovy when updateProjectSettingsIfPresent then does nothing`() {
+        // Given
+        val givenFeatureNameLowerCase = "feat"
+        val initial =
+            """
+            rootProject.name = 'app'
+            [
+                'ui',
+                'presentation',
+                'domain',
+                'data'
+            ].each { module ->
+                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+            }
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
+
+        // When
+        val result =
+            classUnderTest.updateProjectSettingsIfPresent(
+                startDirectory = startDirectory,
+                featureNameLowerCase = givenFeatureNameLowerCase
+            )
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertEquals(initial, content)
     }
 
     private fun createProjectWithKotlinSettings(initialContent: String): Pair<File, File> {

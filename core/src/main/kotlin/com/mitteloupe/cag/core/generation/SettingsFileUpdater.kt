@@ -40,28 +40,65 @@ class SettingsFileUpdater {
                     return "${ERROR_PREFIX}Failed to read ${settingsFile.name}: ${it.message}"
                 }
 
-        val modulePaths =
-            listOf("ui", "presentation", "domain", "data")
-                .map { layer -> ":features:$featureNameLowerCase:$layer" }
+        val layers = listOf("ui", "presentation", "domain", "data")
 
-        val missingIncludes =
-            modulePaths.filterNot { path ->
-                originalFileContent.contains("include(\"$path\")") || originalFileContent.contains("include '$path'")
+        val hasGroupedInclude =
+            originalFileContent.contains("include(\":features:$featureNameLowerCase:\$module\")") ||
+                originalFileContent.contains("include \":features:$featureNameLowerCase:\$module\"")
+
+        if (hasGroupedInclude) return null
+
+        val modulePaths = layers.map { layer -> ":features:$featureNameLowerCase:$layer" }
+
+        val allIncludedIndividually =
+            modulePaths.all { path ->
+                originalFileContent.contains("include\\(([\"'])$path\\1\\)".toRegex()) ||
+                    originalFileContent.contains("include ([\"'])$path\\1".toRegex())
             }
 
-        if (missingIncludes.isEmpty()) return null
+        if (allIncludedIndividually) {
+            return null
+        }
+
+        val filteredContent =
+            originalFileContent
+                .lines()
+                .filterNot { line ->
+                    modulePaths.any { path ->
+                        line.contains("include(\"$path\")") ||
+                            line.contains("include '$path'") ||
+                            line.contains("include \"$path\"")
+                    }
+                }
+                .joinToString(separator = "\n", postfix = if (originalFileContent.endsWith("\n")) "\n" else "")
 
         val contentToAppend =
             buildString {
-                if (!originalFileContent.endsWith("\n")) {
+                if (!filteredContent.endsWith("\n")) {
                     append('\n')
                 }
-                missingIncludes.forEach { path ->
-                    append("include(\"$path\")\n")
+                val layersKtsBlock = layers.joinToString(",\n") { "    \"$it\"" }
+                val layersGroovyBlock = layers.joinToString(",\n") { "    '$it'" }
+                if (settingsFile.name.endsWith(".kts")) {
+                    append(
+                        "setOf(\n" +
+                            layersKtsBlock +
+                            "\n).forEach { module ->\n" +
+                            "    include(\":features:$featureNameLowerCase:${'$'}module\")\n" +
+                            "}"
+                    )
+                } else {
+                    append(
+                        "[\n" +
+                            layersGroovyBlock +
+                            "\n].each { module ->\n" +
+                            "    include \":features:$featureNameLowerCase:${'$'}module\"\n" +
+                            "}"
+                    )
                 }
             }
 
-        val updatedFileContent = originalFileContent + contentToAppend
+        val updatedFileContent = filteredContent + contentToAppend
 
         return runCatching { settingsFile.writeText(updatedFileContent) }
             .exceptionOrNull()
