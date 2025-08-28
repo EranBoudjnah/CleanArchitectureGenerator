@@ -2,14 +2,11 @@ package com.mitteloupe.cag.core
 
 import com.mitteloupe.cag.core.content.buildDataGradleScript
 import com.mitteloupe.cag.core.content.buildDomainGradleScript
-import com.mitteloupe.cag.core.content.buildDomainModelKotlinFile
-import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
-import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.CatalogInsertPosition
+import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
-import com.mitteloupe.cag.core.generation.KotlinFileCreator
 import com.mitteloupe.cag.core.generation.SectionRequirement
 import com.mitteloupe.cag.core.generation.SectionTransaction
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
@@ -75,19 +72,12 @@ class Generator {
 
         if (allCreated) {
             populateDomainModule(featureRoot)?.let { return it }
-            writeDomainModelFile(
-                featureRoot = featureRoot,
-                featurePackageName = featurePackageName
-            )?.let { return it }
-            writeDomainRepositoryInterface(
-                featureRoot = featureRoot,
-                featurePackageName = featurePackageName
-            )?.let { return it }
-            writeDomainUseCaseFile(
-                featureRoot = featureRoot,
-                projectNamespace = request.projectNamespace,
-                featurePackageName = featurePackageName
-            )?.let { return it }
+            DomainLayerContentGenerator()
+                .generate(
+                    featureRoot = featureRoot,
+                    projectNamespace = request.projectNamespace,
+                    featurePackageName = featurePackageName
+                )?.let { return it }
             populatePresentationModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateDataModule(featureRoot, featureNameLowerCase)?.let { return it }
             populateUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
@@ -164,54 +154,4 @@ class Generator {
             layer = "ui",
             content = buildUiGradleScript(featurePackageName, featureNameLowerCase)
         )
-
-    private fun writeDomainUseCaseFile(
-        featureRoot: File,
-        projectNamespace: String,
-        featurePackageName: String
-    ): String? {
-        val content =
-            buildDomainUseCaseKotlinFile(
-                projectNamespace = projectNamespace,
-                featurePackageName = featurePackageName
-            )
-        return KotlinFileCreator().writeKotlinFileInLayer(
-            featureRoot = featureRoot,
-            layer = "domain",
-            featurePackageName = featurePackageName,
-            relativePackageSubPath = "usecase",
-            fileName = "PerformActionUseCase.kt",
-            content = content
-        )
-    }
-
-    private fun writeDomainRepositoryInterface(
-        featureRoot: File,
-        featurePackageName: String
-    ): String? {
-        val content = buildDomainRepositoryKotlinFile(featurePackageName)
-        return KotlinFileCreator().writeKotlinFileInLayer(
-            featureRoot = featureRoot,
-            layer = "domain",
-            featurePackageName = featurePackageName,
-            relativePackageSubPath = "repository",
-            fileName = "PerformExampleRepository.kt",
-            content = content
-        )
-    }
-
-    private fun writeDomainModelFile(
-        featureRoot: File,
-        featurePackageName: String
-    ): String? {
-        val content = buildDomainModelKotlinFile(featurePackageName)
-        return KotlinFileCreator().writeKotlinFileInLayer(
-            featureRoot = featureRoot,
-            layer = "domain",
-            featurePackageName = featurePackageName,
-            relativePackageSubPath = "model",
-            fileName = "StubDomainModel.kt",
-            content = content
-        )
-    }
 }
