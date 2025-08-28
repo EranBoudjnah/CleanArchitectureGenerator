@@ -140,7 +140,7 @@ class DefaultGenerator : Generator {
         )
 
     private fun populateDomainModule(featureRoot: File): String? =
-        writeGradleFileIfMissing(
+        GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "domain",
             content = buildDomainGradleScript()
@@ -150,7 +150,7 @@ class DefaultGenerator : Generator {
         featureRoot: File,
         featureNameLowerCase: String
     ): String? =
-        writeGradleFileIfMissing(
+        GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "data",
             content = buildDataGradleScript(featureNameLowerCase)
@@ -160,7 +160,7 @@ class DefaultGenerator : Generator {
         featureRoot: File,
         featureNameLowerCase: String
     ): String? =
-        writeGradleFileIfMissing(
+        GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "presentation",
             content = buildPresentationGradleScript(featureNameLowerCase)
@@ -171,25 +171,11 @@ class DefaultGenerator : Generator {
         featurePackageName: String,
         featureNameLowerCase: String
     ): String? =
-        writeGradleFileIfMissing(
+        GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "ui",
             content = buildUiGradleScript(featurePackageName, featureNameLowerCase)
         )
-
-    private fun writeGradleFileIfMissing(
-        featureRoot: File,
-        layer: String,
-        content: String
-    ): String? {
-        val moduleDirectory = File(featureRoot, layer)
-        val buildGradleFile = File(moduleDirectory, "build.gradle.kts")
-        if (!buildGradleFile.exists()) {
-            runCatching { buildGradleFile.writeText(content) }
-                .onFailure { return "${ERROR_PREFIX}Failed to create $layer/build.gradle.kts: ${it.message}" }
-        }
-        return null
-    }
 
     private fun writeDomainUseCaseFile(
         featureRoot: File,
