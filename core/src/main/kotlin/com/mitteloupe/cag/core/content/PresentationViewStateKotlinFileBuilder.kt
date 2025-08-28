@@ -6,9 +6,11 @@ fun buildPresentationViewStateKotlinFile(
 ): String =
     """package $featurePackageName.presentation.model
 
-sealed interface ${featureName}ViewState(
+sealed interface ${featureName}ViewState {
     data object Loading : ${featureName}ViewState
 
     data class Idle(val value: $PRESENTATION_MODEL_NAME) : ${featureName}ViewState
-)
+
+    data object Error : ${featureName}ViewState
+}
 """

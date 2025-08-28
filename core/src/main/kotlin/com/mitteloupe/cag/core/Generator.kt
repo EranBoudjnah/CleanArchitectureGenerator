@@ -83,6 +83,7 @@ class Generator {
             PresentationLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
+                    projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )?.let { return it }

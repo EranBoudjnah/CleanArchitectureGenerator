@@ -3,7 +3,9 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.content.buildDomainToPresentationMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationModelKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationToDomainMapperKotlinFile
+import com.mitteloupe.cag.core.content.buildPresentationViewModelKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewStateKotlinFile
+import com.mitteloupe.cag.core.content.capitalized
 import java.io.File
 
 class PresentationLayerContentGenerator(
@@ -11,13 +13,15 @@ class PresentationLayerContentGenerator(
 ) {
     fun generate(
         featureRoot: File,
+        projectNamespace: String,
         featurePackageName: String,
         featureName: String
     ): String? {
         writePresentationModelFile(featureRoot, featurePackageName)?.let { return it }
         writeDomainToPresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
         writePresentationToDomainMapperFile(featureRoot, featurePackageName)?.let { return it }
-        return writePresentationViewState(featureRoot, featurePackageName, featureName)
+        writePresentationViewState(featureRoot, featurePackageName, featureName)?.let { return it }
+        return writePresentationViewModelFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
     private fun writePresentationViewState(
@@ -30,11 +34,11 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "model",
-            fileName = "${featureName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}ViewState.kt",
+            fileName = "${featureName.capitalized}ViewState.kt",
             content =
                 buildPresentationViewStateKotlinFile(
                     featurePackageName = featurePackageName,
-                    featureName = featureName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                    featureName = featureName.capitalized
                 )
         )
 
@@ -61,7 +65,7 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
-            fileName = "StubDomainToPresentationMapper.kt",
+            fileName = "StubPresentationMapper.kt",
             content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
         )
 
@@ -74,7 +78,27 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
-            fileName = "StubDomainToPresentationMapper.kt",
+            fileName = "StubDomainMapper.kt",
             content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
+        )
+
+    private fun writePresentationViewModelFile(
+        featureRoot: File,
+        projectNamespace: String,
+        featurePackageName: String,
+        featureName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "viewmodel",
+            fileName = "${featureName.capitalized}ViewModel.kt",
+            content =
+                buildPresentationViewModelKotlinFile(
+                    projectNamespace = projectNamespace,
+                    featurePackageName = featurePackageName,
+                    featureName = featureName.capitalized
+                )
         )
 }
