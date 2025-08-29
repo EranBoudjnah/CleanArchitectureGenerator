@@ -33,6 +33,10 @@
                 class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
+        <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"
+                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>
+        </action>
     </actions>
 </idea-plugin>
 

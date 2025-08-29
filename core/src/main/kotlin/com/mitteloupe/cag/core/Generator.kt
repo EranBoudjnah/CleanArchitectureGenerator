@@ -171,4 +171,34 @@ class Generator {
                     catalog = catalog
                 )
         )
+
+    fun generateDatasource(destinationRootDirectory: File): String {
+        val datasourceRoot = File(destinationRootDirectory, "datasource")
+        val modules = listOf("source", "implementation")
+
+        val allCreated =
+            modules.map { moduleName ->
+                val moduleDirectory = File(datasourceRoot, moduleName)
+                if (moduleDirectory.exists()) {
+                    moduleDirectory.isDirectory
+                } else {
+                    moduleDirectory.mkdirs()
+                }
+            }.all { it }
+
+        if (!allCreated) {
+            return "${ERROR_PREFIX}Failed to create directories for datasource."
+        }
+
+        val gradleFileCreator = GradleFileCreator()
+        for (moduleName in modules) {
+            gradleFileCreator.writeGradleFileIfMissing(
+                featureRoot = datasourceRoot,
+                layer = moduleName,
+                content = ""
+            )?.let { return it }
+        }
+
+        return "Success!"
+    }
 }
