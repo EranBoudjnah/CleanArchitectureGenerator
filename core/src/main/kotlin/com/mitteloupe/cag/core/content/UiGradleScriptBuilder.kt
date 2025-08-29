@@ -19,6 +19,8 @@ fun buildUiGradleScript(
         (catalog.getResolvedLibraryAliasForModule("androidx.compose.material3:material3") ?: "compose-material3").asAccessor
     val libAliasComposeUiGraphics =
         (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-graphics") ?: "compose-ui-graphics").asAccessor
+    val libAliasComposeNavigation =
+        (catalog.getResolvedLibraryAliasForModule("androidx.navigation:navigation-compose") ?: "compose-navigation").asAccessor
     val libAliasAndroidxUiTooling =
         (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling") ?: "androidx-ui-tooling").asAccessor
     val libAliasAndroidxUiToolingPreview =
@@ -49,6 +51,7 @@ fun buildUiGradleScript(
     implementation(libs.$libAliasComposeMaterial3)
     implementation(libs.$libAliasComposeUiGraphics)
     implementation(libs.$libAliasAndroidxUiTooling)
+    implementation(libs.$libAliasComposeNavigation)
     implementation(libs.$libAliasAndroidxUiToolingPreview)
 """
         } else {
