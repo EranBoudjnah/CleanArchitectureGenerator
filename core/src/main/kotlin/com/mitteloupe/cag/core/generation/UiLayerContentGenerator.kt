@@ -3,6 +3,7 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.content.buildPresentationToUiMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildUiDiKotlinFile
 import com.mitteloupe.cag.core.content.buildUiModelKotlinFile
+import com.mitteloupe.cag.core.content.buildUiScreenKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
 import java.io.File
 
@@ -17,7 +18,8 @@ class UiLayerContentGenerator(
     ): String? {
         writeUiModelFile(featureRoot, featurePackageName)?.let { return it }
         writePresentationToUiMapperFile(featureRoot, featurePackageName)?.let { return it }
-        return writeUiDiFile(featureRoot, projectNamespace, featurePackageName, featureName)
+        writeUiDiFile(featureRoot, projectNamespace, featurePackageName, featureName)?.let { return it }
+        return writeUiScreenFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
     private fun writeUiModelFile(
@@ -59,5 +61,20 @@ class UiLayerContentGenerator(
             relativePackageSubPath = "di",
             fileName = "${featureName.capitalized}Dependencies.kt",
             content = buildUiDiKotlinFile(projectNamespace, featurePackageName, featureName)
+        )
+
+    private fun writeUiScreenFile(
+        featureRoot: File,
+        projectNamespace: String,
+        featurePackageName: String,
+        featureName: String
+    ): String? =
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "ui",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "",
+            fileName = "${featureName.capitalized}Screen.kt",
+            content = buildUiScreenKotlinFile(projectNamespace, featurePackageName, featureName)
         )
 }
