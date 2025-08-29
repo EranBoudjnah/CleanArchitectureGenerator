@@ -3,6 +3,9 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.Generator
@@ -18,16 +21,17 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
             val generator = Generator()
-            val projectRootDir = event.project?.basePath?.let { File(it) }
+            val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
             val request =
                 GenerateFeatureRequestBuilder(
-                    destinationRootDir = projectRootDir ?: File("."),
+                    destinationRootDir = projectRootDir,
                     projectNamespace = defaultPrefix ?: "com.unknown.app.",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
                     .enableCompose(true)
                     .build()
             val result = generator.generateFeature(request)
+            refreshIde(projectRootDir)
             Messages.showInfoMessage(
                 project,
                 CleanArchitectureGeneratorBundle.message(
@@ -37,6 +41,15 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                 ),
                 CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
             )
+        }
+    }
+
+    private fun refreshIde(projectRootDirectory: File) {
+        val virtualRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(projectRootDirectory)
+        if (virtualRoot == null) {
+            VirtualFileManager.getInstance().asyncRefresh(null)
+        } else {
+            VfsUtil.markDirtyAndRefresh(true, true, true, virtualRoot)
         }
     }
 }
