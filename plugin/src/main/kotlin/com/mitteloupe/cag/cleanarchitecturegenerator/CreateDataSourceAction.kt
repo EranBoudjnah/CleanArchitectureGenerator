@@ -13,7 +13,11 @@ class CreateDataSourceAction : AnAction() {
         val project = event.project
         val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
 
-        val result = Generator().generateDataSource(projectRootDir)
+        val dialog = CreateDataSourceDialog(project)
+        if (!dialog.showAndGet()) return
+        val dataSourceName = dialog.dataSourceNameWithSuffix
+
+        val result = Generator().generateDataSource(projectRootDir, dataSourceName)
         ideBridge.refreshIde(projectRootDir)
         ideBridge.synchronizeGradle(project, result, projectRootDir)
         Messages.showInfoMessage(

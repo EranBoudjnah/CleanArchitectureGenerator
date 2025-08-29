@@ -121,7 +121,11 @@ class Generator {
         }
     }
 
-    fun generateDataSource(destinationRootDirectory: File): String {
+    @Suppress("UNUSED_PARAMETER")
+    fun generateDataSource(
+        destinationRootDirectory: File,
+        dataSourceName: String
+    ): String {
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
