@@ -2,7 +2,6 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.ERROR_PREFIX
 import java.io.File
-import kotlin.text.trim
 
 data class SectionTransaction(
     val sectionHeader: String,
@@ -12,12 +11,65 @@ data class SectionTransaction(
 
 data class SectionRequirement(val keyRegex: Regex, val lineToAdd: String)
 
-class VersionCatalogUpdater() {
-    fun updateVersionCatalogIfPresent(
-        projectRootDir: File,
+class VersionCatalogUpdater(
+    private val contentUpdater: VersionCatalogContentUpdater = VersionCatalogContentUpdater()
+) {
+    fun updateVersionCatalogIfPresent(projectRootDirectory: File): String? {
+        val catalogTextBefore = readCatalogFile(projectRootDirectory)
+
+        updateVersionCatalogIfPresent(
+            projectRootDirectory = projectRootDirectory,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        sectionHeader = "libraries",
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = versionCatalogLibraryRequirements()
+                    ),
+                    SectionTransaction(
+                        sectionHeader = "plugins",
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = versionCatalogPluginRequirements()
+                    )
+                )
+        )?.let { return it }
+
+        val catalogTextAfter = readCatalogFile(projectRootDirectory)
+        val addedAndroidLibraryAlias =
+            (catalogTextAfter?.contains(Regex("(?m)^\\s*android-library\\s*=")) == true) &&
+                (catalogTextBefore?.contains(Regex("(?m)^\\s*android-library\\s*=")) != true)
+        val addedComposeBomAlias =
+            (catalogTextAfter?.contains(Regex("(?m)^\\s*compose-bom\\s*=")) == true) &&
+                (catalogTextBefore?.contains(Regex("(?m)^\\s*compose-bom\\s*=")) != true)
+
+        return updateVersionCatalogIfPresent(
+            projectRootDirectory = projectRootDirectory,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        sectionHeader = "versions",
+                        insertPositionIfMissing = CatalogInsertPosition.Start,
+                        requirements =
+                            versionCatalogVersionRequirements(
+                                includeAndroidGradlePlugin = addedAndroidLibraryAlias,
+                                includeComposeBom = addedComposeBomAlias
+                            )
+                    )
+                )
+        )
+    }
+
+    private fun readCatalogFile(projectRootDirectory: File): String? {
+        val catalogDirectory = File(projectRootDirectory, "gradle")
+        val catalogFile = File(catalogDirectory, "libs.versions.toml")
+        return runCatching { if (catalogFile.exists()) catalogFile.readText() else null }.getOrNull()
+    }
+
+    private fun updateVersionCatalogIfPresent(
+        projectRootDirectory: File,
         sectionRequirements: List<SectionTransaction>
     ): String? {
-        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        val catalogFile = File(projectRootDirectory, "gradle/libs.versions.toml")
         if (!catalogFile.exists()) {
             return null
         }
@@ -25,9 +77,7 @@ class VersionCatalogUpdater() {
         val catalogContent =
             runCatching { catalogFile.readText() }
                 .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
-        val catalogContentLines = catalogContent.split('\n')
-
-        val updatedContent = updateCatalogText(catalogContentLines, sectionRequirements)
+        val updatedContent = contentUpdater.updateCatalogText(catalogContent, sectionRequirements)
         if (updatedContent == catalogContent) {
             return null
         }
@@ -37,96 +87,79 @@ class VersionCatalogUpdater() {
             ?.let { "${ERROR_PREFIX}Failed to update version catalog: ${it.message}" }
     }
 
-    private fun updateCatalogText(
-        contentLines: List<String>,
-        sectionTransactions: List<SectionTransaction>
-    ): String =
-        sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
-            ensureSectionEntries(currentLines, sectionTransaction)
-        }.joinToString("\n")
-
-    private fun ensureSectionEntries(
-        catalogContentLines: List<String>,
-        sectionTransaction: SectionTransaction
-    ): List<String> {
-        val updatedLines = catalogContentLines.toMutableList()
-        val sectionBounds =
-            findSectionBounds(catalogContentLines, sectionTransaction.sectionHeader)
-        val needToAddSection = sectionBounds == null
-        val sectionLinesRange: IntRange =
-            if (sectionBounds == null) {
-                IntRange(0, -1)
-            } else {
-                val (start, end) = sectionBounds
-                (start + 1) until end
-            }
-
-        val linesToAdd =
-            buildList {
-                if (needToAddSection) add("[${sectionTransaction.sectionHeader}]")
-                for (req in sectionTransaction.requirements) {
-                    val exists = !needToAddSection && updatedLines.hasKeyInRange(req.keyRegex, sectionLinesRange)
-                    if (!exists) {
-                        add(req.lineToAdd)
-                    }
-                }
-            }
-
-        if (linesToAdd.isEmpty()) {
-            return updatedLines
+    private fun versionCatalogVersionRequirements(
+        includeAndroidGradlePlugin: Boolean,
+        includeComposeBom: Boolean
+    ): List<SectionRequirement> {
+        val requirements =
+            mutableListOf(
+                SectionRequirement("^\\s*compileSdk\\s*=".toRegex(), "compileSdk = \"35\""),
+                SectionRequirement("^\\s*minSdk\\s*=".toRegex(), "minSdk = \"24\"")
+            )
+        if (includeAndroidGradlePlugin) {
+            requirements.add(
+                SectionRequirement(
+                    "^\\s*androidGradlePlugin\\s*=".toRegex(),
+                    "androidGradlePlugin = \"8.7.3\""
+                )
+            )
         }
-
-        if (needToAddSection) {
-            val modifiedLines = sectionTransaction.insertPositionIfMissing.insertAtMissingSection(updatedLines, linesToAdd)
-            if (modifiedLines != updatedLines) {
-                updatedLines.clear()
-                updatedLines.addAll(modifiedLines)
-            }
-        } else {
-            val (start, endExclusive) = sectionBounds
-            var insertionIndex = endExclusive
-            while (insertionIndex - 1 > start && updatedLines[insertionIndex - 1].isEmpty()) {
-                insertionIndex--
-            }
-            updatedLines.addAll(insertionIndex, linesToAdd)
-
-            val afterInsertionIndex = insertionIndex + linesToAdd.size
-            if (afterInsertionIndex < updatedLines.size) {
-                if (updatedLines[afterInsertionIndex].isNotEmpty()) {
-                    updatedLines.add(afterInsertionIndex, "")
-                } else {
-                    val blankLineIndex = afterInsertionIndex + 1
-                    while (blankLineIndex < updatedLines.size && updatedLines[blankLineIndex].isEmpty()) {
-                        updatedLines.removeAt(blankLineIndex)
-                    }
-                }
-            }
+        if (includeComposeBom) {
+            requirements.add(
+                SectionRequirement(
+                    "^\\s*composeBom\\s*=".toRegex(),
+                    "composeBom = \"2025.08.01\""
+                )
+            )
         }
-
-        return updatedLines
+        return requirements
     }
 
-    private fun findSectionBounds(
-        contentLines: List<String>,
-        header: String
-    ): Pair<Int, Int>? {
-        val startIndex = contentLines.indexOfFirst { it.trim() == "[$header]" }
-        if (startIndex == -1) {
-            return null
-        }
-        var endIndexExclusive = contentLines.size
-        for (index in startIndex + 1 until contentLines.size) {
-            val trimmedLine = contentLines[index].trim()
-            if (trimmedLine.startsWith("[") && trimmedLine.endsWith("]")) {
-                endIndexExclusive = index
-                break
-            }
-        }
-        return startIndex to endIndexExclusive
-    }
+    private fun versionCatalogPluginRequirements(): List<SectionRequirement> =
+        listOf(
+            SectionRequirement(
+                "^\\s*kotlin-jvm\\s*=".toRegex(),
+                "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
+            ),
+            SectionRequirement(
+                "^\\s*kotlin-android\\s*=".toRegex(),
+                "kotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }"
+            ),
+            SectionRequirement(
+                "^\\s*android-library\\s*=".toRegex(),
+                "android-library = { id = \"com.android.library\", version.ref = \"androidGradlePlugin\" }"
+            ),
+            SectionRequirement(
+                "^\\s*compose-compiler\\s*=".toRegex(),
+                "compose-compiler = { id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }"
+            )
+        )
 
-    private fun List<String>.hasKeyInRange(
-        keyRegex: Regex,
-        range: IntRange
-    ): Boolean = range.any { index -> keyRegex.containsMatchIn(this[index]) }
+    private fun versionCatalogLibraryRequirements(): List<SectionRequirement> =
+        listOf(
+            SectionRequirement(
+                "^\\s*compose-bom\\s*=.*$".toRegex(),
+                "compose-bom = { module = \"androidx.compose:compose-bom\", version.ref = \"composeBom\" }"
+            ),
+            SectionRequirement(
+                "^\\s*compose-ui\\s*=.*$".toRegex(),
+                "compose-ui = { module = \"androidx.compose.ui:ui\" }"
+            ),
+            SectionRequirement(
+                "^\\s*compose-ui-graphics\\s*=.*$".toRegex(),
+                "compose-ui-graphics = { module = \"androidx.compose.ui:ui-graphics\" }"
+            ),
+            SectionRequirement(
+                "^\\s*androidx-ui-tooling\\s*=.*$".toRegex(),
+                "androidx-ui-tooling = { module = \"androidx.compose.ui:ui-tooling\" }"
+            ),
+            SectionRequirement(
+                "^\\s*androidx-ui-tooling-preview\\s*=.*$".toRegex(),
+                "androidx-ui-tooling-preview = { module = \"androidx.compose.ui:ui-tooling-preview\" }"
+            ),
+            SectionRequirement(
+                "^\\s*compose-material3\\s*=.*$".toRegex(),
+                "compose-material3 = { module = \"androidx.compose.material3:material3\" }"
+            )
+        )
 }

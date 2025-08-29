@@ -26,6 +26,7 @@ fun main(args: Array<String>) {
             projectNamespace = basePackage ?: "com.unknown.app.",
             featureName = featureName
         ).featurePackageName(packageName)
+            .enableCompose(true)
             .build()
     val result = generator.generateFeature(request)
     println(result)

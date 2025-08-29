@@ -6,7 +6,8 @@ data class GenerateFeatureRequest(
     val featureName: String,
     val featurePackageName: String?,
     val projectNamespace: String,
-    val destinationRootDir: File
+    val destinationRootDirectory: File,
+    val enableCompose: Boolean
 )
 
 class GenerateFeatureRequestBuilder(
@@ -15,10 +16,16 @@ class GenerateFeatureRequestBuilder(
     private val featureName: String
 ) {
     private var featurePackageName: String? = null
+    private var enableCompose: Boolean = false
 
     fun featurePackageName(featurePackageName: String?) =
         apply {
             this.featurePackageName = featurePackageName
+        }
+
+    fun enableCompose(enable: Boolean) =
+        apply {
+            this.enableCompose = enable
         }
 
     fun build(): GenerateFeatureRequest =
@@ -26,6 +33,7 @@ class GenerateFeatureRequestBuilder(
             featureName = featureName,
             featurePackageName = featurePackageName,
             projectNamespace = projectNamespace,
-            destinationRootDir = destinationRootDir
+            destinationRootDirectory = destinationRootDir,
+            enableCompose = enableCompose
         )
 }

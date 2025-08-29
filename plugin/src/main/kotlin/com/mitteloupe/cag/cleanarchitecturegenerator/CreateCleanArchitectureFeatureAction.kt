@@ -25,6 +25,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                     projectNamespace = defaultPrefix ?: "com.unknown.app.",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
+                    .enableCompose(true)
                     .build()
             val result = generator.generateFeature(request)
             Messages.showInfoMessage(

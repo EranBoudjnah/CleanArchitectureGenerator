@@ -6,13 +6,10 @@ import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
-import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
-import com.mitteloupe.cag.core.generation.SectionRequirement
-import com.mitteloupe.cag.core.generation.SectionTransaction
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
 import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
 import com.mitteloupe.cag.core.generation.VersionCatalogUpdater
@@ -36,22 +33,9 @@ class Generator {
 
         val featureNameLowerCase = request.featureName.lowercase()
         VersionCatalogUpdater().updateVersionCatalogIfPresent(
-            projectRootDir = request.destinationRootDir,
-            sectionRequirements =
-                listOf(
-                    SectionTransaction(
-                        sectionHeader = "versions",
-                        insertPositionIfMissing = CatalogInsertPosition.Start,
-                        requirements = versionCatalogVersionRequirements()
-                    ),
-                    SectionTransaction(
-                        sectionHeader = "plugins",
-                        insertPositionIfMissing = CatalogInsertPosition.End,
-                        requirements = versionCatalogPluginRequirements()
-                    )
-                )
+            projectRootDirectory = request.destinationRootDirectory
         )?.let { return it }
-        val featureRoot = File(request.destinationRootDir, "features/$featureNameLowerCase")
+        val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
             return ERROR_PREFIX +
@@ -98,7 +82,12 @@ class Generator {
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )?.let { return it }
-            createUiModule(featureRoot, featurePackageName, featureNameLowerCase)?.let { return it }
+            createUiModule(
+                featureRoot,
+                featurePackageName,
+                featureNameLowerCase,
+                request.enableCompose
+            )?.let { return it }
             UiLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
@@ -107,17 +96,17 @@ class Generator {
                     featureName = request.featureName
                 )?.let { return it }
             SettingsFileUpdater().updateProjectSettingsIfPresent(
-                request.destinationRootDir,
+                request.destinationRootDirectory,
                 featureNameLowerCase
             )?.let { return it }
             AppModuleContentGenerator().writeFeatureModuleIfPossible(
-                startDirectory = request.destinationRootDir,
+                startDirectory = request.destinationRootDirectory,
                 projectNamespace = request.projectNamespace,
                 featureName = request.featureName,
                 featurePackageName = featurePackageName
             )?.let { return it }
             AppModuleGradleUpdater().updateAppModuleDependenciesIfPresent(
-                startDirectory = request.destinationRootDir,
+                startDirectory = request.destinationRootDirectory,
                 featureNameLowerCase = featureNameLowerCase
             )?.let { return it }
         }
@@ -128,29 +117,6 @@ class Generator {
             "${ERROR_PREFIX}Failed to create directories for package '$featurePackageName'."
         }
     }
-
-    private fun versionCatalogVersionRequirements(): List<SectionRequirement> =
-        listOf(
-            SectionRequirement("^\\s*compileSdk\\s*=".toRegex(), "compileSdk = \"35\""),
-            SectionRequirement("^\\s*minSdk\\s*=".toRegex(), "minSdk = \"24\""),
-            SectionRequirement("^\\s*androidGradlePlugin\\s*=".toRegex(), "androidGradlePlugin = \"8.7.3\"")
-        )
-
-    private fun versionCatalogPluginRequirements(): List<SectionRequirement> =
-        listOf(
-            SectionRequirement(
-                "^\\s*kotlin-jvm\\s*=".toRegex(),
-                "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
-            ),
-            SectionRequirement(
-                "^\\s*kotlin-android\\s*=".toRegex(),
-                "kotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }"
-            ),
-            SectionRequirement(
-                "^\\s*android-library\\s*=".toRegex(),
-                "android-library = { id = \"com.android.library\", version.ref = \"androidGradlePlugin\" }"
-            )
-        )
 
     private fun createDomainModule(featureRoot: File): String? =
         GradleFileCreator().writeGradleFileIfMissing(
@@ -182,11 +148,12 @@ class Generator {
     private fun createUiModule(
         featureRoot: File,
         featurePackageName: String,
-        featureNameLowerCase: String
+        featureNameLowerCase: String,
+        enableCompose: Boolean
     ): String? =
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "ui",
-            content = buildUiGradleScript(featurePackageName, featureNameLowerCase)
+            content = buildUiGradleScript(featurePackageName, featureNameLowerCase, enableCompose)
         )
 }
