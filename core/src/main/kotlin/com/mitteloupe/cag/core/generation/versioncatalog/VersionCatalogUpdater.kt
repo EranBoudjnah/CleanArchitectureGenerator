@@ -210,6 +210,12 @@ class VersionCatalogUpdater(
                         version = "2025.08.01"
                     )
                 )
+                add(
+                    SectionEntryRequirement.VersionRequirement(
+                        key = "composeNavigation",
+                        version = "2.9.3"
+                    )
+                )
             }
         }
 }
@@ -252,6 +258,11 @@ private fun desiredLibraries(enableCompose: Boolean): List<DesiredLibrary> =
                     DesiredLibrary(
                         key = "compose-material3",
                         module = "androidx.compose.material3:material3"
+                    ),
+                    DesiredLibrary(
+                        key = "compose-navigation",
+                        module = "androidx.navigation:navigation-compose",
+                        versionRefKey = "composeNavigation"
                     )
                 )
             )
