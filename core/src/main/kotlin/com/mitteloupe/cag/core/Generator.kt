@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.content.buildDomainGradleScript
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
+import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
 import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
@@ -112,7 +113,12 @@ class Generator {
             AppModuleContentGenerator().writeFeatureModuleIfPossible(
                 startDirectory = request.destinationRootDir,
                 projectNamespace = request.projectNamespace,
-                featureName = request.featureName
+                featureName = request.featureName,
+                featurePackageName = featurePackageName
+            )?.let { return it }
+            AppModuleGradleUpdater().updateAppModuleDependenciesIfPresent(
+                startDirectory = request.destinationRootDir,
+                featureNameLowerCase = featureNameLowerCase
             )?.let { return it }
         }
 

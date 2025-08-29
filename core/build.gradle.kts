@@ -24,6 +24,7 @@ dependencies {
 
     testImplementation(libs.mockk)
     testImplementation(libs.junit4)
+    testImplementation(libs.hamcrest)
 }
 
 ktlint {

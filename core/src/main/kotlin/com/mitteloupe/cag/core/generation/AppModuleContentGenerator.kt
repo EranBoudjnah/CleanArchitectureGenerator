@@ -14,7 +14,8 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
     fun writeFeatureModuleIfPossible(
         startDirectory: File,
         projectNamespace: String,
-        featureName: String
+        featureName: String,
+        featurePackageName: String
     ): String? {
         val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
         val appModuleDirectory =
@@ -37,7 +38,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         val filename = "${featureName.capitalized}Module.kt"
         val targetFile = File(dependencyInjectionDirectory, filename)
         if (!targetFile.exists()) {
-            val content = buildAppFeatureModuleKotlinFile(projectNamespace, featureName)
+            val content = buildAppFeatureModuleKotlinFile(projectNamespace, featurePackageName, featureName)
             runCatching { targetFile.writeText(content) }
                 .onFailure {
                     val absolutePath = targetFile.absolutePath

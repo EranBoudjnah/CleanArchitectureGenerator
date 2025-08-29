@@ -4,6 +4,7 @@ import java.io.File
 
 private val pluginsBlockRegex = """(?s)plugins\s*\{([\n\r\s\S]*?)}""".toRegex()
 private val idPluginLineRegex = """(?m)^\s*id\s*\(\s*['"]([^'"]+)['"]\s*\)[^\n\r]*""".toRegex()
+private val groovyIdPluginLineRegex = """(?m)^\s*id\s*['"]([^'"]+)['"][^\n\r]*""".toRegex()
 private val aliasPluginLineRegex =
     """(?m)^\s*alias\s*\(\s*libs\.plugins\.([A-Za-z0-9_.\-]+)\s*\)[^\n\r]*""".toRegex()
 private val applyFalseRegex = """apply\s*\(?\s*false\s*\)?""".toRegex()
@@ -35,7 +36,14 @@ class AppModuleDirectoryFinder(private val directoryFinder: DirectoryFinder = Di
     private fun containsDirectAndroidAppIdInPluginsBlock(buildFileContents: String): Boolean =
         pluginsBlockRegex.findAll(buildFileContents).any { blockMatch ->
             val block = blockMatch.groupValues[1]
-            idPluginLineRegex.findAll(block).any { idLineMatch ->
+            val ktsMatch =
+                idPluginLineRegex.findAll(block).any { idLineMatch ->
+                    val pluginId = idLineMatch.groupValues[1].trim()
+                    pluginId == "com.android.application" &&
+                        !applyFalseRegex.containsMatchIn(idLineMatch.value)
+                }
+            if (ktsMatch) return@any true
+            groovyIdPluginLineRegex.findAll(block).any { idLineMatch ->
                 val pluginId = idLineMatch.groupValues[1].trim()
                 pluginId == "com.android.application" &&
                     !applyFalseRegex.containsMatchIn(idLineMatch.value)
