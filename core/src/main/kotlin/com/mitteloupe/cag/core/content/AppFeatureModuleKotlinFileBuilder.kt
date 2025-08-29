@@ -1,14 +1,19 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.optimizeImports
+
 fun buildAppFeatureModuleKotlinFile(
     projectNamespace: String,
     featurePackageName: String,
     featureName: String
 ): String {
     val className = featureName.capitalized
+    val variableName = className.replaceFirstChar { it.lowercase() }
     val appPackage = projectNamespace.trimEnd('.')
     return """package $appPackage.di
 
+    ${
+        """
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +24,15 @@ import $featurePackageName.domain.usecase.PerformActionUseCase
 import $featurePackageName.presentation.mapper.StubDomainMapper
 import $featurePackageName.presentation.mapper.StubPresentationMapper
 import $featurePackageName.presentation.viewmodel.${className}ViewModel
+import $featurePackageName.presentation.navigation.${className}PresentationNavigationEvent
+import $featurePackageName.ui.di.${className}Dependencies
+import $featurePackageName.ui.mapper.StubUiMapper
 import ${projectNamespace}architecture.domain.UseCaseExecutor
+import ${projectNamespace}architecture.presentation.notification.PresentationNotification
+import ${projectNamespace}architecture.ui.navigation.mapper.NavigationEventDestinationMapper
+import ${projectNamespace}architecture.ui.notification.mapper.NotificationUiMapper
+""".optimizeImports()
+    }
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -49,6 +62,18 @@ object ${className}Module {
         stubDomainMapper = stubDomainMapper,
         stubPresentationMapper = stubPresentationMapper,
         useCaseExecutor = useCaseExecutor
+    )
+
+    @Provides
+    fun provides${className}Dependencies(
+        ${variableName}ViewModel: ${className}ViewModel,
+        ${variableName}NavigationMapper: NavigationEventDestinationMapper<${className}PresentationNavigationEvent>,
+        ${variableName}NotificationMapper: NotificationUiMapper<PresentationNotification>
+    ): ${className}Dependencies = ${className}Dependencies(
+        ${variableName}ViewModel = ${variableName}ViewModel,
+        ${variableName}NavigationMapper = ${variableName}NavigationMapper,
+        ${variableName}NotificationMapper = ${variableName}NotificationMapper,
+        stubUiMapper = StubUiMapper()
     )
 }
 """
