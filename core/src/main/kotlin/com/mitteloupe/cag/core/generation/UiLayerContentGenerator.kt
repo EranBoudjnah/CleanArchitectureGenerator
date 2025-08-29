@@ -73,7 +73,7 @@ class UiLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "ui",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "",
+            relativePackageSubPath = "view",
             fileName = "${featureName.capitalized}Screen.kt",
             content = buildUiScreenKotlinFile(projectNamespace, featurePackageName, featureName)
         )
