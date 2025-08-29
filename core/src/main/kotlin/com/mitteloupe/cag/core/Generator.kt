@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
+import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
@@ -121,11 +122,7 @@ class Generator {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun generateDataSource(
-        destinationRootDirectory: File,
-        dataSourceName: String
-    ): String {
+    private fun generateDataSourceModules(destinationRootDirectory: File): String {
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
@@ -153,6 +150,24 @@ class Generator {
         }
 
         SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)?.let { return it }
+
+        return "Success!"
+    }
+
+    fun generateDataSource(
+        destinationRootDirectory: File,
+        dataSourceName: String,
+        projectNamespace: String
+    ): String {
+        val baseResult = generateDataSourceModules(destinationRootDirectory)
+        if (baseResult.startsWith(ERROR_PREFIX)) return baseResult
+
+        DataSourceInterfaceCreator()
+            .writeDataSourceInterface(
+                destinationRootDirectory = destinationRootDirectory,
+                projectNamespace = projectNamespace,
+                dataSourceName = dataSourceName
+            )?.let { return it }
 
         return "Success!"
     }

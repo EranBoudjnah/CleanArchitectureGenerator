@@ -3,6 +3,7 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
+import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.Generator
 import java.io.File
 
@@ -12,12 +13,14 @@ class CreateDataSourceAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project
         val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
+        val projectModel = IntellijProjectModel(event)
+        val defaultPrefix = BasePackageResolver().determineBasePackage(projectModel) ?: "com.unknown.app."
 
         val dialog = CreateDataSourceDialog(project)
         if (!dialog.showAndGet()) return
         val dataSourceName = dialog.dataSourceNameWithSuffix
 
-        val result = Generator().generateDataSource(projectRootDir, dataSourceName)
+        val result = Generator().generateDataSource(projectRootDir, dataSourceName, defaultPrefix)
         ideBridge.refreshIde(projectRootDir)
         ideBridge.synchronizeGradle(project, result, projectRootDir)
         Messages.showInfoMessage(
