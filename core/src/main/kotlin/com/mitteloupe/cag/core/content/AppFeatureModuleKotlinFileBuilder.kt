@@ -12,7 +12,7 @@ fun buildAppFeatureModuleKotlinFile(
     val appPackage = projectNamespace.trimEnd('.')
     return """package $appPackage.di
 
-    ${
+${
         """
 import dagger.Module
 import dagger.Provides
@@ -33,7 +33,6 @@ import ${projectNamespace}architecture.ui.navigation.mapper.NavigationEventDesti
 import ${projectNamespace}architecture.ui.notification.mapper.NotificationUiMapper
 """.optimizeImports()
     }
-
 @Module
 @InstallIn(SingletonComponent::class)
 object ${className}Module {
