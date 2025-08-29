@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.optimizeImports
+
 fun buildPresentationViewModelKotlinFile(
     projectNamespace: String,
     featurePackageName: String,
@@ -7,9 +9,12 @@ fun buildPresentationViewModelKotlinFile(
 ): String =
     """package $featurePackageName.presentation.viewmodel
 
+${
+        """
 import ${projectNamespace}architecture.domain.UseCaseExecutor
 import ${projectNamespace}architecture.presentation.notification.PresentationNotification
 import ${projectNamespace}architecture.presentation.viewmodel.BaseViewModel
+import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME
 import $featurePackageName.domain.usecase.PerformActionUseCase
 import $featurePackageName.presentation.mapper.StubDomainMapper
 import $featurePackageName.presentation.mapper.StubPresentationMapper
@@ -17,8 +22,8 @@ import $featurePackageName.presentation.model.${featureName}ViewState
 import $featurePackageName.presentation.model.${featureName}ViewState.Idle
 import $featurePackageName.presentation.model.${featureName}ViewState.Loading
 import $featurePackageName.presentation.model.$PRESENTATION_MODEL_NAME
-import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME
-
+""".optimizeImports()
+    }
 class ${featureName}ViewModel(
     private val performActionUseCase: PerformActionUseCase,
     private val stubDomainMapper: StubDomainMapper,
