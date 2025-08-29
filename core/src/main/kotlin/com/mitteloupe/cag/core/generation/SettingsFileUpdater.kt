@@ -9,6 +9,20 @@ class SettingsFileUpdater {
         startDirectory: File,
         featureNameLowerCase: String
     ): String? {
+        val settingsFile = findSettingsFile(startDirectory) ?: return null
+
+        val featureModules = listOf("ui", "presentation", "domain", "data")
+        return updateIncludes(settingsFile, ":features:$featureNameLowerCase", featureModules)
+    }
+
+    fun updateDataSourceSettingsIfPresent(startDirectory: File): String? {
+        val settingsFile = findSettingsFile(startDirectory) ?: return null
+
+        val modules = listOf("source", "implementation")
+        return updateIncludes(settingsFile, ":datasource", modules)
+    }
+
+    private fun findSettingsFile(startDirectory: File): File? {
         val projectRoot =
             DirectoryFinder()
                 .findDirectory(startDirectory) { currentDirectory ->
@@ -20,19 +34,17 @@ class SettingsFileUpdater {
         val ktsFile = kotlinSettingsFile(projectRoot)
         val groovyFile = groovySettingsFile(projectRoot)
 
-        val settingsFile =
-            when {
-                ktsFile.exists() -> ktsFile
-                groovyFile.exists() -> groovyFile
-                else -> return null
-            }
-
-        return updateSettingsFile(settingsFile, featureNameLowerCase)
+        return when {
+            ktsFile.exists() -> ktsFile
+            groovyFile.exists() -> groovyFile
+            else -> null
+        }
     }
 
-    private fun updateSettingsFile(
+    private fun updateIncludes(
         settingsFile: File,
-        featureNameLowerCase: String
+        groupPrefix: String,
+        moduleNames: List<String>
     ): String? {
         val originalFileContent =
             runCatching { settingsFile.readText() }
@@ -40,21 +52,36 @@ class SettingsFileUpdater {
                     return "${ERROR_PREFIX}Failed to read ${settingsFile.name}: ${it.message}"
                 }
 
-        val layers = listOf("ui", "presentation", "domain", "data")
+        val groupedIncludeKts = "include(\"$groupPrefix:${'$'}module\")"
+        val groupedIncludeGroovyDouble = "include \"$groupPrefix:${'$'}module\""
+        val groupedIncludeGroovySingle = "include '$groupPrefix:${'$'}module'"
 
         val hasGroupedInclude =
-            originalFileContent.contains("include(\":features:$featureNameLowerCase:\$module\")") ||
-                originalFileContent.contains("include \":features:$featureNameLowerCase:\$module\"")
+            originalFileContent.contains(groupedIncludeKts) ||
+                originalFileContent.contains(groupedIncludeGroovyDouble) ||
+                originalFileContent.contains(groupedIncludeGroovySingle)
 
-        if (hasGroupedInclude) return null
+        if (hasGroupedInclude) {
+            return null
+        }
 
-        val modulePaths = layers.map { layer -> ":features:$featureNameLowerCase:$layer" }
+        val modulePaths = moduleNames.map { moduleName -> "$groupPrefix:$moduleName" }
 
-        val allIncludedIndividually =
-            modulePaths.all { path ->
-                originalFileContent.contains("include\\(([\"'])$path\\1\\)".toRegex()) ||
-                    originalFileContent.contains("include ([\"'])$path\\1".toRegex())
-            }
+        // Allow both rooted (":group:module") and non-rooted ("group:module") includes
+        fun includeRegexesFor(path: String): List<Regex> =
+            listOf(
+                "include\\(([\"'])$path\\1\\)".toRegex(),
+                "include ([\"'])$path\\1".toRegex()
+            )
+
+        fun isModuleIncludedIndividually(moduleName: String): Boolean {
+            val pathWithRoot = "$groupPrefix:$moduleName"
+            val pathWithoutRoot = pathWithRoot.removePrefix(":")
+            val regexes = includeRegexesFor(pathWithRoot) + includeRegexesFor(pathWithoutRoot)
+            return regexes.any { regex -> originalFileContent.contains(regex) }
+        }
+
+        val allIncludedIndividually = moduleNames.all { moduleName -> isModuleIncludedIndividually(moduleName) }
 
         if (allIncludedIndividually) {
             return null
@@ -64,35 +91,37 @@ class SettingsFileUpdater {
             originalFileContent
                 .lines()
                 .filterNot { line ->
-                    modulePaths.any { path ->
-                        line.contains("include(\"$path\")") ||
-                            line.contains("include '$path'") ||
-                            line.contains("include \"$path\"")
+                    modulePaths.any { pathWithRoot ->
+                        val pathWithoutRoot = pathWithRoot.removePrefix(":")
+                        line.contains("include(\"$pathWithRoot\")") ||
+                            line.contains("include '$pathWithRoot'") ||
+                            line.contains("include \"$pathWithRoot\"") ||
+                            line.contains("include(\"$pathWithoutRoot\")") ||
+                            line.contains("include '$pathWithoutRoot'") ||
+                            line.contains("include \"$pathWithoutRoot\"")
                     }
                 }
                 .joinToString(separator = "\n", postfix = if (originalFileContent.endsWith("\n")) "\n" else "")
 
         val contentToAppend =
             buildString {
-                if (!filteredContent.endsWith("\n")) {
-                    append('\n')
-                }
-                val layersKtsBlock = layers.joinToString(",\n") { "    \"$it\"" }
-                val layersGroovyBlock = layers.joinToString(",\n") { "    '$it'" }
+                if (!filteredContent.endsWith("\n")) append('\n')
+                val modulesKtsBlock = moduleNames.joinToString(",\n") { "    \"$it\"" }
+                val modulesGroovyBlock = moduleNames.joinToString(",\n") { "    '$it'" }
                 if (settingsFile.name.endsWith(".kts")) {
                     append(
                         "setOf(\n" +
-                            layersKtsBlock +
+                            modulesKtsBlock +
                             "\n).forEach { module ->\n" +
-                            "    include(\":features:$featureNameLowerCase:${'$'}module\")\n" +
+                            "    include(\"$groupPrefix:${'$'}module\")\n" +
                             "}"
                     )
                 } else {
                     append(
                         "[\n" +
-                            layersGroovyBlock +
+                            modulesGroovyBlock +
                             "\n].each { module ->\n" +
-                            "    include \":features:$featureNameLowerCase:${'$'}module\"\n" +
+                            "    include \"$groupPrefix:${'$'}module\"\n" +
                             "}"
                     )
                 }
@@ -102,9 +131,7 @@ class SettingsFileUpdater {
 
         return runCatching { settingsFile.writeText(updatedFileContent) }
             .exceptionOrNull()
-            ?.let {
-                "${ERROR_PREFIX}Failed to update ${settingsFile.name}: ${it.message}"
-            }
+            ?.let { "${ERROR_PREFIX}Failed to update ${settingsFile.name}: ${it.message}" }
     }
 
     private fun groovySettingsFile(projectRoot: File): File = File(projectRoot, "settings.gradle")

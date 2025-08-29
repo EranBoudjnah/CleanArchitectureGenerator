@@ -148,6 +148,8 @@ class Generator {
             )?.let { return it }
         }
 
+        SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)?.let { return it }
+
         return "Success!"
     }
 

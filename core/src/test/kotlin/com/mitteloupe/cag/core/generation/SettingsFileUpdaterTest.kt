@@ -324,4 +324,264 @@ class SettingsFileUpdaterTest {
         nested.mkdirs()
         return nested
     }
+
+    @Test
+    fun `Given no settings files up the tree when updateDataSourceSettingsIfPresent then returns null`() {
+        // Given
+        val startDirectory = createTempDirectory(prefix = "noSettings").toFile()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+
+        // Then
+        assertNull(result)
+    }
+
+    @Test
+    fun `Given kotlin settings file with newline when updateDataSourceSettingsIfPresent then appends grouped includes`() {
+        // Given
+        val (projectRoot, startDirectory) =
+            createProjectWithKotlinSettings(
+                initialContent = "rootProject.name = \"app\"\n"
+            )
+        val expectedTail =
+            """
+            setOf(
+                "source",
+                "implementation"
+            ).forEach { module ->
+                include(":datasource:${'$'}module")
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given kotlin settings file without newline when updateDataSourceSettingsIfPresent then inserts newline before grouped includes`() {
+        // Given
+        val (projectRoot, startDirectory) =
+            createProjectWithKotlinSettings(
+                initialContent = "rootProject.name = \"app\""
+            )
+        val expectedTail =
+            """
+            setOf(
+                "source",
+                "implementation"
+            ).forEach { module ->
+                include(":datasource:${'$'}module")
+            }
+            """.trimIndent()
+        val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedNewlineBeforeIncludes))
+    }
+
+    @Test
+    fun `Given kotlin settings file with partial includes when updateDataSourceSettingsIfPresent then replaces with grouped includes`() {
+        // Given
+        val initial =
+            """
+            rootProject.name = "app"
+            include(":datasource:source")
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
+
+        val expectedTail =
+            """
+            setOf(
+                "source",
+                "implementation"
+            ).forEach { module ->
+                include(":datasource:${'$'}module")
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+        assertFalse(content.lines().any { it.contains("include(\":datasource:source\")") })
+        assertFalse(content.lines().any { it.contains("include(\":datasource:implementation\")") })
+    }
+
+    @Test
+    @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+    fun `Given kotlin settings file, non-rooted partial include when updateDataSourceSettingsIfPresent then replaces with grouped includes`() {
+        // Given
+        val initial =
+            """
+            rootProject.name = "app"
+            include("datasource:implementation")
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
+
+        val expectedTail =
+            """
+            setOf(
+                "source",
+                "implementation"
+            ).forEach { module ->
+                include(":datasource:${'$'}module")
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+        assertFalse(content.lines().any { it.contains("include(\"datasource:implementation\")") })
+        assertFalse(content.lines().any { it.contains("include(\"datasource:source\")") })
+    }
+
+    @Test
+    fun `Given groovy settings file when updateDataSourceSettingsIfPresent then appends grouped includes`() {
+        // Given
+        val (projectRoot, startDirectory) =
+            createProjectWithGroovySettings(
+                initialContent = "rootProject.name = 'app'\n"
+            )
+        val expectedTail =
+            """
+            [
+                'source',
+                'implementation'
+            ].each { module ->
+                include ":datasource:${'$'}module"
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given groovy settings file,partial includes when updateDataSourceSettingsIfPresent then replaces with grouped includes`() {
+        // Given
+        val initial =
+            """
+            rootProject.name = 'app'
+            include ":datasource:source"
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
+
+        val expectedTail =
+            """
+            [
+                'source',
+                'implementation'
+            ].each { module ->
+                include ":datasource:${'$'}module"
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+        assertFalse(content.lines().any { it.contains("include \":datasource:source\"") })
+        assertFalse(content.lines().any { it.contains("include \":datasource:implementation\"") })
+    }
+
+    @Test
+    fun `Given grouped includes already present in Kotlin when updateDataSourceSettingsIfPresent then does nothing`() {
+        // Given
+        val initial =
+            """
+            rootProject.name = "app"
+            setOf(
+                "source",
+                "implementation"
+            ).forEach { module ->
+                include(":datasource:${'$'}module")
+            }
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertEquals(initial, content)
+    }
+
+    @Test
+    fun `Given grouped includes already present in Groovy when updateDataSourceSettingsIfPresent then does nothing`() {
+        // Given
+        val initial =
+            """
+            rootProject.name = 'app'
+            [
+                'source',
+                'implementation'
+            ].each { module ->
+                include ":datasource:${'$'}module"
+            }
+            """.trimIndent() + "\n"
+        val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
+
+        // When
+        val result =
+            classUnderTest.updateDataSourceSettingsIfPresent(
+                startDirectory = startDirectory
+            )
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertEquals(initial, content)
+    }
 }
