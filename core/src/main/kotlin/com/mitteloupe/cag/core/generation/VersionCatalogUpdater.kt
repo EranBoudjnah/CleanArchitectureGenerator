@@ -3,51 +3,82 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.ERROR_PREFIX
 import java.io.File
 
-data class SectionTransaction(
-    val sectionHeader: String,
+data class SectionTransaction<SECTION_TYPE : SectionEntryRequirement>(
     val insertPositionIfMissing: CatalogInsertPosition,
-    val requirements: List<SectionRequirement>
+    val requirements: List<SECTION_TYPE>
 )
 
-data class SectionRequirement(val keyRegex: Regex, val lineToAdd: String)
+sealed class SectionEntryRequirement(val header: String) {
+    abstract val key: String
+
+    data class VersionRequirement(
+        override val key: String,
+        val version: String
+    ) : SectionEntryRequirement("versions")
+
+    data class LibraryRequirement(
+        override val key: String,
+        val module: String,
+        val versionRefKey: String? = null,
+        val versionLiteral: String? = null
+    ) : SectionEntryRequirement("libraries")
+
+    data class BundleRequirement(
+        override val key: String,
+        val members: List<String>
+    ) : SectionEntryRequirement("bundles")
+
+    data class PluginRequirement(
+        override val key: String,
+        val id: String,
+        val versionRefKey: String
+    ) : SectionEntryRequirement("plugins")
+}
 
 class VersionCatalogUpdater(
     private val contentUpdater: VersionCatalogContentUpdater = VersionCatalogContentUpdater()
 ) {
-    fun updateVersionCatalogIfPresent(projectRootDirectory: File): String? {
-        val catalogTextBefore = readCatalogFile(projectRootDirectory)
+    fun updateVersionCatalogIfPresent(projectRootDir: File): String? {
+        val catalogTextBefore = readCatalogFile(projectRootDir)
+        val existingPluginIdToAlias: Map<String, String> =
+            catalogTextBefore?.let { parseExistingPluginIdToAlias(it) } ?: emptyMap()
+
+        val desiredPlugins = desiredPluginEntries()
+        val missingDesiredPlugins = desiredPlugins.filter { it.id !in existingPluginIdToAlias.keys }
+
+        val pluginRequirements =
+            if (missingDesiredPlugins.isEmpty()) {
+                emptyList()
+            } else {
+                versionCatalogPluginRequirements(missingDesiredPlugins)
+            }
 
         updateVersionCatalogIfPresent(
-            projectRootDirectory = projectRootDirectory,
+            projectRootDir = projectRootDir,
             sectionRequirements =
                 listOf(
                     SectionTransaction(
-                        sectionHeader = "libraries",
                         insertPositionIfMissing = CatalogInsertPosition.End,
                         requirements = versionCatalogLibraryRequirements()
                     ),
                     SectionTransaction(
-                        sectionHeader = "plugins",
                         insertPositionIfMissing = CatalogInsertPosition.End,
-                        requirements = versionCatalogPluginRequirements()
+                        requirements = pluginRequirements
                     )
                 )
         )?.let { return it }
 
-        val catalogTextAfter = readCatalogFile(projectRootDirectory)
-        val addedAndroidLibraryAlias =
-            (catalogTextAfter?.contains(Regex("(?m)^\\s*android-library\\s*=")) == true) &&
-                (catalogTextBefore?.contains(Regex("(?m)^\\s*android-library\\s*=")) != true)
+        val catalogTextAfter = readCatalogFile(projectRootDir)
+        val addedAndroidLibraryAlias = missingDesiredPlugins.any { it.id == "com.android.library" }
         val addedComposeBomAlias =
             (catalogTextAfter?.contains(Regex("(?m)^\\s*compose-bom\\s*=")) == true) &&
                 (catalogTextBefore?.contains(Regex("(?m)^\\s*compose-bom\\s*=")) != true)
 
         return updateVersionCatalogIfPresent(
-            projectRootDirectory = projectRootDirectory,
+            projectRootDir = projectRootDir,
             sectionRequirements =
                 listOf(
                     SectionTransaction(
-                        sectionHeader = "versions",
                         insertPositionIfMissing = CatalogInsertPosition.Start,
                         requirements =
                             versionCatalogVersionRequirements(
@@ -59,17 +90,17 @@ class VersionCatalogUpdater(
         )
     }
 
-    private fun readCatalogFile(projectRootDirectory: File): String? {
-        val catalogDirectory = File(projectRootDirectory, "gradle")
+    private fun readCatalogFile(projectRootDir: File): String? {
+        val catalogDirectory = File(projectRootDir, "gradle")
         val catalogFile = File(catalogDirectory, "libs.versions.toml")
         return runCatching { if (catalogFile.exists()) catalogFile.readText() else null }.getOrNull()
     }
 
-    private fun updateVersionCatalogIfPresent(
-        projectRootDirectory: File,
-        sectionRequirements: List<SectionTransaction>
+    fun <SECTION_TYPE : SectionEntryRequirement> updateVersionCatalogIfPresent(
+        projectRootDir: File,
+        sectionRequirements: List<SectionTransaction<SECTION_TYPE>>
     ): String? {
-        val catalogFile = File(projectRootDirectory, "gradle/libs.versions.toml")
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
         if (!catalogFile.exists()) {
             return null
         }
@@ -90,76 +121,115 @@ class VersionCatalogUpdater(
     private fun versionCatalogVersionRequirements(
         includeAndroidGradlePlugin: Boolean,
         includeComposeBom: Boolean
-    ): List<SectionRequirement> {
+    ): List<SectionEntryRequirement> {
         val requirements =
-            mutableListOf(
-                SectionRequirement("^\\s*compileSdk\\s*=".toRegex(), "compileSdk = \"35\""),
-                SectionRequirement("^\\s*minSdk\\s*=".toRegex(), "minSdk = \"24\"")
+            mutableListOf<SectionEntryRequirement>(
+                SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"),
+                SectionEntryRequirement.VersionRequirement(key = "minSdk", version = "24")
             )
         if (includeAndroidGradlePlugin) {
             requirements.add(
-                SectionRequirement(
-                    "^\\s*androidGradlePlugin\\s*=".toRegex(),
-                    "androidGradlePlugin = \"8.7.3\""
+                SectionEntryRequirement.VersionRequirement(
+                    key = "androidGradlePlugin",
+                    version = "8.7.3"
                 )
             )
         }
         if (includeComposeBom) {
             requirements.add(
-                SectionRequirement(
-                    "^\\s*composeBom\\s*=".toRegex(),
-                    "composeBom = \"2025.08.01\""
+                SectionEntryRequirement.VersionRequirement(
+                    key = "composeBom",
+                    version = "2025.08.01"
                 )
             )
         }
         return requirements
     }
 
-    private fun versionCatalogPluginRequirements(): List<SectionRequirement> =
-        listOf(
-            SectionRequirement(
-                "^\\s*kotlin-jvm\\s*=".toRegex(),
-                "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
-            ),
-            SectionRequirement(
-                "^\\s*kotlin-android\\s*=".toRegex(),
-                "kotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }"
-            ),
-            SectionRequirement(
-                "^\\s*android-library\\s*=".toRegex(),
-                "android-library = { id = \"com.android.library\", version.ref = \"androidGradlePlugin\" }"
-            ),
-            SectionRequirement(
-                "^\\s*compose-compiler\\s*=".toRegex(),
-                "compose-compiler = { id = \"org.jetbrains.kotlin.plugin.compose\", version.ref = \"kotlin\" }"
+    private fun versionCatalogPluginRequirements(missingDesired: List<DesiredPlugin>): List<SectionEntryRequirement> =
+        missingDesired.map { desired ->
+            SectionEntryRequirement.PluginRequirement(
+                key = desired.alias,
+                id = desired.id,
+                versionRefKey = desired.versionRefKey
             )
-        )
+        }
 
-    private fun versionCatalogLibraryRequirements(): List<SectionRequirement> =
+    private fun versionCatalogLibraryRequirements(): List<SectionEntryRequirement> =
         listOf(
-            SectionRequirement(
-                "^\\s*compose-bom\\s*=.*$".toRegex(),
-                "compose-bom = { module = \"androidx.compose:compose-bom\", version.ref = \"composeBom\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "compose-bom",
+                module = "androidx.compose:compose-bom",
+                versionRefKey = "composeBom"
             ),
-            SectionRequirement(
-                "^\\s*compose-ui\\s*=.*$".toRegex(),
-                "compose-ui = { module = \"androidx.compose.ui:ui\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "compose-ui",
+                module = "androidx.compose.ui:ui"
             ),
-            SectionRequirement(
-                "^\\s*compose-ui-graphics\\s*=.*$".toRegex(),
-                "compose-ui-graphics = { module = \"androidx.compose.ui:ui-graphics\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "compose-ui-graphics",
+                module = "androidx.compose.ui:ui-graphics"
             ),
-            SectionRequirement(
-                "^\\s*androidx-ui-tooling\\s*=.*$".toRegex(),
-                "androidx-ui-tooling = { module = \"androidx.compose.ui:ui-tooling\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "androidx-ui-tooling",
+                module = "androidx.compose.ui:ui-tooling"
             ),
-            SectionRequirement(
-                "^\\s*androidx-ui-tooling-preview\\s*=.*$".toRegex(),
-                "androidx-ui-tooling-preview = { module = \"androidx.compose.ui:ui-tooling-preview\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "androidx-ui-tooling-preview",
+                module = "androidx.compose.ui:ui-tooling-preview"
             ),
-            SectionRequirement(
-                "^\\s*compose-material3\\s*=.*$".toRegex(),
-                "compose-material3 = { module = \"androidx.compose.material3:material3\" }"
+            SectionEntryRequirement.LibraryRequirement(
+                key = "compose-material3",
+                module = "androidx.compose.material3:material3"
             )
         )
 }
+
+private data class DesiredPlugin(val id: String, val alias: String, val versionRefKey: String)
+
+private fun desiredPluginEntries(): List<DesiredPlugin> =
+    listOf(
+        DesiredPlugin(
+            id = "org.jetbrains.kotlin.jvm",
+            alias = "kotlin-jvm",
+            versionRefKey = "kotlin"
+        ),
+        DesiredPlugin(
+            id = "org.jetbrains.kotlin.android",
+            alias = "kotlin-android",
+            versionRefKey = "kotlin"
+        ),
+        DesiredPlugin(
+            id = "com.android.library",
+            alias = "android-library",
+            versionRefKey = "androidGradlePlugin"
+        ),
+        DesiredPlugin(
+            id = "org.jetbrains.kotlin.plugin.compose",
+            alias = "compose-compiler",
+            versionRefKey = "kotlin"
+        )
+    )
+
+private fun parseExistingPluginIdToAlias(catalogText: String): Map<String, String> {
+    val pluginsSection = extractPluginsSection(catalogText) ?: return emptyMap()
+    val aliasToId =
+        VERSION_CATALOG_PLUGIN_ENTRY_REGEX.findAll(pluginsSection).associate { match ->
+            val alias = match.groupValues[1].trim()
+            val id = match.groupValues[2].trim()
+            alias to id
+        }
+    return aliasToId.entries.associate { (alias, id) -> id to alias }
+}
+
+private fun extractPluginsSection(toml: String): String? {
+    val marker = "[plugins]"
+    val startIndex = toml.indexOf(marker)
+    if (startIndex == -1) return null
+    val rest = toml.substring(startIndex + marker.length)
+    val nextSectionIndex = rest.indexOf("\n[")
+    return if (nextSectionIndex == -1) rest else rest.take(nextSectionIndex)
+}
+
+private val VERSION_CATALOG_PLUGIN_ENTRY_REGEX =
+    """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bid\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()

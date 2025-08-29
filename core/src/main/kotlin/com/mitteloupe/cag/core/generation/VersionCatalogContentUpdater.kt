@@ -1,9 +1,9 @@
 package com.mitteloupe.cag.core.generation
 
 class VersionCatalogContentUpdater {
-    fun updateCatalogText(
+    fun <SECTION_TYPE : SectionEntryRequirement> updateCatalogText(
         catalogText: String,
-        sectionTransactions: List<SectionTransaction>
+        sectionTransactions: List<SectionTransaction<SECTION_TYPE>>
     ): String {
         val contentLines = catalogText.split('\n')
         return sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
@@ -11,12 +11,17 @@ class VersionCatalogContentUpdater {
         }.joinToString("\n")
     }
 
-    private fun ensureSectionEntries(
+    private fun <SECTION_TYPE : SectionEntryRequirement> ensureSectionEntries(
         catalogContentLines: List<String>,
-        sectionTransaction: SectionTransaction
+        sectionTransaction: SectionTransaction<SECTION_TYPE>
     ): List<String> {
         val updatedLines = catalogContentLines.toMutableList()
-        val sectionBounds = findSectionBounds(catalogContentLines, sectionTransaction.sectionHeader)
+        if (sectionTransaction.requirements.isEmpty()) {
+            return updatedLines
+        }
+
+        val header = sectionTransaction.requirements.first().header
+        val sectionBounds = findSectionBounds(catalogContentLines, header)
         val needToAddSection = sectionBounds == null
         val sectionLinesRange: IntRange =
             if (sectionBounds == null) {
@@ -28,12 +33,11 @@ class VersionCatalogContentUpdater {
 
         val linesToAdd =
             buildList {
-                if (needToAddSection) add("[${sectionTransaction.sectionHeader}]")
+                if (needToAddSection) add("[$header]")
                 for (req in sectionTransaction.requirements) {
-                    val exists = !needToAddSection && updatedLines.hasKeyInRange(req.keyRegex, sectionLinesRange)
-                    if (!exists) {
-                        add(req.lineToAdd)
-                    }
+                    val keyRegex = buildKeyRegex(req.key)
+                    val exists = !needToAddSection && updatedLines.hasKeyInRange(keyRegex, sectionLinesRange)
+                    if (!exists) add(formatRequirementLine(req))
                 }
             }
 
@@ -94,4 +98,28 @@ class VersionCatalogContentUpdater {
         keyRegex: Regex,
         range: IntRange
     ): Boolean = range.any { index -> keyRegex.containsMatchIn(this[index]) }
+
+    private fun buildKeyRegex(key: String): Regex = ("""(?m)^\s*${Regex.escape(key)}\s*=""").toRegex()
+
+    private fun formatRequirementLine(req: SectionEntryRequirement): String =
+        when (req) {
+            is SectionEntryRequirement.VersionRequirement -> {
+                "${req.key} = \"${req.version}\""
+            }
+            is SectionEntryRequirement.LibraryRequirement -> {
+                val parts = mutableListOf("module = \"${req.module}\"")
+                when {
+                    req.versionRefKey != null -> parts.add("version.ref = \"${req.versionRefKey}\"")
+                    req.versionLiteral != null -> parts.add("version = \"${req.versionLiteral}\"")
+                }
+                "${req.key} = { ${parts.joinToString(", ")} }"
+            }
+            is SectionEntryRequirement.BundleRequirement -> {
+                val members = req.members.joinToString(", ") { "\"$it\"" }
+                "${req.key} = [ $members ]"
+            }
+            is SectionEntryRequirement.PluginRequirement -> {
+                "${req.key} = { id = \"${req.id}\", version.ref = \"${req.versionRefKey}\" }"
+            }
+        }
 }

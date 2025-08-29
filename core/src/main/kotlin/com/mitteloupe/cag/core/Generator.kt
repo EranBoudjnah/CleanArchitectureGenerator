@@ -33,7 +33,7 @@ class Generator {
 
         val featureNameLowerCase = request.featureName.lowercase()
         VersionCatalogUpdater().updateVersionCatalogIfPresent(
-            projectRootDirectory = request.destinationRootDirectory
+            projectRootDir = request.destinationRootDirectory
         )?.let { return it }
         val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 

@@ -1,8 +1,9 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.generation.SectionEntryRequirement.VersionRequirement
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.junit.Assert
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -25,11 +26,17 @@ class VersionCatalogUpdaterTest {
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = emptyList()
+                sectionRequirements =
+                    listOf(
+                        SectionTransaction(
+                            insertPositionIfMissing = CatalogInsertPosition.Start,
+                            requirements = listOf(VersionRequirement(key = "compileSdk", version = "35"))
+                        )
+                    )
             )
 
         // Then
-        Assert.assertNull(result)
+        assertNull(result)
     }
 
     @Test
@@ -45,12 +52,11 @@ class VersionCatalogUpdaterTest {
             )
         val section =
             SectionTransaction(
-                sectionHeader = "versions",
                 insertPositionIfMissing = CatalogInsertPosition.Start,
                 requirements =
                     listOf(
-                        SectionRequirement("^\\s*compileSdk\\s*=.*$".toRegex(), "compileSdk = \"35\""),
-                        SectionRequirement("^\\s*minSdk\\s*=.*$".toRegex(), "minSdk = \"24\"")
+                        VersionRequirement(key = "compileSdk", version = "35"),
+                        VersionRequirement(key = "minSdk", version = "24")
                     )
             )
 
@@ -72,8 +78,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertNull(result)
+        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -94,12 +100,11 @@ class VersionCatalogUpdaterTest {
             )
         val section =
             SectionTransaction(
-                sectionHeader = "versions",
                 insertPositionIfMissing = CatalogInsertPosition.Start,
                 requirements =
                     listOf(
-                        SectionRequirement("^\\s*compileSdk\\s*=.*$".toRegex(), "compileSdk = \"35\""),
-                        SectionRequirement("^\\s*minSdk\\s*=.*$".toRegex(), "minSdk = \"24\"")
+                        VersionRequirement(key = "compileSdk", version = "35"),
+                        VersionRequirement(key = "minSdk", version = "24")
                     )
             )
 
@@ -121,8 +126,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertNull(result)
+        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -139,17 +144,18 @@ class VersionCatalogUpdaterTest {
             )
         val section =
             SectionTransaction(
-                sectionHeader = "plugins",
                 insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
-                        SectionRequirement(
-                            "^\\s*android-library\\s*=.*$".toRegex(),
-                            "android-library = { id = \"com.android.library\", version.ref = \"agp\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "android-library",
+                            id = "com.android.library",
+                            versionRefKey = "agp"
                         ),
-                        SectionRequirement(
-                            "^\\s*kotlin-jvm\\s*=.*$".toRegex(),
-                            "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "kotlin-jvm",
+                            id = "org.jetbrains.kotlin.jvm",
+                            versionRefKey = "kotlin"
                         )
                     )
             )
@@ -172,8 +178,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertNull(result)
+        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -192,17 +198,18 @@ class VersionCatalogUpdaterTest {
             )
         val section =
             SectionTransaction(
-                sectionHeader = "plugins",
                 insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
-                        SectionRequirement(
-                            "^\\s*android-library\\s*=.*$".toRegex(),
-                            "android-library = { id = \"com.android.library\", version.ref = \"agp\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "android-library",
+                            id = "com.android.library",
+                            versionRefKey = "agp"
                         ),
-                        SectionRequirement(
-                            "^\\s*kotlin-jvm\\s*=.*$".toRegex(),
-                            "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "kotlin-jvm",
+                            id = "org.jetbrains.kotlin.jvm",
+                            versionRefKey = "kotlin"
                         )
                     )
             )
@@ -225,8 +232,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertNull(result)
+        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     @Test
@@ -246,17 +253,18 @@ class VersionCatalogUpdaterTest {
             )
         val section =
             SectionTransaction(
-                sectionHeader = "plugins",
                 insertPositionIfMissing = CatalogInsertPosition.End,
                 requirements =
                     listOf(
-                        SectionRequirement(
-                            "^\\s*android-library\\s*=.*$".toRegex(),
-                            "android-library = { id = \"com.android.library\", version.ref = \"agp\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "android-library",
+                            id = "com.android.library",
+                            versionRefKey = "agp"
                         ),
-                        SectionRequirement(
-                            "^\\s*kotlin-jvm\\s*=.*$".toRegex(),
-                            "kotlin-jvm = { id = \"org.jetbrains.kotlin.jvm\", version.ref = \"kotlin\" }"
+                        SectionEntryRequirement.PluginRequirement(
+                            key = "kotlin-jvm",
+                            id = "org.jetbrains.kotlin.jvm",
+                            versionRefKey = "kotlin"
                         )
                     )
             )
@@ -279,8 +287,8 @@ class VersionCatalogUpdaterTest {
             )
 
         // Then
-        Assert.assertNull(result)
-        MatcherAssert.assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertNull(result)
+        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
     }
 
     private fun createProjectWithCatalog(initialContent: String): Pair<File, File> {
