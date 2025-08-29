@@ -1,12 +1,18 @@
 package com.mitteloupe.cag.core.content
 
-fun buildDomainGradleScript(): String =
-    """plugins {
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+
+fun buildDomainGradleScript(catalog: VersionCatalogReader): String {
+    val aliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+
+    return """plugins {
     id("project-java-library")
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.$aliasKotlinJvm)
 }
 
 dependencies {
     implementation(projects.architecture.domain)
 }
 """
+}

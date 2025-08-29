@@ -1,9 +1,17 @@
 package com.mitteloupe.cag.core.content
 
-fun buildDataGradleScript(featureNameLowerCase: String): String =
-    """plugins {
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+
+fun buildDataGradleScript(
+    featureNameLowerCase: String,
+    catalog: VersionCatalogReader
+): String {
+    val aliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+
+    return """plugins {
     id("project-java-library")
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.$aliasKotlinJvm)
 }
 
 dependencies {
@@ -14,3 +22,4 @@ dependencies {
     implementation(projects.datasource.source)
 }
 """
+}

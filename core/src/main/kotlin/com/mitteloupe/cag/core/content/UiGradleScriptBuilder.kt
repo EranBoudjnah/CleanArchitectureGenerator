@@ -1,11 +1,35 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+
 fun buildUiGradleScript(
     featurePackageName: String,
     featureNameLowerCase: String,
-    enableCompose: Boolean
+    enableCompose: Boolean,
+    catalog: VersionCatalogReader
 ): String {
-    val composePluginLine = if (enableCompose) "    alias(libs.plugins.compose.compiler)\n" else ""
+    val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
+    val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.plugin.compose")?.asAccessor
+
+    val libAliasComposeBom = (catalog.getResolvedLibraryAliasForModule("androidx.compose:compose-bom") ?: "compose-bom").asAccessor
+    val libAliasComposeUi = (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui") ?: "compose-ui").asAccessor
+    val libAliasComposeMaterial3 =
+        (catalog.getResolvedLibraryAliasForModule("androidx.compose.material3:material3") ?: "compose-material3").asAccessor
+    val libAliasComposeUiGraphics =
+        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-graphics") ?: "compose-ui-graphics").asAccessor
+    val libAliasAndroidxUiTooling =
+        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling") ?: "androidx-ui-tooling").asAccessor
+    val libAliasAndroidxUiToolingPreview =
+        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling-preview") ?: "androidx-ui-tooling-preview").asAccessor
+
+    val composePluginLine =
+        if (enableCompose && pluginAliasComposeCompiler != null) {
+            "    alias(libs.plugins.$pluginAliasComposeCompiler)\n"
+        } else {
+            ""
+        }
     val composeBuildFeaturesSection =
         if (enableCompose) {
             """
@@ -20,20 +44,20 @@ fun buildUiGradleScript(
     val composeDependenciesSection =
         if (enableCompose) {
             """
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.ui.tooling.preview)
+    implementation(platform(libs.$libAliasComposeBom))
+    implementation(libs.$libAliasComposeUi)
+    implementation(libs.$libAliasComposeMaterial3)
+    implementation(libs.$libAliasComposeUiGraphics)
+    implementation(libs.$libAliasAndroidxUiTooling)
+    implementation(libs.$libAliasAndroidxUiToolingPreview)
 """
         } else {
             ""
         }
 
     return """plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.$pluginAliasAndroidLibrary)
+    alias(libs.plugins.$pluginAliasKotlinAndroid)
 $composePluginLine}
 
 android {

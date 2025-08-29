@@ -1,6 +1,5 @@
 package com.mitteloupe.cag.core.generation
-
-import com.mitteloupe.cag.core.generation.SectionEntryRequirement.VersionRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertNull
@@ -26,13 +25,7 @@ class VersionCatalogUpdaterTest {
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements =
-                    listOf(
-                        SectionTransaction(
-                            insertPositionIfMissing = CatalogInsertPosition.Start,
-                            requirements = listOf(VersionRequirement(key = "compileSdk", version = "35"))
-                        )
-                    )
+                enableCompose = false
             )
 
         // Then
@@ -40,7 +33,7 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given no versions section when updateVersionCatalogIfPresent then inserts at start with single separator after`() {
+    fun `Given no versions section when updateVersionCatalogIfPresent then adds desired plugins and versions`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -50,31 +43,25 @@ class VersionCatalogUpdaterTest {
                     android-application = { id = "com.android.application", version = "1.0.0" }
                     """.trimIndent()
             )
-        val section =
-            SectionTransaction(
-                insertPositionIfMissing = CatalogInsertPosition.Start,
-                requirements =
-                    listOf(
-                        VersionRequirement(key = "compileSdk", version = "35"),
-                        VersionRequirement(key = "minSdk", version = "24")
-                    )
-            )
-
         val expected =
             """
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            androidGradlePlugin = "8.7.3"
 
             [plugins]
             android-application = { id = "com.android.application", version = "1.0.0" }
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent()
 
         // When
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = listOf(section)
+                enableCompose = false
             )
 
         // Then
@@ -84,7 +71,7 @@ class VersionCatalogUpdaterTest {
 
     @Test
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
-    fun `Given versions section with trailing blanks when updateVersionCatalogIfPresent then adds entries without gaps and keeps single separator`() {
+    fun `Given versions section with trailing blanks when updateVersionCatalogIfPresent then trims gaps and adds plugins`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -98,31 +85,25 @@ class VersionCatalogUpdaterTest {
                     android-application = { id = "com.android.application", version.ref = "agp" }
                     """.trimIndent()
             )
-        val section =
-            SectionTransaction(
-                insertPositionIfMissing = CatalogInsertPosition.Start,
-                requirements =
-                    listOf(
-                        VersionRequirement(key = "compileSdk", version = "35"),
-                        VersionRequirement(key = "minSdk", version = "24")
-                    )
-            )
-
         val expected =
             """
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            androidGradlePlugin = "8.7.3"
 
             [plugins]
             android-application = { id = "com.android.application", version.ref = "agp" }
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent()
 
         // When
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = listOf(section)
+                enableCompose = false
             )
 
         // Then
@@ -132,7 +113,7 @@ class VersionCatalogUpdaterTest {
 
     @Test
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
-    fun `Given no plugins section, no trailing newline when updateVersionCatalogIfPresent with END then appends with single separator and trailing newline`() {
+    fun `Given no plugins section, when updateVersionCatalogIfPresent then appends desired plugins and versions with proper separators`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -142,39 +123,24 @@ class VersionCatalogUpdaterTest {
                     compileSdk = "35"
                     """.trimIndent()
             )
-        val section =
-            SectionTransaction(
-                insertPositionIfMissing = CatalogInsertPosition.End,
-                requirements =
-                    listOf(
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "android-library",
-                            id = "com.android.library",
-                            versionRefKey = "agp"
-                        ),
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "kotlin-jvm",
-                            id = "org.jetbrains.kotlin.jvm",
-                            versionRefKey = "kotlin"
-                        )
-                    )
-            )
-
         val expected =
             """
             [versions]
             compileSdk = "35"
+            minSdk = "24"
+            androidGradlePlugin = "8.7.3"
 
             [plugins]
-            android-library = { id = "com.android.library", version.ref = "agp" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent() + "\n"
 
         // When
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = listOf(section)
+                enableCompose = false
             )
 
         // Then
@@ -184,7 +150,7 @@ class VersionCatalogUpdaterTest {
 
     @Test
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
-    fun `Given no plugins section, trailing newline when updateVersionCatalogIfPresent with END then appends with single separator and trailing newline`() {
+    fun `Given no plugins section, trailing newline when updateVersionCatalogIfPresent then appends with single separator and trailing newline`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -196,39 +162,24 @@ class VersionCatalogUpdaterTest {
                         """.trimIndent() + "\n"
                     )
             )
-        val section =
-            SectionTransaction(
-                insertPositionIfMissing = CatalogInsertPosition.End,
-                requirements =
-                    listOf(
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "android-library",
-                            id = "com.android.library",
-                            versionRefKey = "agp"
-                        ),
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "kotlin-jvm",
-                            id = "org.jetbrains.kotlin.jvm",
-                            versionRefKey = "kotlin"
-                        )
-                    )
-            )
-
         val expected =
             """
             [versions]
             compileSdk = "35"
+            minSdk = "24"
+            androidGradlePlugin = "8.7.3"
 
             [plugins]
-            android-library = { id = "com.android.library", version.ref = "agp" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent() + "\n"
 
         // When
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = listOf(section)
+                enableCompose = false
             )
 
         // Then
@@ -238,7 +189,7 @@ class VersionCatalogUpdaterTest {
 
     @Test
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
-    fun `Given plugins section with one required entry missing when updateVersionCatalogIfPresent with END then appends missing entry and keeps single separator`() {
+    fun `Given plugins section with one desired entry missing when updateVersionCatalogIfPresent then appends missing entries`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -251,39 +202,24 @@ class VersionCatalogUpdaterTest {
                     android-library = { id = "com.android.library", version.ref = "agp" }
                     """.trimIndent()
             )
-        val section =
-            SectionTransaction(
-                insertPositionIfMissing = CatalogInsertPosition.End,
-                requirements =
-                    listOf(
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "android-library",
-                            id = "com.android.library",
-                            versionRefKey = "agp"
-                        ),
-                        SectionEntryRequirement.PluginRequirement(
-                            key = "kotlin-jvm",
-                            id = "org.jetbrains.kotlin.jvm",
-                            versionRefKey = "kotlin"
-                        )
-                    )
-            )
-
         val expected =
             """
             [versions]
             agp = "35"
+            compileSdk = "35"
+            minSdk = "24"
 
             [plugins]
             android-library = { id = "com.android.library", version.ref = "agp" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
             """.trimIndent()
 
         // When
         val result =
             classUnderTest.updateVersionCatalogIfPresent(
                 projectRootDir = projectRoot,
-                sectionRequirements = listOf(section)
+                enableCompose = false
             )
 
         // Then

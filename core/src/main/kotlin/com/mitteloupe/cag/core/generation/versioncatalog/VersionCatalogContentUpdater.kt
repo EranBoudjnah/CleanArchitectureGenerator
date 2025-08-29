@@ -1,4 +1,13 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.versioncatalog
+
+private val VERSION_CATALOG_PLUGIN_ENTRY_REGEX =
+    """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bid\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
+
+private val VERSION_CATALOG_LIBRARY_KEY_REGEX =
+    """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*.*$""".toRegex()
+
+private val VERSION_CATALOG_LIBRARY_ENTRY_WITH_MODULE_REGEX =
+    """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bmodule\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
 
 class VersionCatalogContentUpdater {
     fun <SECTION_TYPE : SectionEntryRequirement> updateCatalogText(
@@ -122,4 +131,42 @@ class VersionCatalogContentUpdater {
                 "${req.key} = { id = \"${req.id}\", version.ref = \"${req.versionRefKey}\" }"
             }
         }
+
+    fun parseExistingPluginIdToAlias(catalogText: String): Map<String, String> {
+        val contentLines = catalogText.split('\n')
+        val sectionBounds = findSectionBounds(contentLines, "plugins") ?: return emptyMap()
+        val (start, endExclusive) = sectionBounds
+        val sectionText = contentLines.subList(start + 1, endExclusive).joinToString("\n")
+        val aliasToId =
+            VERSION_CATALOG_PLUGIN_ENTRY_REGEX.findAll(sectionText).associate { match ->
+                val alias = match.groupValues[1].trim()
+                val id = match.groupValues[2].trim()
+                alias to id
+            }
+        return aliasToId.entries.associate { (alias, id) -> id to alias }
+    }
+
+    fun parseExistingPluginAliasToId(catalogText: String): Map<String, String> {
+        val contentLines = catalogText.split('\n')
+        val sectionBounds = findSectionBounds(contentLines, "plugins") ?: return emptyMap()
+        val (start, endExclusive) = sectionBounds
+        val sectionText = contentLines.subList(start + 1, endExclusive).joinToString("\n")
+        return VERSION_CATALOG_PLUGIN_ENTRY_REGEX.findAll(sectionText).associate { match ->
+            val alias = match.groupValues[1].trim()
+            val id = match.groupValues[2].trim()
+            alias to id
+        }
+    }
+
+    fun parseExistingLibraryAliasToModule(catalogText: String): Map<String, String> {
+        val contentLines = catalogText.split('\n')
+        val sectionBounds = findSectionBounds(contentLines, "libraries") ?: return emptyMap()
+        val (start, endExclusive) = sectionBounds
+        val sectionText = contentLines.subList(start + 1, endExclusive).joinToString("\n")
+        return VERSION_CATALOG_LIBRARY_ENTRY_WITH_MODULE_REGEX.findAll(sectionText).associate { match ->
+            val alias = match.groupValues[1].trim()
+            val module = match.groupValues[2].trim()
+            alias to module
+        }
+    }
 }
