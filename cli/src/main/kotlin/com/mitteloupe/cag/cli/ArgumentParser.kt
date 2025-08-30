@@ -1,6 +1,12 @@
 package com.mitteloupe.cag.cli
 
 class ArgumentParser {
+    fun isHelpRequested(arguments: Array<String>): Boolean {
+        if (arguments.isEmpty()) return false
+
+        return arguments.any { argument -> argument == "--help" || argument == "-h" }
+    }
+
     fun parseFeatureNames(args: Array<String>): List<String> {
         if (args.isEmpty()) return emptyList()
 

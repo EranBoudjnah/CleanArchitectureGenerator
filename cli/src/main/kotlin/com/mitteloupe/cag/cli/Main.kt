@@ -12,10 +12,29 @@ fun main(args: Array<String>) {
     val projectModel = FilesystemProjectModel(projectRoot)
     val basePackage = BasePackageResolver().determineBasePackage(projectModel)
 
+    if (argumentParser.isHelpRequested(args)) {
+        println(
+            """
+            usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+
+            Options:
+              --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
+              --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
+              --help, -h                                    Show this help message and exit
+            """.trimIndent()
+        )
+        return
+    }
+
     val featureNames = argumentParser.parseFeatureNames(args)
     val dataSourceNames = argumentParser.parseDataSourceNames(args)
     if (featureNames.isEmpty() && dataSourceNames.isEmpty()) {
-        println("usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...")
+        println(
+            """
+            usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+            Run with --help or -h for more options.
+            """.trimIndent()
+        )
         return
     }
 

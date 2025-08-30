@@ -7,19 +7,32 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 - **Run via Gradle (no install):**
 
 ```bash
-./gradlew :cli:run --args="MyFeature"
+./gradlew :cli:run --args="--new-feature=MyFeature"
 ```
 
 - **Run via installed script:**
 
 ```bash
 ./gradlew :cli:installDist
-"./cli/build/install/cli/bin/cli" MyFeature
+"./cli/build/install/cli/bin/cli" --new-feature=MyFeature
 ```
 
 - **Run the fat jar:**
 
 ```bash
 ./gradlew :cli:shadowJar
-java -jar "cli/build/libs/cli-all.jar" MyFeature
+java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
 ```
+
+#### Options
+
+```bash
+usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+
+Options:
+  --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
+  --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
+  --help, -h                                    Show this help message and exit
+```
+
+When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.
