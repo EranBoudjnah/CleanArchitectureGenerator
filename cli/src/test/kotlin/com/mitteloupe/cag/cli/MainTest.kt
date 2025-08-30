@@ -33,7 +33,9 @@ class MainTest : BaseMainTest() {
 
         // Then
         assertEquals(
-            "usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...\nRun with --help or -h for more options.\n",
+            "usage: cag [--new-feature=FeatureName [--package=PackageName]]... " +
+                "[--new-datasource=DataSourceName]...\n" +
+                "Run with --help or -h for more options.\n",
             output.toString()
         )
     }
@@ -60,10 +62,11 @@ class MainHelpTest : BaseMainTest() {
 
     companion object {
         private const val EXPECTED_HELP =
-            """usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+            """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
 
 Options:
   --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
+  --package=PackageName, -p=PackageName         Override the feature package for the preceding feature
   --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
   --help, -h                                    Show this help message and exit
 """

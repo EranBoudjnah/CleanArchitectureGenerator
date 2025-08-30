@@ -153,3 +153,48 @@ class ArgumentParserDataSourceTest {
         private const val DATA_SOURCE_NAME_SUFFIX = "DataSource"
     }
 }
+
+class ArgumentParserFeaturePackagesTest {
+    private lateinit var classUnderTest: ArgumentParser
+
+    @Before
+    fun setUp() {
+        classUnderTest = ArgumentParser()
+    }
+
+    @Test
+    fun `Given single feature without package when parseFeaturePackages then returns null`() {
+        // Given
+        val givenArguments = arrayOf("--new-feature=FeatureName")
+
+        // When
+        val result = classUnderTest.parseFeaturePackages(givenArguments)
+
+        // Then
+        assertEquals(listOf<String?>(null), result)
+    }
+
+    @Test
+    fun `Given feature with package when parseFeaturePackages then returns package`() {
+        // Given
+        val givenArguments = arrayOf("--new-feature=FeatureName", "--package=com.example.feature")
+
+        // When
+        val result = classUnderTest.parseFeaturePackages(givenArguments)
+
+        // Then
+        assertEquals(listOf("com.example.feature"), result)
+    }
+
+    @Test
+    fun `Given mixed short flags when parseFeaturePackages then maps in order`() {
+        // Given
+        val givenArguments = arrayOf("-nf=First", "-p=com.first", "--new-feature=Second")
+
+        // When
+        val result = classUnderTest.parseFeaturePackages(givenArguments)
+
+        // Then
+        assertEquals(listOf("com.first", null), result)
+    }
+}

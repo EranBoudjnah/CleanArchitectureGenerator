@@ -15,10 +15,11 @@ fun main(args: Array<String>) {
     if (argumentParser.isHelpRequested(args)) {
         println(
             """
-            usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
 
             Options:
               --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
+              --package=PackageName, -p=PackageName         Override the feature package for the preceding feature
               --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
               --help, -h                                    Show this help message and exit
             """.trimIndent()
@@ -27,11 +28,12 @@ fun main(args: Array<String>) {
     }
 
     val featureNames = argumentParser.parseFeatureNames(args)
+    val featurePackages = argumentParser.parseFeaturePackages(args)
     val dataSourceNames = argumentParser.parseDataSourceNames(args)
     if (featureNames.isEmpty() && dataSourceNames.isEmpty()) {
         println(
             """
-            usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...
+            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
             Run with --help or -h for more options.
             """.trimIndent()
         )
@@ -42,9 +44,12 @@ fun main(args: Array<String>) {
     val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
-    featureNames.forEach { featureName ->
+    featureNames.forEachIndexed { index, featureName ->
+        val explicitPackage = featurePackages.getOrNull(index)
         val packageName =
-            if (basePackage == null) {
+            if (explicitPackage != null) {
+                explicitPackage
+            } else if (basePackage == null) {
                 null
             } else {
                 "$basePackage${featureName.lowercase()}"
