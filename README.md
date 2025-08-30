@@ -26,14 +26,30 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
 
 #### Options
 
-```bash
-usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
+Usage:
 
-Options:
-  --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
-  --package=PackageName, -p=PackageName         Override the feature package for the preceding feature
-  --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
-  --help, -h                                    Show this help message and exit
+```bash
+cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
+```
+
+##### New Feature Options
+```bash
+  --new-feature=<FeatureName> | --new-feature <FeatureName> | -nf=<FeatureName> | -nf <FeatureName> | -nf<FeatureName>
+    Generate a new feature named FeatureName
+  --package=<PackageName> | --package <PackageName> | -p=<PackageName> | -p <PackageName> | -p<PackageName>
+    (Optional) Override the feature package for the preceding feature
+```
+
+##### New DataSource Options
+```bash
+  --new-datasource=<Name> | --new-datasource <Name> | -nds=<Name> | -nds <Name> | -nds<Name>
+    Generate a new DataDource named NameDataSource
+```
+
+##### Other Options
+```bash
+  --help, -h
+    Show the help document for cag
 ```
 
 When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.

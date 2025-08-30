@@ -18,9 +18,12 @@ fun main(args: Array<String>) {
             usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
 
             Options:
-              --new-feature=FeatureName, -nf=FeatureName    Generate a new feature named FeatureName
-              --package=PackageName, -p=PackageName         Override the feature package for the preceding feature
-              --new-datasource=Name, -nds=Name              Generate a new data source named NameDataSource
+              --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
+                                                        Generate a new feature named FeatureName
+              --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+                                                        Override the feature package for the preceding feature
+              --new-datasource=Name | --new-datasource Name | -nds=Name | -nds Name | -ndsName
+                                                        Generate a new data source named NameDataSource
               --help, -h                                    Show this help message and exit
             """.trimIndent()
         )
