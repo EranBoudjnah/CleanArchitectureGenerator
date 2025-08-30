@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
+import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
@@ -164,6 +165,13 @@ class Generator {
 
         DataSourceInterfaceCreator()
             .writeDataSourceInterface(
+                destinationRootDirectory = destinationRootDirectory,
+                projectNamespace = projectNamespace,
+                dataSourceName = dataSourceName
+            )?.let { return it }
+
+        DataSourceImplementationCreator()
+            .writeDataSourceImplementation(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
