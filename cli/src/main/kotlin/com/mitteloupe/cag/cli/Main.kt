@@ -7,27 +7,49 @@ import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.nio.file.Paths
 
 fun main(args: Array<String>) {
+    val argumentParser = ArgumentParser()
     val projectRoot = findGradleProjectRoot(Paths.get("").toAbsolutePath().toFile()) ?: Paths.get("").toAbsolutePath().toFile()
     val projectModel = FilesystemProjectModel(projectRoot)
     val basePackage = BasePackageResolver().determineBasePackage(projectModel)
 
-    val featureName = args.firstOrNull() ?: "SampleFeature"
-    val packageName =
-        if (basePackage == null) {
-            null
-        } else {
-            "$basePackage${featureName.lowercase()}"
-        }
-    println("Package: ${packageName ?: "<not found>" }")
+    val featureNames = argumentParser.parseFeatureNames(args)
+    val dataSourceNames = argumentParser.parseDataSourceNames(args)
+    if (featureNames.isEmpty() && dataSourceNames.isEmpty()) {
+        println("usage: cag [--new-feature=FeatureName]... [--new-datasource=DataSourceName]...")
+        return
+    }
+
     val generator = Generator()
-    val request =
-        GenerateFeatureRequestBuilder(
-            destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot,
-            projectNamespace = basePackage ?: "com.unknown.app.",
-            featureName = featureName
-        ).featurePackageName(packageName)
-            .enableCompose(true)
-            .build()
-    val result = generator.generateFeature(request)
-    println(result)
+    val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
+    val projectNamespace = basePackage ?: "com.unknown.app."
+
+    featureNames.forEach { featureName ->
+        val packageName =
+            if (basePackage == null) {
+                null
+            } else {
+                "$basePackage${featureName.lowercase()}"
+            }
+
+        val request =
+            GenerateFeatureRequestBuilder(
+                destinationRootDir = destinationRootDir,
+                projectNamespace = projectNamespace,
+                featureName = featureName
+            ).featurePackageName(packageName)
+                .enableCompose(true)
+                .build()
+        val result = generator.generateFeature(request)
+        println(result)
+    }
+
+    dataSourceNames.forEach { dataSourceName ->
+        val result =
+            generator.generateDataSource(
+                destinationRootDirectory = destinationRootDir,
+                dataSourceName = dataSourceName,
+                projectNamespace = projectNamespace
+            )
+        println(result)
+    }
 }
