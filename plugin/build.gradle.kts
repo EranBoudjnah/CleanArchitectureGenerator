@@ -1,5 +1,3 @@
-import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
-
 plugins {
     id("java")
     alias(libs.plugins.kotlin.jvm)
@@ -40,14 +38,6 @@ tasks {
 
     named("buildSearchableOptions").configure {
         enabled = false
-    }
-
-    named<RunIdeTask>("runIde").configure {
-        systemProperty("idea.kotlin.plugin.use.k2", "false")
-
-        doFirst {
-            logger.lifecycle("runIde: K2 disabled")
-        }
     }
 }
 
