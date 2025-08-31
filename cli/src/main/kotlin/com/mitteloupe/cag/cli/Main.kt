@@ -6,37 +6,39 @@ import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.nio.file.Paths
 
-fun main(args: Array<String>) {
-    val argumentParser = ArgumentParser()
+fun main(arguments: Array<String>) {
+    val argumentProcessor = AppArgumentProcessor()
     val projectRoot = findGradleProjectRoot(Paths.get("").toAbsolutePath().toFile()) ?: Paths.get("").toAbsolutePath().toFile()
     val projectModel = FilesystemProjectModel(projectRoot)
     val basePackage = BasePackageResolver().determineBasePackage(projectModel)
 
-    if (argumentParser.isHelpRequested(args)) {
+    if (argumentProcessor.isHelpRequested(arguments)) {
         println(
             """
-            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
+            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...
 
             Options:
               --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
-                                                        Generate a new feature named FeatureName
+                Generate a new feature named FeatureName
               --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
-                                                        Override the feature package for the preceding feature
+                Override the feature package for the preceding feature
               --new-datasource=Name | --new-datasource Name | -nds=Name | -nds Name | -ndsName
-                                                        Generate a new data source named NameDataSource
-              --help, -h                                    Show this help message and exit
+                Generate a new data source named NameDataSource
+              --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
+                Attach dependencies to the preceding new data source
+              --help, -h
+                Show this help message and exit
             """.trimIndent()
         )
         return
     }
 
-    val featureNames = argumentParser.parseFeatureNames(args)
-    val featurePackages = argumentParser.parseFeaturePackages(args)
-    val dataSourceNames = argumentParser.parseDataSourceNames(args)
-    if (featureNames.isEmpty() && dataSourceNames.isEmpty()) {
+    val featureRequests = argumentProcessor.getNewFeatures(arguments)
+    val dataSourceRequests = argumentProcessor.getNewDataSources(arguments)
+    if (featureRequests.isEmpty() && dataSourceRequests.isEmpty()) {
         println(
             """
-            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
+            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...
             Run with --help or -h for more options.
             """.trimIndent()
         )
@@ -47,8 +49,9 @@ fun main(args: Array<String>) {
     val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
-    featureNames.forEachIndexed { index, featureName ->
-        val explicitPackage = featurePackages.getOrNull(index)
+    featureRequests.forEach { requestFeature ->
+        val featureName = requestFeature.featureName
+        val explicitPackage = requestFeature.packageName
         val packageName =
             if (explicitPackage != null) {
                 explicitPackage
@@ -70,12 +73,14 @@ fun main(args: Array<String>) {
         println(result)
     }
 
-    dataSourceNames.forEach { dataSourceName ->
+    dataSourceRequests.forEach { request ->
         val result =
             generator.generateDataSource(
                 destinationRootDirectory = destinationRootDir,
-                dataSourceName = dataSourceName,
-                projectNamespace = projectNamespace
+                dataSourceName = request.dataSourceName,
+                projectNamespace = projectNamespace,
+                useKtor = request.useKtor,
+                useRetrofit = request.useRetrofit
             )
         println(result)
     }

@@ -26,7 +26,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <actions>
-        <group id="NewCleanArchitectureGenerator" text="Clean Architecture Generator" popup="false">
+        <group id="NewCleanArchitectureGenerator" popup="false">
             <separator />
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
                     class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>

@@ -29,7 +29,7 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
 Usage:
 
 ```bash
-cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName]...
+cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...
 ```
 
 ##### New Feature Options
@@ -44,6 +44,8 @@ cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=Dat
 ```bash
   --new-datasource=<Name> | --new-datasource <Name> | -nds=<Name> | -nds <Name> | -nds<Name>
     Generate a new DataDource named NameDataSource
+  --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
+    Attach dependencies to the preceding new data source
 ```
 
 ##### Other Options
@@ -53,3 +55,11 @@ cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=Dat
 ```
 
 When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.
+
+### Android Studio plugin
+
+- New data source dialog now includes two checkboxes:
+  - Add Ktor dependencies
+  - Add Retrofit dependencies
+
+These control whether the generated `datasource/implementation` module `build.gradle.kts` includes Ktor and/or Retrofit dependencies.

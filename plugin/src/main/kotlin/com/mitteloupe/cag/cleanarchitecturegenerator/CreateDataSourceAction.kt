@@ -20,7 +20,14 @@ class CreateDataSourceAction : AnAction() {
         if (!dialog.showAndGet()) return
         val dataSourceName = dialog.dataSourceNameWithSuffix
 
-        val result = Generator().generateDataSource(projectRootDir, dataSourceName, defaultPrefix)
+        val result =
+            Generator().generateDataSource(
+                destinationRootDirectory = projectRootDir,
+                dataSourceName = dataSourceName,
+                projectNamespace = defaultPrefix,
+                useKtor = dialog.useKtor,
+                useRetrofit = dialog.useRetrofit
+            )
         ideBridge.refreshIde(projectRootDir)
         ideBridge.synchronizeGradle(project, result, projectRootDir)
         Messages.showInfoMessage(

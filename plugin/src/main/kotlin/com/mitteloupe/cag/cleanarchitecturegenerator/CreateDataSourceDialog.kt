@@ -3,6 +3,7 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
@@ -18,12 +19,20 @@ class CreateDataSourceDialog(
     project: Project?
 ) : DialogWrapper(project) {
     private val dataSourceNameTextField = JBTextField()
+    private val ktorCheckBox = JBCheckBox("Add Ktor dependencies")
+    private val retrofitCheckBox = JBCheckBox("Add Retrofit dependencies")
 
     val dataSourceNameWithSuffix: String
         get() = "${dataSourceName}DataSource"
 
     private val dataSourceName: String
         get() = dataSourceNameTextField.text.trim()
+
+    val useKtor: Boolean
+        get() = ktorCheckBox.isSelected
+
+    val useRetrofit: Boolean
+        get() = retrofitCheckBox.isSelected
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.datasource.generator.title")
@@ -59,6 +68,8 @@ class CreateDataSourceDialog(
                     1,
                     false
                 )
+                .addComponent(ktorCheckBox)
+                .addComponent(retrofitCheckBox)
                 .panel
 
         return formPanel

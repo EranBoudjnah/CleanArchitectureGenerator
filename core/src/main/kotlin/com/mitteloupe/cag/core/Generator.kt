@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core
 
 import com.mitteloupe.cag.core.content.buildDataGradleScript
+import com.mitteloupe.cag.core.content.buildDataSourceImplementationGradleScript
+import com.mitteloupe.cag.core.content.buildDataSourceSourceGradleScript
 import com.mitteloupe.cag.core.content.buildDomainGradleScript
 import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
@@ -124,32 +126,51 @@ class Generator {
         }
     }
 
-    private fun generateDataSourceModules(destinationRootDirectory: File): String {
+    private fun generateDataSourceModules(
+        destinationRootDirectory: File,
+        useKtor: Boolean,
+        useRetrofit: Boolean
+    ): String {
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
         val allCreated =
-            modules.map { moduleName ->
+            modules.all { moduleName ->
                 val moduleDirectory = File(datasourceRoot, moduleName)
                 if (moduleDirectory.exists()) {
                     moduleDirectory.isDirectory
                 } else {
                     moduleDirectory.mkdirs()
                 }
-            }.all { it }
+            }
 
         if (!allCreated) {
             return "${ERROR_PREFIX}Failed to create directories for datasource."
         }
 
         val gradleFileCreator = GradleFileCreator()
-        for (moduleName in modules) {
-            gradleFileCreator.writeGradleFileIfMissing(
-                featureRoot = datasourceRoot,
-                layer = moduleName,
-                content = ""
-            )?.let { return it }
-        }
+        val catalogUpdater = VersionCatalogUpdater()
+        catalogUpdater.updateVersionCatalogIfPresent(
+            projectRootDir = destinationRootDirectory,
+            enableCompose = false
+        )?.let { return it }
+
+        gradleFileCreator.writeGradleFileIfMissing(
+            featureRoot = datasourceRoot,
+            layer = "source",
+            content = buildDataSourceSourceGradleScript(catalogUpdater)
+        )?.let { return it }
+
+        gradleFileCreator.writeGradleFileIfMissing(
+            featureRoot = datasourceRoot,
+            layer = "implementation",
+            content =
+                buildDataSourceImplementationGradleScript(
+                    catalog = catalogUpdater,
+                    useKtor = useKtor,
+                    useRetrofit = useRetrofit
+                )
+        )?.let { return it }
 
         SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)?.let { return it }
 
@@ -159,9 +180,11 @@ class Generator {
     fun generateDataSource(
         destinationRootDirectory: File,
         dataSourceName: String,
-        projectNamespace: String
+        projectNamespace: String,
+        useKtor: Boolean = false,
+        useRetrofit: Boolean = false
     ): String {
-        val baseResult = generateDataSourceModules(destinationRootDirectory)
+        val baseResult = generateDataSourceModules(destinationRootDirectory, useKtor, useRetrofit)
         if (baseResult.startsWith(ERROR_PREFIX)) return baseResult
 
         DataSourceInterfaceCreator()
