@@ -25,18 +25,16 @@
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <extensions defaultExtensionNs="com.intellij">
-
-    </extensions>
     <actions>
-        <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
-                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction">
+        <group id="NewCleanArchitectureGenerator" text="Clean Architecture Generator" popup="false">
+            <separator />
+            <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
+                    class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>
+            <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"
+                    class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"/>
+            <separator />
             <add-to-group group-id="NewGroup" anchor="first"/>
-        </action>
-        <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"
-                class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction">
-            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>
-        </action>
+        </group>
     </actions>
 </idea-plugin>
 
