@@ -32,10 +32,11 @@
                     class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"
                     class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"/>
+            <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateUseCaseAction"
+                    class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateUseCaseAction"/>
             <separator />
             <add-to-group group-id="NewGroup" anchor="first"/>
         </group>
     </actions>
 </idea-plugin>
-
 
