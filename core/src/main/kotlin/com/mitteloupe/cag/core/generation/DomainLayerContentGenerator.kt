@@ -23,7 +23,9 @@ class DomainLayerContentGenerator(
 
     fun generateUseCase(
         destinationDirectory: File,
-        useCaseName: String
+        useCaseName: String,
+        inputDataType: String? = null,
+        outputDataType: String? = null
     ): String? {
         val packageSuffixRegex = USE_CASE_PACKAGE_SUFFIX.replace(".", "\\.") + "$"
         val packageName =
@@ -36,7 +38,9 @@ class DomainLayerContentGenerator(
             targetDirectory = destinationDirectory,
             projectNamespace = extractProjectNamespace(packageName),
             featurePackageName = packageName,
-            useCaseName = useCaseName
+            useCaseName = useCaseName,
+            inputDataType = inputDataType,
+            outputDataType = outputDataType
         )
     }
 
@@ -44,7 +48,9 @@ class DomainLayerContentGenerator(
         targetDirectory: File,
         projectNamespace: String,
         featurePackageName: String,
-        useCaseName: String
+        useCaseName: String,
+        inputDataType: String? = null,
+        outputDataType: String? = null
     ): String? {
         return kotlinFileCreator.writeKotlinFileInLayer(
             targetDirectory = targetDirectory,
@@ -54,7 +60,9 @@ class DomainLayerContentGenerator(
                     projectNamespace = projectNamespace,
                     featurePackageName = featurePackageName,
                     useCaseName = useCaseName,
-                    repositoryName = null
+                    repositoryName = null,
+                    inputDataType = inputDataType,
+                    outputDataType = outputDataType
                 )
         )
     }

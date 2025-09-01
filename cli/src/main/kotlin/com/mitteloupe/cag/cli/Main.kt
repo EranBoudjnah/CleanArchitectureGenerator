@@ -101,7 +101,10 @@ fun main(arguments: Array<String>) {
             GenerateUseCaseRequest.Builder(
                 destinationDirectory = targetDirectory,
                 useCaseName = request.useCaseName
-            ).build()
+            )
+                .inputDataType(request.inputDataType)
+                .outputDataType(request.outputDataType)
+                .build()
 
         val result = generator.generateUseCase(useCaseRequest)
         println(result)

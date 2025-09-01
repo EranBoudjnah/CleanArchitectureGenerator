@@ -142,24 +142,34 @@ class AppArgumentProcessorUseCasesTest {
     fun `Given use case with optional path when getNewUseCases then maps in order`() {
         // Given
         val givenArguments = arrayOf("--new-use-case=FirstUseCase", "--path=com.first", "--new-use-case", "SecondUseCase")
+        val expected =
+            listOf(
+                UseCaseRequest("FirstUseCase", "com.first", null, null),
+                UseCaseRequest("SecondUseCase", null, null, null)
+            )
 
         // When
         val result = classUnderTest.getNewUseCases(givenArguments)
 
         // Then
-        assertEquals(listOf(UseCaseRequest("FirstUseCase", "com.first"), UseCaseRequest("SecondUseCase", null)), result)
+        assertEquals(expected, result)
     }
 
     @Test
     fun `Given short flags when getNewUseCases then parses correctly`() {
         // Given
         val givenArguments = arrayOf("-nucThirdUseCase", "-p", "com.third", "-nuc=FourthUseCase", "-pcom.fourth")
+        val expected =
+            listOf(
+                UseCaseRequest("ThirdUseCase", "com.third", null, null),
+                UseCaseRequest("FourthUseCase", "com.fourth", null, null)
+            )
 
         // When
         val result = classUnderTest.getNewUseCases(givenArguments)
 
         // Then
-        assertEquals(listOf(UseCaseRequest("ThirdUseCase", "com.third"), UseCaseRequest("FourthUseCase", "com.fourth")), result)
+        assertEquals(expected, result)
     }
 
     @Test
@@ -171,7 +181,7 @@ class AppArgumentProcessorUseCasesTest {
         val result = classUnderTest.getNewUseCases(givenArguments)
 
         // Then
-        assertEquals(listOf(UseCaseRequest("SimpleUseCase", null)), result)
+        assertEquals(listOf(UseCaseRequest("SimpleUseCase", null, null, null)), result)
     }
 
     @Test
@@ -183,7 +193,7 @@ class AppArgumentProcessorUseCasesTest {
         val result = classUnderTest.getNewUseCases(givenArguments)
 
         // Then
-        assertEquals(listOf(UseCaseRequest("AbsoluteUseCase", "/absolute/path")), result)
+        assertEquals(listOf(UseCaseRequest("AbsoluteUseCase", "/absolute/path", null, null)), result)
     }
 
     @Test
@@ -195,7 +205,7 @@ class AppArgumentProcessorUseCasesTest {
         val result = classUnderTest.getNewUseCases(givenArguments)
 
         // Then
-        assertEquals(listOf(UseCaseRequest("RelativeUseCase", "./relative/path")), result)
+        assertEquals(listOf(UseCaseRequest("RelativeUseCase", "./relative/path", null, null)), result)
     }
 
     @Test
@@ -217,11 +227,35 @@ class AppArgumentProcessorUseCasesTest {
         // Then
         assertEquals(
             listOf(
-                UseCaseRequest("FirstUseCase", "path1"),
-                UseCaseRequest("SecondUseCase", null),
-                UseCaseRequest("ThirdUseCase", "path3")
+                UseCaseRequest("FirstUseCase", "path1", null, null),
+                UseCaseRequest("SecondUseCase", null, null, null),
+                UseCaseRequest("ThirdUseCase", "path3", null, null)
             ),
             result
         )
+    }
+
+    @Test
+    fun `Given use case with input and output types when getNewUseCases then parses correctly`() {
+        // Given
+        val givenArguments = arrayOf("--new-use-case=TypedUseCase", "--input-type=String", "--output-type=Boolean")
+
+        // When
+        val result = classUnderTest.getNewUseCases(givenArguments)
+
+        // Then
+        assertEquals(listOf(UseCaseRequest("TypedUseCase", null, "String", "Boolean")), result)
+    }
+
+    @Test
+    fun `Given use case with short flags for input and output types when getNewUseCases then parses correctly`() {
+        // Given
+        val givenArguments = arrayOf("-nuc=ShortTypedUseCase", "-it", "Int", "-ot", "String")
+
+        // When
+        val result = classUnderTest.getNewUseCases(givenArguments)
+
+        // Then
+        assertEquals(listOf(UseCaseRequest("ShortTypedUseCase", null, "Int", "String")), result)
     }
 }

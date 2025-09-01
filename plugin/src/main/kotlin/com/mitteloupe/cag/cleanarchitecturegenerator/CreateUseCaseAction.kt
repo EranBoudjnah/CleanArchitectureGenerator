@@ -65,7 +65,10 @@ class CreateUseCaseAction : AnAction() {
             GenerateUseCaseRequest.Builder(
                 destinationDirectory = destination ?: File(projectRootDir, ""),
                 useCaseName = useCaseName
-            ).build()
+            )
+                .inputDataType(dialog.inputDataType)
+                .outputDataType(dialog.outputDataType)
+                .build()
 
         val result = Generator().generateUseCase(request)
         ideBridge.refreshIde(projectRootDir)

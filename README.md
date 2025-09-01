@@ -54,6 +54,10 @@ cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=Dat
     Generate a new use case named UseCaseName. By default, the target path is determined by the current location.
   --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
     (Optional) Specify the target directory for the preceding use case
+  --input-type=<InputType> | --input-type <InputType> | -it=<InputType> | -it <InputType> | -it<InputType>
+    (Optional) Specify the input data type for the preceding use case
+  --output-type=<OutputType> | --output-type <OutputType> | -ot=<OutputType> | -ot <OutputType> | -ot<OutputType>
+    (Optional) Specify the output data type for the preceding use case
 ```
 
 ##### Other Options
@@ -71,3 +75,9 @@ When run without arguments, the command prints a short usage and suggests using 
   - Add Retrofit dependencies
 
 These control whether the generated `datasource/implementation` module `build.gradle.kts` includes Ktor and/or Retrofit dependencies.
+
+- New use case dialog now includes two optional fields:
+  - Input data type: Specify the input type for the use case (e.g., String, Int, Boolean)
+  - Output data type: Specify the output type for the use case (e.g., String, Int, Boolean)
+
+These fields allow you to customize the input and output types of the generated use case instead of using the default domain model.

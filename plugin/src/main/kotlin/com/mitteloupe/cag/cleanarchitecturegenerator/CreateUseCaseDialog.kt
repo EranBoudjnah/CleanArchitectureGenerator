@@ -20,6 +20,8 @@ import javax.swing.JPanel
 import javax.swing.text.AbstractDocument
 
 private const val USE_CASE_SUFFIX = "UseCase"
+private const val DEFAULT_USE_CASE_NAME = "DoSomething"
+private const val DEFAULT_DATA_TYPE = "Unit"
 
 class CreateUseCaseDialog(
     project: Project?,
@@ -27,6 +29,8 @@ class CreateUseCaseDialog(
 ) : DialogWrapper(project) {
     private val useCaseNameTextField = JBTextField()
     private val directoryField = TextFieldWithBrowseButton()
+    private val inputDataTypeTextField = JBTextField()
+    private val outputDataTypeTextField = JBTextField()
 
     val useCaseNameWithSuffix: String
         get() = "$useCaseName$USE_CASE_SUFFIX"
@@ -34,12 +38,20 @@ class CreateUseCaseDialog(
     private val useCaseName: String
         get() = useCaseNameTextField.text.trim()
 
+    val inputDataType: String?
+        get() = inputDataTypeTextField.text.trim().takeIf { it.isNotEmpty() }
+
+    val outputDataType: String?
+        get() = outputDataTypeTextField.text.trim().takeIf { it.isNotEmpty() }
+
     init {
         title = CleanArchitectureGeneratorBundle.message("info.usecase.generator.title")
         init()
 
         useCaseNameTextField.columns = 20
-        directoryField.text = suggestedDirectory?.absolutePath ?: ""
+        inputDataTypeTextField.columns = 20
+        outputDataTypeTextField.columns = 20
+        directoryField.text = suggestedDirectory?.absolutePath.orEmpty()
         directoryField.addActionListener {
             val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
             val initialDirectory = LocalFileSystem.getInstance().findFileByIoFile(File(directoryField.text))
@@ -49,7 +61,16 @@ class CreateUseCaseDialog(
             }
         }
 
+        useCaseNameTextField.text = DEFAULT_USE_CASE_NAME
+        useCaseNameTextField.selectAll()
+        inputDataTypeTextField.text = DEFAULT_DATA_TYPE
+        outputDataTypeTextField.text = DEFAULT_DATA_TYPE
+
         (useCaseNameTextField.document as AbstractDocument).documentFilter =
+            PredicateDocumentFilter { !it.isWhitespace() }
+        (inputDataTypeTextField.document as AbstractDocument).documentFilter =
+            PredicateDocumentFilter { !it.isWhitespace() }
+        (outputDataTypeTextField.document as AbstractDocument).documentFilter =
             PredicateDocumentFilter { !it.isWhitespace() }
     }
 
@@ -74,6 +95,18 @@ class CreateUseCaseDialog(
                 .addLabeledComponent(
                     CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label"),
                     nameWithSuffixPanel,
+                    1,
+                    false
+                )
+                .addLabeledComponent(
+                    CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label"),
+                    inputDataTypeTextField,
+                    1,
+                    false
+                )
+                .addLabeledComponent(
+                    CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label"),
+                    outputDataTypeTextField,
                     1,
                     false
                 )

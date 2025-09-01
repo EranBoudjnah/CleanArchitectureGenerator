@@ -52,11 +52,18 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments = arguments,
             primaryLong = "--new-use-case",
             primaryShort = "-nuc",
-            secondaryFlags = listOf(SecondaryFlag(long = "--path", short = "-p"))
+            secondaryFlags =
+                listOf(
+                    SecondaryFlag(long = "--path", short = "-p"),
+                    SecondaryFlag(long = "--input-type", short = "-it"),
+                    SecondaryFlag(long = "--output-type", short = "-ot")
+                )
         ).map { (useCaseName, secondaries) ->
             UseCaseRequest(
                 useCaseName = useCaseName,
-                targetPath = secondaries["--path"]
+                targetPath = secondaries["--path"],
+                inputDataType = secondaries["--input-type"],
+                outputDataType = secondaries["--output-type"]
             )
         }
 

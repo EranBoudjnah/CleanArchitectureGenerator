@@ -133,7 +133,9 @@ class Generator {
         DomainLayerContentGenerator()
             .generateUseCase(
                 destinationDirectory = destinationDirectory,
-                useCaseName = useCaseName
+                useCaseName = useCaseName,
+                inputDataType = request.inputDataType,
+                outputDataType = request.outputDataType
             )?.let { return it }
 
         return "Success!"
