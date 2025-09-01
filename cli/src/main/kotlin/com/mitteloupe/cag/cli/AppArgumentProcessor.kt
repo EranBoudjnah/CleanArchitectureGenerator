@@ -1,12 +1,8 @@
 package com.mitteloupe.cag.cli
 
-data class FeatureRequest(val featureName: String, val packageName: String?)
-
-data class DataSourceRequest(
-    val dataSourceName: String,
-    val useKtor: Boolean,
-    val useRetrofit: Boolean
-)
+import com.mitteloupe.cag.cli.request.DataSourceRequest
+import com.mitteloupe.cag.cli.request.FeatureRequest
+import com.mitteloupe.cag.cli.request.UseCaseRequest
 
 class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
     fun isHelpRequested(arguments: Array<String>): Boolean = arguments.any { it == "--help" || it == "-h" }
@@ -50,6 +46,19 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             )
         }
     }
+
+    fun getNewUseCases(arguments: Array<String>): List<UseCaseRequest> =
+        argumentParser.parsePrimaryWithSecondaries(
+            arguments = arguments,
+            primaryLong = "--new-use-case",
+            primaryShort = "-nuc",
+            secondaryFlags = listOf(SecondaryFlag(long = "--path", short = "-p"))
+        ).map { (useCaseName, secondaries) ->
+            UseCaseRequest(
+                useCaseName = useCaseName,
+                targetPath = secondaries["--path"]
+            )
+        }
 
     private fun ensureDataSourceSuffix(name: String): String {
         val trimmedName = name.trim()

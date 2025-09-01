@@ -34,7 +34,8 @@ class MainTest : BaseMainTest() {
         // Then
         assertEquals(
             "usage: cag [--new-feature=FeatureName [--package=PackageName]]... " +
-                "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...\n" +
+                "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
+                "[--new-use-case=UseCaseName [--path=TargetPath]]...\n" +
                 "Run with --help or -h for more options.\n",
             output.toString()
         )
@@ -62,7 +63,7 @@ class MainHelpTest : BaseMainTest() {
 
     companion object {
         private const val EXPECTED_HELP =
-            """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...
+            """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
 
 Options:
   --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
@@ -73,6 +74,10 @@ Options:
     Generate a new data source named NameDataSource
   --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
     Attach dependencies to the preceding new data source
+  --new-use-case=UseCaseName | --new-use-case UseCaseName | -nuc=UseCaseName | -nuc UseCaseName | -nucUseCaseName
+    Generate a new use case named UseCaseName
+  --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+    Specify the target directory for the preceding use case
   --help, -h
     Show this help message and exit
 """

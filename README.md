@@ -1,6 +1,6 @@
 ## Clean Architecture Generator
 
-A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
+A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, and use cases.
 
 ### CLI usage
 
@@ -29,7 +29,7 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
 Usage:
 
 ```bash
-cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]...
+cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
 ```
 
 ##### New Feature Options
@@ -46,6 +46,14 @@ cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=Dat
     Generate a new DataDource named NameDataSource
   --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
     Attach dependencies to the preceding new data source
+```
+
+##### New UseCase Options
+```bash
+  --new-use-case=<UseCaseName> | --new-use-case <UseCaseName> | -nuc=<UseCaseName> | -nuc <UseCaseName> | -nuc<UseCaseName>
+    Generate a new use case named UseCaseName. By default, the target path is determined by the current location.
+  --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
+    (Optional) Specify the target directory for the preceding use case
 ```
 
 ##### Other Options
