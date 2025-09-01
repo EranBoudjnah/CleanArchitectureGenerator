@@ -15,6 +15,8 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.text.AbstractDocument
 
+private const val DATA_SOURCE_SUFFIX = "DataSource"
+
 class CreateDataSourceDialog(
     project: Project?
 ) : DialogWrapper(project) {
@@ -23,7 +25,7 @@ class CreateDataSourceDialog(
     private val retrofitCheckBox = JBCheckBox("Add Retrofit dependencies")
 
     val dataSourceNameWithSuffix: String
-        get() = "${dataSourceName}DataSource"
+        get() = "$dataSourceName$DATA_SOURCE_SUFFIX"
 
     private val dataSourceName: String
         get() = dataSourceNameTextField.text.trim()
@@ -44,11 +46,11 @@ class CreateDataSourceDialog(
             PredicateDocumentFilter { !it.isWhitespace() }
     }
 
-    override fun getPreferredFocusedComponent(): JComponent? = dataSourceNameTextField
+    override fun getPreferredFocusedComponent(): JComponent = dataSourceNameTextField
 
     override fun createCenterPanel(): JComponent {
         val suffixLabel =
-            JBLabel("DataSource").apply {
+            JBLabel(DATA_SOURCE_SUFFIX).apply {
                 foreground = UIUtil.getLabelDisabledForeground()
             }
 

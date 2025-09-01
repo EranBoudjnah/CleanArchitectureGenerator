@@ -69,7 +69,7 @@ class Generator {
         if (allCreated) {
             createDomainModule(featureRoot, catalogUpdater)?.let { return it }
             DomainLayerContentGenerator()
-                .generate(
+                .generateDomainLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
@@ -124,6 +124,19 @@ class Generator {
         } else {
             "${ERROR_PREFIX}Failed to create directories for package '$featurePackageName'."
         }
+    }
+
+    fun generateUseCase(request: GenerateUseCaseRequest): String {
+        val destinationDirectory = request.destinationDirectory
+        val useCaseName = request.useCaseName.trim()
+
+        DomainLayerContentGenerator()
+            .generateUseCase(
+                destinationDirectory = destinationDirectory,
+                useCaseName = useCaseName
+            )?.let { return it }
+
+        return "Success!"
     }
 
     private fun generateDataSourceModules(

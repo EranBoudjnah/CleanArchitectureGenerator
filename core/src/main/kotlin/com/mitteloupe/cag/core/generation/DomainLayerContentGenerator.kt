@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.content.USE_CASE_PACKAGE_SUFFIX
 import com.mitteloupe.cag.core.content.buildDomainModelKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
@@ -8,7 +10,7 @@ import java.io.File
 class DomainLayerContentGenerator(
     private val kotlinFileCreator: KotlinFileCreator = KotlinFileCreator()
 ) {
-    fun generate(
+    fun generateDomainLayer(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String
@@ -19,37 +21,83 @@ class DomainLayerContentGenerator(
         return null
     }
 
+    fun generateUseCase(
+        destinationDirectory: File,
+        useCaseName: String
+    ): String? {
+        val packageSuffixRegex = USE_CASE_PACKAGE_SUFFIX.replace(".", "\\.") + "$"
+        val packageName =
+            derivePackageNameForDirectory(destinationDirectory)
+                ?.replace(packageSuffixRegex.toRegex(), "")
+                ?: return "${ERROR_PREFIX}Could not determine package name from directory: " +
+                    destinationDirectory.absolutePath
+
+        return writeDomainUseCaseFile(
+            targetDirectory = destinationDirectory,
+            projectNamespace = extractProjectNamespace(packageName),
+            featurePackageName = packageName,
+            useCaseName = useCaseName
+        )
+    }
+
+    private fun writeDomainUseCaseFile(
+        targetDirectory: File,
+        projectNamespace: String,
+        featurePackageName: String,
+        useCaseName: String
+    ): String? {
+        return kotlinFileCreator.writeKotlinFileInLayer(
+            targetDirectory = targetDirectory,
+            fileName = "$useCaseName.kt",
+            content =
+                buildDomainUseCaseKotlinFile(
+                    projectNamespace = projectNamespace,
+                    featurePackageName = featurePackageName,
+                    useCaseName = useCaseName,
+                    repositoryName = null
+                )
+        )
+    }
+
     private fun writeDomainUseCaseFile(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String
-    ): String? =
-        kotlinFileCreator.writeKotlinFileInLayer(
+    ): String? {
+        val useCaseName = "PerformActionUseCase"
+        val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
+
+        return kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "usecase",
-            fileName = "PerformActionUseCase.kt",
+            fileName = "$useCaseName.kt",
             content =
                 buildDomainUseCaseKotlinFile(
                     projectNamespace = projectNamespace,
-                    featurePackageName = featurePackageName
+                    featurePackageName = featurePackageName,
+                    useCaseName = useCaseName,
+                    repositoryName = repositoryName
                 )
         )
+    }
 
     private fun writeDomainRepositoryInterface(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
-        kotlinFileCreator.writeKotlinFileInLayer(
+    ): String? {
+        val repositoryName = "PerformExampleRepository"
+        return kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "repository",
-            fileName = "PerformExampleRepository.kt",
+            fileName = "$repositoryName.kt",
             content =
-                buildDomainRepositoryKotlinFile(featurePackageName)
+                buildDomainRepositoryKotlinFile(featurePackageName, repositoryName)
         )
+    }
 
     private fun writeDomainModelFile(
         featureRoot: File,
@@ -64,4 +112,28 @@ class DomainLayerContentGenerator(
             content =
                 buildDomainModelKotlinFile(featurePackageName)
         )
+
+    private fun deriveRepositoryNameFromUseCaseName(useCaseName: String): String = useCaseName.removeSuffix("UseCase") + "Repository"
+
+    private fun derivePackageNameForDirectory(directory: File): String? {
+        val absolutePath = directory.absolutePath
+        val marker =
+            listOf("src/main/java", "src/main/kotlin").firstOrNull { absolutePath.contains(it) }
+                ?: return null
+        val afterMarker = absolutePath.substringAfter(marker).trimStart(File.separatorChar)
+        if (afterMarker.isEmpty()) {
+            return null
+        }
+        val segments = afterMarker.split(File.separatorChar).filter { it.isNotEmpty() }
+        return segments.joinToString(separator = ".")
+    }
+
+    private fun extractProjectNamespace(packageName: String): String {
+        val segments = packageName.split(".")
+        return if (segments.size >= 3) {
+            segments.take(3).joinToString(".") + "."
+        } else {
+            "$packageName."
+        }
+    }
 }

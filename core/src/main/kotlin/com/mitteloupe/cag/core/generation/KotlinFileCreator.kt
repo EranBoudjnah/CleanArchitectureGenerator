@@ -28,6 +28,14 @@ class KotlinFileCreator {
             }
         }
 
+        return writeKotlinFileInLayer(targetDirectory, fileName, content)
+    }
+
+    fun writeKotlinFileInLayer(
+        targetDirectory: File,
+        fileName: String,
+        content: String
+    ): String? {
         val targetFile = File(targetDirectory, fileName)
         if (!targetFile.exists()) {
             runCatching { targetFile.writeText(content) }
