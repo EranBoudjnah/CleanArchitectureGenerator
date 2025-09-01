@@ -62,10 +62,6 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
 
     private fun ensureDataSourceSuffix(name: String): String {
         val trimmedName = name.trim()
-        return if (trimmedName.endsWith("DataSource")) {
-            trimmedName
-        } else {
-            "${trimmedName}DataSource"
-        }
+        return if (trimmedName.endsWith("DataSource")) trimmedName else "${trimmedName}DataSource"
     }
 }

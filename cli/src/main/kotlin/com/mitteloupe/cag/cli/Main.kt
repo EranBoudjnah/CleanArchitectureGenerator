@@ -57,21 +57,14 @@ fun main(arguments: Array<String>) {
     val projectNamespace = basePackage ?: "com.unknown.app."
 
     featureRequests.forEach { requestFeature ->
-        val featureName = requestFeature.featureName
-        val explicitPackage = requestFeature.packageName
         val packageName =
-            explicitPackage
-                ?: if (basePackage == null) {
-                    null
-                } else {
-                    "$basePackage${featureName.lowercase()}"
-                }
+            requestFeature.packageName ?: basePackage?.let { "$it${requestFeature.featureName.lowercase()}" }
 
         val request =
             GenerateFeatureRequestBuilder(
                 destinationRootDir = destinationRootDir,
                 projectNamespace = projectNamespace,
-                featureName = featureName
+                featureName = requestFeature.featureName
             ).featurePackageName(packageName)
                 .enableCompose(true)
                 .build()

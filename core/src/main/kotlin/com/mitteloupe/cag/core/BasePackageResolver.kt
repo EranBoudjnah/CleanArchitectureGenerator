@@ -35,8 +35,8 @@ class BasePackageResolver() {
         if (!isAppModule) {
             return null
         }
-        val match = namespaceRegex.find(fileContents)
-        return match?.groupValues?.get(1)?.trim()
+
+        return namespaceRegex.find(fileContents)?.groupValues?.get(1)?.trim()
     }
 
     private fun ensureTrailingDot(name: String): String = if (name.endsWith('.')) name else "$name."
