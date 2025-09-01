@@ -70,14 +70,9 @@ When run without arguments, the command prints a short usage and suggests using 
 
 ### Android Studio plugin
 
-- New data source dialog now includes two checkboxes:
-  - Add Ktor dependencies
-  - Add Retrofit dependencies
+- New menu items:
+  - New feature
+  - New data source
 
-These control whether the generated `datasource/implementation` module `build.gradle.kts` includes Ktor and/or Retrofit dependencies.
-
-- New use case dialog now includes two optional fields:
-  - Input data type: Specify the input type for the use case (e.g., String, Int, Boolean)
-  - Output data type: Specify the output type for the use case (e.g., String, Int, Boolean)
-
-These fields allow you to customize the input and output types of the generated use case instead of using the default domain model.
+- Context menu items:
+  - New use case in domain modules

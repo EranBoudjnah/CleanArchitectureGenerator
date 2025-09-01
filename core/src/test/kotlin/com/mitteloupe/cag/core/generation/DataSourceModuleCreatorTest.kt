@@ -2,8 +2,10 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.ERROR_PREFIX
 import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.junit.Assert
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -42,16 +44,16 @@ class DataSourceModuleCreatorTest {
             )
 
         // Then
-        Assert.assertNull(result)
+        assertNull(result)
         val file = File(targetDir, "ExampleDataSourceModule.kt")
-        Assert.assertTrue(file.exists())
+        assertTrue(file.exists())
         val content = file.readText()
-        MatcherAssert.assertThat(content, CoreMatchers.containsString("package com.example.app.di"))
-        MatcherAssert.assertThat(
+        assertThat(content, CoreMatchers.containsString("package com.example.app.di"))
+        assertThat(
             content,
             CoreMatchers.containsString("object ExampleDataSourceModule")
         )
-        MatcherAssert.assertThat(
+        assertThat(
             content,
             CoreMatchers.containsString(
                 "fun providesExampleDataSource(): ExampleDataSource = ExampleDataSourceImpl()"
@@ -87,9 +89,9 @@ class DataSourceModuleCreatorTest {
                 )
 
             // Then
-            Assert.assertNotNull(result)
+            assertNotNull(result)
             checkNotNull(result)
-            MatcherAssert.assertThat(result, CoreMatchers.startsWith(ERROR_PREFIX))
+            assertThat(result, CoreMatchers.startsWith(ERROR_PREFIX))
         } finally {
             blockingFile.delete()
         }

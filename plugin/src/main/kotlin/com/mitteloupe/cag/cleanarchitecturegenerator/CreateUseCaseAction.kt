@@ -93,9 +93,17 @@ private fun suggestUseCaseDirectory(
 ): File? {
     if (project == null || virtualFile == null) return null
     val startingDir = if (virtualFile.isDirectory) virtualFile else virtualFile.parent
+
+    // First, try to find usecase directory starting from the clicked directory
     val byCurrent = findUseCaseDirectoryIn(startingDir)
     if (byCurrent != null) {
         return File(byCurrent.path)
+    }
+
+    // If not found, try searching from the parent directory to find siblings
+    val byParent = startingDir.parent?.let { findUseCaseDirectoryIn(it) }
+    if (byParent != null) {
+        return File(byParent.path)
     }
 
     val module = ModuleUtilCore.findModuleForFile(startingDir, project) ?: return null

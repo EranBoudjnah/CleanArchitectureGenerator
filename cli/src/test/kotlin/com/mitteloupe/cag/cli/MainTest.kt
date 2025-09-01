@@ -4,66 +4,75 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Suite
+import org.junit.runners.Suite.SuiteClasses
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
 
-abstract class BaseMainTest {
-    private lateinit var originalOutput: PrintStream
-    protected lateinit var output: OutputStream
+@RunWith(Suite::class)
+@SuiteClasses(
+    MainTest.NoArgsTest::class,
+    MainTest.HelpTest::class
+)
+class MainTest {
+    abstract class BaseMainTest {
+        private lateinit var originalOutput: PrintStream
+        protected lateinit var output: OutputStream
 
-    @Before
-    fun setUp() {
-        originalOutput = System.out
-        output = ByteArrayOutputStream()
-        System.setOut(PrintStream(output))
+        @Before
+        fun setUp() {
+            originalOutput = System.out
+            output = ByteArrayOutputStream()
+            System.setOut(PrintStream(output))
+        }
+
+        @After
+        fun tearDown() {
+            System.setOut(originalOutput)
+        }
     }
 
-    @After
-    fun tearDown() {
-        System.setOut(originalOutput)
-    }
-}
+    class NoArgsTest : BaseMainTest() {
+        @Test
+        fun `Given no args when main then prints updated usage`() {
+            // When
+            main(emptyArray())
 
-class MainTest : BaseMainTest() {
-    @Test
-    fun `Given no args when main then prints updated usage`() {
-        // When
-        main(emptyArray())
-
-        // Then
-        assertEquals(
-            "usage: cag [--new-feature=FeatureName [--package=PackageName]]... " +
-                "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-                "[--new-use-case=UseCaseName [--path=TargetPath]]...\n" +
-                "Run with --help or -h for more options.\n",
-            output.toString()
-        )
-    }
-}
-
-class MainHelpTest : BaseMainTest() {
-    @Test
-    fun `Given --help when main then prints help document`() {
-        // When
-        main(arrayOf("--help"))
-
-        // Then
-        assertEquals(EXPECTED_HELP, output.toString())
+            // Then
+            assertEquals(
+                "usage: cag [--new-feature=FeatureName [--package=PackageName]]... " +
+                    "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
+                    "[--new-use-case=UseCaseName [--path=TargetPath]]...\n" +
+                    "Run with --help or -h for more options.\n",
+                output.toString()
+            )
+        }
     }
 
-    @Test
-    fun `Given -h when main then prints help document`() {
-        // When
-        main(arrayOf("-h"))
+    class HelpTest : BaseMainTest() {
+        @Test
+        fun `Given --help when main then prints help document`() {
+            // When
+            main(arrayOf("--help"))
 
-        // Then
-        assertEquals(EXPECTED_HELP, output.toString())
-    }
+            // Then
+            assertEquals(EXPECTED_HELP, output.toString())
+        }
 
-    companion object {
-        private const val EXPECTED_HELP =
-            """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+        @Test
+        fun `Given -h when main then prints help document`() {
+            // When
+            main(arrayOf("-h"))
+
+            // Then
+            assertEquals(EXPECTED_HELP, output.toString())
+        }
+
+        companion object {
+            private const val EXPECTED_HELP =
+                """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
 
 Options:
   --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
@@ -81,5 +90,6 @@ Options:
   --help, -h
     Show this help message and exit
 """
+        }
     }
 }
