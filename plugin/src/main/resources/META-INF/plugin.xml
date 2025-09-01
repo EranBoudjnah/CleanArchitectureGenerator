@@ -15,8 +15,14 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Enter short description for your plugin here.<br>
-        <em>most HTML tags may be used</em>
+        Provides quick actions to create:
+        <ul>
+            <li><b>Features</b> - Complete feature modules with presentation, domain, and data layers</li>
+            <li><b>Data Sources</b> - Repository implementations and data source classes</li>
+            <li><b>Use Cases</b> - Domain use cases following Clean Architecture principles</li>
+        </ul>
+        <br>
+        Designed for Android and Kotlin projects following Clean Architecture patterns.
     ]]></description>
 
     <!-- Product and plugin compatibility requirements.
