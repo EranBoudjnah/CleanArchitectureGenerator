@@ -53,12 +53,11 @@ class SymbolValidatorFileSystemTest {
     @Test
     fun `Given custom type that exists in module when isValidSymbolInContext then returns true`() {
         // Given
-        fakeFileSystem.createFile("build.gradle.kts", "", "kts")
+        fakeFileSystem.createFile("build.gradle.kts", "")
         fakeFileSystem.createDirectory("src/main/kotlin")
         fakeFileSystem.createFile(
             "src/main/kotlin/UserModel.kt",
-            "class UserModel",
-            "kt"
+            "class UserModel"
         )
         val type = "UserModel"
 
@@ -72,12 +71,11 @@ class SymbolValidatorFileSystemTest {
     @Test
     fun `Given custom type that does not exist in module when isValidSymbolInContext then returns false`() {
         // Given
-        fakeFileSystem.createFile("build.gradle.kts", "", "kts")
+        fakeFileSystem.createFile("build.gradle.kts", "")
         fakeFileSystem.createDirectory("src/main/kotlin")
         fakeFileSystem.createFile(
             "src/main/kotlin/UserModel.kt",
-            "class UserModel",
-            "kt"
+            "class UserModel"
         )
         val type = "NonExistentType"
 
@@ -91,7 +89,7 @@ class SymbolValidatorFileSystemTest {
     @Test
     fun `Given module without source directory when isValidSymbolInContext then returns false`() {
         // Given
-        fakeFileSystem.createFile("build.gradle.kts", "", "kts")
+        fakeFileSystem.createFile("build.gradle.kts", "")
         // No source directory created
         val type = "UserModel"
 
@@ -105,12 +103,11 @@ class SymbolValidatorFileSystemTest {
     @Test
     fun `Given module with build gradle kts when isValidSymbolInContext then finds module root`() {
         // Given
-        fakeFileSystem.createFile("build.gradle.kts", "", "kts")
+        fakeFileSystem.createFile("build.gradle.kts", "")
         fakeFileSystem.createDirectory("src/main/kotlin")
         fakeFileSystem.createFile(
             "src/main/kotlin/UserModel.kt",
-            "class UserModel",
-            "kt"
+            "class UserModel"
         )
         val type = "UserModel"
 

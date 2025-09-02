@@ -94,7 +94,7 @@ class ModelClassFinderTest {
     fun `Given different directories when findModelClasses then returns consistent results`() {
         // Given
         fakeFileSystem.createDirectory("feature1/domain/model")
-        fakeFileSystem.createFile("feature1/domain/model/UserModel.kt", "class UserModel", "kt")
+        fakeFileSystem.createFile("feature1/domain/model/UserModel.kt", "class UserModel")
 
         val useCaseDirectory = fakeFileSystem.createFakeFile("feature1/domain/usecase")
         val originalRightClickedDirectory = fakeFileSystem.createFakeFile("feature1/domain/presentation")
@@ -117,8 +117,7 @@ class ModelClassFinderTest {
             package com.example.domain.model
 
             class UserModel
-            """.trimIndent(),
-            "kt"
+            """.trimIndent()
         )
         val useCaseDirectory = fakeFileSystem.createFakeFile("feature1/domain/usecase")
         val expected = arrayOf("com.example.domain.model.UserModel")

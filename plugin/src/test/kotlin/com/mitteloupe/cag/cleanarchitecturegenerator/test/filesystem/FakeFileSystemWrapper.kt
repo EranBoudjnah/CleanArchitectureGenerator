@@ -5,44 +5,28 @@ import com.intellij.openapi.vfs.VirtualFileSystem
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.FileSystemWrapper
 import java.io.File
+import java.io.OutputStream
 
 class FakeFileSystemWrapper(
     private val rootDirectory: File
 ) : FileSystemWrapper {
-    private val files = mutableMapOf<String, FakeVirtualFile>()
-    private val directories = mutableMapOf<String, FakeVirtualDirectory>()
-
     fun createFile(
         path: String,
-        content: String,
-        extension: String? = null
+        content: String
     ) {
         val fullPath = File(rootDirectory, path)
         fullPath.parentFile?.mkdirs()
         fullPath.writeText(content)
-
-        val file = FakeVirtualFile(fullPath.absolutePath, content, extension)
-        files[fullPath.absolutePath] = file
     }
 
     fun createDirectory(path: String) {
         val fullPath = File(rootDirectory, path)
         fullPath.mkdirs()
-
-        val directory = FakeVirtualDirectory(fullPath.absolutePath)
-        directories[fullPath.absolutePath] = directory
     }
 
-    fun createFakeFile(path: String): FakeFile {
+    fun createFakeFile(path: String): TemporaryFile {
         val fullPath = File(rootDirectory, path)
-        return FakeFile(fullPath.absolutePath, this)
-    }
-
-    fun reset() {
-        rootDirectory.deleteRecursively()
-        rootDirectory.mkdirs()
-        files.clear()
-        directories.clear()
+        return TemporaryFile(fullPath.absolutePath, this)
     }
 
     fun fileExists(path: String): Boolean {
@@ -56,21 +40,31 @@ class FakeFileSystemWrapper(
     }
 
     override fun findVirtualFile(file: File): VirtualFile? {
-        val path = file.absolutePath
-        return files[path] ?: directories[path]
+        if (!file.exists()) {
+            return null
+        }
+
+        return TemporaryVirtualFile(file)
     }
 
     override fun visitChildrenRecursively(
         directory: VirtualFile,
         visitor: VirtualFileVisitor<Any>
     ): VirtualFileVisitor.Result {
-        val fakeDirectory = directory as? FakeVirtualDirectory ?: return VirtualFileVisitor.SKIP_CHILDREN
+        val fakeDirectory = directory as? TemporaryVirtualFile ?: return VirtualFileVisitor.SKIP_CHILDREN
+        val directoryFile = File(fakeDirectory.path)
 
-        for (file in files.values) {
-            if (file.path.startsWith(fakeDirectory.path + "/")) {
-                val shouldContinue = visitor.visitFile(file)
-                if (!shouldContinue) {
-                    return VirtualFileVisitor.SKIP_CHILDREN
+        if (!directoryFile.exists() || !directoryFile.isDirectory) {
+            return VirtualFileVisitor.SKIP_CHILDREN
+        }
+
+        directoryFile.walkTopDown().forEach { file ->
+            if (file != directoryFile) {
+                val virtualFile = findVirtualFile(file)
+                if (virtualFile != null) {
+                    if (!visitor.visitFile(virtualFile)) {
+                        return VirtualFileVisitor.SKIP_CHILDREN
+                    }
                 }
             }
         }
@@ -78,22 +72,15 @@ class FakeFileSystemWrapper(
         return VirtualFileVisitor.CONTINUE
     }
 
-    override fun getFileContents(file: VirtualFile): String {
-        val fakeFile = file as? FakeVirtualFile ?: return ""
-        return fakeFile.content
-    }
+    override fun getFileContents(file: VirtualFile): String =
+        (file as? TemporaryVirtualFile)?.contentsToByteArray()?.toString(Charsets.UTF_8).orEmpty()
 
-    override fun isDirectory(file: VirtualFile): Boolean {
-        return file is FakeVirtualDirectory
-    }
+    override fun isDirectory(file: VirtualFile): Boolean = (file as? TemporaryVirtualFile)?.isDirectory == true
 
-    override fun getFileExtension(file: VirtualFile): String? {
-        val fakeFile = file as? FakeVirtualFile ?: return null
-        return fakeFile.extension
-    }
+    override fun getFileExtension(file: VirtualFile): String? = (file as? TemporaryVirtualFile)?.extension
 }
 
-class FakeFile(
+class TemporaryFile(
     private val path: String,
     private val fileSystem: FakeFileSystemWrapper
 ) : File(path) {
@@ -101,20 +88,20 @@ class FakeFile(
 
     override fun isDirectory(): Boolean = fileSystem.isDirectory(path)
 
-    override fun getParentFile(): FakeFile? {
+    override fun getParentFile(): TemporaryFile? {
         val parentPath = File(path).parent
-        return if (parentPath != null) FakeFile(parentPath, fileSystem) else null
+        return if (parentPath != null) {
+            TemporaryFile(parentPath, fileSystem)
+        } else {
+            null
+        }
     }
 }
 
-private class FakeVirtualFile(
-    private val path: String,
-    val content: String,
-    private val extension: String?
-) : VirtualFile() {
+private class TemporaryVirtualFile(private val file: File) : VirtualFile() {
     override fun getName(): String = File(path).name
 
-    override fun getPath(): String = path
+    override fun getPath(): String = file.absolutePath
 
     override fun isDirectory(): Boolean = false
 
@@ -126,69 +113,25 @@ private class FakeVirtualFile(
 
     override fun getChildren(): Array<VirtualFile> = emptyArray()
 
-    override fun getInputStream(): java.io.InputStream = content.byteInputStream()
+    override fun getInputStream(): java.io.InputStream = file.readText().byteInputStream()
 
     override fun getOutputStream(
         requestor: Any?,
         newModificationStamp: Long,
         newTimeStamp: Long
-    ): java.io.OutputStream = throw UnsupportedOperationException()
+    ): OutputStream = throw UnsupportedOperationException()
 
-    override fun contentsToByteArray(): ByteArray = content.toByteArray()
-
-    override fun getTimeStamp(): Long = 0
-
-    override fun getModificationStamp(): Long = 0
-
-    override fun getExtension(): String? = extension
-
-    override fun getFileSystem(): VirtualFileSystem = throw UnsupportedOperationException()
-
-    override fun getLength(): Long = content.length.toLong()
-
-    override fun refresh(
-        asynchronous: Boolean,
-        recursive: Boolean,
-        postRunnable: Runnable?
-    ): Unit = Unit
-}
-
-private class FakeVirtualDirectory(
-    private val path: String
-) : VirtualFile() {
-    override fun getName(): String = File(path).name
-
-    override fun getPath(): String = path
-
-    override fun isDirectory(): Boolean = true
-
-    override fun isWritable(): Boolean = false
-
-    override fun isValid(): Boolean = true
-
-    override fun getParent(): VirtualFile? = null
-
-    override fun getChildren(): Array<VirtualFile> = emptyArray()
-
-    override fun getInputStream(): java.io.InputStream = throw UnsupportedOperationException()
-
-    override fun getOutputStream(
-        requestor: Any?,
-        newModificationStamp: Long,
-        newTimeStamp: Long
-    ): java.io.OutputStream = throw UnsupportedOperationException()
-
-    override fun contentsToByteArray(): ByteArray = throw UnsupportedOperationException()
+    override fun contentsToByteArray(): ByteArray = file.readText().toByteArray()
 
     override fun getTimeStamp(): Long = 0
 
     override fun getModificationStamp(): Long = 0
 
-    override fun getExtension(): String? = null
+    override fun getExtension(): String? = file.extension.takeIf { it.isNotEmpty() }
 
     override fun getFileSystem(): VirtualFileSystem = throw UnsupportedOperationException()
 
-    override fun getLength(): Long = 0
+    override fun getLength(): Long = contentsToByteArray().size.toLong()
 
     override fun refresh(
         asynchronous: Boolean,
