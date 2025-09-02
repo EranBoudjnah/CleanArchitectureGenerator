@@ -4,7 +4,7 @@ private const val CURSOR_RETURN_LINE_FEED = "\r\n"
 private const val DEFAULT_INDENTATION = "    "
 
 fun String.preferredIndentation(): String =
-    lines().firstNotNullOfOrNull { line ->
+    lineSequence().firstNotNullOfOrNull { line ->
         if (line.isBlank()) {
             null
         } else {
