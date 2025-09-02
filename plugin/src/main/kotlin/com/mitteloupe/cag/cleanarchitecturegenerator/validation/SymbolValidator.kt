@@ -1,12 +1,14 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.validation
 
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.FileSystemWrapper
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.IntelliJFileSystemWrapper
 import java.io.File
 
-class SymbolValidator {
+class SymbolValidator(
+    private val fileSystemWrapper: FileSystemWrapper = IntelliJFileSystemWrapper()
+) {
     fun isValidSymbolSyntax(type: String): Boolean {
         if (type.isEmpty()) return false
         val normalizedType = type.trim()
@@ -95,10 +97,10 @@ class SymbolValidator {
         contextDirectory: File
     ): Boolean {
         val moduleRoot = findModuleRoot(contextDirectory) ?: return false
-        val srcDirectory = findSourceDirectory(moduleRoot) ?: return false
-        val virtualSrcDirectory = LocalFileSystem.getInstance().findFileByIoFile(srcDirectory) ?: return false
+        val sourceDirectory = findSourceDirectory(moduleRoot) ?: return false
+        val virtualSourceDirectory = fileSystemWrapper.findVirtualFile(sourceDirectory) ?: return false
 
-        return searchForTypeInDirectory(typeName, virtualSrcDirectory)
+        return searchForTypeInDirectory(typeName, virtualSourceDirectory)
     }
 
     private fun findModuleRoot(directory: File): File? {
@@ -128,12 +130,12 @@ class SymbolValidator {
     ): Boolean {
         var found = false
 
-        VfsUtil.visitChildrenRecursively(
+        fileSystemWrapper.visitChildrenRecursively(
             directory,
             object : VirtualFileVisitor<Any>() {
                 override fun visitFile(file: VirtualFile): Boolean {
-                    if (!file.isDirectory && file.extension == "kt") {
-                        val content = String(file.contentsToByteArray())
+                    if (!fileSystemWrapper.isDirectory(file) && fileSystemWrapper.getFileExtension(file) == "kt") {
+                        val content = fileSystemWrapper.getFileContents(file)
                         if (containsTypeDefinition(content, typeName)) {
                             found = true
                             return false
