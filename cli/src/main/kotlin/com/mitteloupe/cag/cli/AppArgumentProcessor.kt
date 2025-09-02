@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.request.ArchitectureRequest
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
@@ -66,6 +67,27 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 outputDataType = secondaries["--output-type"]
             )
         }
+
+    fun getNewArchitecture(arguments: Array<String>): List<ArchitectureRequest> {
+        val pairs =
+            argumentParser.parsePrimaryWithSecondaries(
+                arguments = arguments,
+                primaryLong = "--new-architecture",
+                primaryShort = "-na",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(long = "--package", short = "-p"),
+                        SecondaryFlag(long = "--no-compose", short = "-nc")
+                    )
+            )
+        return pairs.map { (packageName, secondaries) ->
+            val enableCompose = secondaries["--no-compose"] == null
+            ArchitectureRequest(
+                packageName = packageName,
+                enableCompose = enableCompose
+            )
+        }
+    }
 
     private fun ensureDataSourceSuffix(name: String): String {
         val trimmedName = name.trim()

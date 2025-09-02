@@ -8,6 +8,7 @@ import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
+import com.mitteloupe.cag.core.generation.ArchitectureLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
@@ -276,4 +277,49 @@ class Generator {
                     catalog = catalog
                 )
         )
+
+    fun generateArchitecture(request: GenerateArchitectureRequest): String {
+        val architecturePackageName = request.architecturePackageName.trim()
+        if (architecturePackageName.isEmpty()) {
+            return "${ERROR_PREFIX}Architecture package name is missing."
+        }
+
+        val pathSegments = architecturePackageName.toSegments()
+        if (pathSegments.isEmpty()) {
+            return "${ERROR_PREFIX}Architecture package name is invalid."
+        }
+
+        val architectureRoot = File(request.destinationRootDirectory, "architecture")
+
+        if (architectureRoot.exists()) {
+            return ERROR_PREFIX +
+                if (architectureRoot.isDirectory) {
+                    "The architecture directory already exists."
+                } else {
+                    "A file with the architecture name exists where the architecture directory should be created."
+                }
+        }
+
+        if (!architectureRoot.mkdirs()) {
+            return "${ERROR_PREFIX}Failed to create architecture directory."
+        }
+
+        val result =
+            ArchitectureLayerContentGenerator()
+                .generate(
+                    architectureRoot = architectureRoot,
+                    architecturePackageName = architecturePackageName,
+                    enableCompose = request.enableCompose
+                )
+
+        if (result != null) {
+            return result
+        }
+
+        SettingsFileUpdater().updateArchitectureSettingsIfPresent(
+            request.destinationRootDirectory
+        )?.let { return it }
+
+        return "Success!"
+    }
 }

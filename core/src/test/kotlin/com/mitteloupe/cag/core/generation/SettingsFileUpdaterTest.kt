@@ -584,4 +584,72 @@ class SettingsFileUpdaterTest {
         assertNull(result)
         assertEquals(initial, content)
     }
+
+    @Test
+    fun `Given kotlin settings file when updateArchitectureSettingsIfPresent then appends grouped includes`() {
+        // Given
+        val (projectRoot, _) =
+            createProjectWithKotlinSettings(
+                initialContent = "rootProject.name = \"app\"\n"
+            )
+        val expectedTail =
+            """
+            setOf(
+                "domain",
+                "presentation",
+                "ui"
+            ).forEach { module ->
+                include(":architecture:${'$'}module")
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given groovy settings file when updateArchitectureSettingsIfPresent then appends grouped includes`() {
+        // Given
+        val (projectRoot, _) =
+            createProjectWithGroovySettings(
+                initialContent = "rootProject.name = 'app'\n"
+            )
+        val expectedTail =
+            """
+            [
+                'domain',
+                'presentation',
+                'ui'
+            ].each { module ->
+                include ":architecture:${'$'}module"
+            }
+            """.trimIndent()
+
+        // When
+        val result =
+            classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
+        val content = File(projectRoot, "settings.gradle").readText()
+
+        // Then
+        assertNull(result)
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given no settings files when updateArchitectureSettingsIfPresent then returns null`() {
+        // Given
+        val projectRoot = createTempDirectory(prefix = "noSettings").toFile()
+
+        // When
+        val result = classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
+
+        // Then
+        assertNull(result)
+    }
 }

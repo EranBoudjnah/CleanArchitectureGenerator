@@ -1,6 +1,7 @@
 package com.mitteloupe.cag.cli
 
 import com.mitteloupe.cag.core.BasePackageResolver
+import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.Generator
@@ -17,9 +18,13 @@ fun main(arguments: Array<String>) {
     if (argumentProcessor.isHelpRequested(arguments)) {
         println(
             """
-            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
 
             Options:
+              --new-architecture=PackageName | --new-architecture PackageName | -na=PackageName | -na PackageName | -naPackageName
+                Generate a new Clean Architecture package with domain, presentation, and UI layers
+              --no-compose | -nc
+                Disable Compose support for the preceding architecture package
               --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
                 Generate a new feature named FeatureName
               --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
@@ -39,13 +44,14 @@ fun main(arguments: Array<String>) {
         return
     }
 
+    val architectureRequests = argumentProcessor.getNewArchitecture(arguments)
     val featureRequests = argumentProcessor.getNewFeatures(arguments)
     val dataSourceRequests = argumentProcessor.getNewDataSources(arguments)
     val useCaseRequests = argumentProcessor.getNewUseCases(arguments)
-    if (featureRequests.isEmpty() && dataSourceRequests.isEmpty() && useCaseRequests.isEmpty()) {
+    if (architectureRequests.isEmpty() && featureRequests.isEmpty() && dataSourceRequests.isEmpty() && useCaseRequests.isEmpty()) {
         println(
             """
-            usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
             Run with --help or -h for more options.
             """.trimIndent()
         )
@@ -55,6 +61,20 @@ fun main(arguments: Array<String>) {
     val generator = Generator()
     val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
+
+    architectureRequests.forEach { request ->
+        val packageName = request.packageName
+        if (packageName != null) {
+            val architectureRequest =
+                GenerateArchitectureRequest(
+                    destinationRootDirectory = destinationRootDir,
+                    architecturePackageName = packageName,
+                    enableCompose = request.enableCompose
+                )
+            val result = generator.generateArchitecture(architectureRequest)
+            println(result)
+        }
+    }
 
     featureRequests.forEach { requestFeature ->
         val packageName =

@@ -8,18 +8,34 @@ class SettingsFileUpdater {
     fun updateProjectSettingsIfPresent(
         startDirectory: File,
         featureNameLowerCase: String
+    ): String? =
+        updateSettingsIfPresent(
+            startDirectory = startDirectory,
+            groupPrefix = ":features:$featureNameLowerCase",
+            moduleNames = listOf("ui", "presentation", "domain", "data")
+        )
+
+    fun updateDataSourceSettingsIfPresent(startDirectory: File): String? =
+        updateSettingsIfPresent(
+            startDirectory = startDirectory,
+            groupPrefix = ":datasource",
+            moduleNames = listOf("source", "implementation")
+        )
+
+    fun updateArchitectureSettingsIfPresent(projectRoot: File): String? =
+        updateSettingsIfPresent(
+            startDirectory = projectRoot,
+            groupPrefix = ":architecture",
+            moduleNames = listOf("domain", "presentation", "ui")
+        )
+
+    private fun updateSettingsIfPresent(
+        startDirectory: File,
+        groupPrefix: String,
+        moduleNames: List<String>
     ): String? {
         val settingsFile = findSettingsFile(startDirectory) ?: return null
-
-        val featureModules = listOf("ui", "presentation", "domain", "data")
-        return updateIncludes(settingsFile, ":features:$featureNameLowerCase", featureModules)
-    }
-
-    fun updateDataSourceSettingsIfPresent(startDirectory: File): String? {
-        val settingsFile = findSettingsFile(startDirectory) ?: return null
-
-        val modules = listOf("source", "implementation")
-        return updateIncludes(settingsFile, ":datasource", modules)
+        return updateIncludes(settingsFile, groupPrefix, moduleNames)
     }
 
     private fun findSettingsFile(startDirectory: File): File? {

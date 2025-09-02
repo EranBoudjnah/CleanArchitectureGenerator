@@ -17,6 +17,7 @@
     <description><![CDATA[
         Provides quick actions to create:
         <ul>
+            <li><b>Architecture Package</b> - A Clean Architecture architecture package</li>
             <li><b>Features</b> - Complete feature modules with presentation, domain, and data layers</li>
             <li><b>Data Sources</b> - Repository implementations and data source classes</li>
             <li><b>Use Cases</b> - Domain use cases following Clean Architecture principles</li>
@@ -34,6 +35,8 @@
     <actions>
         <group id="NewCleanArchitectureGenerator" popup="false">
             <separator />
+            <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitecturePackageAction"
+                    class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitecturePackageAction"/>
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
                     class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"/>
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateDataSourceAction"

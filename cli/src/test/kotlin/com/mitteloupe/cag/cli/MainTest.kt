@@ -42,7 +42,8 @@ class MainTest {
 
             // Then
             assertEquals(
-                "usage: cag [--new-feature=FeatureName [--package=PackageName]]... " +
+                "usage: cag [--new-architecture=PackageName [--no-compose]]... " +
+                    "[--new-feature=FeatureName [--package=PackageName]]... " +
                     "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
                     "[--new-use-case=UseCaseName [--path=TargetPath]]...\n" +
                     "Run with --help or -h for more options.\n",
@@ -72,9 +73,13 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+                """usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
 
 Options:
+  --new-architecture=PackageName | --new-architecture PackageName | -na=PackageName | -na PackageName | -naPackageName
+    Generate a new Clean Architecture package with domain, presentation, and UI layers
+  --no-compose | -nc
+    Disable Compose support for the preceding architecture package
   --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
     Generate a new feature named FeatureName
   --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
