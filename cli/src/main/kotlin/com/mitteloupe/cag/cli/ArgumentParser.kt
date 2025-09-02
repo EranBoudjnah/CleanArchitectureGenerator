@@ -1,6 +1,11 @@
 package com.mitteloupe.cag.cli
 
-data class SecondaryFlag(val long: String, val short: String)
+data class SecondaryFlag(
+    val long: String,
+    val short: String,
+    val isMandatory: Boolean = false,
+    val missingErrorMessage: String = ""
+)
 
 class ArgumentParser {
     fun parsePrimaryWithSecondaries(
@@ -8,7 +13,7 @@ class ArgumentParser {
         primaryLong: String,
         primaryShort: String,
         secondaryFlags: List<SecondaryFlag>
-    ): List<Pair<String, Map<String, String>>> {
+    ): List<Map<String, String>> {
         if (arguments.isEmpty()) {
             return emptyList()
         }
@@ -16,16 +21,14 @@ class ArgumentParser {
         val secondaryByLong = secondaryFlags.associateBy { it.long }
         val secondaryByShort = secondaryFlags.associateBy { it.short }
 
-        val results = mutableListOf<Pair<String, Map<String, String>>>()
-        var currentPrimaryValue: String? = null
+        val results = mutableListOf<Map<String, String>>()
         var currentSecondaries = mutableMapOf<String, String>()
 
         fun finalizeCurrentIfNeeded() {
-            val primaryValue = currentPrimaryValue
-            if (primaryValue != null) {
-                results.add(primaryValue to currentSecondaries.toMap())
+            if (currentSecondaries.isNotEmpty()) {
+                validateMandatoryFlags(currentSecondaries, secondaryFlags)
+                results.add(currentSecondaries.toMap())
             }
-            currentPrimaryValue = null
             currentSecondaries = mutableMapOf()
         }
 
@@ -33,84 +36,71 @@ class ArgumentParser {
         while (index < arguments.size) {
             val token = arguments[index]
             when {
-                token == primaryLong -> {
-                    val newIndex =
-                        consumeNextNonFlag(arguments, index) { value ->
-                            finalizeCurrentIfNeeded()
-                            currentPrimaryValue = value
-                        }
-                    index = newIndex
-                    continue
-                }
-                token.startsWith("$primaryLong=") -> {
-                    handleValueAfterEquals(token) { value ->
-                        finalizeCurrentIfNeeded()
-                        currentPrimaryValue = value
-                    }
-                }
-                token == primaryShort -> {
-                    val newIndex =
-                        consumeNextNonFlag(arguments, index) { value ->
-                            finalizeCurrentIfNeeded()
-                            currentPrimaryValue = value
-                        }
-                    index = newIndex
-                    continue
-                }
-                token.startsWith(primaryShort) -> {
-                    handleShortFlagTail(token, primaryShort) { value ->
-                        finalizeCurrentIfNeeded()
-                        currentPrimaryValue = value
-                    }
+                token == primaryLong || token == primaryShort -> {
+                    finalizeCurrentIfNeeded()
+                    index++
                 }
                 secondaryByLong.containsKey(token) -> {
                     val secondary = secondaryByLong.getValue(token)
                     val newIndex =
                         consumeNextNonFlag(arguments, index) { value ->
-                            if (currentPrimaryValue != null) {
-                                currentSecondaries[secondary.long] = value
-                            }
+                            currentSecondaries[secondary.long] = value
                         }
                     index = newIndex
-                    continue
                 }
                 secondaryByLong.keys.any { token.startsWith("$it=") } -> {
                     val matched = secondaryByLong.keys.first { token.startsWith("$it=") }
+                    val secondary = secondaryByLong.getValue(matched)
                     handleValueAfterEquals(token) { value ->
-                        if (currentPrimaryValue != null) {
-                            currentSecondaries[matched] = value
-                        }
+                        currentSecondaries[secondary.long] = value
                     }
+                    index++
                 }
                 secondaryByShort.containsKey(token) -> {
                     val secondary = secondaryByShort.getValue(token)
                     val newIndex =
                         consumeNextNonFlag(arguments, index) { value ->
-                            if (currentPrimaryValue != null) {
-                                currentSecondaries[secondary.long] = value
-                            }
+                            currentSecondaries[secondary.long] = value
                         }
                     index = newIndex
-                    continue
                 }
                 secondaryByShort.keys.any { token.startsWith(it) } -> {
                     val matched = secondaryByShort.keys.first { token.startsWith(it) }
                     handleShortFlagTail(token, matched) { value ->
-                        if (currentPrimaryValue != null) {
-                            val longKey = secondaryByShort.getValue(matched).long
-                            currentSecondaries[longKey] = value
-                        }
+                        val longKey = secondaryByShort.getValue(matched).long
+                        currentSecondaries[longKey] = value
                     }
+                    index++
                 }
+                else -> index++
             }
-            index += 1
         }
 
-        if (currentPrimaryValue != null) {
-            results.add(currentPrimaryValue!! to currentSecondaries.toMap())
+        validateMandatoryFlags(currentSecondaries, secondaryFlags)
+        if (currentSecondaries.isNotEmpty()) {
+            results.add(currentSecondaries.toMap())
         }
 
         return results
+    }
+
+    private fun validateMandatoryFlags(
+        currentSecondaries: Map<String, String>,
+        secondaryFlags: List<SecondaryFlag>
+    ) {
+        val mandatoryFlags = secondaryFlags.filter { it.isMandatory }
+        val missingFlags =
+            mandatoryFlags.filter { flag ->
+                currentSecondaries[flag.long]?.isNotEmpty() != true
+            }
+
+        if (missingFlags.isNotEmpty()) {
+            val errorMessage =
+                missingFlags.joinToString("\n") { flag ->
+                    flag.missingErrorMessage.ifEmpty { "Missing mandatory flag: ${flag.long}" }
+                }
+            throw IllegalArgumentException(errorMessage)
+        }
     }
 }
 

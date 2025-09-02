@@ -18,27 +18,34 @@ fun main(arguments: Array<String>) {
     if (argumentProcessor.isHelpRequested(arguments)) {
         println(
             """
-            usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
 
             Options:
-              --new-architecture=PackageName | --new-architecture PackageName | -na=PackageName | -na PackageName | -naPackageName
-                Generate a new Clean Architecture package with domain, presentation, and UI layers
-              --no-compose | -nc
-                Disable Compose support for the preceding architecture package
-              --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
-                Generate a new feature named FeatureName
-              --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
-                Override the feature package for the preceding feature
-              --new-datasource=Name | --new-datasource Name | -nds=Name | -nds Name | -ndsName
-                Generate a new data source named NameDataSource
-              --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
-                Attach dependencies to the preceding new data source
-              --new-use-case=UseCaseName | --new-use-case UseCaseName | -nuc=UseCaseName | -nuc UseCaseName | -nucUseCaseName
-                Generate a new use case named UseCaseName
-              --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
-                Specify the target directory for the preceding use case
+              --new-architecture | -na
+                  Generate a new Clean Architecture package with domain, presentation, and UI layers
+                --no-compose | -nc
+                  Disable Compose support for the preceding architecture package
+              --new-feature | -nf
+                  Generate a new feature
+                --name=FeatureName | -n=FeatureName
+                    Specify the feature name (required)
+                --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+                    Override the feature package for the preceding feature
+              --new-datasource | -nds
+                  Generate a new data source
+                --name=DataSourceName | -n=DataSourceName
+                    Specify the data source name (required, DataSource suffix will be added automatically)
+                --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
+                    Attach dependencies to the preceding new data source
+              --new-use-case | -nuc
+                  Generate a new use case
+                --name=UseCaseName | -n=UseCaseName
+                    Specify the use case name (required)
+                --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+                    Specify the target directory for the preceding use case
               --help, -h
-                Show this help message and exit
+                  Show this help message and exit
             """.trimIndent()
         )
         return
@@ -51,7 +58,8 @@ fun main(arguments: Array<String>) {
     if (architectureRequests.isEmpty() && featureRequests.isEmpty() && dataSourceRequests.isEmpty() && useCaseRequests.isEmpty()) {
         println(
             """
-            usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
             Run with --help or -h for more options.
             """.trimIndent()
         )
@@ -63,17 +71,15 @@ fun main(arguments: Array<String>) {
     val projectNamespace = basePackage ?: "com.unknown.app."
 
     architectureRequests.forEach { request ->
-        val packageName = request.packageName
-        if (packageName != null) {
-            val architectureRequest =
-                GenerateArchitectureRequest(
-                    destinationRootDirectory = destinationRootDir,
-                    architecturePackageName = packageName,
-                    enableCompose = request.enableCompose
-                )
-            val result = generator.generateArchitecture(architectureRequest)
-            println(result)
-        }
+        val architecturePackageName = basePackage?.let { it.trimEnd('.') + ".architecture" } ?: "com.unknown.app.architecture"
+        val architectureRequest =
+            GenerateArchitectureRequest(
+                destinationRootDirectory = destinationRootDir,
+                architecturePackageName = architecturePackageName,
+                enableCompose = request.enableCompose
+            )
+        val result = generator.generateArchitecture(architectureRequest)
+        println(result)
     }
 
     featureRequests.forEach { requestFeature ->

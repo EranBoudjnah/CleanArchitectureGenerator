@@ -1,27 +1,27 @@
 ## Clean Architecture Generator
 
-A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, and use cases.
+A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, use cases, and architecture packages.
 
 ### CLI usage
 
 - **Run via Gradle (no install):**
 
 ```bash
-./gradlew :cli:run --args="--new-feature=MyFeature"
+./gradlew :cli:run --args="--new-feature --name=MyFeature"
 ```
 
 - **Run via installed script:**
 
 ```bash
 ./gradlew :cli:installDist
-"./cli/build/install/cli/bin/cli" --new-feature=MyFeature
+"./cli/build/install/cli/bin/cli" --new-feature --name=MyFeature
 ```
 
 - **Run the fat jar:**
 
 ```bash
 ./gradlew :cli:shadowJar
-java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
+java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
 ```
 
 #### Options
@@ -29,35 +29,46 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature=MyFeature
 Usage:
 
 ```bash
-cag [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+```
+
+##### New Architecture Options
+```bash
+  --new-architecture | -na
+    Generate a new Clean Architecture package with domain, presentation, and UI layers
+  --no-compose | -nc
+    Disable Compose support for the preceding architecture package
 ```
 
 ##### New Feature Options
 ```bash
-  --new-feature=<FeatureName> | --new-feature <FeatureName> | -nf=<FeatureName> | -nf <FeatureName> | -nf<FeatureName>
-    Generate a new feature named FeatureName
+  --new-feature --name=<FeatureName> | --new-feature --name <FeatureName> | -nf --name=<FeatureName> | -nf --name <FeatureName>
+    Generate a new feature named <FeatureName>
   --package=<PackageName> | --package <PackageName> | -p=<PackageName> | -p <PackageName> | -p<PackageName>
     (Optional) Override the feature package for the preceding feature
 ```
 
 ##### New DataSource Options
 ```bash
-  --new-datasource=<Name> | --new-datasource <Name> | -nds=<Name> | -nds <Name> | -nds<Name>
-    Generate a new DataDource named NameDataSource
+  --new-datasource --name=<DataSourceName> | --new-datasource --name <Name> | -nds --name=<Name> | -nds --name <Name>
+    Generate a new DataSource named <DataSourceName>DataSource
   --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
     Attach dependencies to the preceding new data source
 ```
 
 ##### New UseCase Options
 ```bash
-  --new-use-case=<UseCaseName> | --new-use-case <UseCaseName> | -nuc=<UseCaseName> | -nuc <UseCaseName> | -nuc<UseCaseName>
-    Generate a new use case named UseCaseName. By default, the target path is determined by the current location.
+  --new-use-case --name=<UseCaseName> | --new-use-case --name <UseCaseName> | -nuc --name=<UseCaseName> | -nuc --name <UseCaseName>
+    Generate a new use case named <UseCaseName>UseCase.
   --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
     (Optional) Specify the target directory for the preceding use case
+    By default, the target path is determined by the current location
   --input-type=<InputType> | --input-type <InputType> | -it=<InputType> | -it <InputType> | -it<InputType>
     (Optional) Specify the input data type for the preceding use case
+    By default, Unit is used
   --output-type=<OutputType> | --output-type <OutputType> | -ot=<OutputType> | -ot <OutputType> | -ot<OutputType>
     (Optional) Specify the output data type for the preceding use case
+    By default, Unit is used
 ```
 
 ##### Other Options
@@ -71,6 +82,7 @@ When run without arguments, the command prints a short usage and suggests using 
 ### Android Studio plugin
 
 - New menu items:
+  - New architecture package
   - New feature
   - New data source
 

@@ -1,6 +1,7 @@
 package com.mitteloupe.cag.cli
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -27,13 +28,13 @@ class ArgumentParserTest {
             )
 
         // Then
-        assertEquals(emptyList<Pair<String, Map<String, String>>>(), result)
+        assertEquals(emptyList<Map<String, String>>(), result)
     }
 
     @Test
-    fun `Given primaries, secondaries when parsePrimaryWithSecondaries then groups correctly`() {
+    fun `Given valueless primary with secondaries when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha=One", "--beta=x", "-g", "y", "-aTwo", "-b", "z")
+        val givenArguments = arrayOf("--alpha", "--beta=x", "-g", "y", "--alpha", "-b", "z")
 
         // When
         val result =
@@ -47,17 +48,17 @@ class ArgumentParserTest {
         // Then
         assertEquals(
             listOf(
-                "One" to mapOf("--beta" to "x", "--gamma" to "y"),
-                "Two" to mapOf("--beta" to "z")
+                mapOf("--beta" to "x", "--gamma" to "y"),
+                mapOf("--beta" to "z")
             ),
             result
         )
     }
 
     @Test
-    fun `Given unknown primary when parsePrimaryWithSecondaries then groups correctly`() {
+    fun `Given valueless primary with equals syntax when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha=One", "--beta=x", "-g", "y", "--delta", "--beta=x", "--alpha", "Two")
+        val givenArguments = arrayOf("--alpha", "--beta=x", "-g=y", "--alpha", "-b=z")
 
         // When
         val result =
@@ -71,10 +72,156 @@ class ArgumentParserTest {
         // Then
         assertEquals(
             listOf(
-                "One" to mapOf("--beta" to "x", "--gamma" to "y"),
-                "Two" to emptyMap()
+                mapOf("--beta" to "x", "--gamma" to "y"),
+                mapOf("--beta" to "z")
             ),
             result
         )
+    }
+
+    @Test
+    fun `Given mandatory flag is provided when parsePrimaryWithSecondaries then succeeds`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "--beta=x")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        )
+                    )
+            )
+
+        // Then
+        assertEquals(
+            listOf(mapOf("--beta" to "x")),
+            result
+        )
+    }
+
+    @Test
+    fun `Given mandatory flag is missing when parsePrimaryWithSecondaries then throws exception`() {
+        // Given
+        val givenArguments = arrayOf("--alpha")
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (e: IllegalArgumentException) {
+            // Then
+            assertEquals("Beta is required", e.message)
+        }
+    }
+
+    @Test
+    fun `Given multiple mandatory flags when parsePrimaryWithSecondaries then validates all`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "--beta=x")
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        ),
+                        SecondaryFlag(
+                            long = "--gamma",
+                            short = "-g",
+                            isMandatory = true,
+                            missingErrorMessage = "Gamma is required"
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (e: IllegalArgumentException) {
+            // Then
+            assertEquals("Gamma is required", e.message)
+        }
+    }
+
+    @Test
+    fun `Given mandatory flag with empty value when parsePrimaryWithSecondaries then throws exception`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "--beta=")
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (e: IllegalArgumentException) {
+            // Then
+            assertEquals("Beta is required", e.message)
+        }
+    }
+
+    @Test
+    fun `Given mandatory flag with default error message when parsePrimaryWithSecondaries then uses default message`() {
+        // Given
+        val givenArguments = arrayOf("--alpha")
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (e: IllegalArgumentException) {
+            // Then
+            assertEquals("Missing mandatory flag: --beta", e.message)
+        }
     }
 }

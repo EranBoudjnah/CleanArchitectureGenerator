@@ -6,13 +6,10 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JCheckBox
 import javax.swing.JComponent
-import javax.swing.JTextField
 
 class CreateCleanArchitecturePackageDialog(
-    project: Project,
-    defaultPrefix: String
+    project: Project
 ) : DialogWrapper(project) {
-    private val packageField = JTextField(defaultPrefix + "architecture")
     private val enableComposeCheckBox = JCheckBox("Enable Compose", true)
 
     init {
@@ -23,27 +20,11 @@ class CreateCleanArchitecturePackageDialog(
     override fun createCenterPanel(): JComponent =
         panel {
             row {
-                label(CleanArchitectureGeneratorBundle.message("dialog.architecture.package.label"))
-                cell(packageField).focused()
-            }
-            row {
                 cell(enableComposeCheckBox)
             }
         }
 
-    override fun doValidate(): ValidationInfo? {
-        val packageName = packageField.text.trim()
-        if (packageName.isEmpty()) {
-            return ValidationInfo(
-                CleanArchitectureGeneratorBundle.message("validation.architecture.package.required"),
-                packageField
-            )
-        }
-
-        return null
-    }
-
-    fun getPackageName(): String = packageField.text.trim()
+    override fun doValidate(): ValidationInfo? = null
 
     fun isComposeEnabled(): Boolean = enableComposeCheckBox.isSelected
 }

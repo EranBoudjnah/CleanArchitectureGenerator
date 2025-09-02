@@ -42,10 +42,11 @@ class MainTest {
 
             // Then
             assertEquals(
-                "usage: cag [--new-architecture=PackageName [--no-compose]]... " +
-                    "[--new-feature=FeatureName [--package=PackageName]]... " +
-                    "[--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-                    "[--new-use-case=UseCaseName [--path=TargetPath]]...\n" +
+                "usage: cag [--new-architecture [--no-compose]]... " +
+                    "[--new-feature --name=FeatureName [--package=PackageName]]... " +
+                    "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
+                    "[--new-use-case --name=UseCaseName [--path=TargetPath]]...\n" +
+                    "\n" +
                     "Run with --help or -h for more options.\n",
                 output.toString()
             )
@@ -73,27 +74,34 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-architecture=PackageName [--no-compose]]... [--new-feature=FeatureName [--package=PackageName]]... [--new-datasource=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case=UseCaseName [--path=TargetPath]]...
+                """usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
 
 Options:
-  --new-architecture=PackageName | --new-architecture PackageName | -na=PackageName | -na PackageName | -naPackageName
-    Generate a new Clean Architecture package with domain, presentation, and UI layers
-  --no-compose | -nc
-    Disable Compose support for the preceding architecture package
-  --new-feature=FeatureName | --new-feature FeatureName | -nf=FeatureName | -nf FeatureName | -nfFeatureName
-    Generate a new feature named FeatureName
-  --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
-    Override the feature package for the preceding feature
-  --new-datasource=Name | --new-datasource Name | -nds=Name | -nds Name | -ndsName
-    Generate a new data source named NameDataSource
-  --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
-    Attach dependencies to the preceding new data source
-  --new-use-case=UseCaseName | --new-use-case UseCaseName | -nuc=UseCaseName | -nuc UseCaseName | -nucUseCaseName
-    Generate a new use case named UseCaseName
-  --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
-    Specify the target directory for the preceding use case
+  --new-architecture | -na
+      Generate a new Clean Architecture package with domain, presentation, and UI layers
+    --no-compose | -nc
+      Disable Compose support for the preceding architecture package
+  --new-feature | -nf
+      Generate a new feature
+    --name=FeatureName | -n=FeatureName
+        Specify the feature name (required)
+    --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+        Override the feature package for the preceding feature
+  --new-datasource | -nds
+      Generate a new data source
+    --name=DataSourceName | -n=DataSourceName
+        Specify the data source name (required, DataSource suffix will be added automatically)
+    --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
+        Attach dependencies to the preceding new data source
+  --new-use-case | -nuc
+      Generate a new use case
+    --name=UseCaseName | -n=UseCaseName
+        Specify the use case name (required)
+    --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+        Specify the target directory for the preceding use case
   --help, -h
-    Show this help message and exit
+      Show this help message and exit
 """
         }
     }
