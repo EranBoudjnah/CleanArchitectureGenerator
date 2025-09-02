@@ -18,7 +18,7 @@ class KotlinFileCreator {
         val packageSegments = featurePackageName.toSegments()
         val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments)
         val targetDirectory =
-            (listOf(layer) + relativePackageSubPath.toSegments())
+            relativePackageSubPath.toSegments()
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
 
         if (!targetDirectory.exists()) {
@@ -26,6 +26,8 @@ class KotlinFileCreator {
             if (!created) {
                 return "${ERROR_PREFIX}Failed to create directory: ${targetDirectory.absolutePath}"
             }
+        } else if (!targetDirectory.isDirectory) {
+            return "${ERROR_PREFIX}Failed to create directory: ${targetDirectory.absolutePath} (Not a directory)"
         }
 
         return writeKotlinFileInLayer(targetDirectory, fileName, content)
@@ -37,6 +39,9 @@ class KotlinFileCreator {
         content: String
     ): String? {
         val targetFile = File(targetDirectory, fileName)
+        if (targetFile.exists() && !targetFile.isFile) {
+            return "${ERROR_PREFIX}Failed to create file: ${targetFile.absolutePath} (it's a directory)"
+        }
         if (!targetFile.exists()) {
             runCatching { targetFile.writeText(content) }
                 .onFailure {
