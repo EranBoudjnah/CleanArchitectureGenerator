@@ -103,7 +103,7 @@ class ArchitectureLayerContentGenerator {
         architecturePackageName: String
     ): String? {
         val presentationRoot = File(architectureRoot, "presentation/src/main/java")
-        val packageDirectory = buildPackageDirectory(presentationRoot, architecturePackageName.toSegments())
+        val packageDirectory = buildPackageDirectory(presentationRoot, "$architecturePackageName.presentation".toSegments())
 
         generateViewModelBase(packageDirectory, projectNamespace)?.let { return it }
         generateNavigationEventBase(packageDirectory, projectNamespace)?.let { return it }
@@ -181,38 +181,69 @@ class ArchitectureLayerContentGenerator {
 
     private fun generateViewModelBase(
         packageDirectory: File,
-        projectNamespace: String
+        architecturePackage: String
     ): String? {
         val viewModelFile = File(packageDirectory, "viewmodel/BaseViewModel.kt")
         if (viewModelFile.exists()) return null
 
         val content =
             """
-            package $projectNamespace.presentation.viewmodel
+            package $architecturePackage.presentation.viewmodel
 
-            import androidx.lifecycle.ViewModel
-            import androidx.lifecycle.viewModelScope
-            import kotlinx.coroutines.flow.MutableStateFlow
-            import kotlinx.coroutines.flow.StateFlow
-            import kotlinx.coroutines.flow.asStateFlow
+            import $architecturePackage.domain.UseCaseExecutor
+            import $architecturePackage.domain.exception.DomainException
+            import $architecturePackage.domain.usecase.UseCase
+            import $architecturePackage.presentation.navigation.PresentationNavigationEvent
+            import $architecturePackage.presentation.notification.PresentationNotification
+            import kotlinx.coroutines.MainScope
+            import kotlinx.coroutines.flow.Flow
+            import kotlinx.coroutines.flow.MutableSharedFlow
             import kotlinx.coroutines.launch
 
-            abstract class BaseViewModel<State, Event> : ViewModel() {
-                private val _state = MutableStateFlow(createInitialState())
-                val state: StateFlow<State> = _state.asStateFlow()
+            abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotification>(
+                private val useCaseExecutor: UseCaseExecutor
+            ) {
+                val viewState: Flow<VIEW_STATE>
+                    field = MutableSharedFlow()
 
-                protected abstract fun createInitialState(): State
+                val notification: Flow<NOTIFICATION>
+                    field = MutableSharedFlow()
 
-                protected fun setState(reduce: State.() -> State) {
-                    val newState = state.value.reduce()
-                    _state.value = newState
+                val navigationEvent: Flow<PresentationNavigationEvent>
+                    field = MutableSharedFlow()
+            
+                protected fun updateViewState(newState: VIEW_STATE) {
+                    MainScope().launch {
+                        viewState.emit(newState)
+                    }
                 }
 
-                protected fun launch(block: suspend () -> Unit) {
-                    viewModelScope.launch { block() }
+                protected fun notify(notification: NOTIFICATION) {
+                    MainScope().launch {
+                        this@BaseViewModel.notification.emit(notification)
+                    }
                 }
 
-                abstract fun onEvent(event: Event)
+                protected fun emitNavigationEvent(navigationEvent: PresentationNavigationEvent) {
+                    MainScope().launch {
+                        this@BaseViewModel.navigationEvent.emit(navigationEvent)
+                    }
+                }
+
+                protected operator fun <OUTPUT> UseCase<Unit, OUTPUT>.invoke(
+                    onResult: (OUTPUT) -> Unit = {},
+                    onException: (DomainException) -> Unit = {}
+                ) {
+                    useCaseExecutor.execute(this, onResult, onException)
+                }
+
+                protected operator fun <INPUT, OUTPUT> UseCase<INPUT, OUTPUT>.invoke(
+                    value: INPUT,
+                    onResult: (OUTPUT) -> Unit = {},
+                    onException: (DomainException) -> Unit = {}
+                ) {
+                    useCaseExecutor.execute(this, value, onResult, onException)
+                }
             }
             """.trimIndent()
 

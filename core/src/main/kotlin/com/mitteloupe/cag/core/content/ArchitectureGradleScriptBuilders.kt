@@ -4,12 +4,14 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitectureDomainGradleScript(catalog: VersionCatalogReader): String {
-    val aliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
-    val aliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
 
-    return """plugins {
-    alias(libs.plugins.$aliasAndroidLibrary)
-    alias(libs.plugins.$aliasKotlinAndroid)
+    return """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.$pluginAliasAndroidLibrary)
+    alias(libs.plugins.$pluginAliasKotlinAndroid)
 }
 
 kotlin {
@@ -55,12 +57,14 @@ dependencies {
 }
 
 fun buildArchitecturePresentationGradleScript(catalog: VersionCatalogReader): String {
-    val aliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
-    val aliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
 
-    return """plugins {
-    alias(libs.plugins.$aliasAndroidLibrary)
-    alias(libs.plugins.$aliasKotlinAndroid)
+    return """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.$pluginAliasAndroidLibrary)
+    alias(libs.plugins.$pluginAliasKotlinAndroid)
 }
 
 kotlin {
@@ -105,14 +109,16 @@ dependencies {
 }
 
 fun buildArchitectureUiGradleScript(catalog: VersionCatalogReader): String {
-    val aliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
-    val aliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
-    val aliasCompose = (catalog.getResolvedPluginAliasFor("org.jetbrains.compose") ?: "compose").asAccessor
+    val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
+    val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
+    val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.plugin.compose")?.asAccessor
 
-    return """plugins {
-    alias(libs.plugins.$aliasAndroidLibrary)
-    alias(libs.plugins.$aliasKotlinAndroid)
-    alias(libs.plugins.$aliasCompose)
+    return """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.$pluginAliasAndroidLibrary)
+    alias(libs.plugins.$pluginAliasKotlinAndroid)
+    alias(libs.plugins.$pluginAliasComposeCompiler)
 }
 
 kotlin {
