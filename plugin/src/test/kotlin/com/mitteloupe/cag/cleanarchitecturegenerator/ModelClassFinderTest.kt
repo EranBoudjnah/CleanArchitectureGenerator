@@ -1,7 +1,8 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator
 
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -58,45 +59,100 @@ class ModelClassFinderTest {
             interface UserRepository
             class UserUseCase
             """.trimIndent()
+        val expected =
+            arrayOf(
+                "com.example.domain.model.UserModel",
+                "com.example.domain.model.UserRepository",
+                "com.example.domain.model.UserUseCase"
+            )
 
         // When
         val actualResult = classUnderTest.extractClassesFromContent(content)
 
         // Then
         assertEquals(3, actualResult.size)
-        assertTrue(actualResult.contains("com.example.domain.model.UserModel"))
-        assertTrue(actualResult.contains("com.example.domain.model.UserRepository"))
-        assertTrue(actualResult.contains("com.example.domain.model.UserUseCase"))
+        assertThat(actualResult, contains(*expected))
     }
 
     @Test
-    fun `Given different directories when findModelClasses then returns consistent results`() {
+    fun `Given complex model content when extractClassesFromContent then handles all class types`() {
         // Given
-        val useCaseDirectory = java.io.File("/feature1/domain/usecase")
-        val originalRightClickedDirectory = java.io.File("/feature1/domain/presentation")
+        val content =
+            """
+            package com.example.domain.model
+            
+            class UserModel
+            interface UserRepository
+            class UserUseCase
+            interface UserValidator
+            """.trimIndent()
 
         // When
-        val modelClassesFromUseCaseDir = classUnderTest.findModelClasses(useCaseDirectory)
-        val modelClassesFromOriginalDir = classUnderTest.findModelClasses(originalRightClickedDirectory)
+        val actualResult = classUnderTest.extractClassesFromContent(content)
 
         // Then
-        // Both should return the same result since they both look for ../model relative to their respective directories
-        // This test verifies that the ModelClassFinder works correctly with different input directories
-        assertEquals(modelClassesFromUseCaseDir, modelClassesFromOriginalDir)
+        assertEquals(4, actualResult.size)
+        val expected =
+            arrayOf(
+                "com.example.domain.model.UserModel",
+                "com.example.domain.model.UserRepository",
+                "com.example.domain.model.UserUseCase",
+                "com.example.domain.model.UserValidator"
+            )
+        assertThat(actualResult, contains(*expected))
     }
 
     @Test
-    fun `Given usecase directory when findModelClasses then finds model classes in sibling model directory`() {
+    fun `Given nested package structure when extractClassesFromContent then handles correctly`() {
         // Given
-        val useCaseDirectory = java.io.File("/feature1/domain/usecase")
+        val content =
+            """
+            package com.example.feature.user.domain.model
+            
+            class UserModel
+            interface UserRepository
+            """.trimIndent()
+        val expected =
+            arrayOf(
+                "com.example.feature.user.domain.model.UserModel",
+                "com.example.feature.user.domain.model.UserRepository"
+            )
 
         // When
-        val modelClasses = classUnderTest.findModelClasses(useCaseDirectory)
+        val actualResult = classUnderTest.extractClassesFromContent(content)
 
         // Then
-        // This test verifies that the ModelClassFinder correctly looks for model directory in parent
-        // The actual result depends on the file system, but the method should not throw exceptions
-        // and should return a non-null list (empty or populated)
-        assertTrue("Should return a non-null list", modelClasses.size >= 0)
+        assertEquals(2, actualResult.size)
+        assertThat(actualResult, contains(*expected))
+    }
+
+    @Test
+    fun `Given mixed content with comments when extractClassesFromContent then extracts only classes`() {
+        // Given
+        val content =
+            """
+            package com.example.domain.model
+            
+            // This is a comment
+            class UserModel
+            /* Another comment */
+            interface UserRepository
+            // Empty line
+            
+            class UserUseCase
+            """.trimIndent()
+        val expected =
+            arrayOf(
+                "com.example.domain.model.UserModel",
+                "com.example.domain.model.UserRepository",
+                "com.example.domain.model.UserUseCase"
+            )
+
+        // When
+        val actualResult = classUnderTest.extractClassesFromContent(content)
+
+        // Then
+        assertEquals(3, actualResult.size)
+        assertThat(actualResult, contains(*expected))
     }
 }

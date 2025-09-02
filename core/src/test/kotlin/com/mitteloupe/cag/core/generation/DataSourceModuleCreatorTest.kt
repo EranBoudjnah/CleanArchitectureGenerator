@@ -1,7 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.ERROR_PREFIX
-import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -48,14 +49,14 @@ class DataSourceModuleCreatorTest {
         val file = File(targetDir, "ExampleDataSourceModule.kt")
         assertTrue(file.exists())
         val content = file.readText()
-        assertThat(content, CoreMatchers.containsString("package com.example.app.di"))
+        assertThat(content, containsString("package com.example.app.di"))
         assertThat(
             content,
-            CoreMatchers.containsString("object ExampleDataSourceModule")
+            containsString("object ExampleDataSourceModule")
         )
         assertThat(
             content,
-            CoreMatchers.containsString(
+            containsString(
                 "fun providesExampleDataSource(): ExampleDataSource = ExampleDataSourceImpl()"
             )
         )
@@ -91,7 +92,7 @@ class DataSourceModuleCreatorTest {
             // Then
             assertNotNull(result)
             checkNotNull(result)
-            assertThat(result, CoreMatchers.startsWith(ERROR_PREFIX))
+            assertThat(result, startsWith(ERROR_PREFIX))
         } finally {
             blockingFile.delete()
         }

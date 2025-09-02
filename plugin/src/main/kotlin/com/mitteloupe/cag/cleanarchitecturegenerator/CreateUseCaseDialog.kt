@@ -29,6 +29,7 @@ import javax.swing.text.AbstractDocument
 private const val USE_CASE_SUFFIX = "UseCase"
 private const val DEFAULT_USE_CASE_NAME = "DoSomething"
 private const val DEFAULT_DATA_TYPE = "Unit"
+private const val SYMBOL_NOT_FOUND_ERROR_MESSAGE = "Symbol not found."
 
 class CreateUseCaseDialog(
     project: Project?,
@@ -170,16 +171,14 @@ class CreateUseCaseDialog(
         component: JComponent?,
         message: String
     ) {
-        when (component) {
-            inputDataTypeComboBox -> {
-                inputWarningLabel.icon = AllIcons.General.Warning
-                inputWarningLabel.text = "Symbol not found."
+        val label =
+            when (component) {
+                inputDataTypeComboBox -> inputWarningLabel
+                outputDataTypeComboBox -> outputWarningLabel
+                else -> return
             }
-            outputDataTypeComboBox -> {
-                outputWarningLabel.icon = AllIcons.General.Warning
-                outputWarningLabel.text = "Symbol not found."
-            }
-        }
+        label.icon = AllIcons.General.Warning
+        label.text = message
     }
 
     private fun validateInputOutputTypes(): ValidationInfo? {
@@ -234,7 +233,7 @@ class CreateUseCaseDialog(
 
         val destinationDir = destinationDirectory
         if (destinationDir != null && !symbolValidator.isValidSymbolInContext(inputType, destinationDir)) {
-            showFieldWarning(inputDataTypeComboBox, "Symbol not found.")
+            showFieldWarning(inputDataTypeComboBox, SYMBOL_NOT_FOUND_ERROR_MESSAGE)
         } else {
             clearInputWarning()
         }
@@ -255,7 +254,7 @@ class CreateUseCaseDialog(
 
         val destinationDir = destinationDirectory
         if (destinationDir != null && !symbolValidator.isValidSymbolInContext(outputType, destinationDir)) {
-            showFieldWarning(outputDataTypeComboBox, "Symbol not found.")
+            showFieldWarning(outputDataTypeComboBox, SYMBOL_NOT_FOUND_ERROR_MESSAGE)
         } else {
             clearOutputWarning()
         }
