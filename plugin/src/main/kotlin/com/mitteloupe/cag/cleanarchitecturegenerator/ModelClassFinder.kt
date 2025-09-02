@@ -1,15 +1,17 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator
 
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.FileSystemWrapper
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.IntelliJFileSystemWrapper
 import java.io.File
 
-class ModelClassFinder {
+class ModelClassFinder(
+    private val fileSystemWrapper: FileSystemWrapper = IntelliJFileSystemWrapper()
+) {
     fun findModelClasses(useCaseDirectory: File): List<String> {
         val modelDirectory = findModelDirectory(useCaseDirectory) ?: return emptyList()
-        val virtualModelDirectory = findVirtualFile(modelDirectory) ?: return emptyList()
+        val virtualModelDirectory = fileSystemWrapper.findVirtualFile(modelDirectory) ?: return emptyList()
 
         return findClassesInDirectory(virtualModelDirectory)
     }
@@ -28,17 +30,15 @@ class ModelClassFinder {
         return null
     }
 
-    private fun findVirtualFile(file: File): VirtualFile? = LocalFileSystem.getInstance().findFileByIoFile(file)
-
     private fun findClassesInDirectory(directory: VirtualFile): List<String> {
         val classes = mutableListOf<String>()
 
-        VfsUtil.visitChildrenRecursively(
+        fileSystemWrapper.visitChildrenRecursively(
             directory,
             object : VirtualFileVisitor<Any>() {
                 override fun visitFile(file: VirtualFile): Boolean {
-                    if (!file.isDirectory && file.extension == "kt") {
-                        val content = String(file.contentsToByteArray())
+                    if (!fileSystemWrapper.isDirectory(file) && fileSystemWrapper.getFileExtension(file) == "kt") {
+                        val content = fileSystemWrapper.getFileContents(file)
                         classes.addAll(extractClassesFromContent(content))
                     }
                     return true

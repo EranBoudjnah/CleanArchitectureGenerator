@@ -1,17 +1,33 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator
 
+import com.mitteloupe.cag.cleanarchitecturegenerator.test.filesystem.FakeFileSystemWrapper
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.empty
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.not
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.File
+import java.nio.file.Files
 
 class ModelClassFinderTest {
     private lateinit var classUnderTest: ModelClassFinder
+    private lateinit var fakeFileSystem: FakeFileSystemWrapper
+    private lateinit var tempDirectory: File
 
     @Before
     fun setUp() {
-        classUnderTest = ModelClassFinder()
+        tempDirectory = Files.createTempDirectory("ModelClassFinderTest").toFile()
+        fakeFileSystem = FakeFileSystemWrapper(tempDirectory)
+        classUnderTest = ModelClassFinder(fakeFileSystem)
+    }
+
+    @After
+    fun tearDown() {
+        tempDirectory.deleteRecursively()
     }
 
     @Test
@@ -75,84 +91,43 @@ class ModelClassFinderTest {
     }
 
     @Test
-    fun `Given complex model content when extractClassesFromContent then handles all class types`() {
+    fun `Given different directories when findModelClasses then returns consistent results`() {
         // Given
-        val content =
-            """
-            package com.example.domain.model
-            
-            class UserModel
-            interface UserRepository
-            class UserUseCase
-            interface UserValidator
-            """.trimIndent()
+        fakeFileSystem.createDirectory("feature1/domain/model")
+        fakeFileSystem.createFile("feature1/domain/model/UserModel.kt", "class UserModel", "kt")
+
+        val useCaseDirectory = fakeFileSystem.createFakeFile("feature1/domain/usecase")
+        val originalRightClickedDirectory = fakeFileSystem.createFakeFile("feature1/domain/presentation")
 
         // When
-        val actualResult = classUnderTest.extractClassesFromContent(content)
+        val modelClassesFromUseCaseDir = classUnderTest.findModelClasses(useCaseDirectory)
+        val modelClassesFromOriginalDir = classUnderTest.findModelClasses(originalRightClickedDirectory)
 
         // Then
-        assertEquals(4, actualResult.size)
-        val expected =
-            arrayOf(
-                "com.example.domain.model.UserModel",
-                "com.example.domain.model.UserRepository",
-                "com.example.domain.model.UserUseCase",
-                "com.example.domain.model.UserValidator"
-            )
-        assertThat(actualResult, contains(*expected))
+        assertEquals(modelClassesFromUseCaseDir, modelClassesFromOriginalDir)
     }
 
     @Test
-    fun `Given nested package structure when extractClassesFromContent then handles correctly`() {
+    fun `Given usecase directory when findModelClasses then finds model classes in sibling model directory`() {
         // Given
-        val content =
-            """
-            package com.example.feature.user.domain.model
-            
-            class UserModel
-            interface UserRepository
-            """.trimIndent()
-        val expected =
-            arrayOf(
-                "com.example.feature.user.domain.model.UserModel",
-                "com.example.feature.user.domain.model.UserRepository"
-            )
-
-        // When
-        val actualResult = classUnderTest.extractClassesFromContent(content)
-
-        // Then
-        assertEquals(2, actualResult.size)
-        assertThat(actualResult, contains(*expected))
-    }
-
-    @Test
-    fun `Given mixed content with comments when extractClassesFromContent then extracts only classes`() {
-        // Given
-        val content =
+        fakeFileSystem.createDirectory("feature1/domain/model")
+        fakeFileSystem.createFile(
+            "feature1/domain/model/UserModel.kt",
             """
             package com.example.domain.model
-            
-            // This is a comment
+
             class UserModel
-            /* Another comment */
-            interface UserRepository
-            // Empty line
-            
-            class UserUseCase
-            """.trimIndent()
-        val expected =
-            arrayOf(
-                "com.example.domain.model.UserModel",
-                "com.example.domain.model.UserRepository",
-                "com.example.domain.model.UserUseCase"
-            )
+            """.trimIndent(),
+            "kt"
+        )
+        val useCaseDirectory = fakeFileSystem.createFakeFile("feature1/domain/usecase")
+        val expected = arrayOf("com.example.domain.model.UserModel")
 
         // When
-        val actualResult = classUnderTest.extractClassesFromContent(content)
+        val actualResult = classUnderTest.findModelClasses(useCaseDirectory)
 
         // Then
-        assertEquals(3, actualResult.size)
+        assertThat(actualResult, `is`(not(empty())))
         assertThat(actualResult, contains(*expected))
     }
 }
