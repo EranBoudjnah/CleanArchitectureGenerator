@@ -64,7 +64,7 @@ class CreateCleanArchitectureFeatureDialog(
         )
     }
 
-    override fun getPreferredFocusedComponent(): JComponent? = featureNameTextField
+    override fun getPreferredFocusedComponent(): JComponent = featureNameTextField
 
     private fun updateTemplatedPackageName(packagePrefix: String? = defaultPackagePrefix) {
         featurePackageTextField.text = "$packagePrefix${featureName.lowercase()}"

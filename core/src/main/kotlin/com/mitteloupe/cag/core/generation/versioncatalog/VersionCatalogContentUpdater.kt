@@ -3,9 +3,6 @@ package com.mitteloupe.cag.core.generation.versioncatalog
 private val VERSION_CATALOG_PLUGIN_ENTRY_REGEX =
     """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bid\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
 
-private val VERSION_CATALOG_LIBRARY_KEY_REGEX =
-    """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*.*$""".toRegex()
-
 private val VERSION_CATALOG_LIBRARY_ENTRY_WITH_MODULE_REGEX =
     """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bmodule\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
 

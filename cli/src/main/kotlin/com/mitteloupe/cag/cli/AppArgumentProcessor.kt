@@ -96,17 +96,17 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         var index = 0
         while (index < arguments.size) {
             val token = arguments[index]
-            when {
-                token == "--new-architecture" || token == "-na" -> {
+            when (token) {
+                "--new-architecture", "-na" -> {
                     results.add(ArchitectureRequest(enableCompose = currentEnableCompose))
                     currentEnableCompose = true
                 }
-                token == "--no-compose" || token == "-nc" -> {
-                    if (results.isNotEmpty()) {
+                "--no-compose", "-nc" -> {
+                    if (results.isEmpty()) {
+                        currentEnableCompose = false
+                    } else {
                         val lastIndex = results.lastIndex
                         results[lastIndex] = results[lastIndex].copy(enableCompose = false)
-                    } else {
-                        currentEnableCompose = false
                     }
                 }
             }
