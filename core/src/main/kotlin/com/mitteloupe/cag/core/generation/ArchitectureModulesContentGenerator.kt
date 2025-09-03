@@ -144,6 +144,7 @@ class ArchitectureModulesContentGenerator {
                 interface UseCase<REQUEST, RESULT> {
                     fun execute(input: REQUEST, onResult: (RESULT) -> Unit)
                 }
+
                 """.trimIndent(),
             errorMessage = "use case"
         )
@@ -180,7 +181,8 @@ abstract class BackgroundExecutingUseCase<REQUEST, RESULT>(
     }
 
     abstract fun executeInBackground(request: REQUEST): RESULT
-}"""
+}
+"""
 
         generateFileIfMissing(
             packageDirectory = packageDirectory,
@@ -229,7 +231,8 @@ abstract class ContinuousExecutingUseCase<REQUEST, RESULT>(
     }
 
     abstract fun executeInBackground(request: REQUEST): Flow<RESULT>
-}"""
+}
+"""
 
         generateFileIfMissing(
             packageDirectory = packageDirectory,
@@ -421,7 +424,8 @@ abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotifi
     ) {
         useCaseExecutor.execute(this, value, onResult, onException)
     }
-}"""
+}
+"""
 
         generateFileIfMissing(
             packageDirectory = packageDirectory,
@@ -466,7 +470,8 @@ import androidx.compose.runtime.Composable
 interface Screen {
     @Composable
     fun Content()
-}""",
+}
+""",
             errorMessage = "base screen"
         )
     }
@@ -485,6 +490,7 @@ interface Screen {
                 interface Mapper<Input, Output> {
                     fun map(input: Input): Output
                 }
+
                 """.trimIndent(),
             errorMessage = "base mapper"
         )
