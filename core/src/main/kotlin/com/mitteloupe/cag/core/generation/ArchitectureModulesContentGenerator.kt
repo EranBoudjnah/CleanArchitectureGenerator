@@ -495,23 +495,4 @@ interface Screen {
             errorMessage = "base mapper"
         )
     }
-
-    private fun generateFileIfMissing(
-        packageDirectory: File,
-        relativePath: String,
-        content: String,
-        errorMessage: String
-    ) {
-        val file = File(packageDirectory, relativePath)
-        if (file.exists()) {
-            return
-        }
-
-        runCatching {
-            file.parentFile.mkdirs()
-            file.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate $errorMessage: ${it.message}")
-        }
-    }
 }

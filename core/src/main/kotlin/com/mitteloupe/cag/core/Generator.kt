@@ -9,6 +9,7 @@ import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
 import com.mitteloupe.cag.core.generation.ArchitectureModulesContentGenerator
+import com.mitteloupe.cag.core.generation.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
@@ -298,6 +299,12 @@ class Generator {
         if (!architectureRoot.mkdirs()) {
             throw GenerationException("Failed to create architecture directory.")
         }
+
+        CoroutineModuleContentGenerator()
+            .generate(
+                projectRoot = request.destinationRootDirectory,
+                architecturePackageName = architecturePackageName
+            )
 
         ArchitectureModulesContentGenerator()
             .generate(
