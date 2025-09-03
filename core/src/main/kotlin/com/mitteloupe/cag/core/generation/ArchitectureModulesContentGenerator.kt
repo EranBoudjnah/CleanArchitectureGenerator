@@ -46,13 +46,13 @@ class ArchitectureModulesContentGenerator {
         createPresentationModule(architectureRoot, catalogUpdater)
         createUiModule(architectureRoot, catalogUpdater)
 
-        generateDomainContent(architectureRoot, architecturePackageName, architecturePackageName)
+        generateDomainContent(architectureRoot, architecturePackageName, packageSegments)
         generatePresentationContent(
             architectureRoot,
             architecturePackageName,
             architecturePackageName
         )
-        generateUiContent(architectureRoot, architecturePackageName, architecturePackageName)
+        generateUiContent(architectureRoot, architecturePackageName, packageSegments)
     }
 
     private fun createDomainModule(
@@ -91,10 +91,10 @@ class ArchitectureModulesContentGenerator {
     private fun generateDomainContent(
         architectureRoot: File,
         moduleNamespace: String,
-        architecturePackageName: String
+        architecturePackageNameSegments: List<String>
     ) {
         val domainRoot = File(architectureRoot, "domain/src/main/java")
-        val packageDirectory = buildPackageDirectory(domainRoot, architecturePackageName.toSegments())
+        val packageDirectory = buildPackageDirectory(domainRoot, architecturePackageNameSegments)
 
         generateUseCase(packageDirectory, moduleNamespace)
         generateBackgroundExecutingUseCase(packageDirectory, moduleNamespace)
@@ -121,10 +121,10 @@ class ArchitectureModulesContentGenerator {
     private fun generateUiContent(
         architectureRoot: File,
         moduleNamespace: String,
-        architecturePackageName: String
+        architecturePackageNameSegments: List<String>
     ) {
         val uiRoot = File(architectureRoot, "ui/src/main/java")
-        val packageDirectory = buildPackageDirectory(uiRoot, architecturePackageName.toSegments())
+        val packageDirectory = buildPackageDirectory(uiRoot, architecturePackageNameSegments)
 
         generateScreenBase(packageDirectory, moduleNamespace)
         generateMapperBase(packageDirectory, moduleNamespace)
