@@ -45,18 +45,18 @@ class CoroutineModuleContentGeneratorTest {
     fun `Given valid architecture package when generate then creates CoroutineContextProvider with exact content`() {
         // Given
         val projectRoot = temporaryDirectory
-        val architecturePackageName = "com.example.architecture"
+        val coroutinePackageName = "com.example.superapp.coroutine"
 
         // When
-        classUnderTest.generate(projectRoot, architecturePackageName)
+        classUnderTest.generate(projectRoot, coroutinePackageName)
 
         // Then
         val coroutineContextProviderFile =
             File(
                 projectRoot,
-                "coroutine/src/main/java/com/example/architecture/coroutine/CoroutineContextProvider.kt"
+                "coroutine/src/main/java/com/example/superapp/coroutine/CoroutineContextProvider.kt"
             )
-        val expectedContent = """package com.example.architecture.coroutine
+        val expectedContent = """package com.example.superapp.coroutine
 
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers

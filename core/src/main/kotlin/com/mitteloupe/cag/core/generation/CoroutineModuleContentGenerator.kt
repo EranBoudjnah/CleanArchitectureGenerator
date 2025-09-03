@@ -10,30 +10,30 @@ import java.io.File
 class CoroutineModuleContentGenerator {
     fun generate(
         projectRoot: File,
-        architecturePackageName: String
+        coroutinePackageName: String
     ) {
-        val packageSegments = architecturePackageName.toSegments()
+        val packageSegments = coroutinePackageName.toSegments()
         if (packageSegments.isEmpty()) {
-            throw GenerationException("Architecture package name is invalid.")
+            throw GenerationException("Coroutine package name is invalid.")
         }
 
         val coroutineRoot = File(projectRoot, "coroutine")
         val coroutineSourceRoot = File(coroutineRoot, "src/main/java")
-        val destinationDirectory = buildPackageDirectory(coroutineSourceRoot, "$architecturePackageName.coroutine".toSegments())
+        val destinationDirectory = buildPackageDirectory(coroutineSourceRoot, packageSegments)
         if (!destinationDirectory.exists()) {
             if (!destinationDirectory.mkdirs()) {
-                throw GenerationException("Failed to create directories for coroutine package '$architecturePackageName.coroutine'.")
+                throw GenerationException("Failed to create directories for coroutine package '$coroutinePackageName.coroutine'.")
             }
         }
 
         val catalogUpdater = VersionCatalogUpdater()
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
-            enableCompose = false
+            includeCoroutineDependencies = true
         )
 
         createCoroutineModule(coroutineRoot, catalogUpdater)
-        generateCoroutineContent(coroutineRoot, architecturePackageName, architecturePackageName)
+        generateCoroutineContent(coroutineRoot, coroutinePackageName, packageSegments)
     }
 
     private fun createCoroutineModule(
@@ -50,10 +50,10 @@ class CoroutineModuleContentGenerator {
     private fun generateCoroutineContent(
         coroutineRoot: File,
         moduleNamespace: String,
-        architecturePackageName: String
+        coroutinePackageNameSegments: List<String>
     ) {
         val coroutineSourceRoot = File(coroutineRoot, "src/main/java")
-        val packageDirectory = buildPackageDirectory(coroutineSourceRoot, "$architecturePackageName.coroutine".toSegments())
+        val packageDirectory = buildPackageDirectory(coroutineSourceRoot, coroutinePackageNameSegments)
 
         generateCoroutineContextProvider(packageDirectory, moduleNamespace)
     }
@@ -66,7 +66,7 @@ class CoroutineModuleContentGenerator {
             packageDirectory = packageDirectory,
             relativePath = "CoroutineContextProvider.kt",
             content =
-                """package $moduleNamespace.coroutine
+                """package $moduleNamespace
 
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers

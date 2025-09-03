@@ -48,7 +48,8 @@ class VersionCatalogUpdater(
 
     fun updateVersionCatalogIfPresent(
         projectRootDir: File,
-        enableCompose: Boolean
+        enableCompose: Boolean = false,
+        includeCoroutineDependencies: Boolean = false
     ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
         val existingPluginIdToAlias: Map<String, String> =
@@ -64,7 +65,7 @@ class VersionCatalogUpdater(
             }
 
         val desiredPlugins = desiredPlugins(enableCompose)
-        val desiredLibraries = desiredLibraries(enableCompose)
+        val desiredLibraries = desiredLibraries(enableCompose, includeCoroutineDependencies)
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
         val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
@@ -229,8 +230,48 @@ private data class DesiredLibrary(
     val versionLiteral: String? = null
 )
 
-private fun desiredLibraries(enableCompose: Boolean): List<DesiredLibrary> =
+private fun desiredLibraries(
+    enableCompose: Boolean,
+    includeCoroutineDependencies: Boolean
+): List<DesiredLibrary> =
     buildList {
+        if (includeCoroutineDependencies) {
+            addAll(
+                listOf(
+                    DesiredLibrary(
+                        key = "androidx-core-ktx",
+                        module = "androidx.core:core-ktx",
+                        versionLiteral = "1.12.0"
+                    ),
+                    DesiredLibrary(
+                        key = "androidx-lifecycle-runtime-ktx",
+                        module = "androidx.lifecycle:lifecycle-runtime-ktx",
+                        versionLiteral = "2.7.0"
+                    ),
+                    DesiredLibrary(
+                        key = "kotlinx-coroutines-core",
+                        module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+                        versionLiteral = "1.7.3"
+                    ),
+                    DesiredLibrary(
+                        key = "junit",
+                        module = "junit:junit",
+                        versionRefKey = "junit4"
+                    ),
+                    DesiredLibrary(
+                        key = "androidx-test-ext-junit",
+                        module = "androidx.test.ext:junit",
+                        versionLiteral = "1.1.5"
+                    ),
+                    DesiredLibrary(
+                        key = "androidx-test-espresso-core",
+                        module = "androidx.test.espresso:espresso-core",
+                        versionLiteral = "3.5.1"
+                    )
+                )
+            )
+        }
+
         if (enableCompose) {
             addAll(
                 listOf(

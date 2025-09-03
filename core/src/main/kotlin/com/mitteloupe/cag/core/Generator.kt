@@ -303,7 +303,7 @@ class Generator {
         CoroutineModuleContentGenerator()
             .generate(
                 projectRoot = request.destinationRootDirectory,
-                architecturePackageName = architecturePackageName
+                coroutinePackageName = architecturePackageName.replaceAfterLast(".", "coroutine")
             )
 
         ArchitectureModulesContentGenerator()
