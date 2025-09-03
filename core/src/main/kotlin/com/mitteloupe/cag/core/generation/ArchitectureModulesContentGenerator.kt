@@ -132,37 +132,25 @@ class ArchitectureModulesContentGenerator {
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val useCaseFile = File(packageDirectory, "usecase/UseCase.kt")
-        if (useCaseFile.exists()) {
-            return
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "usecase/UseCase.kt",
+            content =
+                """
+                package $moduleNamespace.domain.usecase
 
-        val content =
-            """
-            package $moduleNamespace.domain.usecase
-
-            interface UseCase<REQUEST, RESULT> {
-                fun execute(input: REQUEST, onResult: (RESULT) -> Unit)
-            }
-            """.trimIndent()
-
-        runCatching {
-            useCaseFile.parentFile.mkdirs()
-            useCaseFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate use case: ${it.message}")
-        }
+                interface UseCase<REQUEST, RESULT> {
+                    fun execute(input: REQUEST, onResult: (RESULT) -> Unit)
+                }
+                """.trimIndent(),
+            errorMessage = "use case"
+        )
     }
 
     private fun generateContinuousExecutingUseCase(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val useCaseFile = File(packageDirectory, "usecase/ContinuousExecutingUseCase.kt")
-        if (useCaseFile.exists()) {
-            return
-        }
-
         val imports =
             """
 import $moduleNamespace.coroutine.CoroutineContextProvider
@@ -200,47 +188,35 @@ abstract class ContinuousExecutingUseCase<REQUEST, RESULT>(
     abstract fun executeInBackground(request: REQUEST): Flow<RESULT>
 }"""
 
-        runCatching {
-            useCaseFile.parentFile.mkdirs()
-            useCaseFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate continuous executing use case: ${it.message}")
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "usecase/ContinuousExecutingUseCase.kt",
+            content = content,
+            errorMessage = "continuous executing use case"
+        )
     }
 
     private fun generateRepositoryBase(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val repositoryFile = File(packageDirectory, "repository/Repository.kt")
-        if (repositoryFile.exists()) {
-            return
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "repository/Repository.kt",
+            content =
+                """
+                package $moduleNamespace.domain.repository
 
-        val content =
-            """
-            package $moduleNamespace.domain.repository
-
-            interface Repository
-            """.trimIndent()
-
-        runCatching {
-            repositoryFile.parentFile.mkdirs()
-            repositoryFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate repository: ${it.message}")
-        }
+                interface Repository
+                """.trimIndent(),
+            errorMessage = "repository"
+        )
     }
 
     private fun generateUseCaseExecutor(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val useCaseExecutorFile = File(packageDirectory, "UseCaseExecutor.kt")
-        if (useCaseExecutorFile.exists()) {
-            return
-        }
-
         val content =
             """package $moduleNamespace.domain
 
@@ -275,71 +251,52 @@ class UseCaseExecutor {
 }
 """
 
-        runCatching {
-            useCaseExecutorFile.parentFile.mkdirs()
-            useCaseExecutorFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate use case executor: ${it.message}")
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "UseCaseExecutor.kt",
+            content = content,
+            errorMessage = "use case executor"
+        )
     }
 
     private fun generateDomainException(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val domainExceptionFile = File(packageDirectory, "exception/DomainException.kt")
-        if (domainExceptionFile.exists()) {
-            return
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "exception/DomainException.kt",
+            content =
+                """
+                package $moduleNamespace.domain.exception
 
-        val content =
-            """
-            package $moduleNamespace.domain.exception
-
-            abstract class DomainException(cause: Throwable? = null) : Exception(cause)
-            """.trimIndent()
-
-        runCatching {
-            domainExceptionFile.parentFile.mkdirs()
-            domainExceptionFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate domain exception: ${it.message}")
-        }
+                abstract class DomainException(cause: Throwable? = null) : Exception(cause)
+                """.trimIndent(),
+            errorMessage = "domain exception"
+        )
     }
 
     private fun generateUnknownDomainException(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val domainExceptionFile = File(packageDirectory, "exception/UnknownDomainException.kt")
-        if (domainExceptionFile.exists()) {
-            return
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "exception/UnknownDomainException.kt",
+            content =
+                """
+                package $moduleNamespace.domain.exception
 
-        val content =
-            """
-            package $moduleNamespace.domain.exception
-
-            class UnknownDomainException(cause: Throwable? = null) : DomainException(cause)
-            """.trimIndent()
-
-        runCatching {
-            domainExceptionFile.parentFile.mkdirs()
-            domainExceptionFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate unknown domain exception: ${it.message}")
-        }
+                class UnknownDomainException(cause: Throwable? = null) : DomainException(cause)
+                """.trimIndent(),
+            errorMessage = "unknown domain exception"
+        )
     }
 
     private fun generateViewModelBase(
         packageDirectory: File,
         architecturePackage: String
     ) {
-        val viewModelFile = File(packageDirectory, "viewmodel/BaseViewModel.kt")
-        if (viewModelFile.exists()) {
-            return
-        }
-
         val content =
             """package $architecturePackage.presentation.viewmodel
 
@@ -402,91 +359,89 @@ abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotifi
     }
 }"""
 
-        runCatching {
-            viewModelFile.parentFile.mkdirs()
-            viewModelFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate view model: ${it.message}")
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "viewmodel/BaseViewModel.kt",
+            content = content,
+            errorMessage = "view model"
+        )
     }
 
     private fun generateNavigationEventBase(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val navigationFile = File(packageDirectory, "navigation/PresentationNavigationEvent.kt")
-        if (navigationFile.exists()) {
-            return
-        }
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "navigation/PresentationNavigationEvent.kt",
+            content =
+                """
+                package $moduleNamespace.presentation.navigation
 
-        val content =
-            """
-            package $moduleNamespace.presentation.navigation
-
-            sealed class PresentationNavigationEvent
-            """.trimIndent()
-
-        runCatching {
-            navigationFile.parentFile.mkdirs()
-            navigationFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate navigation event: ${it.message}")
-        }
+                sealed class PresentationNavigationEvent
+                """.trimIndent(),
+            errorMessage = "navigation event"
+        )
     }
 
     private fun generateScreenBase(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val screenFile = File(packageDirectory, "view/Screen.kt")
-        if (screenFile.exists()) {
-            return
-        }
-
-        val content =
-            """package $moduleNamespace.ui.view
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "view/Screen.kt",
+            content =
+                """package $moduleNamespace.ui.view
 
 ${
-                """
+                    """
 import androidx.compose.runtime.Composable
 """.optimizeImports()
-            }
+                }
 interface Screen {
     @Composable
     fun Content()
-}"""
-
-        runCatching {
-            screenFile.parentFile.mkdirs()
-            screenFile.writeText(content)
-        }.onFailure {
-            throw GenerationException("Failed to generate base screen: ${it.message}")
-        }
+}""",
+            errorMessage = "base screen"
+        )
     }
 
     private fun generateMapperBase(
         packageDirectory: File,
         moduleNamespace: String
     ) {
-        val mapperFile = File(packageDirectory, "mapper/Mapper.kt")
-        if (mapperFile.exists()) {
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "mapper/Mapper.kt",
+            content =
+                """
+                package $moduleNamespace.ui.mapper
+
+                interface Mapper<Input, Output> {
+                    fun map(input: Input): Output
+                }
+                """.trimIndent(),
+            errorMessage = "base mapper"
+        )
+    }
+
+    private fun generateFileIfMissing(
+        packageDirectory: File,
+        relativePath: String,
+        content: String,
+        errorMessage: String
+    ) {
+        val file = File(packageDirectory, relativePath)
+        if (file.exists()) {
             return
         }
 
-        val content =
-            """
-            package $moduleNamespace.ui.mapper
-
-            interface Mapper<Input, Output> {
-                fun map(input: Input): Output
-            }
-            """.trimIndent()
-
         runCatching {
-            mapperFile.parentFile.mkdirs()
-            mapperFile.writeText(content)
+            file.parentFile.mkdirs()
+            file.writeText(content)
         }.onFailure {
-            throw GenerationException("Failed to generate base mapper: ${it.message}")
+            throw GenerationException("Failed to generate $errorMessage: ${it.message}")
         }
     }
 }
