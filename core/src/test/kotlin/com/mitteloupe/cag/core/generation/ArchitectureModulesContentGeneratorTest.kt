@@ -7,13 +7,13 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class ArchitectureLayerContentGeneratorTest {
-    private lateinit var classUnderTest: ArchitectureLayerContentGenerator
+class ArchitectureModulesContentGeneratorTest {
+    private lateinit var classUnderTest: ArchitectureModulesContentGenerator
     private lateinit var tempDirectory: File
 
     @Before
     fun setUp() {
-        classUnderTest = ArchitectureLayerContentGenerator()
+        classUnderTest = ArchitectureModulesContentGenerator()
         tempDirectory = createTempDirectory(prefix = "test").toFile()
     }
 

@@ -9,7 +9,7 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class ArchitectureLayerContentGenerator {
+class ArchitectureModulesContentGenerator {
     fun generate(
         architectureRoot: File,
         architecturePackageName: String,
