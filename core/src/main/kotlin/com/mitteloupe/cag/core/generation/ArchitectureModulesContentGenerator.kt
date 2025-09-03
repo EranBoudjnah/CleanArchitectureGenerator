@@ -97,11 +97,13 @@ class ArchitectureModulesContentGenerator {
         val packageDirectory = buildPackageDirectory(domainRoot, architecturePackageName.toSegments())
 
         generateUseCase(packageDirectory, moduleNamespace)
+        generateBackgroundExecutingUseCase(packageDirectory, moduleNamespace)
         generateContinuousExecutingUseCase(packageDirectory, moduleNamespace)
         generateRepositoryBase(packageDirectory, moduleNamespace)
         generateDomainException(packageDirectory, moduleNamespace)
         generateUnknownDomainException(packageDirectory, moduleNamespace)
         generateUseCaseExecutor(packageDirectory, moduleNamespace)
+        generateUseCaseExecutorProvider(packageDirectory, moduleNamespace)
     }
 
     private fun generatePresentationContent(
@@ -144,6 +146,47 @@ class ArchitectureModulesContentGenerator {
                 }
                 """.trimIndent(),
             errorMessage = "use case"
+        )
+    }
+
+    private fun generateBackgroundExecutingUseCase(
+        packageDirectory: File,
+        moduleNamespace: String
+    ) {
+        val imports =
+            """
+import $moduleNamespace.coroutine.CoroutineContextProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+""".optimizeImports()
+
+        val content =
+            """package $moduleNamespace.domain.usecase
+
+$imports
+abstract class BackgroundExecutingUseCase<REQUEST, RESULT>(
+    private val coroutineContextProvider: CoroutineContextProvider,
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+) : UseCase<REQUEST, RESULT> {
+    final override fun execute(input: REQUEST, onResult: (RESULT) -> Unit) {
+        coroutineScope.launch {
+            val result = withContext(coroutineContextProvider.io) {
+                executeInBackground(input)
+            }
+            onResult(result)
+        }
+    }
+
+    abstract fun executeInBackground(request: REQUEST): RESULT
+}"""
+
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "usecase/BackgroundExecutingUseCase.kt",
+            content = content,
+            errorMessage = "background executing use case"
         )
     }
 
@@ -256,6 +299,27 @@ class UseCaseExecutor {
             relativePath = "UseCaseExecutor.kt",
             content = content,
             errorMessage = "use case executor"
+        )
+    }
+
+    private fun generateUseCaseExecutorProvider(
+        packageDirectory: File,
+        moduleNamespace: String
+    ) {
+        val content =
+            """package $moduleNamespace.domain
+
+import kotlinx.coroutines.CoroutineScope
+
+typealias UseCaseExecutorProvider =
+    @JvmSuppressWildcards (coroutineScope: CoroutineScope) -> UseCaseExecutor
+"""
+
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "UseCaseExecutorProvider.kt",
+            content = content,
+            errorMessage = "use case executor provider"
         )
     }
 
