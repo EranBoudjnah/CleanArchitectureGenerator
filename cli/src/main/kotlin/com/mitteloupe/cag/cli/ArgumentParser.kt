@@ -14,20 +14,40 @@ class ArgumentParser {
         primaryShort: String,
         secondaryFlags: List<SecondaryFlag>
     ): List<Map<String, String>> {
-        if (arguments.isEmpty()) {
-            return emptyList()
-        }
+        if (arguments.isEmpty()) return emptyList()
 
-        val secondaryByLong = secondaryFlags.associateBy { it.long }
-        val secondaryByShort = secondaryFlags.associateBy { it.short }
+        val isLongForm = determineForm(arguments, primaryLong, primaryShort)
+        val primary = if (isLongForm) primaryLong else primaryShort
+        val secondaryMap = secondaryFlags.associateBy { if (isLongForm) it.long else it.short }
 
+        return parseArguments(arguments, primary, secondaryMap, isLongForm)
+    }
+
+    private fun determineForm(
+        arguments: Array<String>,
+        primaryLong: String,
+        primaryShort: String
+    ): Boolean {
+        val firstPrimaryIndex = arguments.indexOfFirst { it in setOf(primaryLong, primaryShort) }
+        return firstPrimaryIndex < 0 || arguments[firstPrimaryIndex] == primaryLong
+    }
+
+    private fun parseArguments(
+        arguments: Array<String>,
+        primary: String,
+        secondaryMap: Map<String, SecondaryFlag>,
+        isLongForm: Boolean
+    ): List<Map<String, String>> {
         val results = mutableListOf<Map<String, String>>()
         var currentSecondaries = mutableMapOf<String, String>()
+        var hasPrimary = false
 
-        fun finalizeCurrentIfNeeded() {
-            if (currentSecondaries.isNotEmpty()) {
-                validateMandatoryFlags(currentSecondaries, secondaryFlags)
-                results.add(currentSecondaries.toMap())
+        fun finalizeCurrent() {
+            if (hasPrimary || currentSecondaries.isNotEmpty()) {
+                validateMandatoryFlags(currentSecondaries, secondaryMap.values)
+                if (currentSecondaries.isNotEmpty()) {
+                    results.add(currentSecondaries.toMap())
+                }
             }
             currentSecondaries = mutableMapOf()
         }
@@ -36,63 +56,37 @@ class ArgumentParser {
         while (index < arguments.size) {
             val token = arguments[index]
             when {
-                token == primaryLong || token == primaryShort -> {
-                    finalizeCurrentIfNeeded()
+                token == primary -> {
+                    finalizeCurrent()
+                    hasPrimary = true
                     index++
                 }
-                secondaryByLong.containsKey(token) -> {
-                    val secondary = secondaryByLong.getValue(token)
-                    val newIndex =
-                        consumeNextNonFlag(arguments, index) { value ->
+                secondaryMap.containsKey(token) -> {
+                    val secondary = secondaryMap.getValue(token)
+                    index =
+                        consumeValue(arguments, index) { value ->
                             currentSecondaries[secondary.long] = value
                         }
-                    index = newIndex
                 }
-                secondaryByLong.keys.any { token.startsWith("$it=") } -> {
-                    val matched = secondaryByLong.keys.first { token.startsWith("$it=") }
-                    val secondary = secondaryByLong.getValue(matched)
-                    handleValueAfterEquals(token) { value ->
-                        currentSecondaries[secondary.long] = value
+                else -> {
+                    parseInlineArgument(token, secondaryMap, isLongForm)?.let { (key, value) ->
+                        currentSecondaries[key] = value
                     }
                     index++
                 }
-                secondaryByShort.containsKey(token) -> {
-                    val secondary = secondaryByShort.getValue(token)
-                    val newIndex =
-                        consumeNextNonFlag(arguments, index) { value ->
-                            currentSecondaries[secondary.long] = value
-                        }
-                    index = newIndex
-                }
-                secondaryByShort.keys.any { token.startsWith(it) } -> {
-                    val matched = secondaryByShort.keys.first { token.startsWith(it) }
-                    handleShortFlagTail(token, matched) { value ->
-                        val longKey = secondaryByShort.getValue(matched).long
-                        currentSecondaries[longKey] = value
-                    }
-                    index++
-                }
-                else -> index++
             }
         }
 
-        validateMandatoryFlags(currentSecondaries, secondaryFlags)
-        if (currentSecondaries.isNotEmpty()) {
-            results.add(currentSecondaries.toMap())
-        }
-
+        finalizeCurrent()
         return results
     }
 
     private fun validateMandatoryFlags(
         currentSecondaries: Map<String, String>,
-        secondaryFlags: List<SecondaryFlag>
+        secondaryFlags: Collection<SecondaryFlag>
     ) {
-        val mandatoryFlags = secondaryFlags.filter { it.isMandatory }
         val missingFlags =
-            mandatoryFlags.filter { flag ->
-                currentSecondaries[flag.long]?.isNotEmpty() != true
-            }
+            secondaryFlags.filter { it.isMandatory && currentSecondaries[it.long]?.isNotEmpty() != true }
 
         if (missingFlags.isNotEmpty()) {
             val errorMessage =
@@ -104,47 +98,46 @@ class ArgumentParser {
     }
 }
 
-private inline fun consumeNextNonFlag(
+private inline fun consumeValue(
     arguments: Array<String>,
     currentIndex: Int,
     crossinline onValue: (String) -> Unit
 ): Int {
     val next = arguments.getOrNull(currentIndex + 1)
-    if (next != null && !next.startsWith("-")) {
+    return if (next != null && !next.startsWith("-")) {
         val value = next.trim()
         if (value.isNotEmpty()) onValue(value)
-        return currentIndex + 2
-    }
-    return currentIndex + 1
-}
-
-private fun String.extractValueFromFlagTail(): String =
-    if (startsWith("=")) {
-        removePrefix("=")
+        currentIndex + 2
     } else {
-        this
-    }.trim()
-
-private fun String.extractValueAfterEquals(): String = substringAfter("=").trim()
-
-private inline fun handleValueAfterEquals(
-    argument: String,
-    crossinline onValue: (String) -> Unit
-) {
-    val value = argument.extractValueAfterEquals()
-    if (value.isNotEmpty()) {
-        onValue(value)
+        currentIndex + 1
     }
 }
 
-private inline fun handleShortFlagTail(
-    argument: String,
-    shortFlag: String,
-    crossinline onValue: (String) -> Unit
-) {
-    val tail = argument.removePrefix(shortFlag)
-    val value = tail.extractValueFromFlagTail()
-    if (value.isNotEmpty()) {
-        onValue(value)
+private fun parseInlineArgument(
+    token: String,
+    secondaryMap: Map<String, SecondaryFlag>,
+    isLongForm: Boolean
+): Pair<String, String>? {
+    val matchingKey =
+        if (isLongForm) {
+            secondaryMap.keys.find { token.startsWith("$it=") }
+        } else {
+            secondaryMap.keys.find { token.startsWith(it) }
+        } ?: return null
+
+    val secondary = secondaryMap.getValue(matchingKey)
+    val value =
+        if (isLongForm) {
+            token.substringAfter("=").trim()
+        } else {
+            token.removePrefix(matchingKey).let {
+                if (it.startsWith("=")) it.removePrefix("=") else it
+            }.trim()
+        }
+
+    return if (value.isNotEmpty()) {
+        Pair(secondary.long, value)
+    } else {
+        null
     }
 }

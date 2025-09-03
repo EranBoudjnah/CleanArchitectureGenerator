@@ -6,115 +6,106 @@ import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 
 class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
-    fun isHelpRequested(arguments: Array<String>): Boolean = arguments.any { it == "--help" || it == "-h" }
+    fun isHelpRequested(arguments: Array<String>): Boolean = arguments.any { it in setOf("--help", "-h") }
 
     fun getNewFeatures(arguments: Array<String>): List<FeatureRequest> =
-        argumentParser.parsePrimaryWithSecondaries(
+        parseWithNameFlag(
             arguments = arguments,
             primaryLong = "--new-feature",
             primaryShort = "-nf",
-            secondaryFlags =
-                listOf(
-                    SecondaryFlag(
-                        long = "--name",
-                        short = "-n",
-                        isMandatory = true,
-                        missingErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName"
-                    ),
-                    SecondaryFlag(long = "--package", short = "-p")
-                )
-        ).map { secondaries ->
-            val featureName = secondaries["--name"] ?: ""
+            nameErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName",
+            additionalFlags = listOf(SecondaryFlag("--package", "-p"))
+        ) { secondaries ->
             FeatureRequest(
-                featureName = featureName,
+                featureName = secondaries["--name"] ?: "",
                 packageName = secondaries["--package"]
             )
-        }.filter { it.featureName.isNotEmpty() }
+        }
 
     fun getNewDataSources(arguments: Array<String>): List<DataSourceRequest> =
-        argumentParser.parsePrimaryWithSecondaries(
+        parseWithNameFlag(
             arguments = arguments,
             primaryLong = "--new-datasource",
             primaryShort = "-nds",
-            secondaryFlags =
-                listOf(
-                    SecondaryFlag(
-                        long = "--name",
-                        short = "-n",
-                        isMandatory = true,
-                        missingErrorMessage = "Data source name is required. Use --name=DataSourceName or -n=DataSourceName"
-                    ),
-                    SecondaryFlag(long = "--with", short = "-w")
-                )
-        ).map { secondaries ->
+            nameErrorMessage = "Data source name is required. Use --name=DataSourceName or -n=DataSourceName",
+            additionalFlags = listOf(SecondaryFlag("--with", "-w"))
+        ) { secondaries ->
             val rawName = secondaries["--name"] ?: ""
             val name = ensureDataSourceSuffix(rawName)
-            val libraries =
-                (secondaries["--with"] ?: "").lowercase()
-                    .split(",")
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
-                    .toSet()
+            val libraries = parseLibraries(secondaries["--with"])
             DataSourceRequest(
                 dataSourceName = name,
                 useKtor = libraries.contains("ktor"),
                 useRetrofit = libraries.contains("retrofit")
             )
-        }.filter { it.dataSourceName.isNotEmpty() }
+        }
 
     fun getNewUseCases(arguments: Array<String>): List<UseCaseRequest> =
-        argumentParser.parsePrimaryWithSecondaries(
+        parseWithNameFlag(
             arguments = arguments,
             primaryLong = "--new-use-case",
             primaryShort = "-nuc",
-            secondaryFlags =
+            nameErrorMessage = "Use case name is required. Use --name=UseCaseName or -n=UseCaseName",
+            additionalFlags =
                 listOf(
-                    SecondaryFlag(
-                        long = "--name",
-                        short = "-n",
-                        isMandatory = true,
-                        missingErrorMessage = "Use case name is required. Use --name=UseCaseName or -n=UseCaseName"
-                    ),
-                    SecondaryFlag(long = "--path", short = "-p"),
-                    SecondaryFlag(long = "--input-type", short = "-it"),
-                    SecondaryFlag(long = "--output-type", short = "-ot")
+                    SecondaryFlag("--path", "-p"),
+                    SecondaryFlag("--input-type", "-it"),
+                    SecondaryFlag("--output-type", "-ot")
                 )
-        ).map { secondaries ->
-            val useCaseName = secondaries["--name"] ?: ""
+        ) { secondaries ->
             UseCaseRequest(
-                useCaseName = useCaseName,
+                useCaseName = secondaries["--name"] ?: "",
                 targetPath = secondaries["--path"],
                 inputDataType = secondaries["--input-type"],
                 outputDataType = secondaries["--output-type"]
             )
-        }.filter { it.useCaseName.isNotEmpty() }
-
-    fun getNewArchitecture(arguments: Array<String>): List<ArchitectureRequest> {
-        val results = mutableListOf<ArchitectureRequest>()
-        var currentEnableCompose = true
-
-        var index = 0
-        while (index < arguments.size) {
-            val token = arguments[index]
-            when (token) {
-                "--new-architecture", "-na" -> {
-                    results.add(ArchitectureRequest(enableCompose = currentEnableCompose))
-                    currentEnableCompose = true
-                }
-                "--no-compose", "-nc" -> {
-                    if (results.isEmpty()) {
-                        currentEnableCompose = false
-                    } else {
-                        val lastIndex = results.lastIndex
-                        results[lastIndex] = results[lastIndex].copy(enableCompose = false)
-                    }
-                }
-            }
-            index++
         }
 
-        return results
+    fun getNewArchitecture(arguments: Array<String>): List<ArchitectureRequest> =
+        argumentParser.parsePrimaryWithSecondaries(
+            arguments = arguments,
+            primaryLong = "--new-architecture",
+            primaryShort = "-na",
+            secondaryFlags = listOf(SecondaryFlag("--no-compose", "-nc"))
+        ).map { secondaries ->
+            ArchitectureRequest(enableCompose = !secondaries.containsKey("--no-compose"))
+        }
+
+    private inline fun <T> parseWithNameFlag(
+        arguments: Array<String>,
+        primaryLong: String,
+        primaryShort: String,
+        nameErrorMessage: String,
+        additionalFlags: List<SecondaryFlag>,
+        transform: (Map<String, String>) -> T
+    ): List<T> {
+        val allFlags =
+            listOf(
+                SecondaryFlag("--name", "-n", isMandatory = true, missingErrorMessage = nameErrorMessage)
+            ) + additionalFlags
+
+        return argumentParser.parsePrimaryWithSecondaries(
+            arguments = arguments,
+            primaryLong = primaryLong,
+            primaryShort = primaryShort,
+            secondaryFlags = allFlags
+        ).map(transform).filter { isValidRequest(it) }
     }
+
+    private fun <T> isValidRequest(request: T): Boolean =
+        when (request) {
+            is FeatureRequest -> request.featureName.isNotEmpty()
+            is DataSourceRequest -> request.dataSourceName.isNotEmpty()
+            is UseCaseRequest -> request.useCaseName.isNotEmpty()
+            else -> true
+        }
+
+    private fun parseLibraries(withValue: String?): Set<String> =
+        (withValue ?: "").lowercase()
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .toSet()
 
     private fun ensureDataSourceSuffix(name: String): String {
         val trimmedName = name.trim()

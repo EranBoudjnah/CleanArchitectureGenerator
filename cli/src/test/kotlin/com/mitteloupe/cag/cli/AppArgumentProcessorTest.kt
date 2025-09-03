@@ -95,7 +95,7 @@ class AppArgumentProcessorDataSourcesTest {
     @Test
     fun `Given -w retrofit when getNewDataSources then returns single request with retrofit`() {
         // Given
-        val givenArguments = arrayOf("--new-datasource", "--name=My", "-w", "retrofit")
+        val givenArguments = arrayOf("-nds", "-n=My", "--w", "retrofit")
 
         // When
         val result = classUnderTest.getNewDataSources(givenArguments)
@@ -107,7 +107,7 @@ class AppArgumentProcessorDataSourcesTest {
     @Test
     fun `Given with both token when getNewDataSources then ignores unknown token`() {
         // Given
-        val givenArguments = arrayOf("-nds", "--name=Your", "--with=both")
+        val givenArguments = arrayOf("-nds", "-n=Your", "-w=both")
 
         // When
         val result = classUnderTest.getNewDataSources(givenArguments)
@@ -119,7 +119,7 @@ class AppArgumentProcessorDataSourcesTest {
     @Test
     fun `Given with comma separated when getNewDataSources then returns single request with both`() {
         // Given
-        val givenArguments = arrayOf("-nds", "--name=Your", "-wktor,retrofit")
+        val givenArguments = arrayOf("-nds", "-n=Your", "-wktor,retrofit")
 
         // When
         val result = classUnderTest.getNewDataSources(givenArguments)

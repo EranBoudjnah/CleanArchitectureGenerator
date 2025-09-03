@@ -22,6 +22,7 @@ fun main(arguments: Array<String>) {
             """
             usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
+            Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
             Options:
               --new-architecture | -na
@@ -30,19 +31,19 @@ fun main(arguments: Array<String>) {
                   Disable Compose support for the preceding architecture package
               --new-feature | -nf
                   Generate a new feature
-                --name=FeatureName | -n=FeatureName
+                --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
                     Specify the feature name (required)
                 --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
                     Override the feature package for the preceding feature
               --new-datasource | -nds
                   Generate a new data source
-                --name=DataSourceName | -n=DataSourceName
+                --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
                     Specify the data source name (required, DataSource suffix will be added automatically)
                 --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
                     Attach dependencies to the preceding new data source
               --new-use-case | -nuc
                   Generate a new use case
-                --name=UseCaseName | -n=UseCaseName
+                --name=UseCaseName | -n=UseCaseName | -n UseCaseName | -nUseCaseName
                     Specify the use case name (required)
                 --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
                     Specify the target directory for the preceding use case

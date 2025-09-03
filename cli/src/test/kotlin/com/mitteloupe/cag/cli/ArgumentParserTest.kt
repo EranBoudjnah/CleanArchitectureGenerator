@@ -34,7 +34,7 @@ class ArgumentParserTest {
     @Test
     fun `Given valueless primary with secondaries when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=x", "-g", "y", "--alpha", "-b", "z")
+        val givenArguments = arrayOf("--alpha", "--beta=x", "--gamma", "y", "--alpha", "--beta", "z")
 
         // When
         val result =
@@ -58,7 +58,7 @@ class ArgumentParserTest {
     @Test
     fun `Given valueless primary with equals syntax when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=x", "-g=y", "--alpha", "-b=z")
+        val givenArguments = arrayOf("--alpha", "--beta=x", "--gamma=y", "--alpha", "--beta=z")
 
         // When
         val result =
@@ -223,5 +223,104 @@ class ArgumentParserTest {
             // Then
             assertEquals("Missing mandatory flag: --beta", e.message)
         }
+    }
+
+    @Test
+    fun `Given long primary with short secondaries when parsePrimaryWithSecondaries then ignores short secondaries`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "-b", "value")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(emptyList<Map<String, String>>(), result)
+    }
+
+    @Test
+    fun `Given short primary with long secondaries when parsePrimaryWithSecondaries then ignores long secondaries`() {
+        // Given
+        val givenArguments = arrayOf("-a", "--beta", "value")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(emptyList<Map<String, String>>(), result)
+    }
+
+    @Test
+    fun `Given long primary with matching long secondaries when parsePrimaryWithSecondaries then processes correctly`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "--beta", "value")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(
+            listOf(mapOf("--beta" to "value")),
+            result
+        )
+    }
+
+    @Test
+    fun `Given short primary with matching short secondaries when parsePrimaryWithSecondaries then processes correctly`() {
+        // Given
+        val givenArguments = arrayOf("-a", "-b", "value")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(
+            listOf(mapOf("--beta" to "value")),
+            result
+        )
+    }
+
+    @Test
+    fun `Given no primary when parsePrimaryWithSecondaries then defaults to long form`() {
+        // Given
+        val givenArguments = arrayOf("--beta", "value")
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(
+            listOf(mapOf("--beta" to "value")),
+            result
+        )
     }
 }
