@@ -796,8 +796,6 @@ interface ViewsProvider
         val expectedContent = """plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
-    id("org.jlleitschuh.gradle.ktlint")
-    id("io.gitlab.arturbosch.detekt")
 }
 
 dependencies {
@@ -823,8 +821,6 @@ dependencies {
         val expectedContent = """plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
-    id("org.jlleitschuh.gradle.ktlint")
-    id("io.gitlab.arturbosch.detekt")
 }
 
 kotlin {
