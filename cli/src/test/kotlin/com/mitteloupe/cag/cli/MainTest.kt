@@ -4,17 +4,17 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
-import org.junit.runners.Suite
 import org.junit.runners.Suite.SuiteClasses
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import java.io.PrintStream
 
-@RunWith(Suite::class)
+@RunWith(Enclosed::class)
 @SuiteClasses(
-    MainTest.NoArgsTest::class,
-    MainTest.HelpTest::class
+    MainTest.NoArguments::class,
+    MainTest.Help::class
 )
 class MainTest {
     abstract class BaseMainTest {
@@ -34,7 +34,7 @@ class MainTest {
         }
     }
 
-    class NoArgsTest : BaseMainTest() {
+    class NoArguments : BaseMainTest() {
         @Test
         fun `Given no args when main then prints updated usage`() {
             // When
@@ -53,7 +53,7 @@ class MainTest {
         }
     }
 
-    class HelpTest : BaseMainTest() {
+    class Help : BaseMainTest() {
         @Test
         fun `Given --help when main then prints help document`() {
             // When

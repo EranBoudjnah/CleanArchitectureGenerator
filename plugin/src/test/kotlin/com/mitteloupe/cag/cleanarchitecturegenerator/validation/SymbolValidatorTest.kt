@@ -5,14 +5,14 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import org.junit.runners.Suite
 import org.junit.runners.Suite.SuiteClasses
 import java.io.File
 
-@RunWith(Suite::class)
+@RunWith(Enclosed::class)
 @SuiteClasses(
     SymbolValidatorTest.BasicTests::class,
     SymbolValidatorTest.IsValidSymbolSyntaxParameterizedTests::class,
