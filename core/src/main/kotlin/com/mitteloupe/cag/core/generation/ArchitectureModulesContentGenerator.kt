@@ -47,11 +47,7 @@ class ArchitectureModulesContentGenerator {
         createUiModule(architectureRoot, catalogUpdater)
 
         generateDomainContent(architectureRoot, architecturePackageName, packageSegments)
-        generatePresentationContent(
-            architectureRoot,
-            architecturePackageName,
-            architecturePackageName
-        )
+        generatePresentationContent(architectureRoot, architecturePackageName)
         generateUiContent(architectureRoot, architecturePackageName, packageSegments)
     }
 
@@ -108,14 +104,14 @@ class ArchitectureModulesContentGenerator {
 
     private fun generatePresentationContent(
         architectureRoot: File,
-        moduleNamespace: String,
         architecturePackageName: String
     ) {
         val presentationRoot = File(architectureRoot, "presentation/src/main/java")
         val packageDirectory = buildPackageDirectory(presentationRoot, "$architecturePackageName.presentation".toSegments())
 
-        generateViewModelBase(packageDirectory, moduleNamespace)
-        generateNavigationEventBase(packageDirectory, moduleNamespace)
+        generateViewModelBase(packageDirectory, architecturePackageName)
+        generateNavigationEventBase(packageDirectory, architecturePackageName)
+        generatePresentationNotification(packageDirectory, architecturePackageName)
     }
 
     private fun generateUiContent(
@@ -437,16 +433,19 @@ abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotifi
 
     private fun generateNavigationEventBase(
         packageDirectory: File,
-        moduleNamespace: String
+        architecturePackageName: String
     ) {
         generateFileIfMissing(
             packageDirectory = packageDirectory,
             relativePath = "navigation/PresentationNavigationEvent.kt",
             content =
                 """
-                package $moduleNamespace.presentation.navigation
+                package $architecturePackageName.presentation.navigation
 
-                sealed class PresentationNavigationEvent
+                interface PresentationNavigationEvent {
+                    object Back : PresentationNavigationEvent
+                }
+                
                 """.trimIndent(),
             errorMessage = "navigation event"
         )
@@ -473,6 +472,24 @@ interface Screen {
 }
 """,
             errorMessage = "base screen"
+        )
+    }
+
+    private fun generatePresentationNotification(
+        packageDirectory: File,
+        architecturePackageName: String
+    ) {
+        generateFileIfMissing(
+            packageDirectory = packageDirectory,
+            relativePath = "notification/PresentationNotification.kt",
+            content =
+                """
+                package $architecturePackageName.presentation.notification
+
+                interface PresentationNotification
+                
+                """.trimIndent(),
+            errorMessage = "presentation notification"
         )
     }
 

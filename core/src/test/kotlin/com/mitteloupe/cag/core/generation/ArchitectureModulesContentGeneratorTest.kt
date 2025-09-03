@@ -361,7 +361,7 @@ abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotifi
     }
 
     @Test
-    fun `Given valid architecture package when generate then creates PresentationNavigationEvent class with exact content`() {
+    fun `Given valid architecture package when generate then creates PresentationNavigationEvent interface with exact content`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
         val architecturePackageName = "com.example.architecture"
@@ -378,8 +378,34 @@ abstract class BaseViewModel<VIEW_STATE : Any, NOTIFICATION : PresentationNotifi
             )
         val expectedContent = """package com.example.architecture.presentation.navigation
 
-sealed class PresentationNavigationEvent"""
+interface PresentationNavigationEvent {
+    object Back : PresentationNavigationEvent
+}
+"""
         assertEquals("PresentationNavigationEvent.kt should have exact content", expectedContent, navigationEventFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates PresentationNotification interface with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val notificationFile =
+            File(
+                architectureRoot,
+                "presentation/src/main/java/com/example/architecture/presentation/notification/PresentationNotification.kt"
+            )
+        val expectedContent = """package com.example.architecture.presentation.notification
+
+interface PresentationNotification
+"""
+        assertEquals("PresentationNotification.kt should have exact content", expectedContent, notificationFile.readText())
     }
 
     @Test
