@@ -66,7 +66,7 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments = arguments,
             primaryLong = "--new-architecture",
             primaryShort = "-na",
-            secondaryFlags = listOf(SecondaryFlag("--no-compose", "-nc"))
+            secondaryFlags = listOf(SecondaryFlag("--no-compose", "-nc", isBoolean = true))
         ).map { secondaries ->
             ArchitectureRequest(enableCompose = !secondaries.containsKey("--no-compose"))
         }

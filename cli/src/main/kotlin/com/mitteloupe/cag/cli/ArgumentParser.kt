@@ -4,7 +4,8 @@ data class SecondaryFlag(
     val long: String,
     val short: String,
     val isMandatory: Boolean = false,
-    val missingErrorMessage: String = ""
+    val missingErrorMessage: String = "",
+    val isBoolean: Boolean = false
 )
 
 class ArgumentParser {
@@ -41,11 +42,14 @@ class ArgumentParser {
         val results = mutableListOf<Map<String, String>>()
         var currentSecondaries = mutableMapOf<String, String>()
         var hasPrimary = false
+        var hasEncounteredSecondaries = false
 
         fun finalizeCurrent() {
             if (hasPrimary || currentSecondaries.isNotEmpty()) {
                 validateMandatoryFlags(currentSecondaries, secondaryMap.values)
                 if (currentSecondaries.isNotEmpty()) {
+                    results.add(currentSecondaries.toMap())
+                } else if (hasPrimary && !hasEncounteredSecondaries) {
                     results.add(currentSecondaries.toMap())
                 }
             }
@@ -63,14 +67,24 @@ class ArgumentParser {
                 }
                 secondaryMap.containsKey(token) -> {
                     val secondary = secondaryMap.getValue(token)
-                    index =
-                        consumeValue(arguments, index) { value ->
-                            currentSecondaries[secondary.long] = value
-                        }
+                    hasEncounteredSecondaries = true
+                    if (secondary.isBoolean) {
+                        currentSecondaries[secondary.long] = ""
+                        index++
+                    } else {
+                        index =
+                            consumeValue(arguments, index) { value ->
+                                currentSecondaries[secondary.long] = value
+                            }
+                    }
                 }
                 else -> {
                     parseInlineArgument(token, secondaryMap, isLongForm)?.let { (key, value) ->
+                        hasEncounteredSecondaries = true
                         currentSecondaries[key] = value
+                    }
+                    if (token.startsWith("-") && !token.startsWith(primary)) {
+                        hasEncounteredSecondaries = true
                     }
                     index++
                 }

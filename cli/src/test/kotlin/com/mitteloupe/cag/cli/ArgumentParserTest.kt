@@ -323,4 +323,23 @@ class ArgumentParserTest {
             result
         )
     }
+
+    @Test
+    fun `Given primary without secondaries when parsePrimaryWithSecondaries then returns empty map`() {
+        // Given
+        val givenArguments = arrayOf("--alpha")
+        val expected = listOf(emptyMap<String, String>())
+
+        // When
+        val result =
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+            )
+
+        // Then
+        assertEquals(expected, result)
+    }
 }
