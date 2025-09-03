@@ -17,20 +17,20 @@ class PresentationLayerContentGenerator(
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? {
-        writePresentationModelFile(featureRoot, featurePackageName)?.let { return it }
-        writeDomainToPresentationMapperFile(featureRoot, featurePackageName)?.let { return it }
-        writePresentationToDomainMapperFile(featureRoot, featurePackageName)?.let { return it }
-        writePresentationViewState(featureRoot, featurePackageName, featureName)?.let { return it }
-        writePresentationNavigationEvent(featureRoot, projectNamespace, featurePackageName, featureName)?.let { return it }
-        return writePresentationViewModelFile(featureRoot, projectNamespace, featurePackageName, featureName)
+    ) {
+        writePresentationModelFile(featureRoot, featurePackageName)
+        writeDomainToPresentationMapperFile(featureRoot, featurePackageName)
+        writePresentationToDomainMapperFile(featureRoot, featurePackageName)
+        writePresentationViewState(featureRoot, featurePackageName, featureName)
+        writePresentationNavigationEvent(featureRoot, projectNamespace, featurePackageName, featureName)
+        writePresentationViewModelFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
     private fun writePresentationViewState(
         featureRoot: File,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -43,11 +43,12 @@ class PresentationLayerContentGenerator(
                     featureName = featureName.capitalized
                 )
         )
+    }
 
     private fun writePresentationModelFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -57,11 +58,12 @@ class PresentationLayerContentGenerator(
             content =
                 buildPresentationModelKotlinFile(featurePackageName)
         )
+    }
 
     private fun writeDomainToPresentationMapperFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -70,11 +72,12 @@ class PresentationLayerContentGenerator(
             fileName = "StubPresentationMapper.kt",
             content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
         )
+    }
 
     private fun writePresentationToDomainMapperFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -83,13 +86,14 @@ class PresentationLayerContentGenerator(
             fileName = "StubDomainMapper.kt",
             content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
         )
+    }
 
     private fun writePresentationViewModelFile(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -103,13 +107,14 @@ class PresentationLayerContentGenerator(
                     featureName = featureName.capitalized
                 )
         )
+    }
 
     private fun writePresentationNavigationEvent(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "presentation",
@@ -123,4 +128,5 @@ class PresentationLayerContentGenerator(
                     featureName = featureName.capitalized
                 )
         )
+    }
 }

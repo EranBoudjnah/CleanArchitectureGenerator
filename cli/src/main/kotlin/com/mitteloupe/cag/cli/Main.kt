@@ -4,10 +4,12 @@ import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.io.File
 import java.nio.file.Paths
+import kotlin.system.exitProcess
 
 fun main(arguments: Array<String>) {
     val argumentProcessor = AppArgumentProcessor()
@@ -78,8 +80,9 @@ fun main(arguments: Array<String>) {
                 architecturePackageName = architecturePackageName,
                 enableCompose = request.enableCompose
             )
-        val result = generator.generateArchitecture(architectureRequest)
-        println(result)
+        executeAndReport {
+            generator.generateArchitecture(architectureRequest)
+        }
     }
 
     featureRequests.forEach { requestFeature ->
@@ -94,12 +97,13 @@ fun main(arguments: Array<String>) {
             ).featurePackageName(packageName)
                 .enableCompose(true)
                 .build()
-        val result = generator.generateFeature(request)
-        println(result)
+        executeAndReport {
+            generator.generateFeature(request)
+        }
     }
 
     dataSourceRequests.forEach { request ->
-        val result =
+        executeAndReport {
             generator.generateDataSource(
                 destinationRootDirectory = destinationRootDir,
                 dataSourceName = request.dataSourceName,
@@ -107,7 +111,7 @@ fun main(arguments: Array<String>) {
                 useKtor = request.useKtor,
                 useRetrofit = request.useRetrofit
             )
-        println(result)
+        }
     }
 
     useCaseRequests.forEach { request ->
@@ -132,7 +136,17 @@ fun main(arguments: Array<String>) {
                 .outputDataType(request.outputDataType)
                 .build()
 
-        val result = generator.generateUseCase(useCaseRequest)
-        println(result)
+        executeAndReport {
+            generator.generateUseCase(useCaseRequest)
+        }
     }
 }
+
+private fun executeAndReport(operation: () -> Unit) =
+    try {
+        operation()
+        println("Done!")
+    } catch (exception: GenerationException) {
+        println("Error: ${exception.message}")
+        exitProcess(1)
+    }

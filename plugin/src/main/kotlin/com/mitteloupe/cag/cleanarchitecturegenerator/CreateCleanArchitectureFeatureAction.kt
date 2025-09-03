@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import java.io.File
 
@@ -29,18 +30,26 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                 ).featurePackageName(featurePackageName)
                     .enableCompose(true)
                     .build()
-            val result = generator.generateFeature(request)
-            ideBridge.refreshIde(projectRootDir)
-            ideBridge.synchronizeGradle(project, result, projectRootDir)
-            Messages.showInfoMessage(
-                project,
-                CleanArchitectureGeneratorBundle.message(
-                    "info.feature.generator.confirmation",
-                    featureName,
-                    result
-                ),
-                CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
-            )
+            try {
+                generator.generateFeature(request)
+                ideBridge.refreshIde(projectRootDir)
+                ideBridge.synchronizeGradle(project, null, projectRootDir)
+                Messages.showInfoMessage(
+                    project,
+                    CleanArchitectureGeneratorBundle.message(
+                        "info.feature.generator.confirmation",
+                        featureName,
+                        "Success!"
+                    ),
+                    CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
+                )
+            } catch (e: GenerationException) {
+                Messages.showErrorDialog(
+                    project,
+                    e.message ?: "Unknown error occurred",
+                    CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
+                )
+            }
         }
     }
 }

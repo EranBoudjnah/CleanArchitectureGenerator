@@ -23,18 +23,16 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-const val ERROR_PREFIX = "Error: "
-
 class Generator {
-    fun generateFeature(request: GenerateFeatureRequest): String {
+    fun generateFeature(request: GenerateFeatureRequest) {
         val featurePackageName = request.featurePackageName?.trim()
         if (featurePackageName.isNullOrEmpty()) {
-            return "${ERROR_PREFIX}Feature package name is missing."
+            throw GenerationException("Feature package name is missing.")
         }
 
         val pathSegments = featurePackageName.toSegments()
         if (pathSegments.isEmpty()) {
-            return "${ERROR_PREFIX}Feature package name is invalid."
+            throw GenerationException("Feature package name is invalid.")
         }
 
         val featureNameLowerCase = request.featureName.lowercase()
@@ -42,16 +40,17 @@ class Generator {
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = request.destinationRootDirectory,
             enableCompose = request.enableCompose
-        )?.let { return it }
+        )
         val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
-            return ERROR_PREFIX +
+            throw GenerationException(
                 if (featureRoot.isDirectory) {
                     "The feature directory already exists."
                 } else {
                     "A file with the feature name exists where the feature directory should be created."
                 }
+            )
         }
 
         val layers = listOf("ui", "presentation", "domain", "data")
@@ -68,66 +67,64 @@ class Generator {
             }.all { it }
 
         if (allCreated) {
-            createDomainModule(featureRoot, catalogUpdater)?.let { return it }
+            createDomainModule(featureRoot, catalogUpdater)
             DomainLayerContentGenerator()
                 .generateDomainLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
-                )?.let { return it }
-            createPresentationModule(featureRoot, featureNameLowerCase, catalogUpdater)?.let { return it }
+                )
+            createPresentationModule(featureRoot, featureNameLowerCase, catalogUpdater)
             PresentationLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
-                )?.let { return it }
-            createDataModule(featureRoot, featureNameLowerCase, catalogUpdater)?.let { return it }
+                )
+            createDataModule(featureRoot, featureNameLowerCase, catalogUpdater)
             DataLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
-                )?.let { return it }
+                )
             createUiModule(
                 featureRoot,
                 featurePackageName,
                 featureNameLowerCase,
                 request.enableCompose,
                 catalogUpdater
-            )?.let { return it }
+            )
             UiLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
-                )?.let { return it }
+                )
             SettingsFileUpdater().updateProjectSettingsIfPresent(
                 request.destinationRootDirectory,
                 featureNameLowerCase
-            )?.let { return it }
+            )
             AppModuleContentGenerator().writeFeatureModuleIfPossible(
                 startDirectory = request.destinationRootDirectory,
                 projectNamespace = request.projectNamespace,
                 featureName = request.featureName,
                 featurePackageName = featurePackageName
-            )?.let { return it }
+            )
             AppModuleGradleUpdater().updateAppModuleDependenciesIfPresent(
                 startDirectory = request.destinationRootDirectory,
                 featureNameLowerCase = featureNameLowerCase
-            )?.let { return it }
+            )
         }
 
-        return if (allCreated) {
-            "Success!"
-        } else {
-            "${ERROR_PREFIX}Failed to create directories for package '$featurePackageName'."
+        if (!allCreated) {
+            throw GenerationException("Failed to create directories for package '$featurePackageName'.")
         }
     }
 
-    fun generateUseCase(request: GenerateUseCaseRequest): String {
+    fun generateUseCase(request: GenerateUseCaseRequest) {
         val destinationDirectory = request.destinationDirectory
         val useCaseName = request.useCaseName.trim()
 
@@ -137,16 +134,14 @@ class Generator {
                 useCaseName = useCaseName,
                 inputDataType = request.inputDataType,
                 outputDataType = request.outputDataType
-            )?.let { return it }
-
-        return "Success!"
+            )
     }
 
     private fun generateDataSourceModules(
         destinationRootDirectory: File,
         useKtor: Boolean,
         useRetrofit: Boolean
-    ): String {
+    ) {
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
@@ -161,7 +156,7 @@ class Generator {
             }
 
         if (!allCreated) {
-            return "${ERROR_PREFIX}Failed to create directories for datasource."
+            throw GenerationException("Failed to create directories for datasource.")
         }
 
         val gradleFileCreator = GradleFileCreator()
@@ -169,13 +164,13 @@ class Generator {
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = destinationRootDirectory,
             enableCompose = false
-        )?.let { return it }
+        )
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
             layer = "source",
             content = buildDataSourceSourceGradleScript(catalogUpdater)
-        )?.let { return it }
+        )
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
@@ -186,11 +181,9 @@ class Generator {
                     useKtor = useKtor,
                     useRetrofit = useRetrofit
                 )
-        )?.let { return it }
+        )
 
-        SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)?.let { return it }
-
-        return "Success!"
+        SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)
     }
 
     fun generateDataSource(
@@ -199,65 +192,65 @@ class Generator {
         projectNamespace: String,
         useKtor: Boolean = false,
         useRetrofit: Boolean = false
-    ): String {
-        val baseResult = generateDataSourceModules(destinationRootDirectory, useKtor, useRetrofit)
-        if (baseResult.startsWith(ERROR_PREFIX)) return baseResult
+    ) {
+        generateDataSourceModules(destinationRootDirectory, useKtor, useRetrofit)
 
         DataSourceInterfaceCreator()
             .writeDataSourceInterface(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
-            )?.let { return it }
+            )
 
         DataSourceImplementationCreator()
             .writeDataSourceImplementation(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
-            )?.let { return it }
+            )
 
         DataSourceModuleCreator()
             .writeDataSourceModule(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
-            )?.let { return it }
-
-        return "Success!"
+            )
     }
 
     private fun createDomainModule(
         featureRoot: File,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "domain",
             content = buildDomainGradleScript(catalog)
         )
+    }
 
     private fun createDataModule(
         featureRoot: File,
         featureNameLowerCase: String,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "data",
             content = buildDataGradleScript(featureNameLowerCase, catalog)
         )
+    }
 
     private fun createPresentationModule(
         featureRoot: File,
         featureNameLowerCase: String,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "presentation",
             content = buildPresentationGradleScript(featureNameLowerCase, catalog)
         )
+    }
 
     private fun createUiModule(
         featureRoot: File,
@@ -265,7 +258,7 @@ class Generator {
         featureNameLowerCase: String,
         enableCompose: Boolean,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = featureRoot,
             layer = "ui",
@@ -277,49 +270,44 @@ class Generator {
                     catalog = catalog
                 )
         )
+    }
 
-    fun generateArchitecture(request: GenerateArchitectureRequest): String {
+    fun generateArchitecture(request: GenerateArchitectureRequest) {
         val architecturePackageName = request.architecturePackageName.trim()
         if (architecturePackageName.isEmpty()) {
-            return "${ERROR_PREFIX}Architecture package name is missing."
+            throw GenerationException("Architecture package name is missing.")
         }
 
         val pathSegments = architecturePackageName.toSegments()
         if (pathSegments.isEmpty()) {
-            return "${ERROR_PREFIX}Architecture package name is invalid."
+            throw GenerationException("Architecture package name is invalid.")
         }
 
         val architectureRoot = File(request.destinationRootDirectory, "architecture")
 
         if (architectureRoot.exists()) {
-            return ERROR_PREFIX +
+            throw GenerationException(
                 if (architectureRoot.isDirectory) {
                     "The architecture directory already exists."
                 } else {
                     "A file with the architecture name exists where the architecture directory should be created."
                 }
+            )
         }
 
         if (!architectureRoot.mkdirs()) {
-            return "${ERROR_PREFIX}Failed to create architecture directory."
+            throw GenerationException("Failed to create architecture directory.")
         }
 
-        val result =
-            ArchitectureLayerContentGenerator()
-                .generate(
-                    architectureRoot = architectureRoot,
-                    architecturePackageName = architecturePackageName,
-                    enableCompose = request.enableCompose
-                )
-
-        if (result != null) {
-            return result
-        }
+        ArchitectureLayerContentGenerator()
+            .generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = request.enableCompose
+            )
 
         SettingsFileUpdater().updateArchitectureSettingsIfPresent(
             request.destinationRootDirectory
-        )?.let { return it }
-
-        return "Success!"
+        )
     }
 }

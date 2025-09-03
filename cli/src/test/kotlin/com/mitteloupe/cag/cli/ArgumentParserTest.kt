@@ -130,9 +130,9 @@ class ArgumentParserTest {
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
-        } catch (e: IllegalArgumentException) {
+        } catch (exception: IllegalArgumentException) {
             // Then
-            assertEquals("Beta is required", e.message)
+            assertEquals("Beta is required", exception.message)
         }
     }
 
@@ -192,9 +192,9 @@ class ArgumentParserTest {
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
-        } catch (e: IllegalArgumentException) {
+        } catch (exception: IllegalArgumentException) {
             // Then
-            assertEquals("Beta is required", e.message)
+            assertEquals("Beta is required", exception.message)
         }
     }
 

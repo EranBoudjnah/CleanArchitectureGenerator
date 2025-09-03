@@ -2,7 +2,7 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.DirectoryFinder
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildDataSourceModuleKotlinFile
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
@@ -14,13 +14,13 @@ class DataSourceModuleCreator {
         destinationRootDirectory: File,
         projectNamespace: String,
         dataSourceName: String
-    ): String? {
+    ) {
         val basePackage = projectNamespace.trimEnd('.')
         val projectRoot = findGradleProjectRoot(destinationRootDirectory, DirectoryFinder()) ?: destinationRootDirectory
         val appModuleDirectory =
             AppModuleDirectoryFinder(DirectoryFinder())
                 .findAndroidAppModuleDirectories(projectRoot)
-                .firstOrNull() ?: return null
+                .firstOrNull() ?: return
         val appSourceRoot = File(appModuleDirectory, "src/main/java")
         val basePackageDirectory = buildPackageDirectory(appSourceRoot, basePackage.toSegments())
         val targetDirectory = File(basePackageDirectory, "di")
@@ -28,7 +28,7 @@ class DataSourceModuleCreator {
         if (!targetDirectory.exists()) {
             val created = runCatching { targetDirectory.mkdirs() }.getOrElse { false }
             if (!created) {
-                return "${ERROR_PREFIX}Failed to create directory: ${targetDirectory.absolutePath}"
+                throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath}")
             }
         }
 
@@ -49,10 +49,8 @@ class DataSourceModuleCreator {
 
             runCatching { targetFile.writeText(content) }
                 .onFailure {
-                    return "${ERROR_PREFIX}Failed to create file: ${targetFile.absolutePath}: ${it.message}"
+                    throw GenerationException("Failed to create file: ${targetFile.absolutePath}: ${it.message}")
                 }
         }
-
-        return null
     }
 }

@@ -11,13 +11,15 @@ class DataLayerContentGenerator(
         featureRoot: File,
         featurePackageName: String,
         featureName: String
-    ): String? = writeDataRepositoryFile(featureRoot, featurePackageName, featureName)
+    ) {
+        writeDataRepositoryFile(featureRoot, featurePackageName, featureName)
+    }
 
     private fun writeDataRepositoryFile(
         featureRoot: File,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "data",
@@ -26,4 +28,5 @@ class DataLayerContentGenerator(
             fileName = "${featureName.capitalized}Repository.kt",
             content = buildDataRepositoryKotlinFile(featurePackageName, featureName)
         )
+    }
 }

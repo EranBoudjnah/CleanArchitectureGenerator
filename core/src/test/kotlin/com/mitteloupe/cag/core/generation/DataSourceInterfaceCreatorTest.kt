@@ -1,8 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -27,16 +26,9 @@ class DataSourceInterfaceCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         assertTrue(datasourceRoot.exists())
 
@@ -59,16 +51,9 @@ class DataSourceInterfaceCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/source/src/main/java/com/example/datasource/test/datasource")
         assertTrue(targetDirectory.exists())
     }
@@ -81,16 +66,9 @@ class DataSourceInterfaceCreatorTest {
         val dataSourceName = "TestData"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/source/src/main/java/com/example/datasource/testdata/datasource")
         assertTrue(targetDirectory.exists())
     }
@@ -109,16 +87,9 @@ class DataSourceInterfaceCreatorTest {
         existingFile.writeText("existing content")
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         assertEquals("existing content", existingFile.readText())
     }
 
@@ -130,16 +101,9 @@ class DataSourceInterfaceCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/source/src/main/java/com/example/datasource/test/datasource")
         assertTrue(targetDirectory.exists())
 
@@ -147,8 +111,8 @@ class DataSourceInterfaceCreatorTest {
         assertTrue(interfaceFile.readText().contains("package com.example.datasource.test.datasource"))
     }
 
-    @Test
-    fun `Given directory creation fails when writeDataSourceInterface then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given directory creation fails when writeDataSourceInterface then throws exception`() {
         // Given
         val destinationRootDirectory = File(tempDirectory, "readonly")
         destinationRootDirectory.mkdirs()
@@ -158,20 +122,17 @@ class DataSourceInterfaceCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(
+            destinationRootDirectory,
+            projectNamespace,
+            dataSourceName
+        )
 
-        // Then
-        assertTrue(result!!.startsWith(ERROR_PREFIX))
-        assertTrue(result.contains("Failed to create directory"))
+        // Then throws GenerationException
     }
 
-    @Test
-    fun `Given file creation fails when writeDataSourceInterface then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given file creation fails when writeDataSourceInterface then throws exception`() {
         // Given
         val destinationRootDirectory = tempDirectory
         val projectNamespace = "com.example"
@@ -182,15 +143,12 @@ class DataSourceInterfaceCreatorTest {
         targetDirectory.setReadOnly()
 
         // When
-        val result =
-            classUnderTest.writeDataSourceInterface(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceInterface(
+            destinationRootDirectory,
+            projectNamespace,
+            dataSourceName
+        )
 
-        // Then
-        assertTrue(result!!.startsWith(ERROR_PREFIX))
-        assertTrue(result.contains("Failed to create file"))
+        // Then throws GenerationException
     }
 }

@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildArchitectureDomainGradleScript
 import com.mitteloupe.cag.core.content.buildArchitecturePresentationGradleScript
 import com.mitteloupe.cag.core.content.buildArchitectureUiGradleScript
@@ -14,10 +14,10 @@ class ArchitectureLayerContentGenerator {
         architectureRoot: File,
         architecturePackageName: String,
         enableCompose: Boolean
-    ): String? {
+    ) {
         val packageSegments = architecturePackageName.toSegments()
         if (packageSegments.isEmpty()) {
-            return "Error: Architecture package name is invalid."
+            throw GenerationException("Architecture package name is invalid.")
         }
 
         val layers = listOf("domain", "presentation", "ui")
@@ -33,104 +33,105 @@ class ArchitectureLayerContentGenerator {
             }
 
         if (!allCreated) {
-            return "Error: Failed to create directories for architecture package '$architecturePackageName'."
+            throw GenerationException("Failed to create directories for architecture package '$architecturePackageName'.")
         }
 
         val catalogUpdater = VersionCatalogUpdater()
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = architectureRoot.parentFile,
             enableCompose = enableCompose
-        )?.let { return it }
+        )
 
-        createDomainModule(architectureRoot, catalogUpdater)?.let { return it }
-        createPresentationModule(architectureRoot, catalogUpdater)?.let { return it }
-        createUiModule(architectureRoot, catalogUpdater)?.let { return it }
+        createDomainModule(architectureRoot, catalogUpdater)
+        createPresentationModule(architectureRoot, catalogUpdater)
+        createUiModule(architectureRoot, catalogUpdater)
 
-        generateDomainContent(architectureRoot, architecturePackageName, architecturePackageName)?.let { return it }
-        generatePresentationContent(architectureRoot, architecturePackageName, architecturePackageName)?.let { return it }
-        generateUiContent(architectureRoot, architecturePackageName, architecturePackageName)?.let { return it }
-
-        return null
+        generateDomainContent(architectureRoot, architecturePackageName, architecturePackageName)
+        generatePresentationContent(
+            architectureRoot,
+            architecturePackageName,
+            architecturePackageName
+        )
+        generateUiContent(architectureRoot, architecturePackageName, architecturePackageName)
     }
 
     private fun createDomainModule(
         architectureRoot: File,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "domain",
             content = buildArchitectureDomainGradleScript(catalog)
         )
+    }
 
     private fun createPresentationModule(
         architectureRoot: File,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "presentation",
             content = buildArchitecturePresentationGradleScript(catalog)
         )
+    }
 
     private fun createUiModule(
         architectureRoot: File,
         catalog: VersionCatalogUpdater
-    ): String? =
+    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "ui",
             content = buildArchitectureUiGradleScript(catalog)
         )
+    }
 
     private fun generateDomainContent(
         architectureRoot: File,
         projectNamespace: String,
         architecturePackageName: String
-    ): String? {
+    ) {
         val domainRoot = File(architectureRoot, "domain/src/main/java")
         val packageDirectory = buildPackageDirectory(domainRoot, architecturePackageName.toSegments())
 
-        generateUseCaseBase(packageDirectory, projectNamespace)?.let { return it }
-        generateRepositoryBase(packageDirectory, projectNamespace)?.let { return it }
-
-        return null
+        generateUseCaseBase(packageDirectory, projectNamespace)
+        generateRepositoryBase(packageDirectory, projectNamespace)
     }
 
     private fun generatePresentationContent(
         architectureRoot: File,
         projectNamespace: String,
         architecturePackageName: String
-    ): String? {
+    ) {
         val presentationRoot = File(architectureRoot, "presentation/src/main/java")
         val packageDirectory = buildPackageDirectory(presentationRoot, "$architecturePackageName.presentation".toSegments())
 
-        generateViewModelBase(packageDirectory, projectNamespace)?.let { return it }
-        generateNavigationEventBase(packageDirectory, projectNamespace)?.let { return it }
-
-        return null
+        generateViewModelBase(packageDirectory, projectNamespace)
+        generateNavigationEventBase(packageDirectory, projectNamespace)
     }
 
     private fun generateUiContent(
         architectureRoot: File,
         projectNamespace: String,
         architecturePackageName: String
-    ): String? {
+    ) {
         val uiRoot = File(architectureRoot, "ui/src/main/java")
         val packageDirectory = buildPackageDirectory(uiRoot, architecturePackageName.toSegments())
 
-        generateScreenBase(packageDirectory, projectNamespace)?.let { return it }
-        generateMapperBase(packageDirectory, projectNamespace)?.let { return it }
-
-        return null
+        generateScreenBase(packageDirectory, projectNamespace)
+        generateMapperBase(packageDirectory, projectNamespace)
     }
 
     private fun generateUseCaseBase(
         packageDirectory: File,
         projectNamespace: String
-    ): String? {
+    ) {
         val useCaseFile = File(packageDirectory, "usecase/UseCase.kt")
-        if (useCaseFile.exists()) return null
+        if (useCaseFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -149,18 +150,18 @@ class ArchitectureLayerContentGenerator {
             useCaseFile.parentFile.mkdirs()
             useCaseFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate use case: ${it.message}"
+            throw GenerationException("Failed to generate use case: ${it.message}")
         }
-
-        return null
     }
 
     private fun generateRepositoryBase(
         packageDirectory: File,
         projectNamespace: String
-    ): String? {
+    ) {
         val repositoryFile = File(packageDirectory, "repository/Repository.kt")
-        if (repositoryFile.exists()) return null
+        if (repositoryFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -173,18 +174,18 @@ class ArchitectureLayerContentGenerator {
             repositoryFile.parentFile.mkdirs()
             repositoryFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate repository: ${it.message}"
+            throw GenerationException("Failed to generate repository: ${it.message}")
         }
-
-        return null
     }
 
     private fun generateViewModelBase(
         packageDirectory: File,
         architecturePackage: String
-    ): String? {
+    ) {
         val viewModelFile = File(packageDirectory, "viewmodel/BaseViewModel.kt")
-        if (viewModelFile.exists()) return null
+        if (viewModelFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -251,18 +252,18 @@ class ArchitectureLayerContentGenerator {
             viewModelFile.parentFile.mkdirs()
             viewModelFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate view model: ${it.message}"
+            throw GenerationException("Failed to generate view model: ${it.message}")
         }
-
-        return null
     }
 
     private fun generateNavigationEventBase(
         packageDirectory: File,
         projectNamespace: String
-    ): String? {
+    ) {
         val navigationFile = File(packageDirectory, "navigation/PresentationNavigationEvent.kt")
-        if (navigationFile.exists()) return null
+        if (navigationFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -275,18 +276,18 @@ class ArchitectureLayerContentGenerator {
             navigationFile.parentFile.mkdirs()
             navigationFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate navigation event: ${it.message}"
+            throw GenerationException("Failed to generate navigation event: ${it.message}")
         }
-
-        return null
     }
 
     private fun generateScreenBase(
         packageDirectory: File,
         projectNamespace: String
-    ): String? {
+    ) {
         val screenFile = File(packageDirectory, "view/Screen.kt")
-        if (screenFile.exists()) return null
+        if (screenFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -304,18 +305,18 @@ class ArchitectureLayerContentGenerator {
             screenFile.parentFile.mkdirs()
             screenFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate base screen: ${it.message}"
+            throw GenerationException("Failed to generate base screen: ${it.message}")
         }
-
-        return null
     }
 
     private fun generateMapperBase(
         packageDirectory: File,
         projectNamespace: String
-    ): String? {
+    ) {
         val mapperFile = File(packageDirectory, "mapper/Mapper.kt")
-        if (mapperFile.exists()) return null
+        if (mapperFile.exists()) {
+            return
+        }
 
         val content =
             """
@@ -330,9 +331,7 @@ class ArchitectureLayerContentGenerator {
             mapperFile.parentFile.mkdirs()
             mapperFile.writeText(content)
         }.onFailure {
-            return "${ERROR_PREFIX}Failed to generate base mapper: ${it.message}"
+            throw GenerationException("Failed to generate base mapper: ${it.message}")
         }
-
-        return null
     }
 }

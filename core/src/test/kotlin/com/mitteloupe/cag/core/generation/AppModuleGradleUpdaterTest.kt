@@ -1,7 +1,6 @@
 package com.mitteloupe.cag.core.generation
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -56,11 +55,10 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        val result = classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
         val content = buildFile.readText()
 
         // Then
-        assertNull(result)
         assertEquals(expectedContent, content)
     }
 
@@ -89,11 +87,10 @@ class AppModuleGradleUpdaterTest {
         val expectedComplete = "$givenGradleContent\n$expectedTail\n"
 
         // When
-        val result = classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
         val content = buildFile.readText()
 
         // Then
-        assertNull(result)
         assertEquals(expectedComplete, content)
     }
 
@@ -123,11 +120,10 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        val result = classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
         val content = buildFile.readText()
 
         // Then
-        assertNull(result)
         assertEquals(expectedContentPartial, content)
     }
 
@@ -171,11 +167,10 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        val result = classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
         val content = buildFile.readText()
 
         // Then
-        assertNull(result)
         assertEquals(expectedContentGroovy, content)
     }
 

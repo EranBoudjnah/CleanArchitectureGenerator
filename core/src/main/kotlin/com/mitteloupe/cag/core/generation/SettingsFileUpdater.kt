@@ -1,41 +1,44 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.DirectoryFinder
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import java.io.File
 
 class SettingsFileUpdater {
     fun updateProjectSettingsIfPresent(
         startDirectory: File,
         featureNameLowerCase: String
-    ): String? =
+    ) {
         updateSettingsIfPresent(
             startDirectory = startDirectory,
             groupPrefix = ":features:$featureNameLowerCase",
             moduleNames = listOf("ui", "presentation", "domain", "data")
         )
+    }
 
-    fun updateDataSourceSettingsIfPresent(startDirectory: File): String? =
+    fun updateDataSourceSettingsIfPresent(startDirectory: File) {
         updateSettingsIfPresent(
             startDirectory = startDirectory,
             groupPrefix = ":datasource",
             moduleNames = listOf("source", "implementation")
         )
+    }
 
-    fun updateArchitectureSettingsIfPresent(projectRoot: File): String? =
+    fun updateArchitectureSettingsIfPresent(projectRoot: File) {
         updateSettingsIfPresent(
             startDirectory = projectRoot,
             groupPrefix = ":architecture",
             moduleNames = listOf("domain", "presentation", "ui")
         )
+    }
 
     private fun updateSettingsIfPresent(
         startDirectory: File,
         groupPrefix: String,
         moduleNames: List<String>
-    ): String? {
-        val settingsFile = findSettingsFile(startDirectory) ?: return null
-        return updateIncludes(settingsFile, groupPrefix, moduleNames)
+    ) {
+        val settingsFile = findSettingsFile(startDirectory) ?: return
+        updateIncludes(settingsFile, groupPrefix, moduleNames)
     }
 
     private fun findSettingsFile(startDirectory: File): File? {
@@ -61,11 +64,11 @@ class SettingsFileUpdater {
         settingsFile: File,
         groupPrefix: String,
         moduleNames: List<String>
-    ): String? {
+    ) {
         val originalFileContent =
             runCatching { settingsFile.readText() }
                 .getOrElse {
-                    return "${ERROR_PREFIX}Failed to read ${settingsFile.name}: ${it.message}"
+                    throw GenerationException("Failed to read ${settingsFile.name}: ${it.message}")
                 }
 
         val groupedIncludeKts = "include(\"$groupPrefix:${'$'}module\")"
@@ -78,12 +81,11 @@ class SettingsFileUpdater {
                 originalFileContent.contains(groupedIncludeGroovySingle)
 
         if (hasGroupedInclude) {
-            return null
+            return
         }
 
         val modulePaths = moduleNames.map { moduleName -> "$groupPrefix:$moduleName" }
 
-        // Allow both rooted (":group:module") and non-rooted ("group:module") includes
         fun includeRegexesFor(path: String): List<Regex> =
             listOf(
                 "include\\(([\"'])$path\\1\\)".toRegex(),
@@ -100,7 +102,7 @@ class SettingsFileUpdater {
         val allIncludedIndividually = moduleNames.all { moduleName -> isModuleIncludedIndividually(moduleName) }
 
         if (allIncludedIndividually) {
-            return null
+            return
         }
 
         val filteredContent =
@@ -145,9 +147,9 @@ class SettingsFileUpdater {
 
         val updatedFileContent = filteredContent + contentToAppend
 
-        return runCatching { settingsFile.writeText(updatedFileContent) }
+        runCatching { settingsFile.writeText(updatedFileContent) }
             .exceptionOrNull()
-            ?.let { "${ERROR_PREFIX}Failed to update ${settingsFile.name}: ${it.message}" }
+            ?.let { throw GenerationException("Failed to update ${settingsFile.name}: ${it.message}") }
     }
 
     private fun groovySettingsFile(projectRoot: File): File = File(projectRoot, "settings.gradle")

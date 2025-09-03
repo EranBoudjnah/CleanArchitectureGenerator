@@ -1,11 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -37,15 +34,13 @@ class DataSourceModuleCreatorTest {
         val targetDir = File(appRoot, "com/example/app/di")
 
         // When
-        val result =
-            classUnderTest.writeDataSourceModule(
-                destinationRootDirectory = projectRoot,
-                projectNamespace = givenNamespace,
-                dataSourceName = "ExampleDataSource"
-            )
+        classUnderTest.writeDataSourceModule(
+            destinationRootDirectory = projectRoot,
+            projectNamespace = givenNamespace,
+            dataSourceName = "ExampleDataSource"
+        )
 
         // Then
-        assertNull(result)
         val file = File(targetDir, "ExampleDataSourceModule.kt")
         assertTrue(file.exists())
         val content = file.readText()
@@ -62,8 +57,8 @@ class DataSourceModuleCreatorTest {
         )
     }
 
-    @Test
-    fun `Given cannot create directory when writeDataSourceModule then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given cannot create directory when writeDataSourceModule then throws exception`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "projectRoot2").toFile()
         val appRoot = File(projectRoot, "app/src/main/java")
@@ -82,19 +77,15 @@ class DataSourceModuleCreatorTest {
 
         try {
             // When
-            val result =
-                classUnderTest.writeDataSourceModule(
-                    destinationRootDirectory = projectRoot,
-                    projectNamespace = givenNamespace,
-                    dataSourceName = "ExampleDataSource"
-                )
-
-            // Then
-            assertNotNull(result)
-            checkNotNull(result)
-            assertThat(result, startsWith(ERROR_PREFIX))
+            classUnderTest.writeDataSourceModule(
+                destinationRootDirectory = projectRoot,
+                projectNamespace = givenNamespace,
+                dataSourceName = "ExampleDataSource"
+            )
         } finally {
             blockingFile.delete()
         }
+
+        // Then throws GenerationException
     }
 }

@@ -2,7 +2,7 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.DirectoryFinder
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.io.File
 
@@ -12,20 +12,19 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
     fun updateAppModuleDependenciesIfPresent(
         startDirectory: File,
         featureNameLowerCase: String
-    ): String? {
+    ) {
         val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
         val appModuleDirectory =
             AppModuleDirectoryFinder(directoryFinder)
                 .findAndroidAppModuleDirectories(projectRoot)
-                .firstOrNull() ?: return null
+                .firstOrNull() ?: return
 
         val kotlinDslFile = File(appModuleDirectory, "build.gradle.kts")
         val groovyDslFile = File(appModuleDirectory, "build.gradle")
 
-        return when {
+        when {
             kotlinDslFile.exists() -> updateDslFile(kotlinDslFile, featureNameLowerCase, isKotlinDsl = true)
             groovyDslFile.exists() -> updateDslFile(groovyDslFile, featureNameLowerCase, isKotlinDsl = false)
-            else -> null
         }
     }
 
@@ -33,21 +32,21 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
         file: File,
         featureNameLowerCase: String,
         isKotlinDsl: Boolean
-    ): String? {
+    ) {
         val desiredLines =
             if (isKotlinDsl) {
                 FEATURE_LAYERS.map { layer -> "implementation(projects.features.$featureNameLowerCase.$layer)" }
             } else {
                 FEATURE_LAYERS.map { layer -> "implementation(project(\":features:$featureNameLowerCase:$layer\"))" }
             }
-        return updateFileWithDesiredLines(file, desiredLines)
+        updateFileWithDesiredLines(file, desiredLines)
     }
 
     private fun updateFileWithDesiredLines(
         file: File,
         desiredLines: List<String>
-    ): String? {
-        val original = runCatching { file.readText() }.getOrElse { return errorForFileRead(file.name, it) }
+    ) {
+        val original = runCatching { file.readText() }.getOrElse { throw errorForFileRead(file.name, it) }
 
         val updated = insertIntoDependenciesBlock(original, desiredLines)
         if (updated == null) {
@@ -63,10 +62,13 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
                     append("}").append(newline)
                 }
             val finalContent = original + block
-            return writeFile(file, finalContent)
+            writeFile(file, finalContent)
+            return
         }
-        if (updated == original) return null
-        return writeFile(file, updated)
+        if (updated == original) {
+            return
+        }
+        writeFile(file, updated)
     }
 
     private fun insertIntoDependenciesBlock(
@@ -114,8 +116,6 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
         return null
     }
 
-    private data class BlockRange(val openBraceIndex: Int, val endIndex: Int)
-
     private fun findDependenciesBlock(text: String): BlockRange? {
         var index = 0
         val length = text.length
@@ -150,8 +150,12 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
         index: Int,
         word: String
     ): Boolean {
-        if (index + word.length > text.length) return false
-        if (!text.regionMatches(index, word, 0, word.length)) return false
+        if (index + word.length > text.length) {
+            return false
+        }
+        if (!text.regionMatches(index, word, 0, word.length)) {
+            return false
+        }
         val beforeOk = index == 0 || !text[index - 1].isLetterOrDigit() && text[index - 1] != '_'
         val afterIndex = index + word.length
         val afterOk = afterIndex >= text.length || !text[afterIndex].isLetterOrDigit() && text[afterIndex] != '_'
@@ -281,13 +285,16 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
     private fun writeFile(
         file: File,
         content: String
-    ): String? =
+    ) {
         runCatching { file.writeText(content) }
             .exceptionOrNull()
-            ?.let { "${ERROR_PREFIX}Failed to update ${file.name}: ${it.message}" }
+            ?.let { throw GenerationException("Failed to update ${file.name}: ${it.message}") }
+    }
 
     private fun errorForFileRead(
         fileName: String,
         throwable: Throwable
-    ): String = "${ERROR_PREFIX}Failed to read $fileName: ${throwable.message}"
+    ): GenerationException = GenerationException("Failed to read $fileName: ${throwable.message}")
+
+    private data class BlockRange(val openBraceIndex: Int, val endIndex: Int)
 }

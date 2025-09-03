@@ -2,7 +2,7 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.DirectoryFinder
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildAppFeatureModuleKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
 import com.mitteloupe.cag.core.findGradleProjectRoot
@@ -16,12 +16,12 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         projectNamespace: String,
         featureName: String,
         featurePackageName: String
-    ): String? {
+    ) {
         val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
         val appModuleDirectory =
             AppModuleDirectoryFinder(directoryFinder)
                 .findAndroidAppModuleDirectories(projectRoot).firstOrNull()
-                ?: return null
+                ?: return
         val packageName = projectNamespace.trimEnd('.')
         val sourceRoot = File(appModuleDirectory, "src/main/java")
         val basePackageDir = buildPackageDirectory(sourceRoot, packageName.toSegments())
@@ -32,7 +32,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
                     .getOrElse { false }
             if (!created) {
                 val absolutePath = dependencyInjectionDirectory.absolutePath
-                return "${ERROR_PREFIX}Failed to create directory: $absolutePath"
+                throw GenerationException("Failed to create directory: $absolutePath")
             }
         }
         val filename = "${featureName.capitalized}Module.kt"
@@ -42,9 +42,8 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
             runCatching { targetFile.writeText(content) }
                 .onFailure {
                     val absolutePath = targetFile.absolutePath
-                    return "${ERROR_PREFIX}Failed to create file: $absolutePath: ${it.message}"
+                    throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
                 }
         }
-        return null
     }
 }

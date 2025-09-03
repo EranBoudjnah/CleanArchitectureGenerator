@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import java.io.File
 
@@ -32,18 +33,26 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                     architecturePackageName = architecturePackageName,
                     enableCompose = dialog.isComposeEnabled()
                 )
-            val result = generator.generateArchitecture(request)
-            ideBridge.refreshIde(projectRootDir)
-            ideBridge.synchronizeGradle(project, result, projectRootDir)
-            Messages.showInfoMessage(
-                project,
-                CleanArchitectureGeneratorBundle.message(
-                    "info.architecture.generator.confirmation",
-                    architecturePackageName,
-                    result
-                ),
-                CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
-            )
+            try {
+                generator.generateArchitecture(request)
+                ideBridge.refreshIde(projectRootDir)
+                ideBridge.synchronizeGradle(project, null, projectRootDir)
+                Messages.showInfoMessage(
+                    project,
+                    CleanArchitectureGeneratorBundle.message(
+                        "info.architecture.generator.confirmation",
+                        architecturePackageName,
+                        "Success!"
+                    ),
+                    CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
+                )
+            } catch (e: GenerationException) {
+                Messages.showErrorDialog(
+                    project,
+                    e.message ?: "Unknown error occurred",
+                    CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
+                )
+            }
         }
     }
 

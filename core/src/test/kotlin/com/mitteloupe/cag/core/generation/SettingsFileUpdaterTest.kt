@@ -4,7 +4,6 @@ import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -19,19 +18,14 @@ class SettingsFileUpdaterTest {
     }
 
     @Test
-    fun `Given no settings files up the tree when updateProjectSettingsIfPresent then returns null`() {
+    fun `Given no settings files up the tree when updateProjectSettingsIfPresent then does nothing`() {
         // Given
         val startDirectory = createTempDirectory(prefix = "noSettings").toFile()
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = "sample"
-            )
+        classUnderTest.updateProjectSettingsIfPresent(startDirectory = startDirectory, featureNameLowerCase = "sample")
 
-        // Then
-        assertNull(result)
+        // Then does nothing
     }
 
     @Test
@@ -55,15 +49,13 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
         assertThat(content, endsWith(expectedTail))
     }
 
@@ -89,15 +81,13 @@ class SettingsFileUpdaterTest {
         val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedNewlineBeforeIncludes))
     }
 
@@ -120,15 +110,13 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertEquals(initial, content)
     }
 
@@ -153,15 +141,13 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
         val content = File(projectRoot, "settings.gradle").readText()
 
         // Then
-        assertNull(result)
         assertThat(content, endsWith(expectedTail))
     }
 
@@ -190,15 +176,13 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
         assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:ui\")") })
         assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:domain\")") })
@@ -229,15 +213,13 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
         val content = File(projectRoot, "settings.gradle").readText()
 
         // Then
-        assertNull(result)
         assertThat(content, endsWith(expectedTail))
         assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:ui\"") })
         assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:domain\"") })
@@ -262,15 +244,13 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
         assertEquals(initial, content)
     }
 
@@ -293,15 +273,13 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
 
         // When
-        val result =
-            classUnderTest.updateProjectSettingsIfPresent(
-                startDirectory = startDirectory,
-                featureNameLowerCase = givenFeatureNameLowerCase
-            )
+        classUnderTest.updateProjectSettingsIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = givenFeatureNameLowerCase
+        )
         val content = File(projectRoot, "settings.gradle").readText()
 
         // Then
-        assertNull(result)
         assertEquals(initial, content)
     }
 
@@ -326,18 +304,16 @@ class SettingsFileUpdaterTest {
     }
 
     @Test
-    fun `Given no settings files up the tree when updateDataSourceSettingsIfPresent then returns null`() {
+    fun `Given no settings files up the tree when updateDataSourceSettingsIfPresent then does nothing`() {
         // Given
         val startDirectory = createTempDirectory(prefix = "noSettings").toFile()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
+        classUnderTest.updateDataSourceSettingsIfPresent(
+            startDirectory = startDirectory
+        )
 
-        // Then
-        assertNull(result)
+        // Then does nothing
     }
 
     @Test
@@ -358,14 +334,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
         val content = File(projectRoot, "settings.gradle.kts").readText()
 
         // Then
-        assertNull(result)
         assertThat(content, endsWith(expectedTail))
     }
 
@@ -388,14 +360,12 @@ class SettingsFileUpdaterTest {
         val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(
+            startDirectory = startDirectory
+        )
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedNewlineBeforeIncludes))
     }
 
@@ -420,14 +390,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
         assertFalse(content.lines().any { it.contains("include(\":datasource:source\")") })
         assertFalse(content.lines().any { it.contains("include(\":datasource:implementation\")") })
@@ -455,14 +421,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
         assertFalse(content.lines().any { it.contains("include(\"datasource:implementation\")") })
         assertFalse(content.lines().any { it.contains("include(\"datasource:source\")") })
@@ -486,14 +448,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle").readText()
         assertThat(content, endsWith(expectedTail))
     }
 
@@ -518,14 +476,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle").readText()
         assertThat(content, endsWith(expectedTail))
         assertFalse(content.lines().any { it.contains("include \":datasource:source\"") })
         assertFalse(content.lines().any { it.contains("include \":datasource:implementation\"") })
@@ -547,14 +501,10 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(startDirectory = startDirectory)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertEquals(initial, content)
     }
 
@@ -574,14 +524,12 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
 
         // When
-        val result =
-            classUnderTest.updateDataSourceSettingsIfPresent(
-                startDirectory = startDirectory
-            )
-        val content = File(projectRoot, "settings.gradle").readText()
+        classUnderTest.updateDataSourceSettingsIfPresent(
+            startDirectory = startDirectory
+        )
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle").readText()
         assertEquals(initial, content)
     }
 
@@ -604,12 +552,10 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
-        val content = File(projectRoot, "settings.gradle.kts").readText()
+        classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
     }
 
@@ -632,24 +578,21 @@ class SettingsFileUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
-        val content = File(projectRoot, "settings.gradle").readText()
+        classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
 
         // Then
-        assertNull(result)
+        val content = File(projectRoot, "settings.gradle").readText()
         assertThat(content, endsWith(expectedTail))
     }
 
     @Test
-    fun `Given no settings files when updateArchitectureSettingsIfPresent then returns null`() {
+    fun `Given no settings files when updateArchitectureSettingsIfPresent then does nothing`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "noSettings").toFile()
 
         // When
-        val result = classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
+        classUnderTest.updateArchitectureSettingsIfPresent(projectRoot)
 
-        // Then
-        assertNull(result)
+        // Then does nothing
     }
 }

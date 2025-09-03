@@ -1,9 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
-import org.junit.Assert
+import com.mitteloupe.cag.core.GenerationException
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -27,42 +25,32 @@ class GradleFileCreatorTest {
         val givenContent = "plugins { kotlin(\"jvm\") }\n"
 
         // When
-        val result =
-            classUnderTest.writeGradleFileIfMissing(
-                featureRoot = featureRoot,
-                layer = givenLayer,
-                content = givenContent
-            )
-        val targetFile = File(moduleDir, "build.gradle.kts")
+        classUnderTest.writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = givenLayer,
+            content = givenContent
+        )
 
         // Then
-        Assert.assertNull(result)
-        Assert.assertEquals(givenContent, targetFile.readText())
+        val targetFile = File(moduleDir, "build.gradle.kts")
+        assertEquals(givenContent, targetFile.readText())
     }
 
-    @Test
-    fun `Given module directory missing when writeGradleFileIfMissing then returns error and does not create file`() {
+    @Test(expected = GenerationException::class)
+    fun `Given module directory missing when writeGradleFileIfMissing then throws exception and does not create file`() {
         // Given
         val featureRoot = createTempDirectory(prefix = "featureRoot2").toFile()
         val givenLayer = "presentation"
-        val moduleDir = File(featureRoot, givenLayer)
         val givenContent = "// gradle script\n"
 
         // When
-        val result =
-            classUnderTest.writeGradleFileIfMissing(
-                featureRoot = featureRoot,
-                layer = givenLayer,
-                content = givenContent
-            )
-        val targetFile = File(moduleDir, "build.gradle.kts")
+        classUnderTest.writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = givenLayer,
+            content = givenContent
+        )
 
-        // Then
-        Assert.assertNotNull(result)
-        checkNotNull(result)
-        MatcherAssert.assertThat(result, CoreMatchers.startsWith(ERROR_PREFIX))
-        MatcherAssert.assertThat(result, CoreMatchers.containsString("$givenLayer/build.gradle.kts"))
-        Assert.assertFalse(targetFile.exists())
+        // Then throws GenerationException
     }
 
     @Test
@@ -78,15 +66,13 @@ class GradleFileCreatorTest {
         val newContent = "// new content that should be ignored\n"
 
         // When
-        val result =
-            classUnderTest.writeGradleFileIfMissing(
-                featureRoot = featureRoot,
-                layer = givenLayer,
-                content = newContent
-            )
+        classUnderTest.writeGradleFileIfMissing(
+            featureRoot = featureRoot,
+            layer = givenLayer,
+            content = newContent
+        )
 
         // Then
-        Assert.assertNull(result)
-        Assert.assertEquals(initialContent, targetFile.readText())
+        assertEquals(initialContent, targetFile.readText())
     }
 }

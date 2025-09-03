@@ -1,8 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -27,16 +26,9 @@ class DataSourceImplementationCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         assertTrue(datasourceRoot.exists())
 
@@ -59,16 +51,9 @@ class DataSourceImplementationCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/implementation/src/main/java/com/example/datasource/test/datasource")
         assertTrue(targetDirectory.exists())
     }
@@ -81,16 +66,9 @@ class DataSourceImplementationCreatorTest {
         val dataSourceName = "TestData"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/implementation/src/main/java/com/example/datasource/testdata/datasource")
         assertTrue(targetDirectory.exists())
     }
@@ -108,16 +86,9 @@ class DataSourceImplementationCreatorTest {
         existingFile.writeText("existing content")
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         assertEquals("existing content", existingFile.readText())
     }
 
@@ -129,16 +100,9 @@ class DataSourceImplementationCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
 
         // Then
-        assertNull(result)
-
         val targetDirectory = File(tempDirectory, "datasource/implementation/src/main/java/com/example/datasource/test/datasource")
         assertTrue(targetDirectory.exists())
 
@@ -146,8 +110,8 @@ class DataSourceImplementationCreatorTest {
         assertTrue(implementationFile.readText().contains("package com.example.datasource.test.datasource"))
     }
 
-    @Test
-    fun `Given directory creation fails when writeDataSourceImplementation then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given directory creation fails when writeDataSourceImplementation then throws exception`() {
         // Given
         val destinationRootDirectory = File(tempDirectory, "readonly")
         destinationRootDirectory.mkdirs()
@@ -157,20 +121,17 @@ class DataSourceImplementationCreatorTest {
         val dataSourceName = "TestDataSource"
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(
+            destinationRootDirectory,
+            projectNamespace,
+            dataSourceName
+        )
 
-        // Then
-        assertTrue(result!!.startsWith(ERROR_PREFIX))
-        assertTrue(result.contains("Failed to create directory"))
+        // Then throws GenerationException
     }
 
-    @Test
-    fun `Given file creation fails when writeDataSourceImplementation then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given file creation fails when writeDataSourceImplementation then throws exception`() {
         // Given
         val destinationRootDirectory = tempDirectory
         val projectNamespace = "com.example"
@@ -181,15 +142,12 @@ class DataSourceImplementationCreatorTest {
         targetDirectory.setReadOnly()
 
         // When
-        val result =
-            classUnderTest.writeDataSourceImplementation(
-                destinationRootDirectory,
-                projectNamespace,
-                dataSourceName
-            )
+        classUnderTest.writeDataSourceImplementation(
+            destinationRootDirectory,
+            projectNamespace,
+            dataSourceName
+        )
 
-        // Then
-        assertTrue(result!!.startsWith(ERROR_PREFIX))
-        assertTrue(result.contains("Failed to create file"))
+        // Then throws GenerationException
     }
 }

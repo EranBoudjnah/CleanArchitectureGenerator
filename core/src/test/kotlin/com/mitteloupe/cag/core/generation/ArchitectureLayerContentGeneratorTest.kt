@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.generation
 
-import org.junit.Assert.assertNull
+import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -17,34 +17,30 @@ class ArchitectureLayerContentGeneratorTest {
         tempDirectory = createTempDirectory(prefix = "test").toFile()
     }
 
-    @Test
-    fun `Given empty architecture package name when generate then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given empty architecture package name when generate then throws exception`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
         val architecturePackageName = ""
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
-        // Then
-        assertTrue(result!!.startsWith("Error:"))
-        assertTrue(result.contains("Architecture package name is invalid"))
+        // Then throws GenerationException
     }
 
-    @Test
-    fun `Given invalid architecture package name when generate then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given invalid architecture package name when generate then throws exception`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
         val architecturePackageName = "..."
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
-        // Then
-        assertTrue(result!!.startsWith("Error:"))
-        assertTrue(result.contains("Architecture package name is invalid"))
+        // Then throws GenerationException
     }
 
     @Test
@@ -55,11 +51,9 @@ class ArchitectureLayerContentGeneratorTest {
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        assertNull(result)
-
         val layers = listOf("domain", "presentation", "ui")
         layers.forEach { layer ->
             val layerSourceRoot = File(architectureRoot, "$layer/src/main/java")
@@ -87,11 +81,9 @@ class ArchitectureLayerContentGeneratorTest {
         packageDirectory.mkdirs()
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        assertNull(result)
-
         val layers = listOf("domain", "presentation", "ui")
         layers.forEach { layer ->
             val layerSourceRoot = File(architectureRoot, "$layer/src/main/java")
@@ -107,12 +99,9 @@ class ArchitectureLayerContentGeneratorTest {
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        assertNull(result)
-
-        // Verify
         val domainLayer = File(architectureRoot, "domain/src/main/java/architecture")
         assertTrue("Domain package should exist", domainLayer.exists())
     }
@@ -125,12 +114,9 @@ class ArchitectureLayerContentGeneratorTest {
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        assertNull(result)
-
-        // Verify
         val domainLayer = File(architectureRoot, "domain/src/main/java/com/example/myapp/architecture")
         assertTrue("Nested domain package should exist", domainLayer.exists())
 
@@ -141,18 +127,16 @@ class ArchitectureLayerContentGeneratorTest {
         assertTrue("Nested ui package should exist", uiLayer.exists())
     }
 
-    @Test
-    fun `Given architecture root that is a file when generate then fails to create directories`() {
+    @Test(expected = GenerationException::class)
+    fun `Given architecture root that is a file when generate then throws exception`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { createNewFile() }
         val architecturePackageName = "com.example.architecture"
         val enableCompose = true
 
         // When
-        val result = classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
-        // Then
-        assertTrue(result!!.startsWith("Error:"))
-        assertTrue(result.contains("Failed to create directories"))
+        // Then throws GenerationException
     }
 }

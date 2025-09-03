@@ -15,17 +15,17 @@ class UiLayerContentGenerator(
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? {
-        writeUiModelFile(featureRoot, featurePackageName)?.let { return it }
-        writePresentationToUiMapperFile(featureRoot, featurePackageName)?.let { return it }
-        writeUiDiFile(featureRoot, projectNamespace, featurePackageName, featureName)?.let { return it }
-        return writeUiScreenFile(featureRoot, projectNamespace, featurePackageName, featureName)
+    ) {
+        writeUiModelFile(featureRoot, featurePackageName)
+        writePresentationToUiMapperFile(featureRoot, featurePackageName)
+        writeUiDiFile(featureRoot, projectNamespace, featurePackageName, featureName)
+        writeUiScreenFile(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
     private fun writeUiModelFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "ui",
@@ -34,11 +34,12 @@ class UiLayerContentGenerator(
             fileName = "StubUiModel.kt",
             content = buildUiModelKotlinFile(featurePackageName)
         )
+    }
 
     private fun writePresentationToUiMapperFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "ui",
@@ -47,13 +48,14 @@ class UiLayerContentGenerator(
             fileName = "StubUiMapper.kt",
             content = buildPresentationToUiMapperKotlinFile(featurePackageName)
         )
+    }
 
     private fun writeUiDiFile(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "ui",
@@ -62,13 +64,14 @@ class UiLayerContentGenerator(
             fileName = "${featureName.capitalized}Dependencies.kt",
             content = buildUiDiKotlinFile(projectNamespace, featurePackageName, featureName)
         )
+    }
 
     private fun writeUiScreenFile(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "ui",
@@ -77,4 +80,5 @@ class UiLayerContentGenerator(
             fileName = "${featureName.capitalized}Screen.kt",
             content = buildUiScreenKotlinFile(projectNamespace, featurePackageName, featureName)
         )
+    }
 }

@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.USE_CASE_PACKAGE_SUFFIX
 import com.mitteloupe.cag.core.content.buildDomainModelKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
@@ -14,11 +14,10 @@ class DomainLayerContentGenerator(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String
-    ): String? {
-        writeDomainModelFile(featureRoot, featurePackageName)?.let { return it }
-        writeDomainRepositoryInterface(featureRoot, featurePackageName)?.let { return it }
-        writeDomainUseCaseFile(featureRoot, projectNamespace, featurePackageName)?.let { return it }
-        return null
+    ) {
+        writeDomainModelFile(featureRoot, featurePackageName)
+        writeDomainRepositoryInterface(featureRoot, featurePackageName)
+        writeDomainUseCaseFile(featureRoot, projectNamespace, featurePackageName)
     }
 
     fun generateUseCase(
@@ -26,15 +25,17 @@ class DomainLayerContentGenerator(
         useCaseName: String,
         inputDataType: String? = null,
         outputDataType: String? = null
-    ): String? {
+    ) {
         val packageSuffixRegex = USE_CASE_PACKAGE_SUFFIX.replace(".", "\\.") + "$"
         val packageName =
             derivePackageNameForDirectory(destinationDirectory)
                 ?.replace(packageSuffixRegex.toRegex(), "")
-                ?: return "${ERROR_PREFIX}Could not determine package name from directory: " +
-                    destinationDirectory.absolutePath
+                ?: throw GenerationException(
+                    "Could not determine package name from directory: " +
+                        destinationDirectory.absolutePath
+                )
 
-        return writeDomainUseCaseFile(
+        writeDomainUseCaseFile(
             targetDirectory = destinationDirectory,
             projectNamespace = extractProjectNamespace(packageName),
             featurePackageName = packageName,
@@ -51,8 +52,8 @@ class DomainLayerContentGenerator(
         useCaseName: String,
         inputDataType: String? = null,
         outputDataType: String? = null
-    ): String? {
-        return kotlinFileCreator.writeKotlinFileInLayer(
+    ) {
+        kotlinFileCreator.writeKotlinFileInLayer(
             targetDirectory = targetDirectory,
             fileName = "$useCaseName.kt",
             content =
@@ -71,11 +72,11 @@ class DomainLayerContentGenerator(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String
-    ): String? {
+    ) {
         val useCaseName = "PerformActionUseCase"
         val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
 
-        return kotlinFileCreator.writeKotlinFileInLayer(
+        kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
@@ -94,9 +95,9 @@ class DomainLayerContentGenerator(
     private fun writeDomainRepositoryInterface(
         featureRoot: File,
         featurePackageName: String
-    ): String? {
+    ) {
         val repositoryName = "PerformExampleRepository"
-        return kotlinFileCreator.writeKotlinFileInLayer(
+        kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
@@ -110,7 +111,7 @@ class DomainLayerContentGenerator(
     private fun writeDomainModelFile(
         featureRoot: File,
         featurePackageName: String
-    ): String? =
+    ) {
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
@@ -120,6 +121,7 @@ class DomainLayerContentGenerator(
             content =
                 buildDomainModelKotlinFile(featurePackageName)
         )
+    }
 
     private fun deriveRepositoryNameFromUseCaseName(useCaseName: String): String = useCaseName.removeSuffix("UseCase") + "Repository"
 

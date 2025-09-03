@@ -1,12 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.startsWith
-import org.hamcrest.MatcherAssert.assertThat
+import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -36,18 +31,16 @@ class KotlinFileCreatorTest {
         val expectedFile = File(featureRoot, "$layer/src/main/java/com/example/feature/usecase/$fileName")
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                featureRoot = featureRoot,
-                layer = layer,
-                featurePackageName = featurePackageName,
-                relativePackageSubPath = relativePackageSubPath,
-                fileName = fileName,
-                content = content
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = layer,
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = relativePackageSubPath,
+            fileName = fileName,
+            content = content
+        )
 
         // Then
-        assertNull(result)
         assertTrue(expectedFile.exists())
         assertEquals(content, expectedFile.readText())
     }
@@ -70,23 +63,21 @@ class KotlinFileCreatorTest {
         targetFile.writeText(originalContent)
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                featureRoot = featureRoot,
-                layer = layer,
-                featurePackageName = featurePackageName,
-                relativePackageSubPath = relativePackageSubPath,
-                fileName = fileName,
-                content = newContent
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = layer,
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = relativePackageSubPath,
+            fileName = fileName,
+            content = newContent
+        )
 
         // Then
-        assertNull(result)
         assertEquals(originalContent, targetFile.readText())
     }
 
-    @Test
-    fun `Given directory creation fails when writeKotlinFileInLayer then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given directory creation fails when writeKotlinFileInLayer then throws exception`() {
         // Given
         val featureRoot = File(temporaryDirectory, "feature")
         val layer = "domain"
@@ -101,25 +92,20 @@ class KotlinFileCreatorTest {
         conflictingFile.writeText("conflicting file")
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                featureRoot = featureRoot,
-                layer = layer,
-                featurePackageName = featurePackageName,
-                relativePackageSubPath = relativePackageSubPath,
-                fileName = fileName,
-                content = content
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = layer,
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = relativePackageSubPath,
+            fileName = fileName,
+            content = content
+        )
 
-        // Then
-        assertNotNull(result)
-        checkNotNull(result)
-        assertThat(result, startsWith(ERROR_PREFIX))
-        assertThat(result, containsString("Failed to create directory"))
+        // Then throws GenerationException
     }
 
-    @Test
-    fun `Given file write fails when writeKotlinFileInLayer then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given file write fails when writeKotlinFileInLayer then throws exception`() {
         // Given
         val featureRoot = File(temporaryDirectory, "feature")
         val layer = "domain"
@@ -135,21 +121,16 @@ class KotlinFileCreatorTest {
         conflictingDirectory.mkdirs()
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                featureRoot = featureRoot,
-                layer = layer,
-                featurePackageName = featurePackageName,
-                relativePackageSubPath = relativePackageSubPath,
-                fileName = fileName,
-                content = content
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = layer,
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = relativePackageSubPath,
+            fileName = fileName,
+            content = content
+        )
 
-        // Then
-        assertNotNull(result)
-        checkNotNull(result)
-        assertThat(result, startsWith(ERROR_PREFIX))
-        assertThat(result, containsString("Failed to create file"))
+        // Then throws GenerationException
     }
 
     @Test
@@ -162,15 +143,13 @@ class KotlinFileCreatorTest {
         val expectedFile = File(targetDirectory, fileName)
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                targetDirectory = targetDirectory,
-                fileName = fileName,
-                content = content
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            targetDirectory = targetDirectory,
+            fileName = fileName,
+            content = content
+        )
 
         // Then
-        assertNull(result)
         assertTrue(expectedFile.exists())
         assertEquals(content, expectedFile.readText())
     }
@@ -187,20 +166,18 @@ class KotlinFileCreatorTest {
         targetFile.writeText(originalContent)
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                targetDirectory = targetDirectory,
-                fileName = fileName,
-                content = newContent
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            targetDirectory = targetDirectory,
+            fileName = fileName,
+            content = newContent
+        )
 
         // Then
-        assertNull(result)
         assertEquals(originalContent, targetFile.readText())
     }
 
-    @Test
-    fun `Given file write fails when writeKotlinFileInLayer with target directory then returns error`() {
+    @Test(expected = GenerationException::class)
+    fun `Given file write fails when writeKotlinFileInLayer with target directory then throws exception`() {
         // Given
         val targetDirectory = File(temporaryDirectory, "target")
         targetDirectory.mkdirs()
@@ -211,17 +188,12 @@ class KotlinFileCreatorTest {
         conflictingDirectory.mkdirs()
 
         // When
-        val result =
-            classUnderTest.writeKotlinFileInLayer(
-                targetDirectory = targetDirectory,
-                fileName = fileName,
-                content = content
-            )
+        classUnderTest.writeKotlinFileInLayer(
+            targetDirectory = targetDirectory,
+            fileName = fileName,
+            content = content
+        )
 
-        // Then
-        assertNotNull(result)
-        checkNotNull(result)
-        assertThat(result, startsWith(ERROR_PREFIX))
-        assertThat(result, containsString("Failed to create file"))
+        // Then throws GenerationException
     }
 }

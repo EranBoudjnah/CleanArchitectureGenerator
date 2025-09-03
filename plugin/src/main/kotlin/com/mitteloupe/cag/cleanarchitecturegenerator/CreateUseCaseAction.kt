@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import java.io.File
 
@@ -70,17 +71,25 @@ class CreateUseCaseAction : AnAction() {
                 .outputDataType(dialog.outputDataType)
                 .build()
 
-        val result = Generator().generateUseCase(request)
-        ideBridge.refreshIde(projectRootDir)
-        ideBridge.synchronizeGradle(project, result, projectRootDir)
-        Messages.showInfoMessage(
-            project,
-            CleanArchitectureGeneratorBundle.message(
-                "info.datasource.generator.confirmation",
-                result
-            ),
-            CleanArchitectureGeneratorBundle.message("info.datasource.generator.title")
-        )
+        try {
+            Generator().generateUseCase(request)
+            ideBridge.refreshIde(projectRootDir)
+            ideBridge.synchronizeGradle(project, null, projectRootDir)
+            Messages.showInfoMessage(
+                project,
+                CleanArchitectureGeneratorBundle.message(
+                    "info.datasource.generator.confirmation",
+                    "Success!"
+                ),
+                CleanArchitectureGeneratorBundle.message("info.datasource.generator.title")
+            )
+        } catch (e: GenerationException) {
+            Messages.showErrorDialog(
+                project,
+                e.message ?: "Unknown error occurred",
+                CleanArchitectureGeneratorBundle.message("info.datasource.generator.title")
+            )
+        }
     }
 }
 

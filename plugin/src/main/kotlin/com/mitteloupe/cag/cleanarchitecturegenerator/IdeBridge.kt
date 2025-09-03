@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.mitteloupe.cag.core.ERROR_PREFIX
 import java.io.File
 
 class IdeBridge {
@@ -22,10 +21,10 @@ class IdeBridge {
 
     fun synchronizeGradle(
         project: Project?,
-        result: String,
+        result: String?,
         projectRootDir: File
     ) {
-        if (project != null && !result.startsWith(ERROR_PREFIX)) {
+        if (project != null) {
             ExternalSystemUtil.refreshProject(
                 projectRootDir.absolutePath,
                 ImportSpecBuilder(project, ProjectSystemId("GRADLE")).build()

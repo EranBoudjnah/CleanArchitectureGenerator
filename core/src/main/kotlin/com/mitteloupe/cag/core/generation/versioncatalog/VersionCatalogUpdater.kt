@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.generation.versioncatalog
 
-import com.mitteloupe.cag.core.ERROR_PREFIX
+import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import java.io.File
 
@@ -49,7 +49,7 @@ class VersionCatalogUpdater(
     fun updateVersionCatalogIfPresent(
         projectRootDir: File,
         enableCompose: Boolean
-    ): String? {
+    ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
         val existingPluginIdToAlias: Map<String, String> =
             catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
@@ -139,12 +139,12 @@ class VersionCatalogUpdater(
                         requirements = pluginRequirements
                     )
                 )
-        )?.let { return it }
+        )
 
         val addedAndroidLibraryAlias = pluginRequirements.any { it.id == "com.android.library" }
         val addedComposeBomAlias = libraryRequirements.any { it.module == "androidx.compose:compose-bom" }
 
-        return updateVersionCatalogIfPresent(
+        updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,
             sectionRequirements =
                 listOf(
@@ -169,23 +169,23 @@ class VersionCatalogUpdater(
     private fun <SECTION_TYPE : SectionEntryRequirement> updateVersionCatalogIfPresent(
         projectRootDir: File,
         sectionRequirements: List<SectionTransaction<SECTION_TYPE>>
-    ): String? {
+    ) {
         val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
         if (!catalogFile.exists()) {
-            return null
+            return
         }
 
         val catalogContent =
             runCatching { catalogFile.readText() }
-                .getOrElse { return "${ERROR_PREFIX}Failed to read version catalog: ${it.message}" }
+                .getOrElse { throw GenerationException("Failed to read version catalog: ${it.message}") }
         val updatedContent = contentUpdater.updateCatalogText(catalogContent, sectionRequirements)
         if (updatedContent == catalogContent) {
-            return null
+            return
         }
 
-        return runCatching { catalogFile.writeText(updatedContent) }
+        runCatching { catalogFile.writeText(updatedContent) }
             .exceptionOrNull()
-            ?.let { "${ERROR_PREFIX}Failed to update version catalog: ${it.message}" }
+            ?.let { throw GenerationException("Failed to update version catalog: ${it.message}") }
     }
 
     private fun versionCatalogVersionRequirements(

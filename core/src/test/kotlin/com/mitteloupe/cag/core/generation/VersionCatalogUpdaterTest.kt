@@ -1,8 +1,6 @@
 package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -17,19 +15,14 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given no catalog file when updateVersionCatalogIfPresent then returns null`() {
+    fun `Given no catalog file when updateVersionCatalogIfPresent then does nothing`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "noCatalog").toFile()
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
-        // Then
-        assertNull(result)
+        // Then does nothing
     }
 
     @Test
@@ -58,15 +51,10 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertEquals(expected, catalogFile.readText())
     }
 
     @Test
@@ -100,15 +88,10 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertEquals(expected, catalogFile.readText())
     }
 
     @Test
@@ -137,15 +120,10 @@ class VersionCatalogUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertEquals(expected, catalogFile.readText())
     }
 
     @Test
@@ -176,15 +154,10 @@ class VersionCatalogUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertEquals(expected, catalogFile.readText())
     }
 
     @Test
@@ -216,15 +189,10 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        val result =
-            classUnderTest.updateVersionCatalogIfPresent(
-                projectRootDir = projectRoot,
-                enableCompose = false
-            )
+        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, enableCompose = false)
 
         // Then
-        assertNull(result)
-        assertThat(catalogFile.readText(), CoreMatchers.equalTo(expected))
+        assertEquals(expected, catalogFile.readText())
     }
 
     private fun createProjectWithCatalog(initialContent: String): Pair<File, File> {
