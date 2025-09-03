@@ -36,7 +36,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
             try {
                 generator.generateArchitecture(request)
                 ideBridge.refreshIde(projectRootDir)
-                ideBridge.synchronizeGradle(project, null, projectRootDir)
+                ideBridge.synchronizeGradle(project, projectRootDir)
                 Messages.showInfoMessage(
                     project,
                     CleanArchitectureGeneratorBundle.message(

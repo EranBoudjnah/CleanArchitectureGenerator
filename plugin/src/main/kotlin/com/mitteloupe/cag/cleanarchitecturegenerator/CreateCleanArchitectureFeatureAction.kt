@@ -33,7 +33,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             try {
                 generator.generateFeature(request)
                 ideBridge.refreshIde(projectRootDir)
-                ideBridge.synchronizeGradle(project, null, projectRootDir)
+                ideBridge.synchronizeGradle(project, projectRootDir)
                 Messages.showInfoMessage(
                     project,
                     CleanArchitectureGeneratorBundle.message(

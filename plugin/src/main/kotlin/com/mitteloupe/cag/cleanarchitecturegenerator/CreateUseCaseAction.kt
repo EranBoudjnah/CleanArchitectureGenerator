@@ -74,7 +74,7 @@ class CreateUseCaseAction : AnAction() {
         try {
             Generator().generateUseCase(request)
             ideBridge.refreshIde(projectRootDir)
-            ideBridge.synchronizeGradle(project, null, projectRootDir)
+            ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(
                 project,
                 CleanArchitectureGeneratorBundle.message(

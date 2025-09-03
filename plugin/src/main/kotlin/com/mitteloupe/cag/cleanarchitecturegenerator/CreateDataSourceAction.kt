@@ -30,7 +30,7 @@ class CreateDataSourceAction : AnAction() {
                 useRetrofit = dialog.useRetrofit
             )
             ideBridge.refreshIde(projectRootDir)
-            ideBridge.synchronizeGradle(project, null, projectRootDir)
+            ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(
                 project,
                 CleanArchitectureGeneratorBundle.message(

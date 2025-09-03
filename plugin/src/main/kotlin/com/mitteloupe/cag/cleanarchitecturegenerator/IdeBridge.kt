@@ -21,7 +21,6 @@ class IdeBridge {
 
     fun synchronizeGradle(
         project: Project?,
-        result: String?,
         projectRootDir: File
     ) {
         if (project != null) {
