@@ -67,7 +67,7 @@ class ArchitectureModulesContentGeneratorTest {
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val useCaseFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/usecase/UseCase.kt")
+        val useCaseFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/usecase/UseCase.kt")
         val expectedContent = """package com.example.architecture.domain.usecase
 
 interface UseCase<REQUEST, RESULT> {
@@ -75,24 +75,6 @@ interface UseCase<REQUEST, RESULT> {
 }
 """
         assertEquals("UseCase.kt should have exact content", expectedContent, useCaseFile.readText())
-    }
-
-    @Test
-    fun `Given valid architecture package when generate then creates Repository interface with exact content`() {
-        // Given
-        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
-        val architecturePackageName = "com.example.architecture"
-        val enableCompose = true
-
-        // When
-        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
-
-        // Then
-        val repositoryFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/repository/Repository.kt")
-        val expectedContent = """package com.example.architecture.domain.repository
-
-interface Repository"""
-        assertEquals("Repository.kt should have exact content", expectedContent, repositoryFile.readText())
     }
 
     @Test
@@ -106,10 +88,15 @@ interface Repository"""
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val domainExceptionFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/exception/DomainException.kt")
+        val domainExceptionFile =
+            File(
+                architectureRoot,
+                "domain/src/main/java/com/example/architecture/domain/exception/DomainException.kt"
+            )
         val expectedContent = """package com.example.architecture.domain.exception
 
-abstract class DomainException(cause: Throwable? = null) : Exception(cause)"""
+abstract class DomainException(cause: Throwable? = null) : Exception(cause)
+"""
         assertEquals("DomainException.kt should have exact content", expectedContent, domainExceptionFile.readText())
     }
 
@@ -125,10 +112,11 @@ abstract class DomainException(cause: Throwable? = null) : Exception(cause)"""
 
         // Then
         val unknownDomainExceptionFile =
-            File(architectureRoot, "domain/src/main/java/com/example/architecture/exception/UnknownDomainException.kt")
+            File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/exception/UnknownDomainException.kt")
         val expectedContent = """package com.example.architecture.domain.exception
 
-class UnknownDomainException(cause: Throwable? = null) : DomainException(cause)"""
+class UnknownDomainException(cause: Throwable? = null) : DomainException(cause)
+"""
         assertEquals("UnknownDomainException.kt should have exact content", expectedContent, unknownDomainExceptionFile.readText())
     }
 
@@ -143,7 +131,7 @@ class UnknownDomainException(cause: Throwable? = null) : DomainException(cause)"
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val useCaseExecutorFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/UseCaseExecutor.kt")
+        val useCaseExecutorFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/UseCaseExecutor.kt")
         val expectedContent = """package com.example.architecture.domain
 
 import com.example.architecture.domain.exception.DomainException
@@ -187,7 +175,11 @@ class UseCaseExecutor {
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val useCaseExecutorProviderFile = File(architectureRoot, "domain/src/main/java/com/example/architecture/UseCaseExecutorProvider.kt")
+        val useCaseExecutorProviderFile =
+            File(
+                architectureRoot,
+                "domain/src/main/java/com/example/architecture/domain/UseCaseExecutorProvider.kt"
+            )
         val expectedContent = """package com.example.architecture.domain
 
 import kotlinx.coroutines.CoroutineScope
@@ -210,10 +202,10 @@ typealias UseCaseExecutorProvider =
 
         // Then
         val backgroundUseCaseFile =
-            File(architectureRoot, "domain/src/main/java/com/example/architecture/usecase/BackgroundExecutingUseCase.kt")
+            File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/usecase/BackgroundExecutingUseCase.kt")
         val expectedContent = """package com.example.architecture.domain.usecase
 
-import com.example.architecture.coroutine.CoroutineContextProvider
+import com.example.coroutine.CoroutineContextProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -250,7 +242,7 @@ abstract class BackgroundExecutingUseCase<REQUEST, RESULT>(
 
         // Then
         val continuousUseCaseFile =
-            File(architectureRoot, "domain/src/main/java/com/example/architecture/usecase/ContinuousExecutingUseCase.kt")
+            File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/usecase/ContinuousExecutingUseCase.kt")
         val expectedContent = """package com.example.architecture.domain.usecase
 
 import com.example.architecture.coroutine.CoroutineContextProvider
@@ -409,7 +401,7 @@ interface PresentationNotification
     }
 
     @Test
-    fun `Given valid architecture package when generate then creates Screen interface with exact content`() {
+    fun `Given valid architecture package when generate then creates ViewStateBinder interface with exact content`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
         val architecturePackageName = "com.example.architecture"
@@ -419,21 +411,20 @@ interface PresentationNotification
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val screenFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/view/Screen.kt")
-        val expectedContent = """package com.example.architecture.ui.view
+        val viewStateBinderFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/binder/ViewStateBinder.kt")
+        val expectedContent = """package com.example.architecture.ui.binder
 
-import androidx.compose.runtime.Composable
+import com.example.architecture.ui.view.ViewsProvider
 
-interface Screen {
-    @Composable
-    fun Content()
+interface ViewStateBinder<in VIEW_STATE : Any, in VIEWS_PROVIDER : ViewsProvider> {
+    fun VIEWS_PROVIDER.bindState(viewState: VIEW_STATE)
 }
 """
-        assertEquals("Screen.kt should have exact content", expectedContent, screenFile.readText())
+        assertEquals("ViewStateBinder.kt should have exact content", expectedContent, viewStateBinderFile.readText())
     }
 
     @Test
-    fun `Given valid architecture package when generate then creates Mapper interface with exact content`() {
+    fun `Given valid architecture package when generate then creates UnhandledNavigationException class with exact content`() {
         // Given
         val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
         val architecturePackageName = "com.example.architecture"
@@ -443,14 +434,351 @@ interface Screen {
         classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
 
         // Then
-        val mapperFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/mapper/Mapper.kt")
-        val expectedContent = """package com.example.architecture.ui.mapper
+        val unhandledNavigationExceptionFile =
+            File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/navigation/exception/UnhandledNavigationException.kt")
+        val expectedContent = """package com.example.architecture.ui.navigation.exception
 
-interface Mapper<Input, Output> {
-    fun map(input: Input): Output
+import com.example.architecture.presentation.navigation.PresentationNavigationEvent
+
+class UnhandledNavigationException(event: PresentationNavigationEvent) :
+    IllegalArgumentException(
+        "Navigation event ${'$'}{event::class.simpleName} was not handled."
+    )
+"""
+        assertEquals(
+            "UnhandledNavigationException.kt should have exact content",
+            expectedContent,
+            unhandledNavigationExceptionFile.readText()
+        )
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates NavigationEventDestinationMapper class with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val navigationEventDestinationMapperFile =
+            File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/navigation/mapper/NavigationEventDestinationMapper.kt")
+        val expectedContent = """package com.example.architecture.ui.navigation.mapper
+
+import com.example.architecture.presentation.navigation.PresentationNavigationEvent
+import com.example.architecture.ui.navigation.exception.UnhandledNavigationException
+import com.example.architecture.ui.navigation.model.UiDestination
+import kotlin.reflect.KClass
+
+abstract class NavigationEventDestinationMapper<in EVENT : PresentationNavigationEvent>(
+    private val kotlinClass: KClass<EVENT>
+) {
+    fun toUi(navigationEvent: PresentationNavigationEvent): UiDestination = when {
+        kotlinClass.isInstance(navigationEvent) -> {
+            @Suppress("UNCHECKED_CAST")
+            mapTypedEvent(navigationEvent as EVENT)
+        }
+
+        else -> {
+            mapGenericEvent(navigationEvent) ?: throw UnhandledNavigationException(
+                navigationEvent
+            )
+        }
+    }
+
+    protected abstract fun mapTypedEvent(navigationEvent: EVENT): UiDestination
+
+    protected open fun mapGenericEvent(
+        navigationEvent: PresentationNavigationEvent
+    ): UiDestination? = null
 }
 """
-        assertEquals("Mapper.kt should have exact content", expectedContent, mapperFile.readText())
+        assertEquals(
+            "NavigationEventDestinationMapper.kt should have exact content",
+            expectedContent,
+            navigationEventDestinationMapperFile.readText()
+        )
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates UiDestination interface with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val uiDestinationFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/navigation/model/UiDestination.kt")
+        val expectedContent = """package com.example.architecture.ui.navigation.model
+
+import androidx.navigation.NavController
+
+fun interface UiDestination {
+    fun navigate(navController: NavController)
+}
+"""
+        assertEquals("UiDestination.kt should have exact content", expectedContent, uiDestinationFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates NotificationUiMapper interface with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val notificationUiMapperFile =
+            File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/notification/mapper/NotificationUiMapper.kt")
+        val expectedContent = """package com.example.architecture.ui.notification.mapper
+
+import com.example.architecture.presentation.notification.PresentationNotification
+import com.example.architecture.ui.notification.model.UiNotification
+
+interface NotificationUiMapper<in PRESENTATION_NOTIFICATION : PresentationNotification> {
+    fun toUi(notification: PRESENTATION_NOTIFICATION): UiNotification
+}
+"""
+        assertEquals("NotificationUiMapper.kt should have exact content", expectedContent, notificationUiMapperFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates UiNotification interface with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val uiNotificationFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/notification/model/UiNotification.kt")
+        val expectedContent = """package com.example.architecture.ui.notification.model
+
+fun interface UiNotification {
+    fun present()
+}
+"""
+        assertEquals("UiNotification.kt should have exact content", expectedContent, uiNotificationFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates BaseComposeHolder class with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val baseComposeHolderFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/view/BaseComposeHolder.kt")
+        val expectedContent = """package com.example.architecture.ui.view
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavController
+import com.example.architecture.presentation.navigation.PresentationNavigationEvent
+import com.example.architecture.presentation.notification.PresentationNotification
+import com.example.architecture.presentation.viewmodel.BaseViewModel
+import com.example.architecture.ui.navigation.mapper.NavigationEventDestinationMapper
+import com.example.architecture.ui.notification.mapper.NotificationUiMapper
+
+abstract class BaseComposeHolder<VIEW_STATE : Any, NOTIFICATION : PresentationNotification>(
+    private val viewModel: BaseViewModel<VIEW_STATE, NOTIFICATION>,
+    private val navigationMapper: NavigationEventDestinationMapper<*>,
+    private val notificationMapper: NotificationUiMapper<NOTIFICATION>
+) {
+    @Composable
+    fun ViewModelObserver(navController: NavController) {
+        viewModel.notification.collectAsState(initial = null)
+            .value?.let { notificationValue ->
+                Notifier(notification = notificationValue)
+            }
+
+        viewModel.navigationEvent.collectAsState(initial = null)
+            .value?.let { navigationValue ->
+                Navigator(navigationValue, navController)
+            }
+    }
+
+    @Composable
+    private fun Notifier(notification: NOTIFICATION) {
+        LaunchedEffect(notification) {
+            notificationMapper.toUi(notification).present()
+        }
+    }
+
+    @Composable
+    private fun Navigator(navigation: PresentationNavigationEvent, navController: NavController) {
+        LaunchedEffect(navigation) {
+            navigationMapper.toUi(navigation).navigate(navController)
+        }
+    }
+}
+"""
+        assertEquals("BaseComposeHolder.kt should have exact content", expectedContent, baseComposeHolderFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates BaseFragment class with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val baseFragmentFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/view/BaseFragment.kt")
+        val expectedContent = """package com.example.architecture.ui.view
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import com.example.architecture.presentation.navigation.PresentationNavigationEvent
+import com.example.architecture.presentation.notification.PresentationNotification
+import com.example.architecture.presentation.viewmodel.BaseViewModel
+import com.example.architecture.ui.binder.ViewStateBinder
+import com.example.architecture.ui.navigation.mapper.NavigationEventDestinationMapper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
+private typealias NavigationMapper = NavigationEventDestinationMapper<PresentationNavigationEvent>
+
+abstract class BaseFragment<VIEW_STATE : Any, NOTIFICATION : PresentationNotification> :
+    Fragment,
+    ViewsProvider {
+    constructor() : super()
+    constructor(@LayoutRes layoutResourceId: Int) : super(layoutResourceId)
+
+    abstract val viewModel: BaseViewModel<VIEW_STATE, NOTIFICATION>
+
+    abstract val viewStateBinder: ViewStateBinder<VIEW_STATE, ViewsProvider>
+
+    abstract val navigationEventDestinationMapper: NavigationMapper
+
+    open val navController: NavController
+        get() = findNavController()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+        view?.bindViews()
+        observeViewModel()
+        return view
+    }
+
+    abstract fun View.bindViews()
+
+    private fun observeViewModel() {
+        with(viewModel) {
+            performOnStartedLifecycleEvent {
+                viewState.collect(::applyViewState)
+            }
+            performOnStartedLifecycleEvent {
+                navigationEvent.collect(::navigate)
+            }
+        }
+    }
+
+    private fun performOnStartedLifecycleEvent(block: suspend CoroutineScope.() -> Unit) {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+        }
+    }
+
+    private fun applyViewState(viewState: VIEW_STATE) {
+        with(viewStateBinder) {
+            bindState(viewState)
+        }
+    }
+
+    private fun navigate(destination: PresentationNavigationEvent) {
+        val uiDestination = navigationEventDestinationMapper.toUi(destination)
+        uiDestination.navigate(navController)
+    }
+}
+"""
+        assertEquals("BaseFragment.kt should have exact content", expectedContent, baseFragmentFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates ScreenEnterObserver function with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val screenEnterObserverFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/view/ScreenEnterObserver.kt")
+        val expectedContent = """package com.example.architecture.ui.view
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+
+@Composable
+fun ScreenEnterObserver(onEntered: () -> Unit) {
+    var entered by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(entered) {
+        if (!entered) {
+            entered = true
+            onEntered()
+        }
+    }
+}
+"""
+        assertEquals("ScreenEnterObserver.kt should have exact content", expectedContent, screenEnterObserverFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates ViewsProvider interface with exact content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val viewsProviderFile = File(architectureRoot, "ui/src/main/java/com/example/architecture/ui/view/ViewsProvider.kt")
+        val expectedContent = """package com.example.architecture.ui.view
+
+interface ViewsProvider
+"""
+        assertEquals("ViewsProvider.kt should have exact content", expectedContent, viewsProviderFile.readText())
     }
 
     @Test
