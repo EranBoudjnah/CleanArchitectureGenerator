@@ -95,7 +95,7 @@ class AppArgumentProcessorDataSourcesTest {
     @Test
     fun `Given -w retrofit when getNewDataSources then returns single request with retrofit`() {
         // Given
-        val givenArguments = arrayOf("-nds", "-n=My", "--w", "retrofit")
+        val givenArguments = arrayOf("-nds", "-n=My", "-w", "retrofit")
 
         // When
         val result = classUnderTest.getNewDataSources(givenArguments)

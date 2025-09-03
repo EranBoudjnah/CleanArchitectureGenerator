@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.optimizeImports
+
 const val USE_CASE_PACKAGE_SUFFIX = ".domain.usecase"
 
 fun buildDomainUseCaseKotlinFile(
@@ -12,28 +14,31 @@ fun buildDomainUseCaseKotlinFile(
 ): String {
     return """package $featurePackageName$USE_CASE_PACKAGE_SUFFIX
 
+${
+        """
 import ${projectNamespace}architecture.domain.usecase.UseCase
 ${
-        if (inputDataType == null && outputDataType == null) {
-            "import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME\n"
-        } else {
-            ""
+            if (inputDataType == null && outputDataType == null) {
+                "import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME"
+            } else {
+                ""
+            }
+        }${
+            if (repositoryName == null) {
+                ""
+            } else {
+                "import $featurePackageName.domain.repository.$repositoryName"
+            }
         }
-    }${
-        if (repositoryName == null) {
-            ""
-        } else {
-            "import $featurePackageName.domain.repository.$repositoryName\n"
-        }
+""".optimizeImports()
     }
 class $useCaseName(${
         if (repositoryName == null) {
             ""
         } else {
-            "\nprivate val performExampleRepository: $repositoryName\n"
+            "private val performExampleRepository: $repositoryName"
         }
-    }    
-) : UseCase<${inputDataType ?: DOMAIN_MODEL_NAME}, ${outputDataType ?: DOMAIN_MODEL_NAME}> {
+    }) : UseCase<${inputDataType ?: DOMAIN_MODEL_NAME}, ${outputDataType ?: DOMAIN_MODEL_NAME}> {
     override fun execute(input: ${inputDataType ?: DOMAIN_MODEL_NAME}, onResult: (${outputDataType ?: DOMAIN_MODEL_NAME}) -> Unit) {
         onResult(${
         if (repositoryName == null) {
