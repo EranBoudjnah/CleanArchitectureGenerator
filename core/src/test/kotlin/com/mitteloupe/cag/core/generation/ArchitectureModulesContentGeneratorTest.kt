@@ -452,4 +452,65 @@ interface Mapper<Input, Output> {
 """
         assertEquals("Mapper.kt should have exact content", expectedContent, mapperFile.readText())
     }
+
+    @Test
+    fun `Given valid architecture package when generate then creates Domain gradle file with correct content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val domainGradleFile = File(architectureRoot, "domain/build.gradle.kts")
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+        assertEquals("Domain build.gradle.kts should have exact content", expectedContent, domainGradleFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates Presentation gradle file with correct content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val presentationGradleFile = File(architectureRoot, "presentation/build.gradle.kts")
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+dependencies {
+    implementation(projects.architecture.domain)
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.junit4)
+}
+"""
+        assertEquals("Presentation build.gradle.kts should have exact content", expectedContent, presentationGradleFile.readText())
+    }
 }
