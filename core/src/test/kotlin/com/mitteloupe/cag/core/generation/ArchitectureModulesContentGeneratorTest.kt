@@ -245,7 +245,7 @@ abstract class BackgroundExecutingUseCase<REQUEST, RESULT>(
             File(architectureRoot, "domain/src/main/java/com/example/architecture/domain/usecase/ContinuousExecutingUseCase.kt")
         val expectedContent = """package com.example.architecture.domain.usecase
 
-import com.example.architecture.coroutine.CoroutineContextProvider
+import com.example.coroutine.CoroutineContextProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -840,5 +840,65 @@ dependencies {
 }
 """
         assertEquals("Presentation build.gradle.kts should have exact content", expectedContent, presentationGradleFile.readText())
+    }
+
+    @Test
+    fun `Given valid architecture package when generate then creates UI gradle file with correct content`() {
+        // Given
+        val architectureRoot = File(tempDirectory, "architecture").apply { mkdirs() }
+        val architecturePackageName = "com.example.architecture"
+        val enableCompose = true
+
+        // When
+        classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+        // Then
+        val uiGradleFile = File(architectureRoot, "ui/build.gradle.kts")
+        val expectedContent = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
+}
+
+android {
+    namespace = "com.example.architecture.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+dependencies {
+    implementation(projects.architecture.presentation)
+
+    implementation(projects.coroutine)
+
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+}
+"""
+        assertEquals("UI build.gradle.kts should have exact content", expectedContent, uiGradleFile.readText())
     }
 }

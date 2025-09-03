@@ -44,7 +44,7 @@ class ArchitectureModulesContentGenerator {
 
         createDomainModule(architectureRoot, catalogUpdater)
         createPresentationModule(architectureRoot, catalogUpdater)
-        createUiModule(architectureRoot, catalogUpdater)
+        createUiModule(architectureRoot, architecturePackageName, catalogUpdater)
 
         val domainRoot = File(architectureRoot, "domain")
         generateDomainContent(domainRoot, architecturePackageName, packageSegments + "domain")
@@ -78,12 +78,13 @@ class ArchitectureModulesContentGenerator {
 
     private fun createUiModule(
         architectureRoot: File,
+        architecturePackageName: String,
         catalog: VersionCatalogUpdater
     ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "ui",
-            content = buildArchitectureUiGradleScript(catalog)
+            content = buildArchitectureUiGradleScript(architecturePackageName, catalog)
         )
     }
 

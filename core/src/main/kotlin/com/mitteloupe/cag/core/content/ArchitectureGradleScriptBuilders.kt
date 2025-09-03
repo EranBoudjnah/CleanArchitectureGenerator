@@ -44,31 +44,44 @@ dependencies {
 """
 }
 
-fun buildArchitectureUiGradleScript(catalog: VersionCatalogReader): String {
+fun buildArchitectureUiGradleScript(
+    architecturePackageName: String,
+    catalog: VersionCatalogReader
+): String {
     val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
     val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
+    val pluginAliasKsp = (catalog.getResolvedPluginAliasFor("com.google.devtools.ksp") ?: "ksp").asAccessor
     val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.plugin.compose")?.asAccessor
 
-    return """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+    val libAliasComposeBom = (catalog.getResolvedLibraryAliasForModule("androidx.compose:compose-bom") ?: "compose-bom").asAccessor
+    val libAliasComposeUi = (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui") ?: "compose-ui").asAccessor
+    val libAliasAndroidxFragmentKtx =
+        (catalog.getResolvedLibraryAliasForModule("androidx.fragment:fragment-ktx") ?: "androidx-fragment-ktx").asAccessor
+    val libAliasAndroidxNavigationFragmentKtx =
+        (
+            catalog.getResolvedLibraryAliasForModule("androidx.navigation:navigation-fragment-ktx")
+                ?: "androidx-navigation-fragment-ktx"
+        ).asAccessor
 
-plugins {
+    val composePluginLine =
+        if (pluginAliasComposeCompiler != null) {
+            "    alias(libs.plugins.$pluginAliasComposeCompiler)\n"
+        } else {
+            ""
+        }
+
+    return """plugins {
     alias(libs.plugins.$pluginAliasAndroidLibrary)
     alias(libs.plugins.$pluginAliasKotlinAndroid)
-    alias(libs.plugins.$pluginAliasComposeCompiler)
-}
-
-kotlin {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
-}
+    alias(libs.plugins.$pluginAliasKsp)
+$composePluginLine}
 
 android {
-    namespace = "com.example.architecture.ui"
+    namespace = "$architecturePackageName.ui"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -81,32 +94,24 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
-    }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.compose.ui:ui:1.6.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
-    implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-    implementation(project(":architecture:presentation"))
-    implementation(project(":architecture:domain"))
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.0")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.0")
+    implementation(projects.architecture.presentation)
+
+    implementation(projects.coroutine)
+
+    implementation(libs.$libAliasAndroidxFragmentKtx)
+    implementation(libs.$libAliasAndroidxNavigationFragmentKtx)
+
+    implementation(platform(libs.$libAliasComposeBom))
+    implementation(libs.$libAliasComposeUi)
 }
 """
 }
