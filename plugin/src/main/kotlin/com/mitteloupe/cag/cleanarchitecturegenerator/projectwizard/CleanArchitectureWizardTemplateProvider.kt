@@ -55,10 +55,26 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     help = CleanArchitectureGeneratorBundle.message("wizard.parameter.compose.help")
                 }
 
+            val enableKtor =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.ktor.name")
+                    default = false
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.ktor.help")
+                }
+
+            val enableRetrofit =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.retrofit.name")
+                    default = false
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.retrofit.help")
+                }
+
             widgets(
                 CheckBoxWidget(enableKtlint),
                 CheckBoxWidget(enableDetekt),
-                CheckBoxWidget(enableCompose)
+                CheckBoxWidget(enableCompose),
+                CheckBoxWidget(enableKtor),
+                CheckBoxWidget(enableRetrofit)
             )
 
             thumb {
@@ -75,8 +91,8 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                             enableCompose = enableCompose.value,
                             enableKtlint = enableKtlint.value,
                             enableDetekt = enableDetekt.value,
-                            enableKtor = false,
-                            enableRetrofit = false
+                            enableKtor = enableKtor.value,
+                            enableRetrofit = enableRetrofit.value
                         )
 
                     Generator().generateProjectTemplate(request)
