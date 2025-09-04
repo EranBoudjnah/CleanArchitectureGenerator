@@ -4,11 +4,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
-import com.intellij.util.ui.FormBuilder
+import com.intellij.ui.dsl.builder.panel
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.text.AbstractDocument
 
 private const val PLACEHOLDER = "FEATURE_NAME"
@@ -72,25 +71,15 @@ class CreateCleanArchitectureFeatureDialog(
         featurePackageTextField.select(endOfModuleIndex - featureName.length, endOfModuleIndex)
     }
 
-    override fun createCenterPanel(): JComponent {
-        val formPanel: JPanel =
-            FormBuilder.createFormBuilder()
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.feature.name.label"),
-                    featureNameTextField,
-                    1,
-                    false
-                )
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.feature.package.label"),
-                    featurePackageTextField,
-                    1,
-                    false
-                )
-                .panel
-
-        return formPanel
-    }
+    override fun createCenterPanel(): JComponent =
+        panel {
+            row(CleanArchitectureGeneratorBundle.message("dialog.feature.name.label")) {
+                cell(featureNameTextField)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.feature.package.label")) {
+                cell(featurePackageTextField)
+            }
+        }
 
     override fun doValidate(): ValidationInfo? =
         if (featureName.isEmpty()) {

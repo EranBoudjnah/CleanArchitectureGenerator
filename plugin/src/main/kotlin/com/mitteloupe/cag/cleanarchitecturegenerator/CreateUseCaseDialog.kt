@@ -11,7 +11,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.util.ui.FormBuilder
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
@@ -342,35 +342,20 @@ class CreateUseCaseDialog(
                 )
             }
 
-        val formPanel: JPanel =
-            FormBuilder.createFormBuilder()
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label"),
-                    nameWithSuffixPanel,
-                    1,
-                    false
-                )
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label"),
-                    inputTypePanel,
-                    1,
-                    false
-                )
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label"),
-                    outputTypePanel,
-                    1,
-                    false
-                )
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label"),
-                    directoryField,
-                    1,
-                    false
-                )
-                .panel
-
-        return formPanel
+        return panel {
+            row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
+                cell(nameWithSuffixPanel)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label")) {
+                cell(inputTypePanel)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label")) {
+                cell(outputTypePanel)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label")) {
+                cell(directoryField)
+            }
+        }
     }
 
     override fun doValidate(): ValidationInfo? =

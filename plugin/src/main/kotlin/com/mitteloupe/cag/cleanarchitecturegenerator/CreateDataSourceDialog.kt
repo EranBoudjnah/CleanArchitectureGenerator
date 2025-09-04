@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.util.ui.FormBuilder
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import javax.swing.Box
@@ -62,19 +62,17 @@ class CreateDataSourceDialog(
                 add(suffixLabel)
             }
 
-        val formPanel: JPanel =
-            FormBuilder.createFormBuilder()
-                .addLabeledComponent(
-                    CleanArchitectureGeneratorBundle.message("dialog.datasource.name.label"),
-                    nameWithSuffixPanel,
-                    1,
-                    false
-                )
-                .addComponent(ktorCheckBox)
-                .addComponent(retrofitCheckBox)
-                .panel
-
-        return formPanel
+        return panel {
+            row(CleanArchitectureGeneratorBundle.message("dialog.datasource.name.label")) {
+                cell(nameWithSuffixPanel)
+            }
+            row {
+                cell(ktorCheckBox)
+            }
+            row {
+                cell(retrofitCheckBox)
+            }
+        }
     }
 
     override fun doValidate(): ValidationInfo? =
