@@ -1,22 +1,19 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.projectwizard
 
 import com.android.tools.idea.wizard.template.Category
-import com.android.tools.idea.wizard.template.Constraint
+import com.android.tools.idea.wizard.template.CheckBoxWidget
 import com.android.tools.idea.wizard.template.FormFactor
-import com.android.tools.idea.wizard.template.PackageNameWidget
-import com.android.tools.idea.wizard.template.StringParameter
+import com.android.tools.idea.wizard.template.ModuleTemplateData
 import com.android.tools.idea.wizard.template.Template
 import com.android.tools.idea.wizard.template.TemplateConstraint
 import com.android.tools.idea.wizard.template.TemplateData
-import com.android.tools.idea.wizard.template.TextFieldWidget
 import com.android.tools.idea.wizard.template.WizardTemplateProvider
 import com.android.tools.idea.wizard.template.WizardUiContext
-import com.android.tools.idea.wizard.template.activityToLayout
+import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.impl.defaultPackageNameParameter
-import com.android.tools.idea.wizard.template.layoutToActivity
-import com.android.tools.idea.wizard.template.stringParameter
 import com.android.tools.idea.wizard.template.template
+import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
@@ -27,46 +24,41 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
 
     private val cleanArchitectureTemplate =
         template {
-            name = "Clean Architecture"
-            description = "A complete Clean Architecture Android project with all modules and sample code"
-            category = Category.Activity
+            name = CleanArchitectureGeneratorBundle.message("wizard.template.name")
+            description = CleanArchitectureGeneratorBundle.message("wizard.template.description")
+            category = Category.Application
             formFactor = FormFactor.Mobile
             minApi = MIN_API
             constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin)
             screens = listOf(WizardUiContext.NewProject, WizardUiContext.NewProjectExtraDetail)
 
-            val appName =
-                stringParameter {
-                    name = "My Clean Architecture App"
-                    default = "MyCleanArchitectureApp"
-                }
             val packageName = defaultPackageNameParameter
 
-            lateinit var layoutName: StringParameter
-            val activityClass: StringParameter =
-                stringParameter {
-                    name = "Activity Name"
-                    constraints = listOf(Constraint.CLASS, Constraint.UNIQUE, Constraint.NONEMPTY)
-                    suggest = {
-                        layoutToActivity(layoutName.value)
-                    }
-                    default = "LauncherActivity"
-                    help = "The name of the activity class to create"
+            val enableKtlint =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.ktlint.name")
+                    default = false
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.ktlint.help")
                 }
-            layoutName =
-                stringParameter {
-                    name = "Layout Name"
-                    constraints = listOf(Constraint.LAYOUT, Constraint.UNIQUE, Constraint.NONEMPTY)
-                    suggest = {
-                        activityToLayout(activityClass.value)
-                    }
-                    default = "activity_launcher"
-                    help = "The name of the UI layout to create for the activity"
+
+            val enableDetekt =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.detekt.name")
+                    default = false
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.detekt.help")
+                }
+
+            val enableCompose =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.compose.name")
+                    default = true
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.compose.help")
                 }
 
             widgets(
-                TextFieldWidget(appName),
-                PackageNameWidget(packageName)
+                CheckBoxWidget(enableKtlint),
+                CheckBoxWidget(enableDetekt),
+                CheckBoxWidget(enableCompose)
             )
 
             thumb {
@@ -78,18 +70,21 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     val request =
                         GenerateProjectTemplateRequest(
                             destinationRootDirectory = File("."),
-                            projectName = appName.value,
+                            projectName = (data as ModuleTemplateData).rootDir.name,
                             packageName = packageName.value,
-                            enableCompose = true,
-                            enableKtlint = false,
-                            enableDetekt = false,
+                            enableCompose = enableCompose.value,
+                            enableKtlint = enableKtlint.value,
+                            enableDetekt = enableDetekt.value,
                             enableKtor = false,
                             enableRetrofit = false
                         )
 
                     Generator().generateProjectTemplate(request)
                 } catch (exception: GenerationException) {
-                    throw RuntimeException("Failed to generate Clean Architecture project: ${exception.message}", exception)
+                    throw RuntimeException(
+                        CleanArchitectureGeneratorBundle.message("wizard.error.generation.failed", exception.message ?: ""),
+                        exception
+                    )
                 }
             }
         }
