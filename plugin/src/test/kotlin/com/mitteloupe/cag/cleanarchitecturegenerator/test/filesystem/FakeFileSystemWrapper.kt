@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFileSystem
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.FileSystemWrapper
 import java.io.File
+import java.io.InputStream
 import java.io.OutputStream
 
 class FakeFileSystemWrapper(
@@ -24,20 +25,7 @@ class FakeFileSystemWrapper(
         fullPath.mkdirs()
     }
 
-    fun createFakeFile(path: String): TemporaryFile {
-        val fullPath = File(rootDirectory, path)
-        return TemporaryFile(fullPath.absolutePath, this)
-    }
-
-    fun fileExists(path: String): Boolean {
-        val fullPath = File(rootDirectory, path)
-        return fullPath.exists()
-    }
-
-    fun isDirectory(path: String): Boolean {
-        val fullPath = File(rootDirectory, path)
-        return fullPath.isDirectory
-    }
+    fun createFakeFile(path: String): File = File(rootDirectory, path)
 
     override fun findVirtualFile(file: File): VirtualFile? {
         if (!file.exists()) {
@@ -52,7 +40,7 @@ class FakeFileSystemWrapper(
         visitor: VirtualFileVisitor<Any>
     ): VirtualFileVisitor.Result {
         val fakeDirectory = directory as? TemporaryVirtualFile ?: return VirtualFileVisitor.SKIP_CHILDREN
-        val directoryFile = File(fakeDirectory.path)
+        val directoryFile = fakeDirectory.file
 
         if (!directoryFile.exists() || !directoryFile.isDirectory) {
             return VirtualFileVisitor.SKIP_CHILDREN
@@ -80,40 +68,27 @@ class FakeFileSystemWrapper(
     override fun getFileExtension(file: VirtualFile): String? = (file as? TemporaryVirtualFile)?.extension
 }
 
-class TemporaryFile(
-    private val path: String,
-    private val fileSystem: FakeFileSystemWrapper
-) : File(path) {
-    override fun exists(): Boolean = fileSystem.fileExists(path)
-
-    override fun isDirectory(): Boolean = fileSystem.isDirectory(path)
-
-    override fun getParentFile(): TemporaryFile? {
-        val parentPath = File(path).parent
-        return if (parentPath != null) {
-            TemporaryFile(parentPath, fileSystem)
-        } else {
-            null
-        }
-    }
-}
-
-private class TemporaryVirtualFile(private val file: File) : VirtualFile() {
-    override fun getName(): String = File(path).name
+private class TemporaryVirtualFile(val file: File) : VirtualFile() {
+    override fun getName(): String = file.name
 
     override fun getPath(): String = file.absolutePath
 
-    override fun isDirectory(): Boolean = false
+    override fun isDirectory(): Boolean = file.isDirectory
 
     override fun isWritable(): Boolean = false
 
     override fun isValid(): Boolean = true
 
-    override fun getParent(): VirtualFile? = null
+    override fun getParent(): VirtualFile? = file.parentFile?.let { TemporaryVirtualFile(it) }
 
-    override fun getChildren(): Array<VirtualFile> = emptyArray()
+    override fun getChildren(): Array<out VirtualFile> =
+        if (file.isDirectory) {
+            file.listFiles()?.map { TemporaryVirtualFile(it) }?.toTypedArray().orEmpty()
+        } else {
+            emptyArray()
+        }
 
-    override fun getInputStream(): java.io.InputStream = file.readText().byteInputStream()
+    override fun getInputStream(): InputStream = file.readText().byteInputStream()
 
     override fun getOutputStream(
         requestor: Any?,
