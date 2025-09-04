@@ -10,9 +10,9 @@ import javax.swing.JComponent
 class CreateCleanArchitecturePackageDialog(
     project: Project
 ) : DialogWrapper(project) {
-    private val enableComposeCheckBox = JCheckBox("Enable Compose", true)
-    private val enableKtlintCheckBox = JCheckBox("Enable ktlint", false)
-    private val enableDetektCheckBox = JCheckBox("Enable detekt", false)
+    private val enableComposeCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.compose.label"), true)
+    private val enableKtlintCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.ktlint.label"), false)
+    private val enableDetektCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.detekt.label"), false)
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
