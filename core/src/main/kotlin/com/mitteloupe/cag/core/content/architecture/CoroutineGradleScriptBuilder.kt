@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.core.content
+package com.mitteloupe.cag.core.content.architecture
 
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor

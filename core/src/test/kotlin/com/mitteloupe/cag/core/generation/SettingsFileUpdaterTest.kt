@@ -543,9 +543,11 @@ class SettingsFileUpdaterTest {
         val expectedTail =
             """
             setOf(
-                "domain",
+                "ui",
+                "instrumentation-test",
                 "presentation",
-                "ui"
+                "presentation-test",
+                "domain"
             ).forEach { module ->
                 include(":architecture:${'$'}module")
             }
@@ -569,9 +571,11 @@ class SettingsFileUpdaterTest {
         val expectedTail =
             """
             [
-                'domain',
+                'ui',
+                'instrumentation-test',
                 'presentation',
-                'ui'
+                'presentation-test',
+                'domain'
             ].each { module ->
                 include ":architecture:${'$'}module"
             }

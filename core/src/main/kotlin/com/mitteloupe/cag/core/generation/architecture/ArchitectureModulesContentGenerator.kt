@@ -1,11 +1,14 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.content.buildArchitectureDomainGradleScript
-import com.mitteloupe.cag.core.content.buildArchitectureInstrumentationTestGradleScript
-import com.mitteloupe.cag.core.content.buildArchitecturePresentationGradleScript
-import com.mitteloupe.cag.core.content.buildArchitecturePresentationTestGradleScript
-import com.mitteloupe.cag.core.content.buildArchitectureUiGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildArchitectureDomainGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildArchitectureInstrumentationTestGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentationGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentationTestGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildArchitectureUiGradleScript
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.generateFileIfMissing
+import com.mitteloupe.cag.core.generation.optimizeImports
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments

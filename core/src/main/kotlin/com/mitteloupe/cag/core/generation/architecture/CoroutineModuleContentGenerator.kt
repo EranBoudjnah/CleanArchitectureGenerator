@@ -1,7 +1,9 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.content.buildCoroutineGradleScript
+import com.mitteloupe.cag.core.content.architecture.buildCoroutineGradleScript
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.generateFileIfMissing
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments

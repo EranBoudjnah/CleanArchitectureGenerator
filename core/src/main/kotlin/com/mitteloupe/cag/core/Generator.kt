@@ -8,8 +8,6 @@ import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
-import com.mitteloupe.cag.core.generation.ArchitectureModulesContentGenerator
-import com.mitteloupe.cag.core.generation.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
@@ -19,6 +17,8 @@ import com.mitteloupe.cag.core.generation.GradleFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
 import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
+import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
+import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments

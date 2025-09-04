@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertEquals
