@@ -11,6 +11,8 @@ class CreateCleanArchitecturePackageDialog(
     project: Project
 ) : DialogWrapper(project) {
     private val enableComposeCheckBox = JCheckBox("Enable Compose", true)
+    private val enableKtlintCheckBox = JCheckBox("Enable ktlint", false)
+    private val enableDetektCheckBox = JCheckBox("Enable detekt", false)
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
@@ -22,9 +24,19 @@ class CreateCleanArchitecturePackageDialog(
             row {
                 cell(enableComposeCheckBox)
             }
+            row {
+                cell(enableKtlintCheckBox)
+            }
+            row {
+                cell(enableDetektCheckBox)
+            }
         }
 
     override fun doValidate(): ValidationInfo? = null
 
     fun isComposeEnabled(): Boolean = enableComposeCheckBox.isSelected
+
+    fun isKtlintEnabled(): Boolean = enableKtlintCheckBox.isSelected
+
+    fun isDetektEnabled(): Boolean = enableDetektCheckBox.isSelected
 }

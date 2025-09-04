@@ -31,7 +31,9 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                 GenerateArchitectureRequest(
                     destinationRootDirectory = projectRootDir,
                     architecturePackageName = architecturePackageName,
-                    enableCompose = dialog.isComposeEnabled()
+                    enableCompose = dialog.isComposeEnabled(),
+                    enableKtlint = dialog.isKtlintEnabled(),
+                    enableDetekt = dialog.isDetektEnabled()
                 )
             try {
                 generator.generateArchitecture(request)
