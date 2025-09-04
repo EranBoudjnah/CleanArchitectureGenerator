@@ -12,7 +12,9 @@ import org.junit.runners.Suite.SuiteClasses
 @RunWith(Enclosed::class)
 @SuiteClasses(
     AppArgumentProcessorTest.Features::class,
-    AppArgumentProcessorTest.Help::class
+    AppArgumentProcessorTest.Help::class,
+    AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
+    AppArgumentProcessorTest.AppArgumentProcessorDataSourcesTest::class
 )
 class AppArgumentProcessorTest {
     class Help {

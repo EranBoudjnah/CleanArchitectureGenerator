@@ -11,7 +11,6 @@ import com.android.tools.idea.wizard.template.WizardTemplateProvider
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
-import com.android.tools.idea.wizard.template.impl.defaultPackageNameParameter
 import com.android.tools.idea.wizard.template.template
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
@@ -31,8 +30,6 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             minApi = MIN_API
             constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin)
             screens = listOf(WizardUiContext.NewProject, WizardUiContext.NewProjectExtraDetail)
-
-            val packageName = defaultPackageNameParameter
 
             val enableKtlint =
                 booleanParameter {
@@ -83,11 +80,12 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
 
             recipe = { data: TemplateData ->
                 try {
+                    val moduleData = (data as ModuleTemplateData)
                     val request =
                         GenerateProjectTemplateRequest(
-                            destinationRootDirectory = File("."),
-                            projectName = (data as ModuleTemplateData).rootDir.name,
-                            packageName = packageName.value,
+                            destinationRootDirectory = moduleData.rootDir,
+                            projectName = data.name,
+                            packageName = data.packageName,
                             enableCompose = enableCompose.value,
                             enableKtlint = enableKtlint.value,
                             enableDetekt = enableDetekt.value,

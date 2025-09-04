@@ -121,12 +121,16 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 SecondaryFlag("--name", "-n", isMandatory = true, missingErrorMessage = nameErrorMessage)
             ) + additionalFlags
 
-        return argumentParser.parsePrimaryWithSecondaries(
-            arguments = arguments,
-            primaryLong = primaryLong,
-            primaryShort = primaryShort,
-            secondaryFlags = allFlags
-        ).map(transform).filter { isValidRequest(it) }
+        return try {
+            argumentParser.parsePrimaryWithSecondaries(
+                arguments = arguments,
+                primaryLong = primaryLong,
+                primaryShort = primaryShort,
+                secondaryFlags = allFlags
+            ).map(transform).filter { isValidRequest(it) }
+        } catch (exception: IllegalArgumentException) {
+            emptyList()
+        }
     }
 
     private fun <T> isValidRequest(request: T): Boolean =

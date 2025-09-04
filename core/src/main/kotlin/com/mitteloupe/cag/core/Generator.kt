@@ -292,8 +292,14 @@ class Generator {
             throw GenerationException("Package name is missing.")
         }
 
-        val projectRoot = File(request.destinationRootDirectory, projectName)
-        if (projectRoot.exists()) {
+        val projectRoot =
+            if (request.destinationRootDirectory.name == projectName) {
+                request.destinationRootDirectory
+            } else {
+                File(request.destinationRootDirectory, projectName)
+            }
+
+        if (projectRoot != request.destinationRootDirectory && projectRoot.exists()) {
             throw GenerationException(
                 if (projectRoot.isDirectory) {
                     "The project directory already exists."
@@ -303,7 +309,7 @@ class Generator {
             )
         }
 
-        if (!projectRoot.mkdirs()) {
+        if (projectRoot != request.destinationRootDirectory && !projectRoot.mkdirs()) {
             throw GenerationException("Failed to create project directory.")
         }
 

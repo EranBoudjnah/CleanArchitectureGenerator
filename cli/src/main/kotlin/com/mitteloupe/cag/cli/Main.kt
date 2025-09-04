@@ -86,13 +86,31 @@ fun main(arguments: Array<String>) {
         dataSourceRequests.isEmpty() &&
         useCaseRequests.isEmpty()
     ) {
-        println(
-            """
-            usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+        val hasInvalidArguments =
+            arguments.any { argument ->
+                argument.startsWith("-") && !argument.matches(Regex("^--(help|h)$"))
+            }
 
-            Run with --help or -h for more options.
-            """.trimIndent()
-        )
+        if (hasInvalidArguments) {
+            println("Error: Invalid arguments provided. No valid commands found.")
+            println()
+            println(
+                """
+                usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
+                Run with --help or -h for more options.
+                """.trimIndent()
+            )
+            exitProcess(1)
+        } else {
+            println(
+                """
+                usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
+                Run with --help or -h for more options.
+                """.trimIndent()
+            )
+        }
         return
     }
 
@@ -101,9 +119,15 @@ fun main(arguments: Array<String>) {
     val projectNamespace = basePackage ?: "com.unknown.app."
 
     projectTemplateRequests.forEach { request ->
+        val projectTemplateDestinationDirectory =
+            if (projectModel.selectedModuleRootDir() != null) {
+                projectRoot
+            } else {
+                destinationRootDir
+            }
         val projectTemplateRequest =
             GenerateProjectTemplateRequest(
-                destinationRootDirectory = destinationRootDir,
+                destinationRootDirectory = projectTemplateDestinationDirectory,
                 projectName = request.projectName,
                 packageName = request.packageName,
                 enableCompose = request.enableCompose,
