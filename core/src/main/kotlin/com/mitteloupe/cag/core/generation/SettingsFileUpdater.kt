@@ -28,7 +28,7 @@ class SettingsFileUpdater {
         updateSettingsIfPresent(
             startDirectory = projectRoot,
             groupPrefix = ":architecture",
-            moduleNames = listOf("domain", "presentation", "ui")
+            moduleNames = listOf("ui", "instrumentation-test", "presentation", "presentation-test", "domain")
         )
     }
 
