@@ -34,19 +34,12 @@ class CoroutineModuleContentGenerator {
             includeCoroutineDependencies = true
         )
 
-        createCoroutineModule(coroutineRoot, catalogUpdater)
-        generateCoroutineContent(coroutineRoot, coroutinePackageName, packageSegments)
-    }
-
-    private fun createCoroutineModule(
-        coroutineRoot: File,
-        catalog: VersionCatalogUpdater
-    ) {
         GradleFileCreator().writeGradleFileIfMissing(
             featureRoot = coroutineRoot,
             layer = "",
-            content = buildCoroutineGradleScript(catalog)
+            content = buildCoroutineGradleScript(catalogUpdater)
         )
+        generateCoroutineContent(coroutineRoot, coroutinePackageName, packageSegments)
     }
 
     private fun generateCoroutineContent(

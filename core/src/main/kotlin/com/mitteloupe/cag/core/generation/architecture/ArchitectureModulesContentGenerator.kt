@@ -47,11 +47,31 @@ class ArchitectureModulesContentGenerator {
             enableCompose = enableCompose
         )
 
-        createDomainModule(architectureRoot, catalogUpdater)
-        createPresentationModule(architectureRoot, catalogUpdater)
-        createUiModule(architectureRoot, architecturePackageName, catalogUpdater)
-        createPresentationTestModule(architectureRoot, catalogUpdater)
-        createInstrumentationTestModule(architectureRoot, architecturePackageName, catalogUpdater)
+        GradleFileCreator().writeGradleFileIfMissing(
+            featureRoot = architectureRoot,
+            layer = "domain",
+            content = buildArchitectureDomainGradleScript(catalogUpdater)
+        )
+        GradleFileCreator().writeGradleFileIfMissing(
+            featureRoot = architectureRoot,
+            layer = "presentation",
+            content = buildArchitecturePresentationGradleScript(catalogUpdater)
+        )
+        GradleFileCreator().writeGradleFileIfMissing(
+            featureRoot = architectureRoot,
+            layer = "ui",
+            content = buildArchitectureUiGradleScript(architecturePackageName, catalogUpdater)
+        )
+        GradleFileCreator().writeGradleFileIfMissing(
+            featureRoot = architectureRoot,
+            layer = "presentation-test",
+            content = buildArchitecturePresentationTestGradleScript(catalogUpdater)
+        )
+        GradleFileCreator().writeGradleFileIfMissing(
+            featureRoot = architectureRoot,
+            layer = "instrumentation-test",
+            content = buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater)
+        )
 
         val domainRoot = File(architectureRoot, "domain")
         generateDomainContent(domainRoot, architecturePackageName, packageSegments + "domain")
@@ -66,63 +86,6 @@ class ArchitectureModulesContentGenerator {
             instrumentationTestRoot,
             architecturePackageName.substringBeforeLast('.'),
             architecturePackageName.substringBeforeLast('.').toSegments() + "test"
-        )
-    }
-
-    private fun createDomainModule(
-        architectureRoot: File,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = architectureRoot,
-            layer = "domain",
-            content = buildArchitectureDomainGradleScript(catalog)
-        )
-    }
-
-    private fun createPresentationModule(
-        architectureRoot: File,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = architectureRoot,
-            layer = "presentation",
-            content = buildArchitecturePresentationGradleScript(catalog)
-        )
-    }
-
-    private fun createPresentationTestModule(
-        architectureRoot: File,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = architectureRoot,
-            layer = "presentation-test",
-            content = buildArchitecturePresentationTestGradleScript(catalog)
-        )
-    }
-
-    private fun createUiModule(
-        architectureRoot: File,
-        architecturePackageName: String,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = architectureRoot,
-            layer = "ui",
-            content = buildArchitectureUiGradleScript(architecturePackageName, catalog)
-        )
-    }
-
-    private fun createInstrumentationTestModule(
-        architectureRoot: File,
-        architecturePackageName: String,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = architectureRoot,
-            layer = "instrumentation-test",
-            content = buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalog)
         )
     }
 

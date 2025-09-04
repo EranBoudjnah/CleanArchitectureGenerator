@@ -68,14 +68,22 @@ class Generator {
             }.all { it }
 
         if (allCreated) {
-            createDomainModule(featureRoot, catalogUpdater)
+            GradleFileCreator().writeGradleFileIfMissing(
+                featureRoot = featureRoot,
+                layer = "domain",
+                content = buildDomainGradleScript(catalogUpdater)
+            )
             DomainLayerContentGenerator()
                 .generateDomainLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
                 )
-            createPresentationModule(featureRoot, featureNameLowerCase, catalogUpdater)
+            GradleFileCreator().writeGradleFileIfMissing(
+                featureRoot = featureRoot,
+                layer = "presentation",
+                content = buildPresentationGradleScript(featureNameLowerCase, catalogUpdater)
+            )
             PresentationLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
@@ -83,19 +91,27 @@ class Generator {
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            createDataModule(featureRoot, featureNameLowerCase, catalogUpdater)
+            GradleFileCreator().writeGradleFileIfMissing(
+                featureRoot = featureRoot,
+                layer = "data",
+                content = buildDataGradleScript(featureNameLowerCase, catalogUpdater)
+            )
             DataLayerContentGenerator()
                 .generate(
                     featureRoot = featureRoot,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            createUiModule(
-                featureRoot,
-                featurePackageName,
-                featureNameLowerCase,
-                request.enableCompose,
-                catalogUpdater
+            GradleFileCreator().writeGradleFileIfMissing(
+                featureRoot = featureRoot,
+                layer = "ui",
+                content =
+                    buildUiGradleScript(
+                        featurePackageName = featurePackageName,
+                        featureNameLowerCase = featureNameLowerCase,
+                        enableCompose = request.enableCompose,
+                        catalog = catalogUpdater
+                    )
             )
             UiLayerContentGenerator()
                 .generate(
@@ -216,61 +232,6 @@ class Generator {
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
             )
-    }
-
-    private fun createDomainModule(
-        featureRoot: File,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = "domain",
-            content = buildDomainGradleScript(catalog)
-        )
-    }
-
-    private fun createDataModule(
-        featureRoot: File,
-        featureNameLowerCase: String,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = "data",
-            content = buildDataGradleScript(featureNameLowerCase, catalog)
-        )
-    }
-
-    private fun createPresentationModule(
-        featureRoot: File,
-        featureNameLowerCase: String,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = "presentation",
-            content = buildPresentationGradleScript(featureNameLowerCase, catalog)
-        )
-    }
-
-    private fun createUiModule(
-        featureRoot: File,
-        featurePackageName: String,
-        featureNameLowerCase: String,
-        enableCompose: Boolean,
-        catalog: VersionCatalogUpdater
-    ) {
-        GradleFileCreator().writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = "ui",
-            content =
-                buildUiGradleScript(
-                    featurePackageName = featurePackageName,
-                    featureNameLowerCase = featureNameLowerCase,
-                    enableCompose = enableCompose,
-                    catalog = catalog
-                )
-        )
     }
 
     fun generateArchitecture(request: GenerateArchitectureRequest) {
