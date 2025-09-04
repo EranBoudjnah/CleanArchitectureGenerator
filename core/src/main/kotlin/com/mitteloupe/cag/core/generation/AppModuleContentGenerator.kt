@@ -4,6 +4,8 @@ import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildAppFeatureModuleKotlinFile
+import com.mitteloupe.cag.core.content.buildApplicationKotlinFile
+import com.mitteloupe.cag.core.content.buildMainActivityKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
@@ -42,6 +44,45 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
             runCatching { targetFile.writeText(content) }
                 .onFailure {
                     val absolutePath = targetFile.absolutePath
+                    throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
+                }
+        }
+    }
+
+    fun writeAppModule(
+        startDirectory: File,
+        projectNamespace: String,
+        enableCompose: Boolean
+    ) {
+        val appModuleDirectory = File(startDirectory, "app")
+        val packageName = projectNamespace.trimEnd('.')
+        val sourceRoot = File(appModuleDirectory, "src/main/java")
+        val basePackageDir = buildPackageDirectory(sourceRoot, packageName.toSegments())
+
+        if (!basePackageDir.exists()) {
+            val created = runCatching { basePackageDir.mkdirs() }.getOrElse { false }
+            if (!created) {
+                val absolutePath = basePackageDir.absolutePath
+                throw GenerationException("Failed to create directory: $absolutePath")
+            }
+        }
+
+        val mainActivityFile = File(basePackageDir, "MainActivity.kt")
+        if (!mainActivityFile.exists()) {
+            val content = buildMainActivityKotlinFile(projectNamespace, enableCompose)
+            runCatching { mainActivityFile.writeText(content) }
+                .onFailure {
+                    val absolutePath = mainActivityFile.absolutePath
+                    throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
+                }
+        }
+
+        val applicationFile = File(basePackageDir, "Application.kt")
+        if (!applicationFile.exists()) {
+            val content = buildApplicationKotlinFile(projectNamespace)
+            runCatching { applicationFile.writeText(content) }
+                .onFailure {
+                    val absolutePath = applicationFile.absolutePath
                     throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
                 }
         }

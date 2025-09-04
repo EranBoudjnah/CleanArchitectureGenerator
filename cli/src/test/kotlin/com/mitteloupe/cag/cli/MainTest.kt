@@ -42,7 +42,9 @@ class MainTest {
 
             // Then
             assertEquals(
-                "usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
+                "usage: cag [--new-project --name=ProjectName --package=PackageName " +
+                    "[--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
+                    "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
                     "[--new-feature --name=FeatureName [--package=PackageName]]... " +
                     "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
                     "[--new-use-case --name=UseCaseName [--path=TargetPath]]...\n" +
@@ -74,16 +76,32 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+                """usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
 Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
 Options:
+  --new-project | -np
+      Generate a complete Clean Architecture project template
+    --name=ProjectName | -n=ProjectName | -n ProjectName | -nProjectName
+        Specify the project name (required)
+    --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+        Specify the package name (required)
+    --no-compose | -nc
+      Disable Compose support for the project
+    --ktlint | -kl
+      Enable ktlint for the project
+    --detekt | -d
+      Enable detekt for the project
+    --ktor | -kt
+      Enable Ktor for data sources
+    --retrofit | -rt
+      Enable Retrofit for data sources
   --new-architecture | -na
       Generate a new Clean Architecture package with domain, presentation, and UI layers
     --no-compose | -nc
       Disable Compose support for the preceding architecture package
-    --ktlint | -k
+    --ktlint | -kl
       Enable ktlint for the preceding architecture package
     --detekt | -d
       Enable detekt for the preceding architecture package

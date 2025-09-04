@@ -17,6 +17,7 @@ dependencies {
 
     intellijPlatform {
         androidStudio(libs.versions.androidStudio.get())
+        bundledPlugin("org.jetbrains.android")
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
 

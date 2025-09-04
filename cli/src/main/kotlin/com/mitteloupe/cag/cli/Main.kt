@@ -3,6 +3,7 @@ package com.mitteloupe.cag.cli
 import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
+import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
@@ -20,16 +21,32 @@ fun main(arguments: Array<String>) {
     if (argumentProcessor.isHelpRequested(arguments)) {
         println(
             """
-            usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
             Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
             Options:
+              --new-project | -np
+                  Generate a complete Clean Architecture project template
+                --name=ProjectName | -n=ProjectName | -n ProjectName | -nProjectName
+                    Specify the project name (required)
+                --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+                    Specify the package name (required)
+                --no-compose | -nc
+                  Disable Compose support for the project
+                --ktlint | -kl
+                  Enable ktlint for the project
+                --detekt | -d
+                  Enable detekt for the project
+                --ktor | -kt
+                  Enable Ktor for data sources
+                --retrofit | -rt
+                  Enable Retrofit for data sources
               --new-architecture | -na
                   Generate a new Clean Architecture package with domain, presentation, and UI layers
                 --no-compose | -nc
                   Disable Compose support for the preceding architecture package
-                --ktlint | -k
+                --ktlint | -kl
                   Enable ktlint for the preceding architecture package
                 --detekt | -d
                   Enable detekt for the preceding architecture package
@@ -58,14 +75,20 @@ fun main(arguments: Array<String>) {
         return
     }
 
+    val projectTemplateRequests = argumentProcessor.getNewProjectTemplate(arguments)
     val architectureRequests = argumentProcessor.getNewArchitecture(arguments)
     val featureRequests = argumentProcessor.getNewFeatures(arguments)
     val dataSourceRequests = argumentProcessor.getNewDataSources(arguments)
     val useCaseRequests = argumentProcessor.getNewUseCases(arguments)
-    if (architectureRequests.isEmpty() && featureRequests.isEmpty() && dataSourceRequests.isEmpty() && useCaseRequests.isEmpty()) {
+    if (projectTemplateRequests.isEmpty() &&
+        architectureRequests.isEmpty() &&
+        featureRequests.isEmpty() &&
+        dataSourceRequests.isEmpty() &&
+        useCaseRequests.isEmpty()
+    ) {
         println(
             """
-            usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
             Run with --help or -h for more options.
             """.trimIndent()
@@ -76,6 +99,23 @@ fun main(arguments: Array<String>) {
     val generator = Generator()
     val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
+
+    projectTemplateRequests.forEach { request ->
+        val projectTemplateRequest =
+            GenerateProjectTemplateRequest(
+                destinationRootDirectory = destinationRootDir,
+                projectName = request.projectName,
+                packageName = request.packageName,
+                enableCompose = request.enableCompose,
+                enableKtlint = request.enableKtlint,
+                enableDetekt = request.enableDetekt,
+                enableKtor = request.enableKtor,
+                enableRetrofit = request.enableRetrofit
+            )
+        executeAndReport {
+            generator.generateProjectTemplate(projectTemplateRequest)
+        }
+    }
 
     architectureRequests.forEach { request ->
         val architecturePackageName = basePackage?.let { it.trimEnd('.') + ".architecture" } ?: "com.unknown.app.architecture"

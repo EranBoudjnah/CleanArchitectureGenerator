@@ -280,4 +280,160 @@ class Generator {
             request.destinationRootDirectory
         )
     }
+
+    fun generateProjectTemplate(request: GenerateProjectTemplateRequest) {
+        val projectName = request.projectName.trim()
+        if (projectName.isEmpty()) {
+            throw GenerationException("Project name is missing.")
+        }
+
+        val packageName = request.packageName.trim()
+        if (packageName.isEmpty()) {
+            throw GenerationException("Package name is missing.")
+        }
+
+        val projectRoot = File(request.destinationRootDirectory, projectName)
+        if (projectRoot.exists()) {
+            throw GenerationException(
+                if (projectRoot.isDirectory) {
+                    "The project directory already exists."
+                } else {
+                    "A file with the project name exists where the project directory should be created."
+                }
+            )
+        }
+
+        if (!projectRoot.mkdirs()) {
+            throw GenerationException("Failed to create project directory.")
+        }
+
+        val catalogUpdater = VersionCatalogUpdater()
+        catalogUpdater.updateVersionCatalogIfPresent(
+            projectRootDir = projectRoot,
+            enableCompose = request.enableCompose
+        )
+
+        generateProjectStructure(projectRoot)
+        generateArchitectureModules(projectRoot, packageName, request)
+        generateSampleFeature(projectRoot, packageName, request)
+        generateDataSourceModules(projectRoot, request)
+        generateAppModule(projectRoot, packageName, request)
+        generateGradleFiles(projectRoot, projectName, request)
+        generateSettingsFile(projectRoot, projectName, request)
+    }
+
+    private fun generateProjectStructure(projectRoot: File) {
+        val directories =
+            listOf(
+                "app/src/main/java",
+                "app/src/main/res/layout",
+                "app/src/main/res/values",
+                "app/src/main/res/drawable",
+                "app/src/main/res/mipmap-hdpi",
+                "app/src/main/res/mipmap-mdpi",
+                "app/src/main/res/mipmap-xhdpi",
+                "app/src/main/res/mipmap-xxhdpi",
+                "app/src/main/res/mipmap-xxxhdpi",
+                "app/src/test/java",
+                "app/src/androidTest/java"
+            )
+
+        directories.forEach { directory ->
+            val dir = File(projectRoot, directory)
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+        }
+    }
+
+    private fun generateArchitectureModules(
+        projectRoot: File,
+        packageName: String,
+        request: GenerateProjectTemplateRequest
+    ) {
+        val architectureRequest =
+            GenerateArchitectureRequest(
+                destinationRootDirectory = projectRoot,
+                architecturePackageName = packageName,
+                enableCompose = request.enableCompose,
+                enableKtlint = request.enableKtlint,
+                enableDetekt = request.enableDetekt
+            )
+        generateArchitecture(architectureRequest)
+    }
+
+    private fun generateSampleFeature(
+        projectRoot: File,
+        packageName: String,
+        request: GenerateProjectTemplateRequest
+    ) {
+        val featureRequest =
+            GenerateFeatureRequest(
+                destinationRootDirectory = projectRoot,
+                featureName = "SampleFeature",
+                featurePackageName = "$packageName.samplefeature",
+                projectNamespace = packageName,
+                enableCompose = request.enableCompose
+            )
+        generateFeature(featureRequest)
+    }
+
+    private fun generateDataSourceModules(
+        projectRoot: File,
+        request: GenerateProjectTemplateRequest
+    ) {
+        generateDataSourceModules(projectRoot, request.enableKtor, request.enableRetrofit)
+    }
+
+    private fun generateAppModule(
+        projectRoot: File,
+        packageName: String,
+        request: GenerateProjectTemplateRequest
+    ) {
+        val appModuleContentGenerator = AppModuleContentGenerator()
+        appModuleContentGenerator.writeAppModule(
+            startDirectory = projectRoot,
+            projectNamespace = packageName,
+            enableCompose = request.enableCompose
+        )
+    }
+
+    private fun generateGradleFiles(
+        projectRoot: File,
+        packageName: String,
+        request: GenerateProjectTemplateRequest
+    ) {
+        val gradleFileCreator = GradleFileCreator()
+        val catalogUpdater = VersionCatalogUpdater()
+        catalogUpdater.updateVersionCatalogIfPresent(
+            projectRootDir = projectRoot,
+            enableCompose = request.enableCompose
+        )
+
+        gradleFileCreator.writeProjectGradleFile(
+            projectRoot = projectRoot,
+            enableKtlint = request.enableKtlint,
+            enableDetekt = request.enableDetekt
+        )
+
+        gradleFileCreator.writeAppGradleFile(
+            projectRoot = projectRoot,
+            packageName = packageName,
+            enableCompose = request.enableCompose
+        )
+    }
+
+    private fun generateSettingsFile(
+        projectRoot: File,
+        projectName: String,
+        request: GenerateProjectTemplateRequest
+    ) {
+        val settingsFileUpdater = SettingsFileUpdater()
+        settingsFileUpdater.writeProjectSettings(
+            projectRoot = projectRoot,
+            projectName = projectName,
+            enableKtlint = request.enableKtlint,
+            enableDetekt = request.enableDetekt
+        )
+    }
 }

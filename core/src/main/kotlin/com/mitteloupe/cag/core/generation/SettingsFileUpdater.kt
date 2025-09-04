@@ -2,6 +2,7 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.content.buildSettingsGradleScript
 import java.io.File
 
 class SettingsFileUpdater {
@@ -155,4 +156,16 @@ class SettingsFileUpdater {
     private fun groovySettingsFile(projectRoot: File): File = File(projectRoot, "settings.gradle")
 
     private fun kotlinSettingsFile(currentDirectory: File): File = File(currentDirectory, "settings.gradle.kts")
+
+    fun writeProjectSettings(
+        projectRoot: File,
+        projectName: String,
+        enableKtlint: Boolean,
+        enableDetekt: Boolean
+    ) {
+        val settingsFile = File(projectRoot, "settings.gradle.kts")
+        val content = buildSettingsGradleScript(projectName, enableKtlint, enableDetekt)
+        runCatching { settingsFile.writeText(content) }
+            .onFailure { throw GenerationException("Failed to create settings.gradle.kts: ${it.message}") }
+    }
 }

@@ -3,6 +3,7 @@ package com.mitteloupe.cag.cli
 import com.mitteloupe.cag.cli.request.ArchitectureRequest
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
+import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 
 class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
@@ -77,6 +78,33 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 enableCompose = !secondaries.containsKey("--no-compose"),
                 enableKtlint = secondaries.containsKey("--ktlint"),
                 enableDetekt = secondaries.containsKey("--detekt")
+            )
+        }
+
+    fun getNewProjectTemplate(arguments: Array<String>): List<ProjectTemplateRequest> =
+        parseWithNameFlag(
+            arguments = arguments,
+            primaryLong = "--new-project",
+            primaryShort = "-np",
+            nameErrorMessage = "Project name is required. Use --name=ProjectName or -n=ProjectName",
+            additionalFlags =
+                listOf(
+                    SecondaryFlag("--package", "-p"),
+                    SecondaryFlag("--no-compose", "-nc", isBoolean = true),
+                    SecondaryFlag("--ktlint", "-kl", isBoolean = true),
+                    SecondaryFlag("--detekt", "-d", isBoolean = true),
+                    SecondaryFlag("--ktor", "-kt", isBoolean = true),
+                    SecondaryFlag("--retrofit", "-rt", isBoolean = true)
+                )
+        ) { secondaries ->
+            ProjectTemplateRequest(
+                projectName = secondaries["--name"] ?: "",
+                packageName = secondaries["--package"] ?: "",
+                enableCompose = !secondaries.containsKey("--no-compose"),
+                enableKtlint = secondaries.containsKey("--ktlint"),
+                enableDetekt = secondaries.containsKey("--detekt"),
+                enableKtor = secondaries.containsKey("--ktor"),
+                enableRetrofit = secondaries.containsKey("--retrofit")
             )
         }
 

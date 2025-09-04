@@ -29,12 +29,17 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.android</depends>
+    <depends>com.intellij.modules.androidstudio</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.android.tools.idea.wizard.template">
+        <wizardTemplateProvider implementation="com.mitteloupe.cag.cleanarchitecturegenerator.projectwizard.CleanArchitectureWizardTemplateProvider"/>
+    </extensions>
+
     <actions>
         <group id="NewCleanArchitectureGenerator" popup="false">
-            <separator />
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitecturePackageAction"
                     class="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitecturePackageAction"/>
             <action id="com.mitteloupe.cag.cleanarchitecturegenerator.CreateCleanArchitectureFeatureAction"
