@@ -106,7 +106,8 @@ class SettingsFileUpdaterTest {
             ).forEach { module ->
                 include(":features:$givenFeatureNameLowerCase:${'$'}module")
             }
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         // When
@@ -160,7 +161,8 @@ class SettingsFileUpdaterTest {
             rootProject.name = "app"
             include(":features:$givenFeatureNameLowerCase:ui")
             include(":features:$givenFeatureNameLowerCase:domain")
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         val expectedTail =

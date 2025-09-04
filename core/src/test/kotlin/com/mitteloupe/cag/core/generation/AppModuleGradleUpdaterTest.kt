@@ -32,7 +32,8 @@ class AppModuleGradleUpdaterTest {
                     exclude("net.bytebuddy")
                 }
             }
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
         val buildFile = givenBuildFile(projectRoot, givenGradleContent)
         val startDirectory = File(projectRoot, "a/b").apply { mkdirs() }
         val expectedContent =
@@ -52,7 +53,8 @@ class AppModuleGradleUpdaterTest {
                 implementation(projects.features.$feature.domain)
                 implementation(projects.features.$feature.data)
             }
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
 
         // When
         classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
@@ -105,7 +107,8 @@ class AppModuleGradleUpdaterTest {
             dependencies {
                 implementation(projects.features.$feature.ui)
             }
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
         val buildFile = givenBuildFile(projectRoot, givenGradleContent)
         val startDirectory = File(projectRoot, "work").apply { mkdirs() }
         val expectedContentPartial =
@@ -117,7 +120,8 @@ class AppModuleGradleUpdaterTest {
                 implementation(projects.features.$feature.domain)
                 implementation(projects.features.$feature.data)
             }
-            """.trimIndent() + "\n"
+            
+            """.trimIndent()
 
         // When
         classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
