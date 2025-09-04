@@ -1679,6 +1679,680 @@ fun retry(waitMilliseconds: Long = 200L, repeat: Int = 5, block: () -> Unit) {
 """
             assertEquals("Retry.kt should have exact content", expectedContent, retryFile.readText())
         }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates ComposeOkHttp3IdlingResource class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val composeOkHttp3IdlingResourceFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/idlingresource/ComposeOkHttp3IdlingResource.kt")
+            val expectedContent = """package com.example.architecture.test.idlingresource
+
+import androidx.compose.ui.test.IdlingResource
+import okhttp3.Dispatcher
+import okhttp3.OkHttpClient
+
+class ComposeOkHttp3IdlingResource private constructor(dispatcher: Dispatcher) : IdlingResource {
+    override val isIdleNow: Boolean = dispatcher.runningCallsCount() == 0
+
+    companion object {
+        fun create(client: OkHttpClient): ComposeOkHttp3IdlingResource =
+            ComposeOkHttp3IdlingResource(client.dispatcher)
+    }
+}
+"""
+            assertEquals(
+                "ComposeOkHttp3IdlingResource.kt should have exact content",
+                expectedContent,
+                composeOkHttp3IdlingResourceFile.readText()
+            )
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates EspressoOkHttp3IdlingResource class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val espressoOkHttp3IdlingResourceFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/idlingresource/EspressoOkHttp3IdlingResource.kt")
+            val expectedContent = """package com.example.architecture.test.idlingresource
+
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource.ResourceCallback
+import okhttp3.Dispatcher
+import okhttp3.OkHttpClient
+
+class EspressoOkHttp3IdlingResource private constructor(
+    private val name: String,
+    private val dispatcher: Dispatcher
+) : IdlingResource {
+    @Volatile
+    var callback: ResourceCallback? = null
+
+    init {
+        dispatcher.idleCallback = Runnable {
+            val callback = callback
+            callback?.onTransitionToIdle()
+        }
+    }
+
+    override fun getName(): String = name
+
+    override fun isIdleNow(): Boolean = dispatcher.runningCallsCount() == 0
+
+    override fun registerIdleTransitionCallback(callback: ResourceCallback) {
+        this.callback = callback
+    }
+
+    companion object {
+        fun create(name: String, client: OkHttpClient): EspressoOkHttp3IdlingResource =
+            EspressoOkHttp3IdlingResource(name, client.dispatcher)
+    }
+}
+"""
+            assertEquals(
+                "EspressoOkHttp3IdlingResource.kt should have exact content",
+                expectedContent,
+                espressoOkHttp3IdlingResourceFile.readText()
+            )
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates AppLauncher interface with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val appLauncherFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/launcher/AppLauncher.kt")
+            val expectedContent = """package com.example.architecture.test.launcher
+
+fun interface AppLauncher {
+    fun launch()
+}
+"""
+            assertEquals("AppLauncher.kt should have exact content", expectedContent, appLauncherFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates FromComposable function with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val fromComposableFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/launcher/FromComposable.kt")
+            val expectedContent = """package com.example.architecture.test.launcher
+
+import android.view.ViewGroup
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
+import com.example.architecture.test.test.TypedAndroidComposeTestRule
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+
+fun <ACTIVITY : ComponentActivity> fromComposable(
+    composeContentTestRule: TypedAndroidComposeTestRule<ACTIVITY>,
+    composable: @Composable (ACTIVITY) -> Unit
+) = AppLauncher {
+    val activity = composeContentTestRule.activity
+    activity.findViewById<ViewGroup>(android.R.id.content)?.let { root ->
+        runBlocking(Dispatchers.Main) {
+            root.removeAllViews()
+        }
+    }
+    composeContentTestRule.setContent { composable(activity) }
+}
+"""
+            assertEquals("FromComposable.kt should have exact content", expectedContent, fromComposableFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates KeyValueStore class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val keyValueStoreFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/localstore/KeyValueStore.kt")
+            val expectedContent = """package com.example.architecture.test.localstore
+
+private typealias KeyValuePairList = List<Pair<String, Pair<String, Any>>>
+private typealias KeyValueMap = Map<String, Pair<String, Any>>
+
+abstract class KeyValueStore {
+    val keyValues by lazy {
+        internalKeyValues.toValidatedMap()
+    }
+
+    protected abstract val internalKeyValues: List<Pair<String, Pair<String, Any>>>
+
+    private fun KeyValuePairList.toValidatedMap(): KeyValueMap {
+        val responses = toMap()
+        check(responses.size == size) {
+            "Duplicate key/value key declared. Make sure all key/value keys are unique."
+        }
+        return responses
+    }
+}
+"""
+            assertEquals("KeyValueStore.kt should have exact content", expectedContent, keyValueStoreFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates WithBackgroundColorMatcher class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val withBackgroundColorMatcherFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/matcher/WithBackgroundColorMatcher.kt")
+            val expectedContent = """package com.example.architecture.test.matcher
+
+import android.graphics.drawable.ColorDrawable
+import android.view.View
+import androidx.annotation.ColorInt
+import androidx.cardview.widget.CardView
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
+
+fun withBackgroundColorMatcher(
+    @ColorInt color: Int,
+    matchCardViewBackgrounds: Boolean
+): Matcher<View> = WithBackgroundColorMatcher(color, matchCardViewBackgrounds)
+
+class WithBackgroundColorMatcher(
+    @ColorInt private val expectedColor: Int,
+    private val matchCardViewBackgrounds: Boolean = false
+) : TypeSafeMatcher<View>() {
+    override fun describeTo(description: Description?) {
+        @OptIn(ExperimentalStdlibApi::class)
+        description?.appendText("has background color: #${'$'}{expectedColor.toHexString()}")
+    }
+
+    override fun matchesSafely(item: View): Boolean {
+        val textViewColor = if (matchCardViewBackgrounds) {
+            (item as? CardView)?.cardBackgroundColor?.getColorForState(item.drawableState, -1)
+                .also {
+                    @OptIn(ExperimentalStdlibApi::class)
+                    println("Background color: #${'$'}{it?.toHexString()}")
+                }
+        } else {
+            (item.background as? ColorDrawable)?.color
+        }
+
+        return textViewColor == expectedColor
+    }
+}
+"""
+            assertEquals(
+                "WithBackgroundColorMatcher.kt should have exact content",
+                expectedContent,
+                withBackgroundColorMatcherFile.readText()
+            )
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates WithDrawableIdMatcher class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val withDrawableIdMatcherFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/matcher/WithDrawableIdMatcher.kt")
+            val expectedContent = """package com.example.architecture.test.matcher
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.StateListDrawable
+import android.os.Build
+import android.util.Log
+import android.view.View
+import android.widget.ImageView
+import androidx.annotation.DrawableRes
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.createBitmap
+import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.reflect.KClass
+import kotlin.reflect.full.memberProperties
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
+
+fun withDrawableId(@DrawableRes id: Int): Matcher<View> = WithDrawableIdMatcher(id)
+
+class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
+    TypeSafeMatcher<View>(View::class.java) {
+
+    override fun matchesSafely(target: View): Boolean {
+        @Suppress("UNCHECKED_CAST")
+        val drawable: Drawable = when {
+            target::class.simpleName == "androidx.appcompat.view.menu.ActionMenuItemView" -> {
+                (target::class as KClass<in View>).memberProperties
+                    .first { it.name == "bar" }
+                    .getter(target) as Drawable
+            }
+
+            target is ImageView -> {
+                target.drawable?.extractStateIfStateful(target.drawableState)
+            }
+
+            else -> null
+        } ?: return false
+
+        val resources = target.resources
+        val expectedDrawable =
+            ResourcesCompat.getDrawable(resources, expectedId, target.context.theme)
+        val constantStateIsSame =
+            expectedDrawable?.constantState?.let { it == drawable.constantState } == true
+        if (constantStateIsSame) return true
+
+        val bitmapHolder = getBitmap(drawable)
+        val expectedBitmapHolder = expectedDrawable?.let(::getBitmap)
+        val result = expectedBitmapHolder?.bitmap?.sameAs(bitmapHolder?.bitmap) == true
+        bitmapHolder?.recycleIfRecyclable()
+        expectedBitmapHolder?.recycleIfRecyclable()
+        return result
+    }
+
+    private fun getBitmap(drawable: Drawable): BitmapHolder? =
+        (drawable as? BitmapDrawable)?.let { bitmapDrawable ->
+            BitmapHolder(bitmap = bitmapDrawable.bitmap, recyclable = false)
+        } ?: run {
+            val width = drawable.intrinsicWidth
+            val height = drawable.intrinsicHeight
+            if (width < 1 || height < 1) {
+                return null
+            }
+            val result = createBitmap(width, height)
+            val canvas = Canvas(result)
+
+            with(drawable) {
+                setBounds(0, 0, canvas.width, canvas.height)
+                colorFilter = PorterDuffColorFilter(0, PorterDuff.Mode.DST)
+                draw(canvas)
+            }
+            BitmapHolder(bitmap = result, recyclable = true)
+        }
+
+    override fun describeTo(description: Description) {
+        description.appendText("with drawable from resource id: ${'$'}expectedId")
+        val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
+        targetContext.resources.getResourceEntryName(expectedId)
+            ?.let { description.appendText("[${'$'}it]") }
+    }
+
+    private fun Drawable.extractStateIfStateful(currentState: IntArray): Drawable? {
+        val stateListDrawable = this as? StateListDrawable ?: return this
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            stateListDrawable.getStateDrawable(
+                stateListDrawable.findStateDrawableIndex(currentState)
+            )
+        } else {
+            Log.w("DrawableMatcher", "Android version ${'$'}{Build.VERSION.SDK_INT} unsupported.")
+            null
+        }
+    }
+
+    private class BitmapHolder(val bitmap: Bitmap, private val recyclable: Boolean) {
+        fun recycleIfRecyclable() {
+            if (recyclable) {
+                bitmap.recycle()
+            }
+        }
+    }
+}
+"""
+            assertEquals("WithDrawableIdMatcher.kt should have exact content", expectedContent, withDrawableIdMatcherFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates HiltInjectorRule class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val hiltInjectorRuleFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/rule/HiltInjectorRule.kt")
+            val expectedContent = """package com.example.architecture.test.rule
+
+import dagger.hilt.android.testing.HiltAndroidRule
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
+
+class HiltInjectorRule(private val hiltAndroidRule: HiltAndroidRule) : TestRule {
+    override fun apply(base: Statement, description: Description): Statement =
+        object : Statement() {
+            override fun evaluate() {
+                hiltAndroidRule.inject()
+                base.evaluate()
+            }
+        }
+}
+"""
+            assertEquals("HiltInjectorRule.kt should have exact content", expectedContent, hiltInjectorRuleFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates MockRequest class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val mockRequestFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/MockRequest.kt")
+            val expectedContent = """package com.example.architecture.test.server
+
+data class MockRequest(val url: String)
+"""
+            assertEquals("MockRequest.kt should have exact content", expectedContent, mockRequestFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates MockResponse class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val mockResponseFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/MockResponse.kt")
+            val expectedContent = """package com.example.architecture.test.server
+
+data class MockResponse(
+    val upgradeToWebSocket: Boolean = false,
+    val code: Int = 200,
+    val headers: List<Pair<String, String>> = emptyList(),
+    val body: String = ""
+)
+"""
+            assertEquals("MockResponse.kt should have exact content", expectedContent, mockResponseFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates MockRequestResponseFactory class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val mockRequestResponseFactoryFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/MockRequestResponseFactory.kt")
+            val expectedContent = """package com.example.architecture.test.server
+
+import com.example.architecture.test.server.response.MockResponseFactory
+
+data class MockRequestResponseFactory(
+    val request: MockRequest,
+    val responseFactory: MockResponseFactory
+)
+"""
+            assertEquals(
+                "MockRequestResponseFactory.kt should have exact content",
+                expectedContent,
+                mockRequestResponseFactoryFile.readText()
+            )
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates MockResponseFactory interface with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val mockResponseFactoryFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/response/MockResponseFactory.kt")
+            val expectedContent = """package com.example.architecture.test.server.response
+
+import com.example.architecture.test.server.MockResponse
+
+interface MockResponseFactory {
+    fun mockResponse(): MockResponse
+}
+"""
+            assertEquals("MockResponseFactory.kt should have exact content", expectedContent, mockResponseFactoryFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates ErrorResponseFactory class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val errorResponseFactoryFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/response/ErrorResponseFactory.kt")
+            val expectedContent = """package com.example.architecture.test.server.response
+
+import com.example.architecture.test.server.MockResponse
+
+sealed class ErrorResponseFactory {
+    object NotFound : MockResponseFactory {
+        override fun mockResponse() = MockResponse(code = 404)
+    }
+}
+"""
+            assertEquals("ErrorResponseFactory.kt should have exact content", expectedContent, errorResponseFactoryFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates SimpleResponseFactory class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val simpleResponseFactoryFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/response/SimpleResponseFactory.kt")
+            val expectedContent = """package com.example.architecture.test.server.response
+
+import com.example.architecture.test.asset.getAssetAsString
+import com.example.architecture.test.server.MockResponse
+
+data class SimpleResponseFactory(
+    private val code: Int = 200,
+    private val headers: List<Pair<String, String>> = emptyList(),
+    private val bodyFileName: String? = null
+) : MockResponseFactory {
+    private val body by lazy {
+        if (bodyFileName == null) {
+            ""
+        } else {
+            getAssetAsString(bodyFileName)
+        }
+    }
+
+    override fun mockResponse() = MockResponse(code = code, headers = headers, body = body)
+}
+"""
+            assertEquals("SimpleResponseFactory.kt should have exact content", expectedContent, simpleResponseFactoryFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates SequenceResponseFactory class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val sequenceResponseFactoryFile =
+                File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/response/SequenceResponseFactory.kt")
+            val expectedContent = """package com.example.architecture.test.server.response
+
+import com.example.architecture.test.server.MockResponse
+
+class SequenceResponseFactory(private vararg val responses: MockResponseFactory) :
+    MockResponseFactory {
+    private var responseIndex = 0
+    override fun mockResponse(): MockResponse {
+        val mockResponse = responses[responseIndex]
+        responseIndex++
+        if (responseIndex == responses.size) {
+            responseIndex = 0
+        }
+        return mockResponse.mockResponse()
+    }
+}
+"""
+            assertEquals("SequenceResponseFactory.kt should have exact content", expectedContent, sequenceResponseFactoryFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates ResponseBinder interface with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val responseBinderFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/ResponseBinder.kt")
+            val expectedContent = """package com.example.architecture.test.server
+
+interface ResponseBinder {
+    var testName: String
+
+    fun bindResponse(requestResponseFactory: MockRequestResponseFactory)
+
+    val usedEndpoints: Set<MockRequest>
+
+    fun reset()
+
+    var onWebSocketMessage: (String) -> Unit
+}
+"""
+            assertEquals("ResponseBinder.kt should have exact content", expectedContent, responseBinderFile.readText())
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given valid instrumentation test module when generateInstrumentationTestContent then creates ResponseStore class with exact content`() {
+            // Given
+            val instrumentationTestRoot = File(temporaryDirectory, "instrumentation-test").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val packageSegments = listOf("com", "example", "architecture", "test")
+
+            // When
+            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+
+            // Then
+            val responseStoreFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/ResponseStore.kt")
+            val expectedContent = """package com.example.architecture.test.server
+
+private typealias MockRequestResponsePairList = List<Pair<String, MockRequestResponseFactory>>
+private typealias MockRequestResponseMap = Map<String, MockRequestResponseFactory>
+
+abstract class ResponseStore {
+    val responseFactories by lazy {
+        internalResponseFactories.toValidatedMap()
+    }
+
+    protected abstract val internalResponseFactories: MockRequestResponsePairList
+
+    private fun MockRequestResponsePairList.toValidatedMap(): MockRequestResponseMap {
+        val responses = toMap()
+        check(responses.size == size) {
+            "Duplicate Request/Response key declared. " +
+                "Make sure all Request/Response keys are unique."
+        }
+        return responses
+    }
+}
+"""
+            assertEquals("ResponseStore.kt should have exact content", expectedContent, responseStoreFile.readText())
+        }
     }
 
     class GradleFileGeneration {
