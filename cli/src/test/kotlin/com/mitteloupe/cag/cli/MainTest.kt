@@ -42,7 +42,7 @@ class MainTest {
 
             // Then
             assertEquals(
-                "usage: cag [--new-architecture [--no-compose]]... " +
+                "usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
                     "[--new-feature --name=FeatureName [--package=PackageName]]... " +
                     "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
                     "[--new-use-case --name=UseCaseName [--path=TargetPath]]...\n" +
@@ -74,7 +74,7 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+                """usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
 Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
@@ -83,6 +83,10 @@ Options:
       Generate a new Clean Architecture package with domain, presentation, and UI layers
     --no-compose | -nc
       Disable Compose support for the preceding architecture package
+    --ktlint | -k
+      Enable ktlint for the preceding architecture package
+    --detekt | -d
+      Enable detekt for the preceding architecture package
   --new-feature | -nf
       Generate a new feature
     --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName

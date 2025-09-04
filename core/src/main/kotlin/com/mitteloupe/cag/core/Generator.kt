@@ -271,7 +271,9 @@ class Generator {
             .generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableCompose = request.enableCompose
+                enableCompose = request.enableCompose,
+                enableKtlint = request.enableKtlint,
+                enableDetekt = request.enableDetekt
             )
 
         SettingsFileUpdater().updateArchitectureSettingsIfPresent(

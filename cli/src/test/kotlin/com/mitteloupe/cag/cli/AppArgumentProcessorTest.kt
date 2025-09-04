@@ -128,6 +128,96 @@ class AppArgumentProcessorTest {
             assertEquals(1, result.size)
             assertEquals(false, result[0].enableCompose)
         }
+
+        @Test
+        fun `Given --new-architecture --detekt when getNewArchitecture then returns single request with detekt enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--detekt")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given --new-architecture --no-compose --detekt when getNewArchitecture then returns correct flags`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--no-compose", "--detekt")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(false, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given short detekt flag when getNewArchitecture then parses correctly`() {
+            // Given
+            val givenArguments = arrayOf("-na", "-d")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given --new-architecture --ktlint when getNewArchitecture then returns single request with ktlint enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--ktlint")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(true, result[0].enableKtlint)
+            assertEquals(false, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given --new-architecture --ktlint --detekt when getNewArchitecture then returns single request with both enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--ktlint", "--detekt")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(true, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given short ktlint flag when getNewArchitecture then parses correctly`() {
+            // Given
+            val givenArguments = arrayOf("-na", "-kl")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(true, result[0].enableKtlint)
+            assertEquals(false, result[0].enableDetekt)
+        }
     }
 
     class AppArgumentProcessorDataSourcesTest {

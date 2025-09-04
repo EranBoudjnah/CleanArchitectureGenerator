@@ -21,7 +21,8 @@ import kotlin.io.path.createTempDirectory
     ArchitectureModulesContentGeneratorTest.UiModule::class,
     ArchitectureModulesContentGeneratorTest.PresentationTestModule::class,
     ArchitectureModulesContentGeneratorTest.CoroutineModule::class,
-    ArchitectureModulesContentGeneratorTest.InstrumentationTestModule::class
+    ArchitectureModulesContentGeneratorTest.InstrumentationTestModule::class,
+    ArchitectureModulesContentGeneratorTest.GradleFileGeneration::class
 )
 class ArchitectureModulesContentGeneratorTest {
     @RunWith(Enclosed::class)
@@ -206,6 +207,56 @@ class ArchitectureModulesContentGeneratorTest {
 
             // When
             classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            verify {
+                domainModuleCreator.generateDomainContent(
+                    architectureRoot = File(architectureRoot, "domain"),
+                    moduleNamespace = architecturePackageName,
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "domain")
+                )
+            }
+            verify {
+                presentationModuleCreator.generatePresentationContent(
+                    architectureRoot = File(architectureRoot, "presentation"),
+                    architecturePackageName = architecturePackageName,
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "presentation")
+                )
+            }
+            verify {
+                uiModuleCreator.generateUiContent(
+                    architectureRoot = File(architectureRoot, "ui"),
+                    moduleNamespace = architecturePackageName,
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "ui")
+                )
+            }
+            verify {
+                presentationTestModuleCreator.generatePresentationTestContent(
+                    architectureRoot = File(architectureRoot, "presentation-test"),
+                    architecturePackageName = architecturePackageName,
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "presentation")
+                )
+            }
+            verify {
+                instrumentationTestModuleCreator.generateInstrumentationTestContent(
+                    architectureRoot = File(architectureRoot, "instrumentation-test"),
+                    architecturePackageName = "com.example.architecture",
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test")
+                )
+            }
+        }
+
+        @Test
+        fun `Given valid architecture package with detekt enabled when generate then calls all module creators correctly`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
 
             // Then
             verify {
@@ -466,7 +517,6 @@ import kotlinx.coroutines.CoroutineScope
 
 typealias UseCaseExecutorProvider =
     @JvmSuppressWildcards (coroutineScope: CoroutineScope) -> UseCaseExecutor
-
 """
             assertEquals("UseCaseExecutorProvider.kt should have exact content", expectedContent, useCaseExecutorProviderFile.readText())
         }
@@ -1628,6 +1678,398 @@ fun retry(waitMilliseconds: Long = 200L, repeat: Int = 5, block: () -> Unit) {
 }
 """
             assertEquals("Retry.kt should have exact content", expectedContent, retryFile.readText())
+        }
+    }
+
+    class GradleFileGeneration {
+        private lateinit var classUnderTest: ArchitectureModulesContentGenerator
+        private lateinit var temporaryDirectory: File
+
+        @Before
+        fun setUp() {
+            classUnderTest = ArchitectureModulesContentGenerator()
+            temporaryDirectory = createTempDirectory(prefix = "test").toFile()
+        }
+
+        @Test
+        fun `Given ktlint and detekt enabled when generate then domain build gradle includes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+            assertEquals("Domain build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given ktlint and detekt disabled when generate then domain build gradle excludes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = false
+            val enableDetekt = false
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+            assertEquals("Domain build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given ktlint and detekt enabled when generate then presentation build gradle includes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "presentation/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.architecture.domain)
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.junit4)
+}
+"""
+            assertEquals("Presentation build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given ktlint and detekt enabled when generate then ui build gradle includes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "ui/build.gradle.kts")
+            val expectedContent = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+android {
+    namespace = "com.example.architecture.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.architecture.presentation)
+
+    implementation(projects.coroutine)
+
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+}
+"""
+            assertEquals("UI build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given ktlint and detekt enabled when generate then presentation-test build gradle includes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "presentation-test/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+
+    implementation(libs.kotlinx.coroutines.core)
+
+    implementation(libs.test.junit)
+    implementation(libs.test.mockito.kotlin)
+    implementation(libs.test.kotlinx.coroutines)
+    implementation(projects.coroutineTest)
+}
+"""
+            assertEquals("Presentation-test build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given ktlint and detekt enabled when generate then instrumentation-test build gradle includes plugins and configurations`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "instrumentation-test/build.gradle.kts")
+            val expectedContent = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+android {
+    namespace = "com.example.test"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(libs.material)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+
+    implementation(libs.test.junit)
+    implementation(libs.test.androidx.junit)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.test.compose.ui.junit4)
+    implementation(libs.test.android.hilt)
+    implementation(libs.test.android.uiautomator)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.okhttp3)
+    implementation(libs.test.android.mockwebserver)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.test.androidx.rules)
+    implementation(libs.androidx.recyclerview)
+    implementation(kotlin("reflect"))
+}
+"""
+            assertEquals("Instrumentation-test build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given only ktlint enabled when generate then build gradle includes only ktlint plugin and configuration`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = true
+            val enableDetekt = false
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+}
+
+ktlint {
+    version.set("0.49.1")
+    android.set(true)
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+            assertEquals("Domain build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
+        }
+
+        @Test
+        fun `Given only detekt enabled when generate then build gradle includes only detekt plugin and configuration`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = false
+            val enableKtlint = false
+            val enableDetekt = true
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+
+            // Then
+            val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
+            val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+            assertEquals("Domain build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
         }
     }
 }

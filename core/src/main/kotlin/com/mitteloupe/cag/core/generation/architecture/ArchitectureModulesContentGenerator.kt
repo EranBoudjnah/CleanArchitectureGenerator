@@ -23,7 +23,9 @@ class ArchitectureModulesContentGenerator(
     fun generate(
         architectureRoot: File,
         architecturePackageName: String,
-        enableCompose: Boolean
+        enableCompose: Boolean,
+        enableKtlint: Boolean = false,
+        enableDetekt: Boolean = false
     ) {
         val packageSegments = architecturePackageName.toSegments()
         if (packageSegments.isEmpty()) {
@@ -49,33 +51,35 @@ class ArchitectureModulesContentGenerator(
         val catalogUpdater = VersionCatalogUpdater()
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = architectureRoot.parentFile,
-            enableCompose = enableCompose
+            enableCompose = enableCompose,
+            enableKtlint = enableKtlint,
+            enableDetekt = enableDetekt
         )
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "domain",
-            content = buildArchitectureDomainGradleScript(catalogUpdater)
+            content = buildArchitectureDomainGradleScript(catalogUpdater, enableKtlint, enableDetekt)
         )
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "presentation",
-            content = buildArchitecturePresentationGradleScript(catalogUpdater)
+            content = buildArchitecturePresentationGradleScript(catalogUpdater, enableKtlint, enableDetekt)
         )
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "ui",
-            content = buildArchitectureUiGradleScript(architecturePackageName, catalogUpdater)
+            content = buildArchitectureUiGradleScript(architecturePackageName, catalogUpdater, enableKtlint, enableDetekt)
         )
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "presentation-test",
-            content = buildArchitecturePresentationTestGradleScript(catalogUpdater)
+            content = buildArchitecturePresentationTestGradleScript(catalogUpdater, enableKtlint, enableDetekt)
         )
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "instrumentation-test",
-            content = buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater)
+            content = buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater, enableKtlint, enableDetekt)
         )
 
         val domainRoot = File(architectureRoot, "domain")

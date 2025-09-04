@@ -49,7 +49,9 @@ class VersionCatalogUpdater(
     fun updateVersionCatalogIfPresent(
         projectRootDir: File,
         enableCompose: Boolean = false,
-        includeCoroutineDependencies: Boolean = false
+        includeCoroutineDependencies: Boolean = false,
+        enableKtlint: Boolean = false,
+        enableDetekt: Boolean = false
     ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
         val existingPluginIdToAlias: Map<String, String> =
@@ -64,7 +66,7 @@ class VersionCatalogUpdater(
                 module to alias
             }
 
-        val desiredPlugins = desiredPlugins(enableCompose)
+        val desiredPlugins = desiredPlugins(enableCompose, enableKtlint, enableDetekt)
         val desiredLibraries = desiredLibraries(enableCompose, includeCoroutineDependencies)
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
@@ -144,6 +146,7 @@ class VersionCatalogUpdater(
 
         val addedAndroidLibraryAlias = pluginRequirements.any { it.id == "com.android.library" }
         val addedComposeBomAlias = libraryRequirements.any { it.module == "androidx.compose:compose-bom" }
+        val addedDetektAlias = pluginRequirements.any { it.id == "io.gitlab.arturbosch.detekt" }
 
         updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,
@@ -154,7 +157,8 @@ class VersionCatalogUpdater(
                         requirements =
                             versionCatalogVersionRequirements(
                                 includeAndroidGradlePlugin = addedAndroidLibraryAlias,
-                                includeComposeBom = addedComposeBomAlias
+                                includeComposeBom = addedComposeBomAlias,
+                                includeDetekt = addedDetektAlias
                             )
                     )
                 )
@@ -191,7 +195,8 @@ class VersionCatalogUpdater(
 
     private fun versionCatalogVersionRequirements(
         includeAndroidGradlePlugin: Boolean,
-        includeComposeBom: Boolean
+        includeComposeBom: Boolean,
+        includeDetekt: Boolean
     ): List<SectionEntryRequirement> =
         buildList {
             add(SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"))
@@ -215,6 +220,14 @@ class VersionCatalogUpdater(
                     SectionEntryRequirement.VersionRequirement(
                         key = "composeNavigation",
                         version = "2.9.3"
+                    )
+                )
+            }
+            if (includeDetekt) {
+                add(
+                    SectionEntryRequirement.VersionRequirement(
+                        key = "detekt",
+                        version = "1.23.6"
                     )
                 )
             }
@@ -310,7 +323,11 @@ private fun desiredLibraries(
         }
     }
 
-private fun desiredPlugins(enableCompose: Boolean): List<DesiredPlugin> =
+private fun desiredPlugins(
+    enableCompose: Boolean,
+    enableKtlint: Boolean,
+    enableDetekt: Boolean
+): List<DesiredPlugin> =
     buildList {
         addAll(
             listOf(
@@ -338,6 +355,26 @@ private fun desiredPlugins(enableCompose: Boolean): List<DesiredPlugin> =
                     id = "org.jetbrains.kotlin.plugin.compose",
                     alias = "compose-compiler",
                     versionRefKey = "kotlin"
+                )
+            )
+        }
+
+        if (enableKtlint) {
+            add(
+                DesiredPlugin(
+                    id = "org.jlleitschuh.gradle.ktlint",
+                    alias = "ktlint",
+                    versionRefKey = "ktlint"
+                )
+            )
+        }
+
+        if (enableDetekt) {
+            add(
+                DesiredPlugin(
+                    id = "io.gitlab.arturbosch.detekt",
+                    alias = "detekt",
+                    versionRefKey = "detekt"
                 )
             )
         }

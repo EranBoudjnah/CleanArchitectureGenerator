@@ -20,7 +20,7 @@ fun main(arguments: Array<String>) {
     if (argumentProcessor.isHelpRequested(arguments)) {
         println(
             """
-            usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
             Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
@@ -29,6 +29,10 @@ fun main(arguments: Array<String>) {
                   Generate a new Clean Architecture package with domain, presentation, and UI layers
                 --no-compose | -nc
                   Disable Compose support for the preceding architecture package
+                --ktlint | -k
+                  Enable ktlint for the preceding architecture package
+                --detekt | -d
+                  Enable detekt for the preceding architecture package
               --new-feature | -nf
                   Generate a new feature
                 --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
@@ -61,7 +65,7 @@ fun main(arguments: Array<String>) {
     if (architectureRequests.isEmpty() && featureRequests.isEmpty() && dataSourceRequests.isEmpty() && useCaseRequests.isEmpty()) {
         println(
             """
-            usage: cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+            usage: cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 
             Run with --help or -h for more options.
             """.trimIndent()
@@ -79,7 +83,9 @@ fun main(arguments: Array<String>) {
             GenerateArchitectureRequest(
                 destinationRootDirectory = destinationRootDir,
                 architecturePackageName = architecturePackageName,
-                enableCompose = request.enableCompose
+                enableCompose = request.enableCompose,
+                enableKtlint = request.enableKtlint,
+                enableDetekt = request.enableDetekt
             )
         executeAndReport {
             generator.generateArchitecture(architectureRequest)

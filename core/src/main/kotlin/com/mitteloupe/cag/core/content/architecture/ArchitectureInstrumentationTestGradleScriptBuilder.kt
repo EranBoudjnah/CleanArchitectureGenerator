@@ -1,11 +1,14 @@
 package com.mitteloupe.cag.core.content.architecture
 
+import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitectureInstrumentationTestGradleScript(
     architecturePackageName: String,
-    catalog: VersionCatalogReader
+    catalog: VersionCatalogReader,
+    enableKtlint: Boolean = false,
+    enableDetekt: Boolean = false
 ): String {
     val aliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
     val aliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
@@ -46,10 +49,16 @@ fun buildArchitectureInstrumentationTestGradleScript(
             ""
         }
 
+    val gradleFileExtender = GradleFileExtender()
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(enableKtlint)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(enableDetekt)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(enableKtlint)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(enableDetekt)
+
     return """plugins {
     alias(libs.plugins.$aliasAndroidLibrary)
     alias(libs.plugins.$aliasKotlinAndroid)
-$composePluginLine}
+$composePluginLine$ktlintPluginLine$detektPluginLine}
 
 android {
     namespace = "${architecturePackageName.substringBeforeLast('.')}.test"
@@ -82,7 +91,7 @@ kotlin {
         languageSettings.enableLanguageFeature("ExplicitBackingFields")
     }
 }
-
+$ktlintConfiguration$detektConfiguration
 dependencies {
     implementation(libs.$aliasMaterial)
 

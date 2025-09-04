@@ -1,11 +1,14 @@
 package com.mitteloupe.cag.core.content.architecture
 
+import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitectureUiGradleScript(
     architecturePackageName: String,
-    catalog: VersionCatalogReader
+    catalog: VersionCatalogReader,
+    enableKtlint: Boolean = false,
+    enableDetekt: Boolean = false
 ): String {
     val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
     val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
@@ -29,11 +32,17 @@ fun buildArchitectureUiGradleScript(
             ""
         }
 
+    val gradleFileExtender = GradleFileExtender()
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(enableKtlint)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(enableDetekt)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(enableKtlint)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(enableDetekt)
+
     return """plugins {
     alias(libs.plugins.$pluginAliasAndroidLibrary)
     alias(libs.plugins.$pluginAliasKotlinAndroid)
     alias(libs.plugins.$pluginAliasKsp)
-$composePluginLine}
+$composePluginLine$ktlintPluginLine$detektPluginLine}
 
 android {
     namespace = "$architecturePackageName.ui"
@@ -60,7 +69,7 @@ android {
         compose = true
     }
 }
-
+$ktlintConfiguration$detektConfiguration
 dependencies {
     implementation(projects.architecture.presentation)
 

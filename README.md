@@ -29,7 +29,7 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
 Usage:
 
 ```bash
-cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
 ```
 
 ##### New Architecture Options
@@ -38,6 +38,10 @@ cag [--new-architecture [--no-compose]]... [--new-feature --name=FeatureName [--
     Generate a new Clean Architecture package with domain, presentation, and UI layers
   --no-compose | -nc
     Disable Compose support for the preceding architecture package
+  --ktlint | -kl
+    Enable ktlint for the preceding architecture package
+  --detekt | -d
+    Enable detekt for the preceding architecture package
 ```
 
 ##### New Feature Options

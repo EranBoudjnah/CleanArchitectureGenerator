@@ -66,9 +66,18 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments = arguments,
             primaryLong = "--new-architecture",
             primaryShort = "-na",
-            secondaryFlags = listOf(SecondaryFlag("--no-compose", "-nc", isBoolean = true))
+            secondaryFlags =
+                listOf(
+                    SecondaryFlag("--no-compose", "-nc", isBoolean = true),
+                    SecondaryFlag("--ktlint", "-kl", isBoolean = true),
+                    SecondaryFlag("--detekt", "-d", isBoolean = true)
+                )
         ).map { secondaries ->
-            ArchitectureRequest(enableCompose = !secondaries.containsKey("--no-compose"))
+            ArchitectureRequest(
+                enableCompose = !secondaries.containsKey("--no-compose"),
+                enableKtlint = secondaries.containsKey("--ktlint"),
+                enableDetekt = secondaries.containsKey("--detekt")
+            )
         }
 
     private inline fun <T> parseWithNameFlag(

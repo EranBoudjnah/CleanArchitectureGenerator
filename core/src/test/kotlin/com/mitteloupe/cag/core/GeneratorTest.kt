@@ -132,7 +132,6 @@ class GeneratorTest {
         assertTrue(featureRoot.exists())
         assertTrue(featureRoot.isDirectory)
 
-        // Verify layer directories were created
         val layers = listOf("ui", "presentation", "domain", "data")
         layers.forEach { layer ->
             val layerDir = File(featureRoot, "$layer/src/main/java")
@@ -227,7 +226,33 @@ class GeneratorTest {
         assertTrue(architectureRoot.exists())
         assertTrue(architectureRoot.isDirectory)
 
-        // Verify layer directories were created
+        val layers = listOf("domain", "presentation", "ui")
+        layers.forEach { layer ->
+            val layerDir = File(architectureRoot, "$layer/src/main/java")
+            assertTrue("Layer $layer should exist", layerDir.exists())
+        }
+    }
+
+    @Test
+    fun `Given request with detekt, ktlint when generateArchitecture then creates architecture structure`() {
+        // Given
+        val request =
+            GenerateArchitectureRequest(
+                architecturePackageName = "com.example.architecture",
+                destinationRootDirectory = tempDirectory,
+                enableCompose = true,
+                enableKtlint = true,
+                enableDetekt = true
+            )
+
+        // When
+        classUnderTest.generateArchitecture(request)
+
+        // Then
+        val architectureRoot = File(tempDirectory, "architecture")
+        assertTrue(architectureRoot.exists())
+        assertTrue(architectureRoot.isDirectory)
+
         val layers = listOf("domain", "presentation", "ui")
         layers.forEach { layer ->
             val layerDir = File(architectureRoot, "$layer/src/main/java")
@@ -254,7 +279,6 @@ class GeneratorTest {
 
         // Then
 
-        // Verify datasource structure was created
         val datasourceRoot = File(tempDirectory, "datasource")
         assertTrue(datasourceRoot.exists())
 
