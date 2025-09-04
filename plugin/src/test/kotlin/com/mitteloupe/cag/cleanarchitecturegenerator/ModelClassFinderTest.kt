@@ -129,4 +129,81 @@ class ModelClassFinderTest {
         assertThat(actualResult, `is`(not(empty())))
         assertThat(actualResult, contains(*expected))
     }
+
+    @Test
+    fun `Given domain module root directory when findModelClasses then finds model classes in model directory`() {
+        // Given
+        fakeFileSystem.createDirectory("feature1/domain/model")
+        fakeFileSystem.createFile(
+            "feature1/domain/model/UserModel.kt",
+            """
+            package com.example.domain.model
+
+            class UserModel
+            """.trimIndent()
+        )
+        fakeFileSystem.createDirectory("feature1/domain/usecase")
+        fakeFileSystem.createFile("feature1/domain/build.gradle.kts", "// gradle file")
+
+        val domainModuleRootDirectory = fakeFileSystem.createFakeFile("feature1/domain")
+        val expected = arrayOf("com.example.domain.model.UserModel")
+
+        // When
+        val actualResult = classUnderTest.findModelClasses(domainModuleRootDirectory)
+
+        // Then
+        assertThat(actualResult, `is`(not(empty())))
+        assertThat(actualResult, contains(*expected))
+    }
+
+    @Test
+    fun `Given domain module root directory without usecase directory when findModelClasses then finds model classes in model directory`() {
+        // Given
+        fakeFileSystem.createDirectory("feature1/domain/model")
+        fakeFileSystem.createFile(
+            "feature1/domain/model/UserModel.kt",
+            """
+            package com.example.domain.model
+
+            class UserModel
+            """.trimIndent()
+        )
+        fakeFileSystem.createFile("feature1/domain/build.gradle.kts", "// gradle file")
+
+        val domainModuleRootDirectory = fakeFileSystem.createFakeFile("feature1/domain")
+        val expected = arrayOf("com.example.domain.model.UserModel")
+
+        // When
+        val actualResult = classUnderTest.findModelClasses(domainModuleRootDirectory)
+
+        // Then
+        assertThat(actualResult, `is`(not(empty())))
+        assertThat(actualResult, contains(*expected))
+    }
+
+    @Test
+    fun `Given real Android project structure when right-clicking on domain module root then finds model classes`() {
+        // Given - Real Android project structure
+        fakeFileSystem.createDirectory("feature1/domain/src/main/kotlin/com/example/domain/model")
+        fakeFileSystem.createFile(
+            "feature1/domain/src/main/kotlin/com/example/domain/model/UserModel.kt",
+            """
+            package com.example.domain.model
+
+            class UserModel
+            """.trimIndent()
+        )
+        fakeFileSystem.createDirectory("feature1/domain/src/main/kotlin/com/example/domain/usecase")
+        fakeFileSystem.createFile("feature1/domain/build.gradle.kts", "// gradle file")
+
+        val domainModuleRootDirectory = fakeFileSystem.createFakeFile("feature1/domain")
+        val expected = arrayOf("com.example.domain.model.UserModel")
+
+        // When
+        val actualResult = classUnderTest.findModelClasses(domainModuleRootDirectory)
+
+        // Then
+        assertThat(actualResult, `is`(not(empty())))
+        assertThat(actualResult, contains(*expected))
+    }
 }
