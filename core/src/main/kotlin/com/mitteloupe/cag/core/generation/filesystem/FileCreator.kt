@@ -25,4 +25,20 @@ object FileCreator {
                 throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
             }
     }
+
+    fun createBinaryFileIfNotExists(
+        file: File,
+        contentProvider: () -> ByteArray
+    ) {
+        if (file.exists()) {
+            return
+        }
+
+        val content = contentProvider()
+        runCatching { file.writeBytes(content) }
+            .onFailure {
+                val absolutePath = file.absolutePath
+                throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
+            }
+    }
 }
