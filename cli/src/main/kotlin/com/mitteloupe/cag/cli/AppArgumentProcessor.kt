@@ -63,7 +63,7 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments = arguments,
             primaryFlag = NewDataSourcePrimary
         ) { secondaries ->
-            val rawName = secondaries[SecondaryFlagConstants.NAME] ?: ""
+            val rawName = secondaries[SecondaryFlagConstants.NAME].orEmpty()
             val name = ensureDataSourceSuffix(rawName)
             val libraries = parseLibraries(secondaries[SecondaryFlagConstants.WITH])
             DataSourceRequest(
@@ -79,7 +79,7 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             primaryFlag = NewUseCasePrimary
         ) { secondaries ->
             UseCaseRequest(
-                useCaseName = secondaries[SecondaryFlagConstants.NAME] ?: "",
+                useCaseName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
                 targetPath = secondaries[SecondaryFlagConstants.PATH],
                 inputDataType = secondaries[SecondaryFlagConstants.INPUT_TYPE],
                 outputDataType = secondaries[SecondaryFlagConstants.OUTPUT_TYPE]
@@ -104,8 +104,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             primaryFlag = NewProjectPrimary
         ) { secondaries ->
             ProjectTemplateRequest(
-                projectName = secondaries[SecondaryFlagConstants.NAME] ?: "",
-                packageName = secondaries[SecondaryFlagConstants.PACKAGE] ?: "",
+                projectName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
+                packageName = secondaries[SecondaryFlagConstants.PACKAGE].orEmpty(),
                 enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                 enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
@@ -134,7 +134,7 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         }
 
     private fun parseLibraries(withValue: String?): Set<String> =
-        (withValue ?: "").lowercase()
+        (withValue.orEmpty()).lowercase()
             .split(",")
             .map { it.trim() }
             .filter { it.isNotEmpty() }
