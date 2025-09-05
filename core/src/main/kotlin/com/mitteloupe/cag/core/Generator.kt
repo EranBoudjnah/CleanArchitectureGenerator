@@ -314,9 +314,10 @@ class Generator {
         }
 
         val catalogUpdater = VersionCatalogUpdater()
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createInitialVersionCatalog(
             projectRootDir = projectRoot,
-            enableCompose = request.enableCompose
+            enableCompose = request.enableCompose,
+            includeCoroutines = true
         )
 
         generateProjectStructure(projectRoot)
@@ -324,7 +325,7 @@ class Generator {
         generateSampleFeature(projectRoot, packageName, request)
         generateDataSourceModules(projectRoot, request)
         generateAppModule(projectRoot, packageName, request)
-        generateGradleFiles(projectRoot, projectName, request)
+        generateGradleFiles(projectRoot, packageName, request)
         generateSettingsFile(projectRoot, projectName, request)
     }
 

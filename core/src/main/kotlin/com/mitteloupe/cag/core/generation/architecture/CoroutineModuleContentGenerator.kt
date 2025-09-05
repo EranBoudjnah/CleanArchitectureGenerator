@@ -30,7 +30,7 @@ class CoroutineModuleContentGenerator {
         val catalogUpdater = VersionCatalogUpdater()
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
-            includeCoroutineDependencies = true
+            includeCoroutines = true
         )
 
         GradleFileCreator().writeGradleFileIfMissing(

@@ -49,7 +49,7 @@ class VersionCatalogUpdater(
     fun updateVersionCatalogIfPresent(
         projectRootDir: File,
         enableCompose: Boolean = false,
-        includeCoroutineDependencies: Boolean = false,
+        includeCoroutines: Boolean = false,
         enableKtlint: Boolean = false,
         enableDetekt: Boolean = false
     ) {
@@ -67,7 +67,7 @@ class VersionCatalogUpdater(
             }
 
         val desiredPlugins = desiredPlugins(enableCompose, enableKtlint, enableDetekt)
-        val desiredLibraries = desiredLibraries(enableCompose, includeCoroutineDependencies)
+        val desiredLibraries = desiredLibraries(enableCompose, includeCoroutines)
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
         val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
@@ -165,6 +165,88 @@ class VersionCatalogUpdater(
         )
     }
 
+    fun createInitialVersionCatalog(
+        projectRootDir: File,
+        enableCompose: Boolean = false,
+        includeCoroutines: Boolean = false,
+        enableKtlint: Boolean = false,
+        enableDetekt: Boolean = false
+    ) {
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        if (catalogFile.exists()) {
+            updateVersionCatalogIfPresent(
+                projectRootDir = projectRootDir,
+                enableCompose = enableCompose,
+                includeCoroutines = includeCoroutines,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
+            return
+        }
+
+        val catalogDirectory = catalogFile.parentFile
+        if (!catalogDirectory.exists()) {
+            if (!catalogDirectory.mkdirs()) {
+                throw GenerationException("Failed to create gradle directory")
+            }
+        }
+
+        val desiredPlugins = desiredPlugins(enableCompose, enableKtlint, enableDetekt)
+        val desiredLibraries = desiredLibraries(enableCompose, includeCoroutines)
+
+        val pluginRequirements =
+            desiredPlugins.map { desired ->
+                SectionEntryRequirement.PluginRequirement(
+                    key = desired.alias,
+                    id = desired.id,
+                    versionRefKey = desired.versionRefKey
+                )
+            }
+
+        val libraryRequirements =
+            desiredLibraries.map { desired ->
+                SectionEntryRequirement.LibraryRequirement(
+                    key = desired.key,
+                    module = desired.module,
+                    versionRefKey = desired.versionRefKey,
+                    versionLiteral = desired.versionLiteral
+                )
+            }
+
+        val addedAndroidLibraryAlias = pluginRequirements.any { it.id == "com.android.library" }
+        val addedComposeBomAlias = libraryRequirements.any { it.module == "androidx.compose:compose-bom" }
+        val addedDetektAlias = pluginRequirements.any { it.id == "io.gitlab.arturbosch.detekt" }
+
+        val versionRequirements =
+            versionCatalogVersionRequirements(
+                includeAndroidGradlePlugin = addedAndroidLibraryAlias,
+                includeComposeBom = addedComposeBomAlias,
+                includeDetekt = addedDetektAlias
+            )
+
+        val initialContent =
+            contentUpdater.createInitialCatalogText(
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.Start,
+                        requirements = versionRequirements
+                    ),
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = libraryRequirements
+                    ),
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = pluginRequirements
+                    )
+                )
+            )
+
+        runCatching { catalogFile.writeText(initialContent) }
+            .exceptionOrNull()
+            ?.let { throw GenerationException("Failed to create version catalog: ${it.message}") }
+    }
+
     private fun readCatalogFile(projectRootDir: File): String? {
         val catalogDirectory = File(projectRootDir, "gradle")
         val catalogFile = File(catalogDirectory, "libs.versions.toml")
@@ -202,6 +284,7 @@ class VersionCatalogUpdater(
             add(SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"))
             add(SectionEntryRequirement.VersionRequirement(key = "minSdk", version = "24"))
             if (includeAndroidGradlePlugin) {
+                add(SectionEntryRequirement.VersionRequirement(key = "targetSdk", version = "35"))
                 add(
                     SectionEntryRequirement.VersionRequirement(
                         key = "androidGradlePlugin",
@@ -220,6 +303,12 @@ class VersionCatalogUpdater(
                     SectionEntryRequirement.VersionRequirement(
                         key = "composeNavigation",
                         version = "2.9.3"
+                    )
+                )
+                add(
+                    SectionEntryRequirement.VersionRequirement(
+                        key = "composeCompiler",
+                        version = "1.5.8"
                     )
                 )
             }

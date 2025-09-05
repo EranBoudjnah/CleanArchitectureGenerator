@@ -166,4 +166,11 @@ class VersionCatalogContentUpdater {
             alias to module
         }
     }
+
+    fun <SECTION_TYPE : SectionEntryRequirement> createInitialCatalogText(
+        sectionTransactions: List<SectionTransaction<SECTION_TYPE>>
+    ): String =
+        sectionTransactions.fold(listOf<String>()) { currentLines, sectionTransaction ->
+            ensureSectionEntries(currentLines, sectionTransaction)
+        }.joinToString("\n")
 }

@@ -41,6 +41,7 @@ class VersionCatalogUpdaterTest {
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            targetSdk = "35"
             androidGradlePlugin = "8.7.3"
 
             [plugins]
@@ -78,6 +79,7 @@ class VersionCatalogUpdaterTest {
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            targetSdk = "35"
             androidGradlePlugin = "8.7.3"
 
             [plugins]
@@ -111,6 +113,7 @@ class VersionCatalogUpdaterTest {
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            targetSdk = "35"
             androidGradlePlugin = "8.7.3"
 
             [plugins]
@@ -145,6 +148,7 @@ class VersionCatalogUpdaterTest {
             [versions]
             compileSdk = "35"
             minSdk = "24"
+            targetSdk = "35"
             androidGradlePlugin = "8.7.3"
 
             [plugins]
