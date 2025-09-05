@@ -39,6 +39,7 @@ class VersionCatalogUpdaterTest {
         val expected =
             """
             [versions]
+            kotlin = "2.1.0"
             compileSdk = "35"
             minSdk = "24"
             targetSdk = "35"
@@ -48,6 +49,7 @@ class VersionCatalogUpdaterTest {
             android-application = { id = "com.android.application", version = "1.0.0" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
             kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
             android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent()
 
@@ -78,6 +80,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             compileSdk = "35"
+            kotlin = "2.1.0"
             minSdk = "24"
             targetSdk = "35"
             androidGradlePlugin = "8.7.3"
@@ -86,6 +89,7 @@ class VersionCatalogUpdaterTest {
             android-application = { id = "com.android.application", version.ref = "agp" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
             kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
             android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent()
 
@@ -112,6 +116,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             compileSdk = "35"
+            kotlin = "2.1.0"
             minSdk = "24"
             targetSdk = "35"
             androidGradlePlugin = "8.7.3"
@@ -119,6 +124,8 @@ class VersionCatalogUpdaterTest {
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
             kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
             android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent() + "\n"
 
@@ -147,6 +154,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             compileSdk = "35"
+            kotlin = "2.1.0"
             minSdk = "24"
             targetSdk = "35"
             androidGradlePlugin = "8.7.3"
@@ -154,6 +162,8 @@ class VersionCatalogUpdaterTest {
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
             kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
             android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
             """.trimIndent() + "\n"
 
@@ -183,13 +193,18 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             agp = "35"
+            kotlin = "2.1.0"
             compileSdk = "35"
             minSdk = "24"
+            targetSdk = "35"
+            androidGradlePlugin = "8.7.3"
 
             [plugins]
             android-library = { id = "com.android.library", version.ref = "agp" }
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
             kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
             """.trimIndent()
 
         // When

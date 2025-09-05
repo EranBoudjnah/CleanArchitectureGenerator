@@ -53,11 +53,59 @@ class VersionCatalogUpdater(
         enableKtlint: Boolean = false,
         enableDetekt: Boolean = false
     ) {
+        updateBasicVersions(projectRootDir)
+        addEssentialAndroidVersions(projectRootDir)
+        addKotlinPlugins(projectRootDir, enableCompose, enableKtlint, enableDetekt)
+        addAndroidPlugins(projectRootDir)
+
+        if (enableCompose || includeCoroutines) {
+            addAndroidLibraries(projectRootDir, enableCompose, includeCoroutines)
+        }
+        if (enableCompose || includeCoroutines || enableKtlint || enableDetekt) {
+            addTestLibraries(projectRootDir, enableCompose)
+        }
+    }
+
+    fun updateBasicVersions(projectRootDir: File) {
+        val versionRequirements = basicVersionRequirements()
+
+        updateVersionCatalogIfPresent(
+            projectRootDir = projectRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.Start,
+                        requirements = versionRequirements
+                    )
+                )
+        )
+    }
+
+    fun addEssentialAndroidVersions(projectRootDir: File) {
+        val versionRequirements =
+            listOf(
+                SectionEntryRequirement.VersionRequirement(key = "targetSdk", version = "35"),
+                SectionEntryRequirement.VersionRequirement(key = "androidGradlePlugin", version = "8.7.3")
+            )
+
+        updateVersionCatalogIfPresent(
+            projectRootDir = projectRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.Start,
+                        requirements = versionRequirements
+                    )
+                )
+        )
+    }
+
+    fun addAndroidLibraries(
+        projectRootDir: File,
+        enableCompose: Boolean = false,
+        includeCoroutines: Boolean = false
+    ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
-        val existingPluginIdToAlias: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
-        val existingPluginAliasToId: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
         val existingLibraryAliasToModule: Map<String, String> =
             catalogTextBefore?.let { contentUpdater.parseExistingLibraryAliasToModule(it) } ?: emptyMap()
 
@@ -66,36 +114,7 @@ class VersionCatalogUpdater(
                 module to alias
             }
 
-        val desiredPlugins = desiredPlugins(enableCompose, enableKtlint, enableDetekt)
-        val desiredLibraries = desiredLibraries(enableCompose, includeCoroutines)
-
-        val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
-        val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
-        val pluginAliasToIdMutable = existingPluginAliasToId.toMutableMap()
-        for (desired in desiredPlugins) {
-            val existingAlias = existingPluginIdToAlias[desired.id]
-            if (existingAlias != null) {
-                resolvedPluginIdToAliasMutable[desired.id] = existingAlias
-                continue
-            }
-            var candidateAlias = desired.alias
-            if (pluginAliasToIdMutable[candidateAlias] != null) {
-                var counter = 2
-                while (pluginAliasToIdMutable.containsKey("$candidateAlias-v$counter")) {
-                    counter++
-                }
-                candidateAlias = "$candidateAlias-v$counter"
-            }
-            resolvedPluginIdToAliasMutable[desired.id] = candidateAlias
-            pluginAliasToIdMutable[candidateAlias] = desired.id
-            pluginRequirements.add(
-                SectionEntryRequirement.PluginRequirement(
-                    key = candidateAlias,
-                    id = desired.id,
-                    versionRefKey = desired.versionRefKey
-                )
-            )
-        }
+        val desiredLibraries = androidLibraries(enableCompose, includeCoroutines)
 
         val resolvedLibraryModuleToAliasMutable = existingLibraryModuleToAlias.toMutableMap()
         val libraryRequirements = mutableListOf<SectionEntryRequirement.LibraryRequirement>()
@@ -126,7 +145,6 @@ class VersionCatalogUpdater(
             )
         }
 
-        resolvedPluginIdToAlias = resolvedPluginIdToAliasMutable.toMap()
         resolvedLibraryModuleToAlias = resolvedLibraryModuleToAliasMutable.toMap()
 
         updateVersionCatalogIfPresent(
@@ -136,17 +154,19 @@ class VersionCatalogUpdater(
                     SectionTransaction(
                         insertPositionIfMissing = CatalogInsertPosition.End,
                         requirements = libraryRequirements
-                    ),
-                    SectionTransaction(
-                        insertPositionIfMissing = CatalogInsertPosition.End,
-                        requirements = pluginRequirements
                     )
                 )
         )
+    }
 
-        val addedAndroidLibraryAlias = pluginRequirements.any { it.id == "com.android.library" }
-        val addedComposeBomAlias = libraryRequirements.any { it.module == "androidx.compose:compose-bom" }
-        val addedDetektAlias = pluginRequirements.any { it.id == "io.gitlab.arturbosch.detekt" }
+    fun addTestLibraries(
+        projectRootDir: File,
+        enableCompose: Boolean = false
+    ) {
+        val versionRequirements =
+            listOf(
+                SectionEntryRequirement.VersionRequirement(key = "junit4", version = "4.13.2")
+            )
 
         updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,
@@ -154,12 +174,167 @@ class VersionCatalogUpdater(
                 listOf(
                     SectionTransaction(
                         insertPositionIfMissing = CatalogInsertPosition.Start,
-                        requirements =
-                            versionCatalogVersionRequirements(
-                                includeAndroidGradlePlugin = addedAndroidLibraryAlias,
-                                includeComposeBom = addedComposeBomAlias,
-                                includeDetekt = addedDetektAlias
-                            )
+                        requirements = versionRequirements
+                    )
+                )
+        )
+
+        val catalogTextBefore = readCatalogFile(projectRootDir)
+        val existingLibraryAliasToModule: Map<String, String> =
+            catalogTextBefore?.let { contentUpdater.parseExistingLibraryAliasToModule(it) } ?: emptyMap()
+
+        val existingLibraryModuleToAlias: Map<String, String> =
+            existingLibraryAliasToModule.entries.associate { (alias, module) ->
+                module to alias
+            }
+
+        val desiredLibraries = testLibraries(enableCompose)
+
+        val resolvedLibraryModuleToAliasMutable = existingLibraryModuleToAlias.toMutableMap()
+        val libraryRequirements = mutableListOf<SectionEntryRequirement.LibraryRequirement>()
+        val libraryAliasToModuleMutable = existingLibraryAliasToModule.toMutableMap()
+        for (desired in desiredLibraries) {
+            val existingAlias = existingLibraryModuleToAlias[desired.module]
+            if (existingAlias != null) {
+                resolvedLibraryModuleToAliasMutable[desired.module] = existingAlias
+                continue
+            }
+            var candidateAlias = desired.key
+            if (libraryAliasToModuleMutable[candidateAlias] != null) {
+                var counter = 2
+                while (libraryAliasToModuleMutable.containsKey("$candidateAlias-v$counter")) {
+                    counter++
+                }
+                candidateAlias = "$candidateAlias-v$counter"
+            }
+            resolvedLibraryModuleToAliasMutable[desired.module] = candidateAlias
+            libraryAliasToModuleMutable[candidateAlias] = desired.module
+            libraryRequirements.add(
+                SectionEntryRequirement.LibraryRequirement(
+                    key = candidateAlias,
+                    module = desired.module,
+                    versionRefKey = desired.versionRefKey,
+                    versionLiteral = desired.versionLiteral
+                )
+            )
+        }
+
+        resolvedLibraryModuleToAlias = resolvedLibraryModuleToAliasMutable.toMap()
+
+        updateVersionCatalogIfPresent(
+            projectRootDir = projectRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = libraryRequirements
+                    )
+                )
+        )
+    }
+
+    fun addKotlinPlugins(
+        projectRootDir: File,
+        enableCompose: Boolean = false,
+        enableKtlint: Boolean = false,
+        enableDetekt: Boolean = false
+    ) {
+        val catalogTextBefore = readCatalogFile(projectRootDir)
+        val existingPluginIdToAlias: Map<String, String> =
+            catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
+        val existingPluginAliasToId: Map<String, String> =
+            catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
+
+        val desiredPlugins = kotlinPlugins(enableCompose, enableKtlint, enableDetekt)
+
+        val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
+        val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
+        val pluginAliasToIdMutable = existingPluginAliasToId.toMutableMap()
+        for (desired in desiredPlugins) {
+            val existingAlias = existingPluginIdToAlias[desired.id]
+            if (existingAlias != null) {
+                resolvedPluginIdToAliasMutable[desired.id] = existingAlias
+                continue
+            }
+            var candidateAlias = desired.alias
+            if (pluginAliasToIdMutable[candidateAlias] != null) {
+                var counter = 2
+                while (pluginAliasToIdMutable.containsKey("$candidateAlias-v$counter")) {
+                    counter++
+                }
+                candidateAlias = "$candidateAlias-v$counter"
+            }
+            resolvedPluginIdToAliasMutable[desired.id] = candidateAlias
+            pluginAliasToIdMutable[candidateAlias] = desired.id
+            pluginRequirements.add(
+                SectionEntryRequirement.PluginRequirement(
+                    key = candidateAlias,
+                    id = desired.id,
+                    versionRefKey = desired.versionRefKey
+                )
+            )
+        }
+
+        resolvedPluginIdToAlias = resolvedPluginIdToAliasMutable.toMap()
+
+        updateVersionCatalogIfPresent(
+            projectRootDir = projectRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = pluginRequirements
+                    )
+                )
+        )
+    }
+
+    fun addAndroidPlugins(projectRootDir: File) {
+        val catalogTextBefore = readCatalogFile(projectRootDir)
+        val existingPluginIdToAlias: Map<String, String> =
+            catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
+        val existingPluginAliasToId: Map<String, String> =
+            catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
+
+        val desiredPlugins = androidPlugins()
+
+        val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
+        val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
+        val pluginAliasToIdMutable = existingPluginAliasToId.toMutableMap()
+        for (desired in desiredPlugins) {
+            val existingAlias = existingPluginIdToAlias[desired.id]
+            if (existingAlias != null) {
+                resolvedPluginIdToAliasMutable[desired.id] = existingAlias
+                continue
+            }
+            var candidateAlias = desired.alias
+            if (pluginAliasToIdMutable[candidateAlias] != null) {
+                var counter = 2
+                while (pluginAliasToIdMutable.containsKey("$candidateAlias-v$counter")) {
+                    counter++
+                }
+                candidateAlias = "$candidateAlias-v$counter"
+            }
+            resolvedPluginIdToAliasMutable[desired.id] = candidateAlias
+            pluginAliasToIdMutable[candidateAlias] = desired.id
+            pluginRequirements.add(
+                SectionEntryRequirement.PluginRequirement(
+                    key = candidateAlias,
+                    id = desired.id,
+                    versionRefKey = desired.versionRefKey
+                )
+            )
+        }
+
+        resolvedPluginIdToAlias = resolvedPluginIdToAliasMutable.toMap()
+
+        updateVersionCatalogIfPresent(
+            projectRootDir = projectRootDir,
+            sectionRequirements =
+                listOf(
+                    SectionTransaction(
+                        insertPositionIfMissing = CatalogInsertPosition.End,
+                        requirements = pluginRequirements
                     )
                 )
         )
@@ -281,10 +456,7 @@ class VersionCatalogUpdater(
         includeDetekt: Boolean
     ): List<SectionEntryRequirement> =
         buildList {
-            add(SectionEntryRequirement.VersionRequirement(key = "kotlin", version = "2.1.0"))
-            add(SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"))
-            add(SectionEntryRequirement.VersionRequirement(key = "minSdk", version = "24"))
-            add(SectionEntryRequirement.VersionRequirement(key = "junit4", version = "4.13.2"))
+            addAll(basicVersionRequirements())
             if (includeAndroidGradlePlugin) {
                 add(SectionEntryRequirement.VersionRequirement(key = "targetSdk", version = "35"))
                 add(
@@ -334,7 +506,14 @@ private data class DesiredLibrary(
     val versionLiteral: String? = null
 )
 
-private fun desiredLibraries(
+private fun basicVersionRequirements(): List<SectionEntryRequirement> =
+    listOf(
+        SectionEntryRequirement.VersionRequirement(key = "kotlin", version = "2.1.0"),
+        SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"),
+        SectionEntryRequirement.VersionRequirement(key = "minSdk", version = "24")
+    )
+
+private fun androidLibraries(
     enableCompose: Boolean,
     includeCoroutineDependencies: Boolean
 ): List<DesiredLibrary> =
@@ -356,21 +535,6 @@ private fun desiredLibraries(
                         key = "kotlinx-coroutines-core",
                         module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
                         versionLiteral = "1.7.3"
-                    ),
-                    DesiredLibrary(
-                        key = "junit",
-                        module = "junit:junit",
-                        versionRefKey = "junit4"
-                    ),
-                    DesiredLibrary(
-                        key = "androidx-test-ext-junit",
-                        module = "androidx.test.ext:junit",
-                        versionLiteral = "1.1.5"
-                    ),
-                    DesiredLibrary(
-                        key = "androidx-test-espresso-core",
-                        module = "androidx.test.espresso:espresso-core",
-                        versionLiteral = "3.5.1"
                     )
                 )
             )
@@ -447,7 +611,10 @@ private fun desiredLibraries(
                 )
             )
         )
+    }
 
+private fun testLibraries(enableCompose: Boolean): List<DesiredLibrary> =
+    buildList {
         addAll(
             listOf(
                 DesiredLibrary(
@@ -464,11 +631,6 @@ private fun desiredLibraries(
                     key = "test-androidx-espresso-core",
                     module = "androidx.test.espresso:espresso-core",
                     versionLiteral = "3.5.1"
-                ),
-                DesiredLibrary(
-                    key = "test-compose-ui-junit4",
-                    module = "androidx.compose.ui:ui-test-junit4",
-                    versionRefKey = "composeBom"
                 ),
                 DesiredLibrary(
                     key = "test-android-hilt",
@@ -492,9 +654,19 @@ private fun desiredLibraries(
                 )
             )
         )
+
+        if (enableCompose) {
+            add(
+                DesiredLibrary(
+                    key = "test-compose-ui-junit4",
+                    module = "androidx.compose.ui:ui-test-junit4",
+                    versionRefKey = "composeBom"
+                )
+            )
+        }
     }
 
-private fun desiredPlugins(
+private fun kotlinPlugins(
     enableCompose: Boolean,
     enableKtlint: Boolean,
     enableDetekt: Boolean
@@ -511,16 +683,6 @@ private fun desiredPlugins(
                     id = "org.jetbrains.kotlin.android",
                     alias = "kotlin-android",
                     versionRefKey = "kotlin"
-                ),
-                DesiredPlugin(
-                    id = "com.android.application",
-                    alias = "android-application",
-                    versionRefKey = "androidGradlePlugin"
-                ),
-                DesiredPlugin(
-                    id = "com.android.library",
-                    alias = "android-library",
-                    versionRefKey = "androidGradlePlugin"
                 ),
                 DesiredPlugin(
                     id = "com.google.devtools.ksp",
@@ -559,4 +721,37 @@ private fun desiredPlugins(
                 )
             )
         }
+    }
+
+private fun androidPlugins(): List<DesiredPlugin> =
+    listOf(
+        DesiredPlugin(
+            id = "com.android.application",
+            alias = "android-application",
+            versionRefKey = "androidGradlePlugin"
+        ),
+        DesiredPlugin(
+            id = "com.android.library",
+            alias = "android-library",
+            versionRefKey = "androidGradlePlugin"
+        )
+    )
+
+private fun desiredLibraries(
+    enableCompose: Boolean,
+    includeCoroutineDependencies: Boolean
+): List<DesiredLibrary> =
+    buildList {
+        addAll(androidLibraries(enableCompose, includeCoroutineDependencies))
+        addAll(testLibraries(enableCompose))
+    }
+
+private fun desiredPlugins(
+    enableCompose: Boolean,
+    enableKtlint: Boolean,
+    enableDetekt: Boolean
+): List<DesiredPlugin> =
+    buildList {
+        addAll(kotlinPlugins(enableCompose, enableKtlint, enableDetekt))
+        addAll(androidPlugins())
     }
