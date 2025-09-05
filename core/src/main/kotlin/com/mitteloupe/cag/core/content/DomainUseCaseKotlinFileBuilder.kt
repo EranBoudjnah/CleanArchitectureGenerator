@@ -12,26 +12,20 @@ fun buildDomainUseCaseKotlinFile(
     inputDataType: String? = null,
     outputDataType: String? = null
 ): String {
+    val imports = mutableListOf<String>()
+    imports.add("import ${projectNamespace}architecture.domain.usecase.UseCase")
+
+    if (inputDataType == null && outputDataType == null) {
+        imports.add("import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME")
+    }
+
+    if (repositoryName != null) {
+        imports.add("import $featurePackageName.domain.repository.$repositoryName")
+    }
+
     return """package $featurePackageName$USE_CASE_PACKAGE_SUFFIX
 
-${
-        """
-import ${projectNamespace}architecture.domain.usecase.UseCase
-${
-            if (inputDataType == null && outputDataType == null) {
-                "import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME"
-            } else {
-                ""
-            }
-        }${
-            if (repositoryName == null) {
-                ""
-            } else {
-                "import $featurePackageName.domain.repository.$repositoryName"
-            }
-        }
-""".optimizeImports()
-    }
+${imports.joinToString("\n").optimizeImports()}
 class $useCaseName(${
         if (repositoryName == null) {
             ""
