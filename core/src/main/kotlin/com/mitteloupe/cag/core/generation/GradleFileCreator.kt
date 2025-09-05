@@ -1,8 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildAppGradleScript
 import com.mitteloupe.cag.core.content.buildProjectGradleScript
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
 class GradleFileCreator {
@@ -13,10 +13,7 @@ class GradleFileCreator {
     ) {
         val moduleDirectory = File(featureRoot, layer)
         val buildGradleFile = File(moduleDirectory, "build.gradle.kts")
-        if (!buildGradleFile.exists()) {
-            runCatching { buildGradleFile.writeText(content) }
-                .onFailure { throw GenerationException("Failed to create $layer/build.gradle.kts: ${it.message}") }
-        }
+        FileCreator.createFileIfNotExists(buildGradleFile) { content }
     }
 
     fun writeProjectGradleFile(
@@ -26,8 +23,7 @@ class GradleFileCreator {
     ) {
         val buildGradleFile = File(projectRoot, "build.gradle.kts")
         val content = buildProjectGradleScript(enableKtlint, enableDetekt)
-        runCatching { buildGradleFile.writeText(content) }
-            .onFailure { throw GenerationException("Failed to create build.gradle.kts: ${it.message}") }
+        FileCreator.createFileIfNotExists(buildGradleFile) { content }
     }
 
     fun writeAppGradleFile(
@@ -37,7 +33,6 @@ class GradleFileCreator {
     ) {
         val appGradleFile = File(projectRoot, "app/build.gradle.kts")
         val content = buildAppGradleScript(packageName, enableCompose)
-        runCatching { appGradleFile.writeText(content) }
-            .onFailure { throw GenerationException("Failed to create app/build.gradle.kts: ${it.message}") }
+        FileCreator.createFileIfNotExists(appGradleFile) { content }
     }
 }
