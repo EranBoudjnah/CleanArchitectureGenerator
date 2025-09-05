@@ -1,7 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildDataSourceInterfaceKotlinFile
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
@@ -25,27 +25,17 @@ class DataSourceInterfaceCreator {
                     File(parent, segment)
                 }
 
-        if (!targetDirectory.exists()) {
-            val created = runCatching { targetDirectory.mkdirs() }.getOrElse { false }
-            if (!created) {
-                throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath}")
-            }
-        }
+        FileCreator.createDirectoryIfNotExists(targetDirectory)
 
         val targetFile = File(targetDirectory, "$dataSourceName.kt")
-        if (!targetFile.exists()) {
-            val packageName =
-                (listOf(basePackage) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
-                    .joinToString(".")
-            val content =
-                buildDataSourceInterfaceKotlinFile(
-                    packageName = packageName,
-                    dataSourceName = dataSourceName
-                )
-            runCatching { targetFile.writeText(content) }
-                .onFailure {
-                    throw GenerationException("Failed to create file: ${targetFile.absolutePath}: ${it.message}")
-                }
-        }
+        val packageName =
+            (listOf(basePackage) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
+                .joinToString(".")
+        val content =
+            buildDataSourceInterfaceKotlinFile(
+                packageName = packageName,
+                dataSourceName = dataSourceName
+            )
+        FileCreator.createFileIfNotExists(targetFile) { content }
     }
 }

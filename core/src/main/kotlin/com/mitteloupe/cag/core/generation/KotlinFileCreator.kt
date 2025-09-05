@@ -1,6 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
@@ -22,10 +23,7 @@ class KotlinFileCreator {
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
 
         if (!targetDirectory.exists()) {
-            val created = runCatching { targetDirectory.mkdirs() }.getOrElse { false }
-            if (!created) {
-                throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath}")
-            }
+            FileCreator.createDirectoryIfNotExists(targetDirectory)
         } else if (!targetDirectory.isDirectory) {
             throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath} (Not a directory)")
         }
@@ -42,11 +40,6 @@ class KotlinFileCreator {
         if (targetFile.exists() && !targetFile.isFile) {
             throw GenerationException("Failed to create file: ${targetFile.absolutePath} (it's a directory)")
         }
-        if (!targetFile.exists()) {
-            runCatching { targetFile.writeText(content) }
-                .onFailure {
-                    throw GenerationException("Failed to create file: ${targetFile.absolutePath}: ${it.message}")
-                }
-        }
+        FileCreator.createFileIfNotExists(targetFile) { content }
     }
 }
