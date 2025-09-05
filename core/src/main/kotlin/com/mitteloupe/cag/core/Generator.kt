@@ -14,6 +14,8 @@ import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
 import com.mitteloupe.cag.core.generation.DataSourceModuleCreator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.GradlePropertiesFileCreator
+import com.mitteloupe.cag.core.generation.GradleWrapperCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
 import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
@@ -321,12 +323,12 @@ class Generator {
         )
 
         generateProjectStructure(projectRoot)
+        generateSettingsFile(projectRoot, projectName, request)
         generateArchitectureModules(projectRoot, packageName, request)
         generateSampleFeature(projectRoot, packageName, request)
         generateDataSourceModules(projectRoot, request)
         generateAppModule(projectRoot, packageName, request)
         generateGradleFiles(projectRoot, packageName, request)
-        generateSettingsFile(projectRoot, projectName, request)
     }
 
     private fun generateProjectStructure(projectRoot: File) {
@@ -411,6 +413,7 @@ class Generator {
         request: GenerateProjectTemplateRequest
     ) {
         val gradleFileCreator = GradleFileCreator()
+        val gradlePropertiesFileCreator = GradlePropertiesFileCreator()
         val catalogUpdater = VersionCatalogUpdater()
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
@@ -428,6 +431,9 @@ class Generator {
             packageName = packageName,
             enableCompose = request.enableCompose
         )
+
+        gradlePropertiesFileCreator.writeGradlePropertiesFile(projectRoot)
+        GradleWrapperCreator().writeGradleWrapperFiles(projectRoot)
     }
 
     private fun generateSettingsFile(
