@@ -1,0 +1,10 @@
+package com.mitteloupe.cag.core.content
+
+fun buildGradleWrapperPropertiesFile(): String =
+    """
+    distributionBase=GRADLE_USER_HOME
+    distributionPath=wrapper/dists
+    distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+    zipStoreBase=GRADLE_USER_HOME
+    zipStorePath=wrapper/dists
+    """.trimIndent()
