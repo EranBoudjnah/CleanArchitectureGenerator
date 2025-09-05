@@ -93,11 +93,11 @@ class ArgumentParser {
                     }
                 }
                 else -> {
-                    parseInlineArgument(token, secondaryMap, isLongForm)?.let { (key, value) ->
+                    val inlineResult = parseInlineArgument(token, secondaryMap, isLongForm)
+                    if (inlineResult != null) {
                         hasEncounteredSecondaries = true
-                        currentSecondaries[key] = value
-                    }
-                    if (token.startsWith("-") && !token.startsWith(primary)) {
+                        currentSecondaries[inlineResult.first] = inlineResult.second
+                    } else if (token.startsWith("-") && !token.startsWith(primary)) {
                         hasEncounteredSecondaries = true
                         validateMixedForm(token, primary, isLongForm, secondaryMap)
                     }
@@ -159,6 +159,27 @@ class ArgumentParser {
                 }
             throw IllegalArgumentException(errorMessage)
         }
+
+        val inlineMatchingSecondary =
+            secondaryMap.values.find { flag ->
+                if (isLongForm) {
+                    token.startsWith(flag.short) && (token == flag.short || token.startsWith("${flag.short}="))
+                } else {
+                    token.startsWith(flag.long) && (token == flag.long || token.startsWith("${flag.long}="))
+                }
+            }
+
+        if (inlineMatchingSecondary != null) {
+            val errorMessage =
+                if (isLongForm) {
+                    "Cannot mix long form ($primary) with short form secondary flags " +
+                        "(${inlineMatchingSecondary.short}). Use ${inlineMatchingSecondary.long} instead."
+                } else {
+                    "Cannot mix short form ($primary) with long form secondary flags " +
+                        "(${inlineMatchingSecondary.long}). Use ${inlineMatchingSecondary.short} instead."
+                }
+            throw IllegalArgumentException(errorMessage)
+        }
     }
 }
 
@@ -190,6 +211,18 @@ private fun parseInlineArgument(
         } ?: return null
 
     val secondary = secondaryMap.getValue(matchingKey)
+
+    val isMixedForm =
+        if (isLongForm) {
+            matchingKey.startsWith("-") && !matchingKey.startsWith("--")
+        } else {
+            matchingKey.startsWith("--")
+        }
+
+    if (isMixedForm) {
+        return null
+    }
+
     val value =
         if (isLongForm) {
             token.substringAfter("=").trim()

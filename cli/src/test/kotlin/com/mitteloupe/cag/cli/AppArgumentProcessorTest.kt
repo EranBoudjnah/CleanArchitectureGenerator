@@ -114,7 +114,10 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Feature name is required. Use --name=FeatureName or -n=FeatureName", exception.message)
+                assertEquals(
+                    "Cannot mix long form (--new-feature) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
             }
         }
 
@@ -129,7 +132,43 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Feature name is required. Use --name=FeatureName or -n=FeatureName", exception.message)
+                assertEquals(
+                    "Cannot mix short form (-nf) with long form secondary flags (--name). Use -n instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        fun `Given feature with long primary and short secondary and missing name when getNewFeatures then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "-n=Test")
+
+            // When
+            try {
+                classUnderTest.getNewFeatures(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(
+                    "Cannot mix long form (--new-feature) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        fun `Given feature with short primary and long secondary and missing name when getNewFeatures then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("-nf", "--name=Test")
+
+            // When
+            try {
+                classUnderTest.getNewFeatures(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Cannot mix short form (-nf) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
     }
@@ -354,7 +393,10 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Data source name is required. Use --name=DataSourceName or -n=DataSourceName", exception.message)
+                assertEquals(
+                    "Cannot mix long form (--new-datasource) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
             }
         }
 
@@ -369,7 +411,48 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Data source name is required. Use --name=DataSourceName or -n=DataSourceName", exception.message)
+                assertEquals(
+                    "Cannot mix short form (-nds) with long form secondary flags (--name). Use -n instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given data source with long primary and short secondary and missing name when getNewDataSources then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-datasource", "-n=Test")
+
+            // When
+            try {
+                classUnderTest.getNewDataSources(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(
+                    "Cannot mix long form (--new-datasource) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given data source with short primary and long secondary and missing name when getNewDataSources then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("-nds", "--name=Test")
+
+            // When
+            try {
+                classUnderTest.getNewDataSources(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(
+                    "Cannot mix short form (-nds) with long form secondary flags (--name). Use -n instead.",
+                    exception.message
+                )
             }
         }
     }
@@ -471,7 +554,10 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Use case name is required. Use --name=UseCaseName or -n=UseCaseName", exception.message)
+                assertEquals(
+                    "Cannot mix long form (--new-use-case) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
             }
         }
 
@@ -486,7 +572,40 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Use case name is required. Use --name=UseCaseName or -n=UseCaseName", exception.message)
+                assertEquals("Cannot mix short form (-nuc) with long form secondary flags (--name). Use -n instead.", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given use case with long primary and short secondary and missing name when getNewUseCases then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-use-case", "-n=Test")
+
+            // When
+            try {
+                classUnderTest.getNewUseCases(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(
+                    "Cannot mix long form (--new-use-case) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        fun `Given use case with short primary and long secondary and missing name when getNewUseCases then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("-nuc", "--name=Test")
+
+            // When
+            try {
+                classUnderTest.getNewUseCases(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Cannot mix short form (-nuc) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
     }
@@ -607,7 +726,10 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Project name is required. Use --name=ProjectName or -n=ProjectName", exception.message)
+                assertEquals(
+                    "Cannot mix long form (--new-project) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
             }
         }
 
@@ -622,7 +744,42 @@ class AppArgumentProcessorTest {
                 fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                assertEquals("Project name is required. Use --name=ProjectName or -n=ProjectName", exception.message)
+                assertEquals("Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.", exception.message)
+            }
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given project template with long primary and short secondary and missing name when getNewProjectTemplate then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-project", "-n=Test")
+
+            // When
+            try {
+                classUnderTest.getNewProjectTemplate(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(
+                    "Cannot mix long form (--new-project) with short form secondary flags (-n). Use --name instead.",
+                    exception.message
+                )
+            }
+        }
+
+        @Test
+        @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+        fun `Given project template with short primary and long secondary and missing name when getNewProjectTemplate then throws mixed form exception`() {
+            // Given
+            val givenArguments = arrayOf("-np", "--name=Test")
+
+            // When
+            try {
+                classUnderTest.getNewProjectTemplate(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
     }

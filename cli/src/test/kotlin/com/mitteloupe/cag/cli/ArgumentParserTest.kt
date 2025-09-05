@@ -724,6 +724,66 @@ class ArgumentParserTest {
     }
 
     @Test
+    @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+    fun `Given long primary with short secondary and missing mandatory name when parsePrimaryWithSecondaries then throws mixed form exception`() {
+        // Given
+        val givenArguments = arrayOf("--alpha", "-b", "value")
+        val expectedErrorMessage = "Cannot mix long form (--alpha) with short form secondary flags (-b). Use --beta instead."
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (exception: IllegalArgumentException) {
+            // Then
+            assertEquals(expectedErrorMessage, exception.message)
+        }
+    }
+
+    @Test
+    @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+    fun `Given short primary with long secondary and missing mandatory name when parsePrimaryWithSecondaries then throws mixed form exception`() {
+        // Given
+        val givenArguments = arrayOf("-a", "--beta", "value")
+        val expectedErrorMessage = "Cannot mix short form (-a) with long form secondary flags (--beta). Use -b instead."
+
+        // When
+        try {
+            classUnderTest.parsePrimaryWithSecondaries(
+                arguments = givenArguments,
+                primaryLong = "--alpha",
+                primaryShort = "-a",
+                secondaryFlags =
+                    listOf(
+                        SecondaryFlag(
+                            long = "--beta",
+                            short = "-b",
+                            isMandatory = true,
+                            missingErrorMessage = "Beta is required"
+                        )
+                    )
+            )
+            fail("Expected IllegalArgumentException to be thrown")
+        } catch (exception: IllegalArgumentException) {
+            // Then
+            assertEquals(expectedErrorMessage, exception.message)
+        }
+    }
+
+    @Test
     fun `Given mixed invalid and valid flags when parsePrimaryWithSecondaries then throws informative exception`() {
         // Given
         val givenArguments = arrayOf("--invalid", "--beta", "value", "-unknown", "test")
