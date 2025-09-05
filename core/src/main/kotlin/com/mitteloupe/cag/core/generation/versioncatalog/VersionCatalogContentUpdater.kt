@@ -12,9 +12,11 @@ class VersionCatalogContentUpdater {
         sectionTransactions: List<SectionTransaction<SECTION_TYPE>>
     ): String {
         val contentLines = catalogText.split('\n')
-        return sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
-            ensureSectionEntries(currentLines, sectionTransaction)
-        }.joinToString("\n")
+        val result =
+            sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
+                ensureSectionEntries(currentLines, sectionTransaction)
+            }.joinToString("\n")
+        return if (result.endsWith("\n")) result else "$result\n"
     }
 
     private fun <SECTION_TYPE : SectionEntryRequirement> ensureSectionEntries(
@@ -166,11 +168,4 @@ class VersionCatalogContentUpdater {
             alias to module
         }
     }
-
-    fun <SECTION_TYPE : SectionEntryRequirement> createInitialCatalogText(
-        sectionTransactions: List<SectionTransaction<SECTION_TYPE>>
-    ): String =
-        sectionTransactions.fold(listOf<String>()) { currentLines, sectionTransaction ->
-            ensureSectionEntries(currentLines, sectionTransaction)
-        }.joinToString("\n")
 }

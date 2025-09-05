@@ -21,6 +21,11 @@ import com.mitteloupe.cag.core.generation.SettingsFileUpdater
 import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
+import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
@@ -40,9 +45,22 @@ class Generator {
 
         val featureNameLowerCase = request.featureName.lowercase()
         val catalogUpdater = VersionCatalogUpdater()
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
+                plugins =
+                    PluginConstants.KOTLIN_PLUGINS +
+                        PluginConstants.ANDROID_PLUGINS +
+                        if (request.enableCompose) {
+                            PluginConstants.COMPOSE_PLUGINS
+                        } else {
+                            emptyList()
+                        }
+            )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = request.destinationRootDirectory,
-            enableCompose = request.enableCompose
+            dependencyConfiguration = dependencyConfiguration
         )
         val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 
@@ -180,9 +198,15 @@ class Generator {
 
         val gradleFileCreator = GradleFileCreator()
         val catalogUpdater = VersionCatalogUpdater()
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                libraries = emptyList(),
+                plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
+            )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = destinationRootDirectory,
-            enableCompose = false
+            dependencyConfiguration = dependencyConfiguration
         )
 
         gradleFileCreator.writeGradleFileIfMissing(
@@ -316,10 +340,41 @@ class Generator {
         }
 
         val catalogUpdater = VersionCatalogUpdater()
-        catalogUpdater.createInitialVersionCatalog(
+        val versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS
+        val libraries =
+            LibraryConstants.CORE_ANDROID_LIBRARIES +
+                if (request.enableCompose) {
+                    LibraryConstants.COMPOSE_LIBRARIES
+                } else {
+                    emptyList<SectionEntryRequirement.LibraryRequirement>() +
+                        LibraryConstants.TESTING_LIBRARIES
+                }
+        val plugins =
+            PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
+                if (request.enableCompose) {
+                    PluginConstants.COMPOSE_PLUGINS
+                } else {
+                    emptyList<SectionEntryRequirement.PluginRequirement>() +
+                        if (request.enableKtlint) {
+                            PluginConstants.CODE_QUALITY_PLUGINS.filter { it.id == "org.jlleitschuh.gradle.ktlint" }
+                        } else {
+                            emptyList<SectionEntryRequirement.PluginRequirement>() +
+                                if (request.enableDetekt) {
+                                    setOf(PluginConstants.DETEKT)
+                                } else {
+                                    emptySet()
+                                }
+                        }
+                }
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = versions,
+                libraries = libraries,
+                plugins = plugins
+            )
+        catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
-            enableCompose = request.enableCompose,
-            includeCoroutines = true
+            dependencyConfiguration = dependencyConfiguration
         )
 
         generateProjectStructure(projectRoot)
@@ -415,9 +470,22 @@ class Generator {
         val gradleFileCreator = GradleFileCreator()
         val gradlePropertiesFileCreator = GradlePropertiesFileCreator()
         val catalogUpdater = VersionCatalogUpdater()
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
+                plugins =
+                    PluginConstants.KOTLIN_PLUGINS +
+                        PluginConstants.ANDROID_PLUGINS +
+                        if (request.enableCompose) {
+                            PluginConstants.COMPOSE_PLUGINS
+                        } else {
+                            emptyList()
+                        }
+            )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
-            enableCompose = request.enableCompose
+            dependencyConfiguration = dependencyConfiguration
         )
 
         gradleFileCreator.writeProjectGradleFile(

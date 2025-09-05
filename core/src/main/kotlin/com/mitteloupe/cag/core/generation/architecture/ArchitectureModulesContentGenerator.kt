@@ -7,6 +7,11 @@ import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentatio
 import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentationTestGradleScript
 import com.mitteloupe.cag.core.content.architecture.buildArchitectureUiGradleScript
 import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
@@ -49,11 +54,59 @@ class ArchitectureModulesContentGenerator(
         }
 
         val catalogUpdater = VersionCatalogUpdater()
+        val versions =
+            VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS +
+                if (enableCompose) {
+                    VersionCatalogConstants.COMPOSE_VERSIONS
+                } else {
+                    emptyList<SectionEntryRequirement.VersionRequirement>()
+                } +
+                if (enableKtlint) {
+                    VersionCatalogConstants.KTLINT_VERSIONS
+                } else {
+                    emptyList<SectionEntryRequirement.VersionRequirement>()
+                } +
+                if (enableDetekt) {
+                    VersionCatalogConstants.DETEKT_VERSIONS
+                } else {
+                    emptyList<SectionEntryRequirement.VersionRequirement>()
+                }
+        val libraries =
+            LibraryConstants.CORE_ANDROID_LIBRARIES +
+                if (enableCompose) {
+                    LibraryConstants.COMPOSE_LIBRARIES
+                } else {
+                    emptyList<SectionEntryRequirement.LibraryRequirement>() +
+                        LibraryConstants.TESTING_LIBRARIES
+                }
+        val plugins =
+            PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
+                if (enableCompose) {
+                    PluginConstants.COMPOSE_PLUGINS
+                } else {
+                    emptyList<SectionEntryRequirement.PluginRequirement>() +
+                        if (enableKtlint) {
+                            PluginConstants.CODE_QUALITY_PLUGINS.filter { it.id == "org.jlleitschuh.gradle.ktlint" }
+                        } else {
+                            emptyList<SectionEntryRequirement.PluginRequirement>() +
+                                if (enableDetekt) {
+                                    PluginConstants.CODE_QUALITY_PLUGINS.filter {
+                                        it.id == "io.gitlab.arturbosch.detekt"
+                                    }
+                                } else {
+                                    emptyList<SectionEntryRequirement.PluginRequirement>()
+                                }
+                        }
+                }
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = versions,
+                libraries = libraries,
+                plugins = plugins
+            )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = architectureRoot.parentFile,
-            enableCompose = enableCompose,
-            enableKtlint = enableKtlint,
-            enableDetekt = enableDetekt
+            dependencyConfiguration = dependencyConfiguration
         )
 
         gradleFileCreator.writeGradleFileIfMissing(
@@ -84,8 +137,10 @@ class ArchitectureModulesContentGenerator(
 
         val domainRoot = File(architectureRoot, "domain")
         domainModuleCreator.generateDomainContent(domainRoot, architecturePackageName, packageSegments + "domain")
+
         val presentationRoot = File(architectureRoot, "presentation")
         presentationModuleCreator.generatePresentationContent(presentationRoot, architecturePackageName, packageSegments + "presentation")
+
         val presentationTestRoot = File(architectureRoot, "presentation-test")
         presentationTestModuleCreator.generatePresentationTestContent(
             presentationTestRoot,

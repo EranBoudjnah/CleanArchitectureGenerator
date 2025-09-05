@@ -3,6 +3,10 @@ package com.mitteloupe.cag.core.generation.architecture
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.architecture.buildCoroutineGradleScript
 import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
@@ -28,9 +32,15 @@ class CoroutineModuleContentGenerator {
         }
 
         val catalogUpdater = VersionCatalogUpdater()
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                libraries = LibraryConstants.CORE_ANDROID_LIBRARIES,
+                plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
+            )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
-            includeCoroutines = true
+            dependencyConfiguration = dependencyConfiguration
         )
 
         GradleFileCreator().writeGradleFileIfMissing(
