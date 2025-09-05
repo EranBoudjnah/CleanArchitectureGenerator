@@ -13,10 +13,10 @@ fun buildUiDiKotlinFile(
 
 ${
         """
-import ${projectNamespace}architecture.presentation.notification.PresentationNotification
-import ${projectNamespace}architecture.ui.navigation.mapper.NavigationEventDestinationMapper
-import ${projectNamespace}architecture.ui.notification.mapper.NotificationUiMapper
-import ${projectNamespace}architecture.ui.view.BaseComposeHolder
+import $projectNamespace.architecture.presentation.notification.PresentationNotification
+import $projectNamespace.architecture.ui.navigation.mapper.NavigationEventDestinationMapper
+import $projectNamespace.architecture.ui.notification.mapper.NotificationUiMapper
+import $projectNamespace.architecture.ui.view.BaseComposeHolder
 import $featurePackageName.presentation.model.${className}ViewState
 import $featurePackageName.presentation.navigation.${className}PresentationNavigationEvent
 import $featurePackageName.presentation.viewmodel.${className}ViewModel

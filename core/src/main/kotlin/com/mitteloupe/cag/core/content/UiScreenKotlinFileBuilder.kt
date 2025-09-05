@@ -16,8 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import ${projectNamespace}architecture.ui.view.ScreenEnterObserver
-import ${projectNamespace}architecture.ui.view.ViewModelObserver
+import $projectNamespace.architecture.ui.view.ScreenEnterObserver
+import $projectNamespace.architecture.ui.view.ViewModelObserver
 import $featurePackageName.presentation.model.StubPresentationModel
 import $featurePackageName.ui.di.${className}Dependencies
 """.optimizeImports()
