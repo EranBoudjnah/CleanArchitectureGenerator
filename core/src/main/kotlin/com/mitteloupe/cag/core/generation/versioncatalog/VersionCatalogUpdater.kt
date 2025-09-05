@@ -412,6 +412,86 @@ private fun desiredLibraries(
                 )
             )
         }
+
+        addAll(
+            listOf(
+                DesiredLibrary(
+                    key = "androidx-fragment-ktx",
+                    module = "androidx.fragment:fragment-ktx",
+                    versionLiteral = "1.6.2"
+                ),
+                DesiredLibrary(
+                    key = "androidx-navigation-fragment-ktx",
+                    module = "androidx.navigation:navigation-fragment-ktx",
+                    versionLiteral = "2.7.6"
+                ),
+                DesiredLibrary(
+                    key = "material",
+                    module = "com.google.android.material:material",
+                    versionLiteral = "1.11.0"
+                ),
+                DesiredLibrary(
+                    key = "androidx-appcompat",
+                    module = "androidx.appcompat:appcompat",
+                    versionLiteral = "1.6.1"
+                ),
+                DesiredLibrary(
+                    key = "androidx-recyclerview",
+                    module = "androidx.recyclerview:recyclerview",
+                    versionLiteral = "1.3.2"
+                ),
+                DesiredLibrary(
+                    key = "okhttp3",
+                    module = "com.squareup.okhttp3:okhttp",
+                    versionLiteral = "4.12.0"
+                )
+            )
+        )
+
+        addAll(
+            listOf(
+                DesiredLibrary(
+                    key = "test-junit",
+                    module = "junit:junit",
+                    versionRefKey = "junit4"
+                ),
+                DesiredLibrary(
+                    key = "test-androidx-junit",
+                    module = "androidx.test.ext:junit",
+                    versionLiteral = "1.1.5"
+                ),
+                DesiredLibrary(
+                    key = "test-androidx-espresso-core",
+                    module = "androidx.test.espresso:espresso-core",
+                    versionLiteral = "3.5.1"
+                ),
+                DesiredLibrary(
+                    key = "test-compose-ui-junit4",
+                    module = "androidx.compose.ui:ui-test-junit4",
+                    versionRefKey = "composeBom"
+                ),
+                DesiredLibrary(
+                    key = "test-android-hilt",
+                    module = "com.google.dagger:hilt-android-testing",
+                    versionLiteral = "2.48"
+                ),
+                DesiredLibrary(
+                    key = "test-android-uiautomator",
+                    module = "androidx.test.uiautomator:uiautomator",
+                    versionLiteral = "2.2.0"
+                ),
+                DesiredLibrary(
+                    key = "test-android-mockwebserver",
+                    module = "com.squareup.okhttp3:mockwebserver",
+                    versionLiteral = "4.12.0"
+                ),
+                DesiredLibrary(
+                    key = "test-androidx-rules",
+                    module = "androidx.test:rules",
+                    versionLiteral = "1.5.0"
+                )
+            )
+        )
     }
 
 private fun desiredPlugins(
@@ -441,6 +521,11 @@ private fun desiredPlugins(
                     id = "com.android.library",
                     alias = "android-library",
                     versionRefKey = "androidGradlePlugin"
+                ),
+                DesiredPlugin(
+                    id = "com.google.devtools.ksp",
+                    alias = "ksp",
+                    versionRefKey = "kotlin"
                 )
             )
         )
