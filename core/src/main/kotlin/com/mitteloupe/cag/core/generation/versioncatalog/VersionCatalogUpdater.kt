@@ -281,8 +281,10 @@ class VersionCatalogUpdater(
         includeDetekt: Boolean
     ): List<SectionEntryRequirement> =
         buildList {
+            add(SectionEntryRequirement.VersionRequirement(key = "kotlin", version = "2.1.0"))
             add(SectionEntryRequirement.VersionRequirement(key = "compileSdk", version = "35"))
             add(SectionEntryRequirement.VersionRequirement(key = "minSdk", version = "24"))
+            add(SectionEntryRequirement.VersionRequirement(key = "junit4", version = "4.13.2"))
             if (includeAndroidGradlePlugin) {
                 add(SectionEntryRequirement.VersionRequirement(key = "targetSdk", version = "35"))
                 add(
@@ -429,6 +431,11 @@ private fun desiredPlugins(
                     id = "org.jetbrains.kotlin.android",
                     alias = "kotlin-android",
                     versionRefKey = "kotlin"
+                ),
+                DesiredPlugin(
+                    id = "com.android.application",
+                    alias = "android-application",
+                    versionRefKey = "androidGradlePlugin"
                 ),
                 DesiredPlugin(
                     id = "com.android.library",
