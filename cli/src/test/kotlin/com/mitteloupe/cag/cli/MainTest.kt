@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -14,7 +16,10 @@ import java.io.PrintStream
 @RunWith(Enclosed::class)
 @SuiteClasses(
     MainTest.NoArguments::class,
-    MainTest.Help::class
+    MainTest.Help::class,
+    MainTest.InvalidFlags::class,
+    MainTest.GenerationException::class,
+    MainTest.SuccessfulGeneration::class
 )
 class MainTest {
     abstract class BaseMainTest {
@@ -31,6 +36,18 @@ class MainTest {
         @After
         fun tearDown() {
             System.setOut(originalOutput)
+        }
+
+        protected fun runMainInSeparateProcess(arguments: Array<String>): Int {
+            val processBuilder =
+                ProcessBuilder(
+                    System.getProperty("java.home") + "/bin/java",
+                    "-classpath",
+                    System.getProperty("java.class.path"),
+                    "com.mitteloupe.cag.cli.MainKt"
+                )
+            processBuilder.command().addAll(arguments.toList())
+            return processBuilder.start().waitFor()
         }
     }
 
@@ -126,6 +143,39 @@ Options:
   --help, -h
       Show this help message and exit
 """
+        }
+    }
+
+    class InvalidFlags : BaseMainTest() {
+        @Test
+        fun `Given invalid flags when main then process exits with code 1`() {
+            // When
+            val exitCode = runMainInSeparateProcess(arrayOf("--invalid-flag"))
+
+            // Then
+            assertEquals(1, exitCode)
+        }
+    }
+
+    class GenerationException : BaseMainTest() {
+        @Test
+        fun `Given generation exception when main then process exits with code 1`() {
+            // When
+            val exitCode = runMainInSeparateProcess(arrayOf("--new-project", "--name=TestProject", "--package=com.test"))
+
+            // Then
+            assertEquals(1, exitCode)
+        }
+    }
+
+    class SuccessfulGeneration : BaseMainTest() {
+        @Test
+        fun `Given valid arguments when main then prints Done!`() {
+            // When
+            main(arrayOf("--help"))
+
+            // Then
+            assertThat(output.toString(), containsString("usage: cag"))
         }
     }
 }

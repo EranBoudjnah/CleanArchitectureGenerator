@@ -1,31 +1,21 @@
 package com.mitteloupe.cag.cli
 
-data class SecondaryFlag(
-    val long: String,
-    val short: String,
-    val isMandatory: Boolean = false,
-    val missingErrorMessage: String = "",
-    val isBoolean: Boolean = false
-)
+import com.mitteloupe.cag.cli.flag.PrimaryFlag
+import com.mitteloupe.cag.cli.flag.SecondaryFlag
 
 class ArgumentParser {
     fun parsePrimaryWithSecondaries(
         arguments: Array<String>,
-        primaryLong: String,
-        primaryShort: String,
-        secondaryFlags: List<SecondaryFlag>
+        primaryFlag: PrimaryFlag
     ): List<Map<String, String>> {
         if (arguments.isEmpty()) {
             return emptyList()
         }
 
-        val isLongForm = determineForm(arguments, primaryLong, primaryShort)
-        if (isLongForm == null) {
-            throw IllegalArgumentException("Invalid syntax: [${arguments.joinToString(", ")}]")
-        }
+        val isLongForm = determineForm(arguments, primaryFlag.long, primaryFlag.short) ?: return emptyList()
 
-        val primary = if (isLongForm) primaryLong else primaryShort
-        val secondaryMap = secondaryFlags.associateBy { if (isLongForm) it.long else it.short }
+        val primary = if (isLongForm) primaryFlag.long else primaryFlag.short
+        val secondaryMap = primaryFlag.secondaryFlags.associateBy { if (isLongForm) it.long else it.short }
 
         return parseArguments(arguments, primary, secondaryMap, isLongForm)
     }

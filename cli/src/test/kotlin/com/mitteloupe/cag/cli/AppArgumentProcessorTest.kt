@@ -19,7 +19,8 @@ import org.junit.runners.Suite.SuiteClasses
     AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorDataSourcesTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorUseCasesTest::class,
-    AppArgumentProcessorTest.AppArgumentProcessorProjectTemplateTest::class
+    AppArgumentProcessorTest.AppArgumentProcessorProjectTemplateTest::class,
+    AppArgumentProcessorTest.UnknownFlagsValidation::class
 )
 class AppArgumentProcessorTest {
     class Help {
@@ -781,6 +782,135 @@ class AppArgumentProcessorTest {
                 // Then
                 assertEquals("Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
+        }
+    }
+
+    class UnknownFlagsValidation {
+        private lateinit var classUnderTest: AppArgumentProcessor
+
+        @Before
+        fun setUp() {
+            classUnderTest = AppArgumentProcessor()
+        }
+
+        @Test
+        fun `Given valid arguments when validateNoUnknownFlags then does not throw exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=TestFeature")
+
+            // When & Then
+            classUnderTest.validateNoUnknownFlags(givenArguments)
+        }
+
+        @Test
+        fun `Given help flag when validateNoUnknownFlags then does not throw exception`() {
+            // Given
+            val givenArguments = arrayOf("--help")
+
+            // When & Then
+            classUnderTest.validateNoUnknownFlags(givenArguments)
+        }
+
+        @Test
+        fun `Given short help flag when validateNoUnknownFlags then does not throw exception`() {
+            // Given
+            val givenArguments = arrayOf("-h")
+
+            // When & Then
+            classUnderTest.validateNoUnknownFlags(givenArguments)
+        }
+
+        @Test
+        fun `Given unknown flag when validateNoUnknownFlags then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("--unknown-flag")
+
+            // When
+            try {
+                classUnderTest.validateNoUnknownFlags(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Unknown flags: --unknown-flag", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given multiple unknown flags when validateNoUnknownFlags then throws exception with all flags`() {
+            // Given
+            val givenArguments = arrayOf("--unknown-flag1", "--unknown-flag2")
+
+            // When
+            try {
+                classUnderTest.validateNoUnknownFlags(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Unknown flags: --unknown-flag1, --unknown-flag2", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given valid arguments with unknown flag when validateNoUnknownFlags then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=TestFeature", "--unknown-flag")
+
+            // When
+            try {
+                classUnderTest.validateNoUnknownFlags(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Unknown flags: --unknown-flag", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given short unknown flag when validateNoUnknownFlags then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("-unknown")
+
+            // When
+            try {
+                classUnderTest.validateNoUnknownFlags(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Unknown flags: -unknown", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given mixed valid and unknown flags when validateNoUnknownFlags then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=Test", "--unknown", "value")
+
+            // When
+            try {
+                classUnderTest.validateNoUnknownFlags(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Unknown flags: --unknown", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given empty arguments when validateNoUnknownFlags then does not throw exception`() {
+            // Given
+            val givenArguments = emptyArray<String>()
+
+            // When & Then
+            classUnderTest.validateNoUnknownFlags(givenArguments)
+        }
+
+        @Test
+        fun `Given arguments without flags when validateNoUnknownFlags then does not throw exception`() {
+            // Given
+            val givenArguments = arrayOf("value1", "value2")
+
+            // When & Then
+            classUnderTest.validateNoUnknownFlags(givenArguments)
         }
     }
 }

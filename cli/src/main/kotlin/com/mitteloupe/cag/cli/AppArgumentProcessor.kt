@@ -1,39 +1,71 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.flag.PrimaryFlag
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.HelpPrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewArchitecturePrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewDataSourcePrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewFeaturePrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewProjectPrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewUseCasePrimary
+import com.mitteloupe.cag.cli.flag.SecondaryFlagConstants
 import com.mitteloupe.cag.cli.request.ArchitectureRequest
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 
+private val PRIMARY_FLAGS =
+    setOf(
+        NewProjectPrimary,
+        NewArchitecturePrimary,
+        NewFeaturePrimary,
+        NewDataSourcePrimary,
+        NewUseCasePrimary,
+        HelpPrimary
+    )
+
 class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
-    fun isHelpRequested(arguments: Array<String>): Boolean = arguments.any { it in setOf("--help", "-h") }
+    fun isHelpRequested(arguments: Array<String>): Boolean = argumentParser.parsePrimaryWithSecondaries(arguments, HelpPrimary).isNotEmpty()
+
+    private fun getAllPrimaryFlagStrings(): Set<String> = PRIMARY_FLAGS.flatMap { listOf(it.long, it.short) }.toSet()
+
+    fun validateNoUnknownFlags(arguments: Array<String>) {
+        val consumedArguments =
+            PRIMARY_FLAGS.flatMap { getConsumedArguments(arguments, it) }.toSet()
+
+        val knownFlags = getAllPrimaryFlagStrings()
+
+        val unknownFlags =
+            arguments.filter { argument ->
+                argument.startsWith("-") &&
+                    !consumedArguments.contains(argument) &&
+                    !knownFlags.contains(argument)
+            }
+
+        if (unknownFlags.isNotEmpty()) {
+            throw IllegalArgumentException("Unknown flags: ${unknownFlags.joinToString(", ")}")
+        }
+    }
 
     fun getNewFeatures(arguments: Array<String>): List<FeatureRequest> =
         parseWithNameFlag(
             arguments = arguments,
-            primaryLong = "--new-feature",
-            primaryShort = "-nf",
-            nameErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName",
-            additionalFlags = listOf(SecondaryFlag("--package", "-p"))
+            primaryFlag = NewFeaturePrimary
         ) { secondaries ->
             FeatureRequest(
-                featureName = secondaries["--name"].orEmpty(),
-                packageName = secondaries["--package"]
+                featureName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
+                packageName = secondaries[SecondaryFlagConstants.PACKAGE]
             )
         }
 
     fun getNewDataSources(arguments: Array<String>): List<DataSourceRequest> =
         parseWithNameFlag(
             arguments = arguments,
-            primaryLong = "--new-datasource",
-            primaryShort = "-nds",
-            nameErrorMessage = "Data source name is required. Use --name=DataSourceName or -n=DataSourceName",
-            additionalFlags = listOf(SecondaryFlag("--with", "-w"))
+            primaryFlag = NewDataSourcePrimary
         ) { secondaries ->
-            val rawName = secondaries["--name"] ?: ""
+            val rawName = secondaries[SecondaryFlagConstants.NAME] ?: ""
             val name = ensureDataSourceSuffix(rawName)
-            val libraries = parseLibraries(secondaries["--with"])
+            val libraries = parseLibraries(secondaries[SecondaryFlagConstants.WITH])
             DataSourceRequest(
                 dataSourceName = name,
                 useKtor = libraries.contains("ktor"),
@@ -44,88 +76,52 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
     fun getNewUseCases(arguments: Array<String>): List<UseCaseRequest> =
         parseWithNameFlag(
             arguments = arguments,
-            primaryLong = "--new-use-case",
-            primaryShort = "-nuc",
-            nameErrorMessage = "Use case name is required. Use --name=UseCaseName or -n=UseCaseName",
-            additionalFlags =
-                listOf(
-                    SecondaryFlag("--path", "-p"),
-                    SecondaryFlag("--input-type", "-it"),
-                    SecondaryFlag("--output-type", "-ot")
-                )
+            primaryFlag = NewUseCasePrimary
         ) { secondaries ->
             UseCaseRequest(
-                useCaseName = secondaries["--name"] ?: "",
-                targetPath = secondaries["--path"],
-                inputDataType = secondaries["--input-type"],
-                outputDataType = secondaries["--output-type"]
+                useCaseName = secondaries[SecondaryFlagConstants.NAME] ?: "",
+                targetPath = secondaries[SecondaryFlagConstants.PATH],
+                inputDataType = secondaries[SecondaryFlagConstants.INPUT_TYPE],
+                outputDataType = secondaries[SecondaryFlagConstants.OUTPUT_TYPE]
             )
         }
 
     fun getNewArchitecture(arguments: Array<String>): List<ArchitectureRequest> =
         argumentParser.parsePrimaryWithSecondaries(
             arguments = arguments,
-            primaryLong = "--new-architecture",
-            primaryShort = "-na",
-            secondaryFlags =
-                listOf(
-                    SecondaryFlag("--no-compose", "-nc", isBoolean = true),
-                    SecondaryFlag("--ktlint", "-kl", isBoolean = true),
-                    SecondaryFlag("--detekt", "-d", isBoolean = true)
-                )
+            primaryFlag = NewArchitecturePrimary
         ).map { secondaries ->
             ArchitectureRequest(
-                enableCompose = !secondaries.containsKey("--no-compose"),
-                enableKtlint = secondaries.containsKey("--ktlint"),
-                enableDetekt = secondaries.containsKey("--detekt")
+                enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
+                enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
+                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT)
             )
         }
 
     fun getNewProjectTemplate(arguments: Array<String>): List<ProjectTemplateRequest> =
         parseWithNameFlag(
             arguments = arguments,
-            primaryLong = "--new-project",
-            primaryShort = "-np",
-            nameErrorMessage = "Project name is required. Use --name=ProjectName or -n=ProjectName",
-            additionalFlags =
-                listOf(
-                    SecondaryFlag("--package", "-p"),
-                    SecondaryFlag("--no-compose", "-nc", isBoolean = true),
-                    SecondaryFlag("--ktlint", "-kl", isBoolean = true),
-                    SecondaryFlag("--detekt", "-d", isBoolean = true),
-                    SecondaryFlag("--ktor", "-kt", isBoolean = true),
-                    SecondaryFlag("--retrofit", "-rt", isBoolean = true)
-                )
+            primaryFlag = NewProjectPrimary
         ) { secondaries ->
             ProjectTemplateRequest(
-                projectName = secondaries["--name"] ?: "",
-                packageName = secondaries["--package"] ?: "",
-                enableCompose = !secondaries.containsKey("--no-compose"),
-                enableKtlint = secondaries.containsKey("--ktlint"),
-                enableDetekt = secondaries.containsKey("--detekt"),
-                enableKtor = secondaries.containsKey("--ktor"),
-                enableRetrofit = secondaries.containsKey("--retrofit")
+                projectName = secondaries[SecondaryFlagConstants.NAME] ?: "",
+                packageName = secondaries[SecondaryFlagConstants.PACKAGE] ?: "",
+                enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
+                enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
+                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
+                enableKtor = secondaries.containsKey(SecondaryFlagConstants.KTOR),
+                enableRetrofit = secondaries.containsKey(SecondaryFlagConstants.RETROFIT)
             )
         }
 
     private inline fun <T> parseWithNameFlag(
         arguments: Array<String>,
-        primaryLong: String,
-        primaryShort: String,
-        nameErrorMessage: String,
-        additionalFlags: List<SecondaryFlag>,
+        primaryFlag: PrimaryFlag,
         transform: (Map<String, String>) -> T
     ): List<T> {
-        val allFlags =
-            listOf(
-                SecondaryFlag("--name", "-n", isMandatory = true, missingErrorMessage = nameErrorMessage)
-            ) + additionalFlags
-
         return argumentParser.parsePrimaryWithSecondaries(
             arguments = arguments,
-            primaryLong = primaryLong,
-            primaryShort = primaryShort,
-            secondaryFlags = allFlags
+            primaryFlag = primaryFlag
         ).map(transform).filter { isValidRequest(it) }
     }
 
@@ -150,6 +146,75 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             trimmedName
         } else {
             "${trimmedName}DataSource"
+        }
+    }
+
+    private fun getConsumedArguments(
+        arguments: Array<String>,
+        primaryFlag: PrimaryFlag
+    ): Set<String> {
+        val consumedArguments = mutableSetOf<String>()
+        val isLongForm = determineForm(arguments, primaryFlag) ?: return emptySet()
+        val primary = if (isLongForm) primaryFlag.long else primaryFlag.short
+
+        val secondaryFlags = primaryFlag.secondaryFlags
+        val secondaryMap = secondaryFlags.associateBy { if (isLongForm) it.long else it.short }
+
+        var index = 0
+        while (index < arguments.size) {
+            val token = arguments[index]
+            if (token == primary) {
+                consumedArguments.add(token)
+                index++
+
+                while (index < arguments.size) {
+                    val nextToken = arguments[index]
+                    if (nextToken.startsWith("-")) {
+                        if (nextToken in getAllPrimaryFlagStrings()) {
+                            break
+                        }
+
+                        val matchingKey =
+                            secondaryMap.keys.find { key ->
+                                nextToken == key || nextToken.startsWith("$key=")
+                            }
+
+                        if (matchingKey != null) {
+                            consumedArguments.add(nextToken)
+                            index++
+
+                            val secondary = secondaryMap.getValue(matchingKey)
+                            if (!secondary.isBoolean && !nextToken.contains("=")) {
+                                if (index < arguments.size && !arguments[index].startsWith("-")) {
+                                    consumedArguments.add(arguments[index])
+                                    index++
+                                }
+                            }
+                        } else {
+                            break
+                        }
+                    } else {
+                        consumedArguments.add(nextToken)
+                        index++
+                    }
+                }
+            } else {
+                index++
+            }
+        }
+
+        return consumedArguments
+    }
+
+    private fun determineForm(
+        arguments: Array<String>,
+        primaryFlag: PrimaryFlag
+    ): Boolean? {
+        val firstPrimaryIndex = arguments.indexOfFirst { it in setOf(primaryFlag.long, primaryFlag.short) }
+        return if (firstPrimaryIndex < 0) {
+            null
+        } else {
+            arguments[firstPrimaryIndex] == primaryFlag.long
         }
     }
 }

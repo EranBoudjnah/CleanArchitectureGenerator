@@ -19,60 +19,16 @@ fun main(arguments: Array<String>) {
     val basePackage = BasePackageResolver().determineBasePackage(projectModel)
 
     if (argumentProcessor.isHelpRequested(arguments)) {
-        println(
-            """
-            usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
-
-            Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
-
-            Options:
-              --new-project | -np
-                  Generate a complete Clean Architecture project template
-                --name=ProjectName | -n=ProjectName | -n ProjectName | -nProjectName
-                    Specify the project name (required)
-                --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
-                    Specify the package name (required)
-                --no-compose | -nc
-                  Disable Compose support for the project
-                --ktlint | -kl
-                  Enable ktlint for the project
-                --detekt | -d
-                  Enable detekt for the project
-                --ktor | -kt
-                  Enable Ktor for data sources
-                --retrofit | -rt
-                  Enable Retrofit for data sources
-              --new-architecture | -na
-                  Generate a new Clean Architecture package with domain, presentation, and UI layers
-                --no-compose | -nc
-                  Disable Compose support for the preceding architecture package
-                --ktlint | -kl
-                  Enable ktlint for the preceding architecture package
-                --detekt | -d
-                  Enable detekt for the preceding architecture package
-              --new-feature | -nf
-                  Generate a new feature
-                --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
-                    Specify the feature name (required)
-                --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
-                    Override the feature package for the preceding feature
-              --new-datasource | -nds
-                  Generate a new data source
-                --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
-                    Specify the data source name (required, DataSource suffix will be added automatically)
-                --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
-                    Attach dependencies to the preceding new data source
-              --new-use-case | -nuc
-                  Generate a new use case
-                --name=UseCaseName | -n=UseCaseName | -n UseCaseName | -nUseCaseName
-                    Specify the use case name (required)
-                --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
-                    Specify the target directory for the preceding use case
-              --help, -h
-                  Show this help message and exit
-            """.trimIndent()
-        )
+        printHelpMessage()
         return
+    }
+
+    try {
+        argumentProcessor.validateNoUnknownFlags(arguments)
+    } catch (exception: IllegalArgumentException) {
+        println("Error: ${exception.message}")
+        printUsageMessage()
+        exitProcess(1)
     }
 
     val projectTemplateRequests = argumentProcessor.getNewProjectTemplate(arguments)
@@ -86,31 +42,7 @@ fun main(arguments: Array<String>) {
         dataSourceRequests.isEmpty() &&
         useCaseRequests.isEmpty()
     ) {
-        val hasInvalidArguments =
-            arguments.any { argument ->
-                argument.startsWith("-") && !argument.matches(Regex("^--(help|h)$"))
-            }
-
-        if (hasInvalidArguments) {
-            println("Error: Invalid arguments provided. No valid commands found.")
-            println()
-            println(
-                """
-                usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
-
-                Run with --help or -h for more options.
-                """.trimIndent()
-            )
-            exitProcess(1)
-        } else {
-            println(
-                """
-                usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
-
-                Run with --help or -h for more options.
-                """.trimIndent()
-            )
-        }
+        printUsageMessage()
         return
     }
 
@@ -211,6 +143,72 @@ fun main(arguments: Array<String>) {
             generator.generateUseCase(useCaseRequest)
         }
     }
+}
+
+private fun printUsageMessage() {
+    println(
+        """
+        usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
+        Run with --help or -h for more options.
+        """.trimIndent()
+    )
+}
+
+private fun printHelpMessage() {
+    println(
+        """
+        usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+
+        Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
+
+        Options:
+          --new-project | -np
+              Generate a complete Clean Architecture project template
+            --name=ProjectName | -n=ProjectName | -n ProjectName | -nProjectName
+                Specify the project name (required)
+            --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+                Specify the package name (required)
+            --no-compose | -nc
+              Disable Compose support for the project
+            --ktlint | -kl
+              Enable ktlint for the project
+            --detekt | -d
+              Enable detekt for the project
+            --ktor | -kt
+              Enable Ktor for data sources
+            --retrofit | -rt
+              Enable Retrofit for data sources
+          --new-architecture | -na
+              Generate a new Clean Architecture package with domain, presentation, and UI layers
+            --no-compose | -nc
+              Disable Compose support for the preceding architecture package
+            --ktlint | -kl
+              Enable ktlint for the preceding architecture package
+            --detekt | -d
+              Enable detekt for the preceding architecture package
+          --new-feature | -nf
+              Generate a new feature
+            --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
+                Specify the feature name (required)
+            --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
+                Override the feature package for the preceding feature
+          --new-datasource | -nds
+              Generate a new data source
+            --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
+                Specify the data source name (required, DataSource suffix will be added automatically)
+            --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
+                Attach dependencies to the preceding new data source
+          --new-use-case | -nuc
+              Generate a new use case
+            --name=UseCaseName | -n=UseCaseName | -n UseCaseName | -nUseCaseName
+                Specify the use case name (required)
+            --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+                Specify the target directory for the preceding use case
+          --help, -h
+              Show this help message and exit
+        """.trimIndent()
+    )
 }
 
 private fun executeAndReport(operation: () -> Unit) =

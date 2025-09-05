@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.flag.PrimaryFlag
+import com.mitteloupe.cag.cli.flag.SecondaryFlag
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
@@ -13,6 +15,17 @@ class ArgumentParserTest {
         classUnderTest = ArgumentParser()
     }
 
+    private fun createPrimaryFlag(
+        long: String,
+        short: String,
+        secondaryFlags: List<SecondaryFlag>
+    ): PrimaryFlag =
+        object : PrimaryFlag {
+            override val long = long
+            override val short = short
+            override val secondaryFlags = secondaryFlags
+        }
+
     @Test
     fun `Given no arguments when parsePrimaryWithSecondaries then returns empty list`() {
         // Given
@@ -22,9 +35,7 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag = createPrimaryFlag("--alpha", "-a", listOf(SecondaryFlag("--beta", "-b")))
             )
 
         // Then
@@ -40,9 +51,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                    )
             )
 
         // Then
@@ -64,9 +78,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                    )
             )
 
         // Then
@@ -88,16 +105,19 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                )
+                            )
                     )
             )
 
@@ -117,16 +137,19 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -145,22 +168,25 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        ),
-                        SecondaryFlag(
-                            long = "--gamma",
-                            short = "-g",
-                            isMandatory = true,
-                            missingErrorMessage = "Gamma is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                ),
+                                SecondaryFlag(
+                                    long = "--gamma",
+                                    short = "-g",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Gamma is required"
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -179,16 +205,19 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -207,15 +236,18 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -235,9 +267,12 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
             fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
@@ -256,9 +291,12 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
             fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
@@ -277,9 +315,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -296,9 +337,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -315,9 +359,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -334,9 +381,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                    )
             )
 
         // Then
@@ -353,9 +403,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                    )
             )
 
         // Then
@@ -372,9 +425,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                    )
             )
 
         // Then
@@ -391,9 +447,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -410,9 +469,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -429,9 +491,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -448,9 +513,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -467,9 +535,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -486,9 +557,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
 
         // Then
@@ -510,9 +584,12 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                    )
             )
 
         // Then
@@ -520,45 +597,47 @@ class ArgumentParserTest {
     }
 
     @Test
-    fun `Given unknown flags when parsePrimaryWithSecondaries then throws informative exception`() {
+    fun `Given unknown flags when parsePrimaryWithSecondaries then ignores unknown flags`() {
         // Given
-        val givenArguments = arrayOf("--unknown", "value", "--beta", "x")
-        val expectedErrorMessage = "Invalid syntax: [--unknown, value, --beta, x]"
+        val givenArguments = arrayOf("--alpha", "--unknown", "value", "--beta", "x")
+        val expectedParsedArguments = listOf(mapOf("--beta" to "x"))
 
         // When
-        try {
+        val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
-            fail("Expected IllegalArgumentException to be thrown")
-        } catch (exception: IllegalArgumentException) {
-            // Then
-            assertEquals(expectedErrorMessage, exception.message)
-        }
+
+        // Then
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
-    fun `Given flags without primary when parsePrimaryWithSecondaries then throws informative exception`() {
+    fun `Given flags without primary when parsePrimaryWithSecondaries then returns empty list`() {
         // Given
         val givenArguments = arrayOf("--beta", "value", "--gamma", "other")
-        val expectedErrorMessage = "Invalid syntax: [--beta, value, --gamma, other]"
+        val expectedParsedArguments = emptyList<Map<String, String>>()
 
         // When
-        try {
+        val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                    )
             )
-            fail("Expected IllegalArgumentException to be thrown")
-        } catch (exception: IllegalArgumentException) {
-            // Then
-            assertEquals(expectedErrorMessage, exception.message)
-        }
+
+        // Then
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -571,12 +650,15 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag("--beta", "-b", isMandatory = true, missingErrorMessage = "Beta required"),
-                        SecondaryFlag("--gamma", "-g", isMandatory = true, missingErrorMessage = "Gamma required")
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag("--beta", "-b", isMandatory = true, missingErrorMessage = "Beta required"),
+                                SecondaryFlag("--gamma", "-g", isMandatory = true, missingErrorMessage = "Gamma required")
+                            )
                     )
             )
 
@@ -599,28 +681,31 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta required"
-                        ),
-                        SecondaryFlag(
-                            long = "--gamma",
-                            short = "-g",
-                            isMandatory = true,
-                            missingErrorMessage = expectedFirstErrorMessage
-                        ),
-                        SecondaryFlag(
-                            long = "--delta",
-                            short = "-d",
-                            isMandatory = true,
-                            missingErrorMessage = expectedSecondErrorMessage
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta required"
+                                ),
+                                SecondaryFlag(
+                                    long = "--gamma",
+                                    short = "-g",
+                                    isMandatory = true,
+                                    missingErrorMessage = expectedFirstErrorMessage
+                                ),
+                                SecondaryFlag(
+                                    long = "--delta",
+                                    short = "-d",
+                                    isMandatory = true,
+                                    missingErrorMessage = expectedSecondErrorMessage
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -640,17 +725,20 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            isBoolean = true,
-                            missingErrorMessage = "Beta required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    isBoolean = true,
+                                    missingErrorMessage = "Beta required"
+                                )
+                            )
                     )
             )
 
@@ -671,17 +759,20 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            isBoolean = true,
-                            missingErrorMessage = expectedErrorMessage
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    isBoolean = true,
+                                    missingErrorMessage = expectedErrorMessage
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -709,13 +800,16 @@ class ArgumentParserTest {
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag("--beta", "-b"),
-                        SecondaryFlag("--gamma", "-g"),
-                        SecondaryFlag("--delta", "-d", isBoolean = true)
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag("--beta", "-b"),
+                                SecondaryFlag("--gamma", "-g"),
+                                SecondaryFlag("--delta", "-d", isBoolean = true)
+                            )
                     )
             )
 
@@ -734,16 +828,19 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -764,16 +861,19 @@ class ArgumentParserTest {
         try {
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags =
-                    listOf(
-                        SecondaryFlag(
-                            long = "--beta",
-                            short = "-b",
-                            isMandatory = true,
-                            missingErrorMessage = "Beta is required"
-                        )
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags =
+                            listOf(
+                                SecondaryFlag(
+                                    long = "--beta",
+                                    short = "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta is required"
+                                )
+                            )
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -784,23 +884,24 @@ class ArgumentParserTest {
     }
 
     @Test
-    fun `Given mixed invalid and valid flags when parsePrimaryWithSecondaries then throws informative exception`() {
+    fun `Given mixed invalid and valid flags when parsePrimaryWithSecondaries then ignores invalid flags`() {
         // Given
-        val givenArguments = arrayOf("--invalid", "--beta", "value", "-unknown", "test")
-        val expectedErrorMessage = "Invalid syntax: [--invalid, --beta, value, -unknown, test]"
+        val givenArguments = arrayOf("--alpha", "--invalid", "--beta", "value", "-unknown", "test")
+        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
 
         // When
-        try {
+        val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryLong = "--alpha",
-                primaryShort = "-a",
-                secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                    )
             )
-            fail("Expected IllegalArgumentException to be thrown")
-        } catch (exception: IllegalArgumentException) {
-            // Then
-            assertEquals(expectedErrorMessage, exception.message)
-        }
+
+        // Then
+        assertEquals(expectedParsedArguments, result)
     }
 }
