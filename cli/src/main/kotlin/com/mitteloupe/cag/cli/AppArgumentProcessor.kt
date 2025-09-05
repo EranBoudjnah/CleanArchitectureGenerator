@@ -18,7 +18,7 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             additionalFlags = listOf(SecondaryFlag("--package", "-p"))
         ) { secondaries ->
             FeatureRequest(
-                featureName = secondaries["--name"] ?: "",
+                featureName = secondaries["--name"].orEmpty(),
                 packageName = secondaries["--package"]
             )
         }
@@ -121,16 +121,12 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 SecondaryFlag("--name", "-n", isMandatory = true, missingErrorMessage = nameErrorMessage)
             ) + additionalFlags
 
-        return try {
-            argumentParser.parsePrimaryWithSecondaries(
-                arguments = arguments,
-                primaryLong = primaryLong,
-                primaryShort = primaryShort,
-                secondaryFlags = allFlags
-            ).map(transform).filter { isValidRequest(it) }
-        } catch (exception: IllegalArgumentException) {
-            emptyList()
-        }
+        return argumentParser.parsePrimaryWithSecondaries(
+            arguments = arguments,
+            primaryLong = primaryLong,
+            primaryShort = primaryShort,
+            secondaryFlags = allFlags
+        ).map(transform).filter { isValidRequest(it) }
     }
 
     private fun <T> isValidRequest(request: T): Boolean =
