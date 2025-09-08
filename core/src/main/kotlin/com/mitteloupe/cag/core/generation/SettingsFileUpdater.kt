@@ -160,11 +160,10 @@ class SettingsFileUpdater {
     fun writeProjectSettings(
         projectRoot: File,
         projectName: String,
-        enableKtlint: Boolean,
-        enableDetekt: Boolean
+        featureNames: List<String>
     ) {
         val settingsFile = File(projectRoot, "settings.gradle.kts")
-        val content = buildSettingsGradleScript(projectName, enableKtlint, enableDetekt)
+        val content = buildSettingsGradleScript(projectName, featureNames)
         runCatching { settingsFile.writeText(content) }
             .onFailure { throw GenerationException("Failed to create settings.gradle.kts: ${it.message}") }
     }

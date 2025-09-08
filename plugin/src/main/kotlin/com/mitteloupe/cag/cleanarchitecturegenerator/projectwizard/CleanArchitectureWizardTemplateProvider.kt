@@ -1,9 +1,12 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.projectwizard
 
+import com.android.tools.idea.templates.recipe.FindReferencesRecipeExecutor
+import com.android.tools.idea.wizard.template.BooleanParameter
 import com.android.tools.idea.wizard.template.Category
 import com.android.tools.idea.wizard.template.CheckBoxWidget
 import com.android.tools.idea.wizard.template.FormFactor
 import com.android.tools.idea.wizard.template.ModuleTemplateData
+import com.android.tools.idea.wizard.template.RecipeExecutor
 import com.android.tools.idea.wizard.template.Template
 import com.android.tools.idea.wizard.template.TemplateConstraint
 import com.android.tools.idea.wizard.template.TemplateData
@@ -12,13 +15,23 @@ import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.template
+import com.intellij.openapi.application.ApplicationManager
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import java.io.File
+import java.lang.reflect.Field
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
+    companion object {
+        private val processedRequests = ConcurrentHashMap<String, Boolean>()
+    }
+
+    private val executionId = UUID.randomUUID().toString()
+
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
     private val cleanArchitectureTemplate =
@@ -79,27 +92,82 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             }
 
             recipe = { data: TemplateData ->
-                try {
-                    val moduleData = (data as ModuleTemplateData)
-                    val request =
-                        GenerateProjectTemplateRequest(
-                            destinationRootDirectory = moduleData.rootDir,
-                            projectName = data.name,
-                            packageName = data.packageName,
-                            enableCompose = enableCompose.value,
-                            enableKtlint = enableKtlint.value,
-                            enableDetekt = enableDetekt.value,
-                            enableKtor = enableKtor.value,
-                            enableRetrofit = enableRetrofit.value
-                        )
+                val moduleData = (data as ModuleTemplateData)
 
-                    Generator().generateProjectTemplate(request)
-                } catch (exception: GenerationException) {
-                    throw RuntimeException(
-                        CleanArchitectureGeneratorBundle.message("wizard.error.generation.failed", exception.message ?: ""),
-                        exception
-                    )
+                if (processedRequests.putIfAbsent(executionId, true) == null) {
+                    try {
+                        val projectRootDirectory = moduleData.rootDir.parentFile
+                        createProject(
+                            projectRootDirectory,
+                            data,
+                            enableCompose,
+                            enableKtlint,
+                            enableDetekt,
+                            enableKtor,
+                            enableRetrofit
+                        )
+                    } catch (exception: GenerationException) {
+                        throw RuntimeException(
+                            CleanArchitectureGeneratorBundle.message(
+                                "wizard.error.generation.failed",
+                                exception.message ?: ""
+                            ),
+                            exception
+                        )
+                    }
                 }
             }
         }
+
+    private fun RecipeExecutor.createProject(
+        projectRootDirectory: File,
+        data: ModuleTemplateData,
+        enableCompose: BooleanParameter,
+        enableKtlint: BooleanParameter,
+        enableDetekt: BooleanParameter,
+        enableKtor: BooleanParameter,
+        enableRetrofit: BooleanParameter
+    ) {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            val request =
+                GenerateProjectTemplateRequest(
+                    requestId = executionId,
+                    destinationRootDirectory = projectRootDirectory,
+                    projectName = readProjectName(projectRootDirectory.name),
+                    packageName = data.packageName,
+                    enableCompose = enableCompose.value,
+                    enableKtlint = enableKtlint.value,
+                    enableDetekt = enableDetekt.value,
+                    enableKtor = enableKtor.value,
+                    enableRetrofit = enableRetrofit.value
+                )
+
+            Generator().generateProjectTemplate(request)
+        }
+    }
+
+    private fun RecipeExecutor.readProjectName(fallbackProjectName: String): String {
+        val projectNameFromContext =
+            try {
+                val findReferencesExecutor = this as? FindReferencesRecipeExecutor
+                if (findReferencesExecutor != null) {
+                    val contextField: Field = FindReferencesRecipeExecutor::class.java.getDeclaredField("context")
+                    contextField.isAccessible = true
+                    val context = contextField.get(findReferencesExecutor)
+                    val projectField = context?.javaClass?.getDeclaredField("project")
+                    projectField?.isAccessible = true
+                    val project = projectField?.get(context)
+                    val nameField = project?.javaClass?.getDeclaredField("name")
+                    nameField?.isAccessible = true
+                    nameField?.get(project) as? String
+                } else {
+                    null
+                }
+            } catch (_: Exception) {
+                null
+            }
+
+        return projectNameFromContext?.takeIf { it.isNotEmpty() }
+            ?: fallbackProjectName
+    }
 }

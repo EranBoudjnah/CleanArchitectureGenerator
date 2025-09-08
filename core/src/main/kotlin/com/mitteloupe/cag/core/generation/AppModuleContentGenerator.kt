@@ -45,6 +45,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
 
     fun writeAppModule(
         startDirectory: File,
+        appName: String,
         projectNamespace: String,
         enableCompose: Boolean
     ) {
@@ -56,37 +57,50 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         FileCreator.createDirectoryIfNotExists(basePackageDir)
 
         val mainActivityFile = File(basePackageDir, "MainActivity.kt")
-        val mainActivityContent = buildMainActivityKotlinFile(projectNamespace, enableCompose)
+        val mainActivityContent =
+            buildMainActivityKotlinFile(
+                appName = appName,
+                projectNamespace = projectNamespace,
+                enableCompose = enableCompose
+            )
         FileCreator.createFileIfNotExists(mainActivityFile) { mainActivityContent }
 
         val applicationFile = File(basePackageDir, "Application.kt")
         val applicationContent = buildApplicationKotlinFile(projectNamespace)
         FileCreator.createFileIfNotExists(applicationFile) { applicationContent }
 
-        generateAndroidResources(appModuleDirectory, packageName, enableCompose)
+        generateAndroidResources(
+            appModuleDirectory = appModuleDirectory,
+            appName = appName,
+            packageName = packageName,
+            enableCompose = enableCompose
+        )
     }
 
     private fun generateAndroidResources(
         appModuleDirectory: File,
+        appName: String,
         packageName: String,
         enableCompose: Boolean
     ) {
         val manifestFile = File(appModuleDirectory, "src/main/AndroidManifest.xml")
-        FileCreator.createFileIfNotExists(manifestFile) { buildAndroidManifest(packageName) }
+        FileCreator.createFileIfNotExists(manifestFile) { buildAndroidManifest(appName) }
 
         val valuesDirectory = File(appModuleDirectory, "src/main/res/values")
         FileCreator.createDirectoryIfNotExists(valuesDirectory)
         val stringsFile = File(valuesDirectory, "strings.xml")
         FileCreator.createFileIfNotExists(stringsFile) { buildStringsXml(packageName) }
+        val xmlDirectory = File(appModuleDirectory, "src/main/res/xml")
+        FileCreator.createDirectoryIfNotExists(xmlDirectory)
 
         if (enableCompose) {
             val themeFile = File(valuesDirectory, "themes.xml")
-            FileCreator.createFileIfNotExists(themeFile) { buildThemesXml(packageName) }
+            FileCreator.createFileIfNotExists(themeFile) { buildThemesXml(appName) }
 
             val uiDirectory = File(appModuleDirectory, "src/main/java/${packageName.replace('.', '/')}/ui/theme")
             FileCreator.createDirectoryIfNotExists(uiDirectory)
             val themeKtFile = File(uiDirectory, "Theme.kt")
-            FileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(packageName) }
+            FileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(appName = appName, packageName = packageName) }
 
             val colorsKtFile = File(uiDirectory, "Color.kt")
             FileCreator.createFileIfNotExists(colorsKtFile) { buildColorsKt(packageName) }
@@ -95,10 +109,34 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
             FileCreator.createFileIfNotExists(typographyKtFile) { buildTypographyKt(packageName) }
         }
 
-        val backupRulesFile = File(valuesDirectory, "backup_rules.xml")
+        val backupRulesFile = File(xmlDirectory, "backup_rules.xml")
         FileCreator.createFileIfNotExists(backupRulesFile) { buildBackupRulesXml() }
 
-        val dataExtractionRulesFile = File(valuesDirectory, "data_extraction_rules.xml")
+        val dataExtractionRulesFile = File(xmlDirectory, "data_extraction_rules.xml")
         FileCreator.createFileIfNotExists(dataExtractionRulesFile) { buildDataExtractionRulesXml() }
+
+        copyMipmapResources(appModuleDirectory)
+    }
+
+    private fun copyMipmapResources(appModuleDirectory: File) {
+        val mipmapDirectories =
+            listOf(
+                "drawable",
+                "mipmap-anydpi-v26",
+                "mipmap-hdpi",
+                "mipmap-mdpi",
+                "mipmap-xhdpi",
+                "mipmap-xxhdpi",
+                "mipmap-xxxhdpi"
+            )
+
+        mipmapDirectories.forEach { mipmapDirectory ->
+            val targetDirectory = File(appModuleDirectory, "src/main/res/$mipmapDirectory")
+            FileCreator.copyResourceDirectoryIfNotExists(
+                targetDirectory = targetDirectory,
+                resourcePath = mipmapDirectory,
+                classLoader = javaClass.classLoader
+            )
+        }
     }
 }

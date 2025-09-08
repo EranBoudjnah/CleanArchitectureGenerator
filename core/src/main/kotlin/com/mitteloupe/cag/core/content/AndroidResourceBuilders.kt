@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.content
 
-fun buildAndroidManifest(packageName: String): String =
+fun buildAndroidManifest(appName: String): String =
     """
     <?xml version="1.0" encoding="utf-8"?>
     <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -14,12 +14,12 @@ fun buildAndroidManifest(packageName: String): String =
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/Theme.${packageName.split('.').last().capitalized}"
+            android:theme="@style/Theme.$appName"
             tools:targetApi="31">
             <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:theme="@style/Theme.${packageName.split('.').last().capitalized}">
+                android:theme="@style/Theme.$appName">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />
                     <category android:name="android.intent.category.LAUNCHER" />
@@ -38,28 +38,18 @@ fun buildStringsXml(packageName: String): String =
     </resources>
     """.trimIndent()
 
-fun buildThemesXml(packageName: String): String =
+fun buildThemesXml(appName: String): String =
     """
     <?xml version="1.0" encoding="utf-8"?>
     <resources xmlns:tools="http://schemas.android.com/tools">
-        <!-- Base application theme. -->
-        <style name="Theme.${packageName.split('.').last().capitalized}" parent="Theme.Material3.DayNight">
-            <!-- Primary brand color. -->
-            <item name="colorPrimary">@android:color/holo_blue_bright</item>
-            <item name="colorPrimaryVariant">@android:color/holo_blue_dark</item>
-            <item name="colorOnPrimary">@android:color/white</item>
-            <!-- Secondary brand color. -->
-            <item name="colorSecondary">@android:color/holo_green_light</item>
-            <item name="colorSecondaryVariant">@android:color/holo_green_dark</item>
-            <item name="colorOnSecondary">@android:color/black</item>
-            <!-- Status bar color. -->
-            <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-            <!-- Customize your theme here. -->
-        </style>
+        <style name="Theme.$appName" parent="Theme.Material3.DayNight.NoActionBar" />
     </resources>
     """.trimIndent()
 
-fun buildThemeKt(packageName: String): String =
+fun buildThemeKt(
+    appName: String,
+    packageName: String
+): String =
     """
     package $packageName.ui.theme
 
@@ -92,7 +82,7 @@ fun buildThemeKt(packageName: String): String =
     )
 
     @Composable
-    fun ${packageName.split('.').last().capitalized}Theme(
+    fun ${appName}Theme(
         darkTheme: Boolean = isSystemInDarkTheme(),
         content: @Composable () -> Unit
     ) {
@@ -187,17 +177,9 @@ fun buildDataExtractionRulesXml(): String =
        for details.
     -->
     <data-extraction-rules>
-        <cloud-backup>
-            <!-- TODO: Use <include> and <exclude> to control what is backed up.
-            <include .../>
-            <exclude .../>
-            -->
-        </cloud-backup>
         <!--
-        <device-transfer>
-            <include .../>
-            <exclude .../>
-        </device-transfer>
+        <cloud-backup />
+        <device-transfer />
         -->
     </data-extraction-rules>
     """.trimIndent()

@@ -1,11 +1,11 @@
 package com.mitteloupe.cag.core.content
 
 fun buildMainActivityKotlinFile(
+    appName: String,
     projectNamespace: String,
     enableCompose: Boolean
 ): String {
     val packageName = projectNamespace.trimEnd('.')
-    val themeName = packageName.split('.').last().capitalized
 
     return if (enableCompose) {
         """
@@ -21,13 +21,13 @@ fun buildMainActivityKotlinFile(
         import androidx.compose.runtime.Composable
         import androidx.compose.ui.Modifier
         import androidx.compose.ui.tooling.preview.Preview
-        import $packageName.ui.theme.${themeName}Theme
+        import $packageName.ui.theme.${appName}Theme
 
         class MainActivity : ComponentActivity() {
             override fun onCreate(savedInstanceState: Bundle?) {
                 super.onCreate(savedInstanceState)
                 setContent {
-                    ${themeName}Theme {
+                    ${appName}Theme {
                         Surface(
                             modifier = Modifier.fillMaxSize(),
                             color = MaterialTheme.colorScheme.background
@@ -50,7 +50,7 @@ fun buildMainActivityKotlinFile(
         @Preview(showBackground = true)
         @Composable
         fun GreetingPreview() {
-            ${themeName}Theme {
+            ${appName}Theme {
                 Greeting("Android")
             }
         }

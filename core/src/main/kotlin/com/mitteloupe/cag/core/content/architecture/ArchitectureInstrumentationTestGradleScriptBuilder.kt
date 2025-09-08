@@ -1,64 +1,48 @@
 package com.mitteloupe.cag.core.content.architecture
 
 import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitectureInstrumentationTestGradleScript(
     architecturePackageName: String,
-    catalog: VersionCatalogReader,
-    enableKtlint: Boolean = false,
-    enableDetekt: Boolean = false
+    catalog: VersionCatalogReader
 ): String {
-    val aliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
-    val aliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
-    val aliasComposeCompiler = catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.plugin.compose")?.asAccessor
+    val aliasAndroidLibrary = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY).asAccessor
+    val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
 
-    val aliasMaterial = (catalog.getResolvedLibraryAliasForModule("com.google.android.material:material") ?: "material").asAccessor
-    val aliasComposeBom = (catalog.getResolvedLibraryAliasForModule("androidx.compose:compose-bom") ?: "compose-bom").asAccessor
-    val aliasComposeUi = (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui") ?: "compose-ui").asAccessor
-    val aliasComposeUiGraphics =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-graphics") ?: "compose-ui-graphics").asAccessor
-    val aliasComposeUiToolingPreview =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling-preview") ?: "compose-ui-tooling-preview").asAccessor
-    val aliasComposeMaterial3 =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.material3:material3") ?: "compose-material3").asAccessor
-    val aliasTestJunit = (catalog.getResolvedLibraryAliasForModule("junit:junit") ?: "test-junit").asAccessor
-    val aliasTestAndroidxJunit = (catalog.getResolvedLibraryAliasForModule("androidx.test.ext:junit") ?: "test-androidx-junit").asAccessor
-    val aliasTestAndroidxEspressoCore =
-        (catalog.getResolvedLibraryAliasForModule("androidx.test.espresso:espresso-core") ?: "test-androidx-espresso-core").asAccessor
-    val aliasTestComposeUiJunit4 =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-test-junit4") ?: "test-compose-ui-junit4").asAccessor
-    val aliasTestAndroidHilt =
-        (catalog.getResolvedLibraryAliasForModule("com.google.dagger:hilt-android-testing") ?: "test-android-hilt").asAccessor
-    val aliasTestAndroidUiAutomator =
-        (catalog.getResolvedLibraryAliasForModule("androidx.test.uiautomator:uiautomator") ?: "test-android-uiautomator").asAccessor
-    val aliasOkhttp3 = (catalog.getResolvedLibraryAliasForModule("com.squareup.okhttp3:okhttp") ?: "okhttp3").asAccessor
-    val aliasTestAndroidMockWebServer =
-        (catalog.getResolvedLibraryAliasForModule("com.squareup.okhttp3:mockwebserver") ?: "test-android-mockwebserver").asAccessor
-    val aliasAndroidxAppcompat =
-        (catalog.getResolvedLibraryAliasForModule("androidx.appcompat:appcompat") ?: "androidx-appcompat").asAccessor
-    val aliasTestAndroidxRules = (catalog.getResolvedLibraryAliasForModule("androidx.test:rules") ?: "test-androidx-rules").asAccessor
-    val aliasAndroidxRecyclerview =
-        (catalog.getResolvedLibraryAliasForModule("androidx.recyclerview:recyclerview") ?: "androidx-recyclerview").asAccessor
-
-    val composePluginLine =
-        if (aliasComposeCompiler != null) {
-            "    alias(libs.plugins.$aliasComposeCompiler)\n"
-        } else {
-            ""
-        }
+    val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
+    val aliasComposeBom = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_BOM).asAccessor
+    val aliasComposeUi = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI).asAccessor
+    val aliasComposeUiGraphics = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI_GRAPHICS).asAccessor
+    val aliasComposeUiToolingPreview = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI_TOOLING_PREVIEW).asAccessor
+    val aliasComposeMaterial3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_MATERIAL3).asAccessor
+    val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
+    val aliasTestAndroidxJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_JUNIT).asAccessor
+    val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
+    val aliasTestComposeUiJunit4 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_COMPOSE_UI_JUNIT4).asAccessor
+    val aliasTestAndroidHilt = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_HILT).asAccessor
+    val aliasTestAndroidUiAutomator = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_UI_AUTOMATOR).asAccessor
+    val aliasOkhttp3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.OKHTTP3).asAccessor
+    val aliasTestAndroidMockWebServer = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_MOCKWEBSERVER).asAccessor
+    val aliasAndroidxAppcompat = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_APPCOMPAT).asAccessor
+    val aliasTestAndroidxRules = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_RULES).asAccessor
+    val aliasAndroidxRecyclerview = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_RECYCLERVIEW).asAccessor
 
     val gradleFileExtender = GradleFileExtender()
-    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(enableKtlint)
-    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(enableDetekt)
-    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(enableKtlint)
-    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(enableDetekt)
+    val composePluginLine = gradleFileExtender.buildComposePluginLine(catalog)
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(catalog)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(catalog)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(catalog)
 
+    val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
     return """plugins {
     alias(libs.plugins.$aliasAndroidLibrary)
-    alias(libs.plugins.$aliasKotlinAndroid)
-$composePluginLine$ktlintPluginLine$detektPluginLine}
+    alias(libs.plugins.$aliasKotlinAndroid)$composePluginLine$ktlintPluginLine$detektPluginLine
+}
 
 android {
     namespace = "${architecturePackageName.substringBeforeLast('.')}.test"
@@ -91,7 +75,12 @@ kotlin {
         languageSettings.enableLanguageFeature("ExplicitBackingFields")
     }
 }
-$ktlintConfiguration$detektConfiguration
+${ if (configurations.isEmpty()) {
+        ""
+    } else {
+        "\n$configurations\n"
+    }
+    }
 dependencies {
     implementation(libs.$aliasMaterial)
 

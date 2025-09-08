@@ -7,7 +7,7 @@ const val USE_CASE_PACKAGE_SUFFIX = ".domain.usecase"
 fun buildDomainUseCaseKotlinFile(
     projectNamespace: String,
     featurePackageName: String,
-    useCaseName: String = "PerformActionUseCase",
+    useCaseName: String,
     repositoryName: String?,
     inputDataType: String? = null,
     outputDataType: String? = null

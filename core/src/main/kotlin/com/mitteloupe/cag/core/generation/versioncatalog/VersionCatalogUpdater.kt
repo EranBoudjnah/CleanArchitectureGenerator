@@ -2,6 +2,9 @@ package com.mitteloupe.cag.core.generation.versioncatalog
 
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.generation.CatalogInsertPosition
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 import java.io.File
 
 data class SectionTransaction<SECTION_TYPE : SectionEntryRequirement>(
@@ -42,9 +45,13 @@ class VersionCatalogUpdater(
     private var resolvedPluginIdToAlias: Map<String, String> = emptyMap()
     private var resolvedLibraryModuleToAlias: Map<String, String> = emptyMap()
 
-    override fun getResolvedPluginAliasFor(pluginId: String): String? = resolvedPluginIdToAlias[pluginId]
+    override fun getResolvedPluginAliasFor(requirement: PluginRequirement): String =
+        resolvedPluginIdToAlias[requirement.id] ?: requirement.key
 
-    override fun getResolvedLibraryAliasForModule(module: String): String? = resolvedLibraryModuleToAlias[module]
+    override fun isPluginAvailable(requirement: PluginRequirement): Boolean = resolvedPluginIdToAlias.containsKey(requirement.id)
+
+    override fun getResolvedLibraryAliasForModule(requirement: LibraryRequirement): String =
+        resolvedLibraryModuleToAlias[requirement.module] ?: requirement.key
 
     fun updateVersionCatalogIfPresent(
         projectRootDir: File,
@@ -70,7 +77,7 @@ class VersionCatalogUpdater(
             catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
-        val pluginRequirements = mutableListOf<SectionEntryRequirement.PluginRequirement>()
+        val pluginRequirements = mutableListOf<PluginRequirement>()
         val pluginAliasToIdMutable = existingPluginAliasToId.toMutableMap()
 
         for (desired in dependencyConfiguration.plugins) {
@@ -90,7 +97,7 @@ class VersionCatalogUpdater(
             resolvedPluginIdToAliasMutable[desired.id] = candidateAlias
             pluginAliasToIdMutable[candidateAlias] = desired.id
             pluginRequirements.add(
-                SectionEntryRequirement.PluginRequirement(
+                PluginRequirement(
                     key = candidateAlias,
                     id = desired.id,
                     versionRefKey = desired.versionRefKey
@@ -110,7 +117,7 @@ class VersionCatalogUpdater(
             }
 
         val resolvedLibraryModuleToAliasMutable = existingLibraryModuleToAlias.toMutableMap()
-        val libraryRequirements = mutableListOf<SectionEntryRequirement.LibraryRequirement>()
+        val libraryRequirements = mutableListOf<LibraryRequirement>()
         val libraryAliasToModuleMutable = existingLibraryAliasToModule.toMutableMap()
 
         for (desired in dependencyConfiguration.libraries) {
@@ -130,7 +137,7 @@ class VersionCatalogUpdater(
             resolvedLibraryModuleToAliasMutable[desired.module] = candidateAlias
             libraryAliasToModuleMutable[candidateAlias] = desired.module
             libraryRequirements.add(
-                SectionEntryRequirement.LibraryRequirement(
+                LibraryRequirement(
                     key = candidateAlias,
                     module = desired.module,
                     versionRefKey = desired.versionRefKey,
@@ -159,6 +166,11 @@ class VersionCatalogUpdater(
                     )
                 )
         )
+
+        val finalCatalogText = readCatalogFile(projectRootDir)
+        if (finalCatalogText != null) {
+            updateResolvedMappingsFromCatalog(finalCatalogText)
+        }
     }
 
     private fun createNewVersionCatalog(
@@ -172,9 +184,12 @@ class VersionCatalogUpdater(
             }
         }
 
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        FileCreator.createFileIfNotExists(catalogFile) { "" }
+
         val pluginRequirements =
             dependencyConfiguration.plugins.map { desired ->
-                SectionEntryRequirement.PluginRequirement(
+                PluginRequirement(
                     key = desired.key,
                     id = desired.id,
                     versionRefKey = desired.versionRefKey
@@ -183,7 +198,7 @@ class VersionCatalogUpdater(
 
         val libraryRequirements =
             dependencyConfiguration.libraries.map { desired ->
-                SectionEntryRequirement.LibraryRequirement(
+                LibraryRequirement(
                     key = desired.key,
                     module = desired.module,
                     versionRefKey = desired.versionRefKey,
@@ -191,23 +206,7 @@ class VersionCatalogUpdater(
                 )
             }
 
-        val addedAndroidLibraryAlias = pluginRequirements.any { it.id == "com.android.library" }
-        val addedComposeBomAlias = libraryRequirements.any { it.module == "androidx.compose:compose-bom" }
-        val addedDetektAlias = pluginRequirements.any { it.id == "io.gitlab.arturbosch.detekt" }
-
-        val versionRequirements =
-            buildList {
-                addAll(dependencyConfiguration.versions)
-                if (addedAndroidLibraryAlias) {
-                    addAll(VersionCatalogConstants.ANDROID_VERSIONS)
-                }
-                if (addedComposeBomAlias) {
-                    addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
-                }
-                if (addedDetektAlias) {
-                    addAll(VersionCatalogConstants.DETEKT_VERSIONS)
-                }
-            }
+        val versionRequirements = dependencyConfiguration.versions
 
         updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,
@@ -227,6 +226,11 @@ class VersionCatalogUpdater(
                     )
                 )
         )
+
+        val finalCatalogText = readCatalogFile(projectRootDir)
+        if (finalCatalogText != null) {
+            updateResolvedMappingsFromCatalog(finalCatalogText)
+        }
     }
 
     private fun <SECTION_TYPE : SectionEntryRequirement> updateVersionCatalogIfPresent(
@@ -255,5 +259,14 @@ class VersionCatalogUpdater(
         } else {
             null
         }
+    }
+
+    private fun updateResolvedMappingsFromCatalog(catalogText: String) {
+        resolvedPluginIdToAlias = contentUpdater.parseExistingPluginIdToAlias(catalogText)
+        val existingLibraryAliasToModule = contentUpdater.parseExistingLibraryAliasToModule(catalogText)
+        resolvedLibraryModuleToAlias =
+            existingLibraryAliasToModule.entries.associate { (alias, module) ->
+                module to alias
+            }
     }
 }

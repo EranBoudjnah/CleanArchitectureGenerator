@@ -1,42 +1,59 @@
 package com.mitteloupe.cag.core.content.gradle
 
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+
 class GradleFileExtender internal constructor() {
-    fun buildKtlintPluginLine(enableKtlint: Boolean): String =
-        if (enableKtlint) {
-            """    alias(libs.plugins.ktlint)
-"""
+    fun buildComposePluginLine(catalog: VersionCatalogReader): String {
+        return if (catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {
+            val aliasComposeCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.COMPOSE_COMPILER).asAccessor
+            "\n    alias(libs.plugins.$aliasComposeCompiler)"
         } else {
             ""
         }
+    }
 
-    fun buildDetektPluginLine(enableDetekt: Boolean): String =
-        if (enableDetekt) {
-            """    alias(libs.plugins.detekt)
-"""
+    fun buildKtlintPluginLine(catalog: VersionCatalogReader): String {
+        return if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
+            val aliasKtlintCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.KTLINT).asAccessor
+            "\n    alias(libs.plugins.$aliasKtlintCompiler)"
         } else {
             ""
         }
+    }
 
-    fun buildKtlintConfiguration(enableKtlint: Boolean): String =
-        if (enableKtlint) {
+    fun buildDetektPluginLine(catalog: VersionCatalogReader): String {
+        return if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
+            val aliasDetektCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.DETEKT).asAccessor
+            "\n    alias(libs.plugins.$aliasDetektCompiler)"
+        } else {
+            ""
+        }
+    }
+
+    fun buildKtlintConfiguration(catalog: VersionCatalogReader): String {
+        return if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
             """
-ktlint {
-    version.set("0.49.1")
-    android.set(true)
-}
-"""
+    ktlint {
+        version.set("1.7.1")
+        android.set(true)
+    }
+    """
         } else {
             ""
         }
+    }
 
-    fun buildDetektConfiguration(enableDetekt: Boolean): String =
-        if (enableDetekt) {
+    fun buildDetektConfiguration(catalog: VersionCatalogReader): String {
+        return if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
             """
-detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
-}
-"""
+    detekt {
+        config.setFrom("${'$'}projectDir/../../detekt.yml")
+    }
+    """
         } else {
             ""
         }
+    }
 }

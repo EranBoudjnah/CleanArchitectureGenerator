@@ -87,4 +87,28 @@ interface CoroutineContextProvider {
         val buildGradleFile = File(projectRoot, "coroutine/build.gradle.kts")
         assertEquals("build.gradle.kts should exist", true, buildGradleFile.exists())
     }
+
+    @Test
+    fun `Given valid architecture package when generate then creates coroutine module build gradle file with java library plugin`() {
+        // Given
+        val projectRoot = temporaryDirectory
+        val architecturePackageName = "com.example.architecture"
+
+        // When
+        classUnderTest.generate(projectRoot, architecturePackageName)
+
+        // Then
+        val buildGradleFile = File(projectRoot, "coroutine/build.gradle.kts")
+        val buildGradleContent = buildGradleFile.readText()
+        assertEquals(
+            "build.gradle.kts should contain project-java-library plugin",
+            true,
+            buildGradleContent.contains("id(\"project-java-library\")")
+        )
+        assertEquals(
+            "build.gradle.kts should not contain android library plugin",
+            false,
+            buildGradleContent.contains("id(\"com.android.library\")")
+        )
+    }
 }

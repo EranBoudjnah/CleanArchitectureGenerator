@@ -119,7 +119,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "navigation",
+            relativePackageSubPath = "presentation/navigation",
             fileName = "${featureName.capitalized}PresentationNavigationEvent.kt",
             content =
                 buildPresentationNavigationEventKotlinFile(

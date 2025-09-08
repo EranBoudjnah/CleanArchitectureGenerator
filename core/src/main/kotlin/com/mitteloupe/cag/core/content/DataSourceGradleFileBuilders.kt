@@ -1,10 +1,12 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildDataSourceSourceGradleScript(catalog: VersionCatalogReader): String {
-    val aliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+    val aliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
     return """plugins {
     id("project-java-library")
@@ -21,13 +23,15 @@ fun buildDataSourceImplementationGradleScript(
     useKtor: Boolean,
     useRetrofit: Boolean
 ): String {
-    val aliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+    val aliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
     val ktorDependencies =
         if (useKtor) {
+            val aliasKtorClientCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.KTOR_CLIENT_CORE).asAccessor
+            val aliasKtorClientOkhttp = catalog.getResolvedLibraryAliasForModule(LibraryConstants.KTOR_CLIENT_OKHTTP).asAccessor
             """
-            implementation("io.ktor:ktor-client-core:3.0.3")
-            implementation("io.ktor:ktor-client-okhttp:3.0.3")
+            implementation(libs.$aliasKtorClientCore)
+            implementation(libs.$aliasKtorClientOkhttp)
             """.trimIndent()
         } else {
             ""
@@ -35,9 +39,14 @@ fun buildDataSourceImplementationGradleScript(
 
     val retrofitDependencies =
         if (useRetrofit) {
+            val aliasRetrofit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.RETROFIT).asAccessor
+            val aliasOkhttp3LoggingInterceptor =
+                catalog.getResolvedLibraryAliasForModule(
+                    LibraryConstants.OKHTTP3_LOGGING_INTERCEPTOR
+                ).asAccessor
             """
-            implementation("com.squareup.retrofit2:retrofit:2.11.0")
-            implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+            implementation(libs.$aliasRetrofit)
+            implementation(libs.$aliasOkhttp3LoggingInterceptor)
             """.trimIndent()
         } else {
             ""

@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
@@ -9,26 +11,21 @@ fun buildUiGradleScript(
     enableCompose: Boolean,
     catalog: VersionCatalogReader
 ): String {
-    val pluginAliasAndroidLibrary = (catalog.getResolvedPluginAliasFor("com.android.library") ?: "android-library").asAccessor
-    val pluginAliasKotlinAndroid = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.android") ?: "kotlin-android").asAccessor
-    val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.plugin.compose")?.asAccessor
+    val pluginAliasAndroidLibrary = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY).asAccessor
+    val pluginAliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
+    val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.COMPOSE_COMPILER).asAccessor
 
-    val libAliasComposeBom = (catalog.getResolvedLibraryAliasForModule("androidx.compose:compose-bom") ?: "compose-bom").asAccessor
-    val libAliasComposeUi = (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui") ?: "compose-ui").asAccessor
-    val libAliasComposeMaterial3 =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.material3:material3") ?: "compose-material3").asAccessor
-    val libAliasComposeUiGraphics =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-graphics") ?: "compose-ui-graphics").asAccessor
-    val libAliasComposeNavigation =
-        (catalog.getResolvedLibraryAliasForModule("androidx.navigation:navigation-compose") ?: "compose-navigation").asAccessor
-    val libAliasAndroidxUiTooling =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling") ?: "androidx-ui-tooling").asAccessor
-    val libAliasAndroidxUiToolingPreview =
-        (catalog.getResolvedLibraryAliasForModule("androidx.compose.ui:ui-tooling-preview") ?: "androidx-ui-tooling-preview").asAccessor
+    val libAliasComposeBom = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_BOM).asAccessor
+    val libAliasComposeUi = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI).asAccessor
+    val libAliasComposeMaterial3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_MATERIAL3).asAccessor
+    val libAliasComposeUiGraphics = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI_GRAPHICS).asAccessor
+    val libAliasComposeNavigation = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_NAVIGATION).asAccessor
+    val libAliasAndroidxUiTooling = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_UI_TOOLING).asAccessor
+    val libAliasAndroidxUiToolingPreview = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI_TOOLING_PREVIEW).asAccessor
 
     val composePluginLine =
-        if (enableCompose && pluginAliasComposeCompiler != null) {
-            "    alias(libs.plugins.$pluginAliasComposeCompiler)\n"
+        if (enableCompose && catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {
+            "\n    alias(libs.plugins.$pluginAliasComposeCompiler)\n"
         } else {
             ""
         }
@@ -60,8 +57,8 @@ fun buildUiGradleScript(
 
     return """plugins {
     alias(libs.plugins.$pluginAliasAndroidLibrary)
-    alias(libs.plugins.$pluginAliasKotlinAndroid)
-$composePluginLine}
+    alias(libs.plugins.$pluginAliasKotlinAndroid)$composePluginLine
+}
 
 android {
     namespace = "$featurePackageName.ui"

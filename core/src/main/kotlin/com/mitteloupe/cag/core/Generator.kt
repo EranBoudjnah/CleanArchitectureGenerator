@@ -8,6 +8,7 @@ import com.mitteloupe.cag.core.content.buildPresentationGradleScript
 import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
+import com.mitteloupe.cag.core.generation.BuildSrcContentCreator
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
@@ -27,9 +28,11 @@ import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
+import com.mitteloupe.cag.core.generation.withoutSpaces
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
+import kotlin.String
 
 class Generator {
     fun generateFeature(request: GenerateFeatureRequest) {
@@ -305,6 +308,11 @@ class Generator {
         SettingsFileUpdater().updateArchitectureSettingsIfPresent(
             request.destinationRootDirectory
         )
+
+        val buildSrcContentCreator = BuildSrcContentCreator()
+        buildSrcContentCreator.writeGradleFile(request.destinationRootDirectory)
+        buildSrcContentCreator.writeSettingsGradleFile(request.destinationRootDirectory)
+        buildSrcContentCreator.writeProjectJavaLibraryFile(request.destinationRootDirectory)
     }
 
     fun generateProjectTemplate(request: GenerateProjectTemplateRequest) {
@@ -318,11 +326,12 @@ class Generator {
             throw GenerationException("Package name is missing.")
         }
 
+        println("Comparing ${request.destinationRootDirectory.name} to ${projectName.withoutSpaces()}")
         val projectRoot =
-            if (request.destinationRootDirectory.name == projectName) {
+            if (request.destinationRootDirectory.name == projectName.withoutSpaces()) {
                 request.destinationRootDirectory
             } else {
-                File(request.destinationRootDirectory, projectName)
+                File(request.destinationRootDirectory, projectName.withoutSpaces())
             }
 
         if (projectRoot != request.destinationRootDirectory && projectRoot.exists()) {
@@ -378,11 +387,20 @@ class Generator {
         )
 
         generateProjectStructure(projectRoot)
-        generateSettingsFile(projectRoot, projectName, request)
-        generateArchitectureModules(projectRoot, packageName, request)
-        generateSampleFeature(projectRoot, packageName, request)
+        SettingsFileUpdater().writeProjectSettings(
+            projectRoot = projectRoot,
+            projectName = projectName,
+            featureNames = listOf("SampleFeature")
+        )
+        generateArchitectureModules(projectRoot, "$packageName.architecture", request)
+        generateSampleFeature(
+            projectRoot = projectRoot,
+            featureName = "SampleFeature",
+            packageName = packageName,
+            request = request
+        )
         generateDataSourceModules(projectRoot, request)
-        generateAppModule(projectRoot, packageName, request)
+        generateAppModule(projectRoot = projectRoot, appName = projectName, packageName = packageName, request = request)
         generateGradleFiles(projectRoot, packageName, request)
     }
 
@@ -393,13 +411,15 @@ class Generator {
                 "app/src/main/res/layout",
                 "app/src/main/res/values",
                 "app/src/main/res/drawable",
+                "app/src/main/res/mipmap-anydpi-v26",
                 "app/src/main/res/mipmap-hdpi",
                 "app/src/main/res/mipmap-mdpi",
                 "app/src/main/res/mipmap-xhdpi",
                 "app/src/main/res/mipmap-xxhdpi",
                 "app/src/main/res/mipmap-xxxhdpi",
                 "app/src/test/java",
-                "app/src/androidTest/java"
+                "app/src/androidTest/java",
+                "buildSrc/src/main/kotlin"
             )
 
         directories.forEach { directory ->
@@ -412,13 +432,13 @@ class Generator {
 
     private fun generateArchitectureModules(
         projectRoot: File,
-        packageName: String,
+        architecturePackageName: String,
         request: GenerateProjectTemplateRequest
     ) {
         val architectureRequest =
             GenerateArchitectureRequest(
                 destinationRootDirectory = projectRoot,
-                architecturePackageName = packageName,
+                architecturePackageName = architecturePackageName,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt
@@ -428,14 +448,15 @@ class Generator {
 
     private fun generateSampleFeature(
         projectRoot: File,
+        featureName: String,
         packageName: String,
         request: GenerateProjectTemplateRequest
     ) {
         val featureRequest =
             GenerateFeatureRequest(
                 destinationRootDirectory = projectRoot,
-                featureName = "SampleFeature",
-                featurePackageName = "$packageName.samplefeature",
+                featureName = featureName,
+                featurePackageName = "$packageName.${featureName.lowercase()}",
                 projectNamespace = packageName,
                 enableCompose = request.enableCompose
             )
@@ -451,12 +472,14 @@ class Generator {
 
     private fun generateAppModule(
         projectRoot: File,
+        appName: String,
         packageName: String,
         request: GenerateProjectTemplateRequest
     ) {
         val appModuleContentGenerator = AppModuleContentGenerator()
         appModuleContentGenerator.writeAppModule(
             startDirectory = projectRoot,
+            appName = appName,
             projectNamespace = packageName,
             enableCompose = request.enableCompose
         )
@@ -491,30 +514,23 @@ class Generator {
         gradleFileCreator.writeProjectGradleFile(
             projectRoot = projectRoot,
             enableKtlint = request.enableKtlint,
-            enableDetekt = request.enableDetekt
+            enableDetekt = request.enableDetekt,
+            catalog = catalogUpdater
         )
 
         gradleFileCreator.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableCompose = request.enableCompose
+            enableCompose = request.enableCompose,
+            catalog = catalogUpdater
         )
+
+        val buildSrcContentCreator = BuildSrcContentCreator()
+        buildSrcContentCreator.writeGradleFile(projectRoot)
+        buildSrcContentCreator.writeSettingsGradleFile(projectRoot)
+        buildSrcContentCreator.writeProjectJavaLibraryFile(projectRoot)
 
         gradlePropertiesFileCreator.writeGradlePropertiesFile(projectRoot)
         GradleWrapperCreator().writeGradleWrapperFiles(projectRoot)
-    }
-
-    private fun generateSettingsFile(
-        projectRoot: File,
-        projectName: String,
-        request: GenerateProjectTemplateRequest
-    ) {
-        val settingsFileUpdater = SettingsFileUpdater()
-        settingsFileUpdater.writeProjectSettings(
-            projectRoot = projectRoot,
-            projectName = projectName,
-            enableKtlint = request.enableKtlint,
-            enableDetekt = request.enableDetekt
-        )
     }
 }

@@ -1,105 +1,130 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+
 fun buildAppGradleScript(
     packageName: String,
-    enableCompose: Boolean
+    enableCompose: Boolean,
+    catalog: VersionCatalogReader
 ): String {
+    val pluginAliasComposeCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.COMPOSE_COMPILER).asAccessor
+
     val composePlugins =
         if (enableCompose) {
-            """
-    alias(libs.plugins.kotlin.compose)
-"""
+            "\n            alias(libs.plugins.$pluginAliasComposeCompiler)"
         } else {
             ""
         }
 
-    val composeDependencies =
+    val viewDependencies =
         if (enableCompose) {
+            val aliasComposeBom = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_BOM).asAccessor
+            val aliasComposeUi = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI).asAccessor
+            val aliasComposeUiToolingPreview =
+                catalog.getResolvedLibraryAliasForModule(
+                    LibraryConstants.COMPOSE_UI_TOOLING_PREVIEW
+                ).asAccessor
+            val aliasComposeMaterial3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_MATERIAL3).asAccessor
+            val aliasComposeUiTooling = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_UI_TOOLING).asAccessor
+
+            val aliasActivityCompose = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_ACTIVITY_COMPOSE).asAccessor
             """
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+            implementation(libs.$aliasActivityCompose)
+            implementation(platform(libs.$aliasComposeBom))
+            implementation(libs.$aliasComposeUi)
+            implementation(libs.$aliasComposeUiToolingPreview)
+            implementation(libs.$aliasComposeMaterial3)
+            debugImplementation(libs.$aliasComposeUiTooling)
+            debugImplementation(libs.compose.ui.test.manifest)
 """
         } else {
+            val aliasAndroidxAppcompat = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_APPCOMPAT).asAccessor
+            val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
+            val aliasConstraintLayout = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CONSTRAINTLAYOUT).asAccessor
             """
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.google.android.material)
+            implementation(libs.$aliasAndroidxAppcompat)
+            implementation(libs.$aliasConstraintLayout)
+            implementation(libs.$aliasMaterial)
 """
         }
 
+    val aliasAndroidApplication = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_APPLICATION).asAccessor
+    val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
+    val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
+    val aliasCoreKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CORE_KTX).asAccessor
+    val aliasLifecycleRuntimeKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_LIFECYCLE_RUNTIME_KTX).asAccessor
+    val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
+    val aliasTestAndroidxJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_JUNIT).asAccessor
+    val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
     val result =
         """
-            plugins {
-                alias(libs.plugins.android.application)
-                alias(libs.plugins.kotlin.android)$composePlugins
+        plugins {
+            alias(libs.plugins.$aliasAndroidApplication)
+            alias(libs.plugins.$aliasKotlinAndroid)$composePlugins
+        }
+        
+        android {
+            namespace = "$packageName"
+            compileSdk = libs.versions.compileSdk.get().toInt()
+        
+            defaultConfig {
+                applicationId = "$packageName"
+                minSdk = libs.versions.minSdk.get().toInt()
+                targetSdk = libs.versions.targetSdk.get().toInt()
+                versionCode = 1
+                versionName = "1.0"
+        
+                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             }
-            
-            android {
-                namespace = "$packageName"
-                compileSdk = libs.versions.android.compileSdk.get().toInt()
-            
-                defaultConfig {
-                    applicationId = "$packageName"
-                    minSdk = libs.versions.android.minSdk.get().toInt()
-                    targetSdk = libs.versions.android.targetSdk.get().toInt()
-                    versionCode = 1
-                    versionName = "1.0"
-            
-                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+            buildTypes {
+                release {
+                    isMinifyEnabled = false
+                    proguardFiles(
+                        getDefaultProguardFile("proguard-android-optimize.txt"),
+                        "proguard-rules.pro"
+                    )
                 }
-            
-                buildTypes {
-                    release {
-                        isMinifyEnabled = false
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-                kotlinOptions {
-                    jvmTarget = "17"
-                }${
+            }
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+            kotlinOptions {
+                jvmTarget = "17"
+            }${
             if (enableCompose) {
                 """
                         buildFeatures {
                             compose = true
-                        }
-                        composeOptions {
-                            kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
                         }"""
             } else {
                 ""
             }
         }
-            }
+        }
             
-            dependencies {
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.lifecycle.runtime.ktx)$composeDependencies
+        dependencies {
+            implementation(libs.$aliasMaterial)
+            implementation(libs.$aliasCoreKtx)
+            implementation(libs.$aliasLifecycleRuntimeKtx)$viewDependencies
+            implementation(projects.architecture.ui)
+            implementation(projects.architecture.presentation)
+            implementation(projects.architecture.domain)
+            implementation(projects.features.samplefeature.ui)
+            implementation(projects.features.samplefeature.presentation)
+            implementation(projects.features.samplefeature.domain)
+            implementation(projects.features.samplefeature.data)
+            implementation(projects.datasource.source)
+            implementation(projects.datasource.implementation)
                 
-                implementation(project(":architecture:ui"))
-                implementation(project(":architecture:presentation"))
-                implementation(project(":architecture:domain"))
-                implementation(project(":features:samplefeature:ui"))
-                implementation(project(":features:samplefeature:presentation"))
-                implementation(project(":features:samplefeature:domain"))
-                implementation(project(":features:samplefeature:data"))
-                implementation(project(":datasource:source"))
-                implementation(project(":datasource:implementation"))
-                
-                testImplementation(libs.junit)
-                androidTestImplementation(libs.androidx.junit)
-                androidTestImplementation(libs.androidx.espresso.core)
-            }
+            testImplementation(libs.$aliasTestJunit)
+            androidTestImplementation(libs.$aliasTestAndroidxJunit)
+            androidTestImplementation(libs.$aliasTestAndroidxEspressoCore)
+        }
         """.trimIndent()
     return result
 }

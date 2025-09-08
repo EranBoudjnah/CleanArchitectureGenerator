@@ -1,27 +1,30 @@
 package com.mitteloupe.cag.core.content.architecture
 
 import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
-fun buildArchitectureDomainGradleScript(
-    catalog: VersionCatalogReader,
-    enableKtlint: Boolean = false,
-    enableDetekt: Boolean = false
-): String {
-    val pluginAliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+fun buildArchitectureDomainGradleScript(catalog: VersionCatalogReader): String {
+    val pluginAliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
     val gradleFileExtender = GradleFileExtender()
-    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(enableKtlint)
-    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(enableDetekt)
-    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(enableKtlint)
-    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(enableDetekt)
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(catalog)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(catalog)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(catalog)
 
+    val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
     return """plugins {
     id("project-java-library")
-    alias(libs.plugins.$pluginAliasKotlinJvm)
-$ktlintPluginLine$detektPluginLine}
-$ktlintConfiguration$detektConfiguration
+    alias(libs.plugins.$pluginAliasKotlinJvm)$ktlintPluginLine$detektPluginLine
+}
+${ if (configurations.isEmpty()) {
+        ""
+    } else {
+        "\n$configurations\n"
+    }
+    }
 dependencies {
     implementation(projects.coroutine)
     implementation(libs.kotlinx.coroutines.core)

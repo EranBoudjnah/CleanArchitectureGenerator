@@ -2,28 +2,21 @@ package com.mitteloupe.cag.core.content
 
 fun buildSettingsGradleScript(
     projectName: String,
-    enableKtlint: Boolean,
-    enableDetekt: Boolean
+    featureNames: List<String>
 ): String {
-    val ktlintPlugins =
-        if (enableKtlint) {
+    val featuresBlock =
+        featureNames.joinToString(
+            separator = "\n        "
+        ) { featureName ->
             """
-    alias(libs.plugins.ktlint)
-"""
-        } else {
-            ""
+        setOf("ui", "presentation", "domain", "data").forEach { layer ->
+           include("features:${featureName.lowercase()}:${'$'}layer")
         }
-
-    val detektPlugins =
-        if (enableDetekt) {
-            """
-    alias(libs.plugins.detekt)
-"""
-        } else {
-            ""
+        """
         }
-
     return """
+        enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+        
         pluginManagement {
             repositories {
                 google()
@@ -36,16 +29,13 @@ fun buildSettingsGradleScript(
             repositories {
                 google()
                 mavenCentral()
+                gradlePluginPortal()
             }
         }
 
         rootProject.name = "$projectName"
         include(":app")
-
-        plugins {
-            alias(libs.plugins.android.application) apply false
-            alias(libs.plugins.kotlin.android) apply false$ktlintPlugins$detektPlugins
-        }
+        include(":coroutine")
 
         setOf(
             "ui",
@@ -56,16 +46,7 @@ fun buildSettingsGradleScript(
         ).forEach { module ->
             include(":architecture:${'$'}module")
         }
-
-        setOf(
-            "ui",
-            "presentation",
-            "domain",
-            "data"
-        ).forEach { module ->
-            include(":features:samplefeature:${'$'}module")
-        }
-
+        $featuresBlock
         setOf(
             "source",
             "implementation"

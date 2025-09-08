@@ -1,33 +1,33 @@
 package com.mitteloupe.cag.core.content.architecture
 
 import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
-fun buildArchitecturePresentationTestGradleScript(
-    catalog: VersionCatalogReader,
-    enableKtlint: Boolean = false,
-    enableDetekt: Boolean = false
-): String {
-    val pluginAliasKotlinJvm = (catalog.getResolvedPluginAliasFor("org.jetbrains.kotlin.jvm") ?: "kotlin-jvm").asAccessor
+fun buildArchitecturePresentationTestGradleScript(catalog: VersionCatalogReader): String {
+    val pluginAliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
-    val aliasTestJunit = (catalog.getResolvedLibraryAliasForModule("junit:junit") ?: "test-junit").asAccessor
-    val aliasTestMockitoKotlin =
-        (catalog.getResolvedLibraryAliasForModule("org.mockito.kotlin:mockito-kotlin") ?: "test-mockito-kotlin").asAccessor
-    val aliasTestKotlinxCoroutines =
-        (catalog.getResolvedLibraryAliasForModule("org.jetbrains.kotlinx:kotlinx-coroutines-test") ?: "test-kotlinx-coroutines").asAccessor
+    val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
 
     val gradleFileExtender = GradleFileExtender()
-    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(enableKtlint)
-    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(enableDetekt)
-    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(enableKtlint)
-    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(enableDetekt)
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(catalog)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(catalog)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(catalog)
 
+    val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
     return """plugins {
     id("project-java-library")
-    alias(libs.plugins.$pluginAliasKotlinJvm)
-$ktlintPluginLine$detektPluginLine}
-$ktlintConfiguration$detektConfiguration
+    alias(libs.plugins.$pluginAliasKotlinJvm)$ktlintPluginLine$detektPluginLine
+}
+${ if (configurations.isEmpty()) {
+        ""
+    } else {
+        "\n$configurations\n"
+    }
+    }
 dependencies {
     implementation(projects.architecture.presentation)
     implementation(projects.architecture.domain)
@@ -35,9 +35,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.$aliasTestJunit)
-    implementation(libs.$aliasTestMockitoKotlin)
-    implementation(libs.$aliasTestKotlinxCoroutines)
-    implementation(projects.coroutineTest)
+    implementation(projects.coroutine)
 }
 """
 }

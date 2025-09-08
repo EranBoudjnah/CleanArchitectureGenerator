@@ -2387,7 +2387,7 @@ abstract class ResponseStore {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 
@@ -2458,7 +2458,7 @@ kotlin {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 
@@ -2469,7 +2469,7 @@ detekt {
 dependencies {
     implementation(projects.architecture.domain)
     implementation(libs.kotlinx.coroutines.core)
-    testImplementation(libs.junit4)
+    testImplementation(libs.test.junit)
 }
 """
             assertEquals("Presentation build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
@@ -2524,7 +2524,7 @@ android {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 
@@ -2569,7 +2569,7 @@ dependencies {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 
@@ -2584,9 +2584,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.test.junit)
-    implementation(libs.test.mockito.kotlin)
-    implementation(libs.test.kotlinx.coroutines)
-    implementation(projects.coroutineTest)
+    implementation(projects.coroutine)
 }
 """
             assertEquals("Presentation-test build.gradle.kts should have exact content", expectedContent, buildGradleFile.readText())
@@ -2646,7 +2644,7 @@ kotlin {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 
@@ -2702,7 +2700,7 @@ dependencies {
 }
 
 ktlint {
-    version.set("0.49.1")
+    version.set("1.7.1")
     android.set(true)
 }
 

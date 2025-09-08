@@ -1,7 +1,12 @@
 package com.mitteloupe.cag.core.generation.versioncatalog
 
-interface VersionCatalogReader {
-    fun getResolvedPluginAliasFor(pluginId: String): String?
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 
-    fun getResolvedLibraryAliasForModule(module: String): String?
+interface VersionCatalogReader {
+    fun getResolvedPluginAliasFor(requirement: PluginRequirement): String
+
+    fun isPluginAvailable(requirement: PluginRequirement): Boolean
+
+    fun getResolvedLibraryAliasForModule(requirement: LibraryRequirement): String
 }

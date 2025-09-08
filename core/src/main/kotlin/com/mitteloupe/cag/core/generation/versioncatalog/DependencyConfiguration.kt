@@ -11,27 +11,30 @@ data class DependencyConfiguration(
 )
 
 object VersionCatalogConstants {
-    val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.1.0")
+    val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.10")
     val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "35")
     val MIN_SDK_VERSION = VersionRequirement(key = "minSdk", version = "24")
     val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "35")
 
-    val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.7.3")
+    val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.12.2")
 
     val COMPOSE_BOM_VERSION = VersionRequirement(key = "composeBom", version = "2025.08.01")
     val COMPOSE_NAVIGATION_VERSION = VersionRequirement(key = "composeNavigation", version = "2.9.3")
     val COMPOSE_COMPILER_VERSION = VersionRequirement(key = "composeCompiler", version = "1.5.8")
 
     val JUNIT4_VERSION = VersionRequirement(key = "junit4", version = "4.13.2")
+    val KSP_VERSION = VersionRequirement(key = "ksp", version = "2.2.10-2.0.2")
 
-    val KTLINT_VERSION = VersionRequirement(key = "ktlint", version = "0.50.0")
+    val KTLINT_VERSION = VersionRequirement(key = "ktlint", version = "13.1.0")
     val DETEKT_VERSION = VersionRequirement(key = "detekt", version = "1.23.6")
 
     val BASIC_VERSIONS =
         listOf(
             KOTLIN_VERSION,
             COMPILE_SDK_VERSION,
-            MIN_SDK_VERSION
+            MIN_SDK_VERSION,
+            JUNIT4_VERSION,
+            KSP_VERSION
         )
 
     val ANDROID_VERSIONS =
@@ -47,20 +50,11 @@ object VersionCatalogConstants {
             COMPOSE_COMPILER_VERSION
         )
 
-    val TESTING_VERSIONS =
-        listOf(
-            JUNIT4_VERSION
-        )
+    val TESTING_VERSIONS = listOf(JUNIT4_VERSION)
 
-    val KTLINT_VERSIONS =
-        listOf(
-            KTLINT_VERSION
-        )
+    val KTLINT_VERSIONS = listOf(KTLINT_VERSION)
 
-    val DETEKT_VERSIONS =
-        listOf(
-            DETEKT_VERSION
-        )
+    val DETEKT_VERSIONS = listOf(DETEKT_VERSION)
 }
 
 object LibraryConstants {
@@ -95,29 +89,25 @@ object LibraryConstants {
     val COMPOSE_UI =
         LibraryRequirement(
             key = "compose-ui",
-            module = "androidx.compose.ui:ui",
-            versionRefKey = "composeBom"
+            module = "androidx.compose.ui:ui"
         )
 
     val COMPOSE_UI_GRAPHICS =
         LibraryRequirement(
             key = "compose-ui-graphics",
-            module = "androidx.compose.ui:ui-graphics",
-            versionRefKey = "composeBom"
+            module = "androidx.compose.ui:ui-graphics"
         )
 
     val COMPOSE_UI_TOOLING_PREVIEW =
         LibraryRequirement(
             key = "compose-ui-tooling-preview",
-            module = "androidx.compose.ui:ui-tooling-preview",
-            versionRefKey = "composeBom"
+            module = "androidx.compose.ui:ui-tooling-preview"
         )
 
     val COMPOSE_MATERIAL3 =
         LibraryRequirement(
             key = "compose-material3",
-            module = "androidx.compose.material3:material3",
-            versionRefKey = "composeBom"
+            module = "androidx.compose.material3:material3"
         )
 
     val COMPOSE_NAVIGATION =
@@ -179,15 +169,116 @@ object LibraryConstants {
     val TEST_COMPOSE_UI_JUNIT4 =
         LibraryRequirement(
             key = "test-compose-ui-junit4",
-            module = "androidx.compose.ui:ui-test-junit4",
-            versionRefKey = "composeBom"
+            module = "androidx.compose.ui:ui-test-junit4"
+        )
+
+    val MATERIAL =
+        LibraryRequirement(
+            key = "material",
+            module = "com.google.android.material:material",
+            versionLiteral = "1.11.0"
+        )
+
+    val OKHTTP3 =
+        LibraryRequirement(
+            key = "okhttp3",
+            module = "com.squareup.okhttp3:okhttp",
+            versionLiteral = "4.12.0"
+        )
+
+    val ANDROIDX_APPCOMPAT =
+        LibraryRequirement(
+            key = "androidx-appcompat",
+            module = "androidx.appcompat:appcompat",
+            versionLiteral = "1.6.1"
+        )
+
+    val ANDROIDX_RECYCLERVIEW =
+        LibraryRequirement(
+            key = "androidx-recyclerview",
+            module = "androidx.recyclerview:recyclerview",
+            versionLiteral = "1.3.2"
+        )
+
+    val ANDROIDX_FRAGMENT_KTX =
+        LibraryRequirement(
+            key = "androidx-fragment-ktx",
+            module = "androidx.fragment:fragment-ktx",
+            versionLiteral = "1.6.2"
+        )
+
+    val ANDROIDX_NAVIGATION_FRAGMENT_KTX =
+        LibraryRequirement(
+            key = "androidx-navigation-fragment-ktx",
+            module = "androidx.navigation:navigation-fragment-ktx",
+            versionLiteral = "2.7.6"
+        )
+
+    val ANDROIDX_UI_TOOLING =
+        LibraryRequirement(
+            key = "compose-ui-tooling",
+            module = "androidx.compose.ui:ui-tooling"
+        )
+
+    val ANDROIDX_UI_TEST_MANIFEST =
+        LibraryRequirement(
+            key = "compose-ui-test-manifest",
+            module = "androidx.compose.ui:ui-test-manifest"
+        )
+
+    val ANDROIDX_ACTIVITY_COMPOSE =
+        LibraryRequirement(
+            key = "androidx-activity-compose",
+            module = "androidx.activity:activity-compose",
+            versionLiteral = "1.8.2"
+        )
+
+    val ANDROIDX_CONSTRAINTLAYOUT =
+        LibraryRequirement(
+            key = "androidx-constraintlayout",
+            module = "androidx.constraintlayout:constraintlayout",
+            versionLiteral = "2.1.4"
+        )
+
+    val KTOR_CLIENT_CORE =
+        LibraryRequirement(
+            key = "ktor-client-core",
+            module = "io.ktor:ktor-client-core",
+            versionLiteral = "3.0.3"
+        )
+
+    val KTOR_CLIENT_OKHTTP =
+        LibraryRequirement(
+            key = "ktor-client-okhttp",
+            module = "io.ktor:ktor-client-okhttp",
+            versionLiteral = "3.0.3"
+        )
+
+    val RETROFIT =
+        LibraryRequirement(
+            key = "retrofit",
+            module = "com.squareup.retrofit2:retrofit",
+            versionLiteral = "2.11.0"
+        )
+
+    val OKHTTP3_LOGGING_INTERCEPTOR =
+        LibraryRequirement(
+            key = "okhttp3-logging-interceptor",
+            module = "com.squareup.okhttp3:logging-interceptor",
+            versionLiteral = "4.12.0"
         )
 
     val CORE_ANDROID_LIBRARIES =
         listOf(
             ANDROIDX_CORE_KTX,
             ANDROIDX_LIFECYCLE_RUNTIME_KTX,
-            KOTLINX_COROUTINES_CORE
+            KOTLINX_COROUTINES_CORE,
+            MATERIAL,
+            OKHTTP3,
+            ANDROIDX_APPCOMPAT,
+            ANDROIDX_RECYCLERVIEW,
+            ANDROIDX_FRAGMENT_KTX,
+            ANDROIDX_NAVIGATION_FRAGMENT_KTX
         )
 
     val COMPOSE_LIBRARIES =
@@ -197,7 +288,9 @@ object LibraryConstants {
             COMPOSE_UI_GRAPHICS,
             COMPOSE_UI_TOOLING_PREVIEW,
             COMPOSE_MATERIAL3,
-            COMPOSE_NAVIGATION
+            COMPOSE_NAVIGATION,
+            ANDROIDX_UI_TOOLING,
+            ANDROIDX_UI_TEST_MANIFEST
         )
 
     val TESTING_LIBRARIES =
@@ -214,6 +307,14 @@ object LibraryConstants {
     val COMPOSE_TESTING_LIBRARIES =
         listOf(
             TEST_COMPOSE_UI_JUNIT4
+        )
+
+    val NETWORK_LIBRARIES =
+        listOf(
+            KTOR_CLIENT_CORE,
+            KTOR_CLIENT_OKHTTP,
+            RETROFIT,
+            OKHTTP3_LOGGING_INTERCEPTOR
         )
 }
 
@@ -236,7 +337,7 @@ object PluginConstants {
         PluginRequirement(
             key = "ksp",
             id = "com.google.devtools.ksp",
-            versionRefKey = "kotlin"
+            versionRefKey = "ksp"
         )
 
     val COMPOSE_COMPILER =

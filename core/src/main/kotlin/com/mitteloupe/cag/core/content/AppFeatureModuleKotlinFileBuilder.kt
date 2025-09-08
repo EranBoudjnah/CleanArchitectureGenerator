@@ -19,7 +19,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import $featurePackageName.data.repository.${className}Repository
-import $featurePackageName.domain.repository.PerformExampleRepository
+import $featurePackageName.domain.repository.PerformActionRepository
 import $featurePackageName.domain.usecase.PerformActionUseCase
 import $featurePackageName.presentation.mapper.StubDomainMapper
 import $featurePackageName.presentation.mapper.StubPresentationMapper

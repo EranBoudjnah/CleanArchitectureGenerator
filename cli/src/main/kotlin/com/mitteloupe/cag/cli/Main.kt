@@ -10,6 +10,7 @@ import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.io.File
 import java.nio.file.Paths
+import java.util.UUID
 import kotlin.system.exitProcess
 
 fun main(arguments: Array<String>) {
@@ -59,6 +60,7 @@ fun main(arguments: Array<String>) {
             }
         val projectTemplateRequest =
             GenerateProjectTemplateRequest(
+                requestId = UUID.randomUUID().toString(),
                 destinationRootDirectory = projectTemplateDestinationDirectory,
                 projectName = request.projectName,
                 packageName = request.packageName,
