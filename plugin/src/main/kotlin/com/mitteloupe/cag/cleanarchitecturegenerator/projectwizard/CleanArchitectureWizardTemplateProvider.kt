@@ -26,9 +26,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
-    companion object {
-        private val processedRequests = ConcurrentHashMap<String, Boolean>()
-    }
+    private val processedRequests = ConcurrentHashMap<String, Boolean>()
 
     private val executionId = UUID.randomUUID().toString()
 

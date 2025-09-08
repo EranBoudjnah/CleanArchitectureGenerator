@@ -107,7 +107,8 @@ object FileCreator {
         resourcePath: String,
         classLoader: ClassLoader
     ) {
-        val resourceFile = File(classLoader.getResource(resourcePath)?.toURI())
+        val resourceUri = requireNotNull(classLoader.getResource(resourcePath)?.toURI())
+        val resourceFile = File(resourceUri)
         if (resourceFile.isDirectory) {
             resourceFile.listFiles()?.forEach { sourceFile ->
                 val targetFile = File(targetDirectory, sourceFile.name)

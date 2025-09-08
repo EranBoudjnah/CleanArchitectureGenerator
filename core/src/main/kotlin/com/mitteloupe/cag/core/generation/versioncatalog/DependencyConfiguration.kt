@@ -50,8 +50,6 @@ object VersionCatalogConstants {
             COMPOSE_COMPILER_VERSION
         )
 
-    val TESTING_VERSIONS = listOf(JUNIT4_VERSION)
-
     val KTLINT_VERSIONS = listOf(KTLINT_VERSION)
 
     val DETEKT_VERSIONS = listOf(DETEKT_VERSION)

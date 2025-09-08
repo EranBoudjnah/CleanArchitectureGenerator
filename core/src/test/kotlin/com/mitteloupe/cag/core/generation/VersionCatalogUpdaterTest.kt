@@ -3,7 +3,8 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
-import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import org.junit.Assert.assertEquals
@@ -409,7 +410,7 @@ class VersionCatalogUpdaterTest {
     @Test
     fun `Given existing catalog when updateVersionCatalogIfPresent then resolved mappings are updated`() {
         // Given
-        val (projectRoot, catalogFile) =
+        val (projectRoot, _) =
             createProjectWithCatalog(
                 initialContent =
                     """
@@ -437,14 +438,14 @@ class VersionCatalogUpdaterTest {
         assertEquals(
             "existing-plugin",
             classUnderTest.getResolvedPluginAliasFor(
-                SectionEntryRequirement.PluginRequirement("existing-plugin", "com.example.existing", "kotlin")
+                PluginRequirement("existing-plugin", "com.example.existing", "kotlin")
             )
         )
         assertEquals("kotlin-jvm", classUnderTest.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM))
         assertEquals(
             "existing-library",
             classUnderTest.getResolvedLibraryAliasForModule(
-                SectionEntryRequirement.LibraryRequirement("existing-library", "com.example:existing", versionLiteral = "1.0.0")
+                LibraryRequirement("existing-library", "com.example:existing", versionLiteral = "1.0.0")
             )
         )
         assertEquals("androidx-core-ktx", classUnderTest.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CORE_KTX))
