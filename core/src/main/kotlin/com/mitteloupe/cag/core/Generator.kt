@@ -9,6 +9,7 @@ import com.mitteloupe.cag.core.content.buildUiGradleScript
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.AppModuleGradleUpdater
 import com.mitteloupe.cag.core.generation.BuildSrcContentCreator
+import com.mitteloupe.cag.core.generation.ConfigurationFileCreator
 import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
 import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
 import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
@@ -313,6 +314,14 @@ class Generator {
         buildSrcContentCreator.writeGradleFile(request.destinationRootDirectory)
         buildSrcContentCreator.writeSettingsGradleFile(request.destinationRootDirectory)
         buildSrcContentCreator.writeProjectJavaLibraryFile(request.destinationRootDirectory)
+
+        val configurationFileCreator = ConfigurationFileCreator()
+        if (request.enableDetekt) {
+            configurationFileCreator.writeDetektConfigurationFile(request.destinationRootDirectory)
+        }
+        if (request.enableKtlint) {
+            configurationFileCreator.writeEditorConfigFile(request.destinationRootDirectory)
+        }
     }
 
     fun generateProjectTemplate(request: GenerateProjectTemplateRequest) {
@@ -532,5 +541,13 @@ class Generator {
 
         gradlePropertiesFileCreator.writeGradlePropertiesFile(projectRoot)
         GradleWrapperCreator().writeGradleWrapperFiles(projectRoot)
+
+        val configurationFileCreator = ConfigurationFileCreator()
+        if (request.enableDetekt) {
+            configurationFileCreator.writeDetektConfigurationFile(projectRoot)
+        }
+        if (request.enableKtlint) {
+            configurationFileCreator.writeEditorConfigFile(projectRoot)
+        }
     }
 }
