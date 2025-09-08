@@ -364,8 +364,7 @@ class Generator {
                 if (request.enableCompose) {
                     LibraryConstants.COMPOSE_LIBRARIES
                 } else {
-                    emptyList<SectionEntryRequirement.LibraryRequirement>() +
-                        LibraryConstants.TESTING_LIBRARIES
+                    LibraryConstants.VIEW_LIBRARIES + LibraryConstants.TESTING_LIBRARIES
                 }
         val plugins =
             PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +

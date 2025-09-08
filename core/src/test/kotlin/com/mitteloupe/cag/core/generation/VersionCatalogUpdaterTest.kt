@@ -307,6 +307,7 @@ class VersionCatalogUpdaterTest {
             compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
             compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
             compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+            androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.8.2" }
             """.trimIndent() + "\n"
 
         val dependencyConfiguration =
@@ -367,12 +368,13 @@ class VersionCatalogUpdaterTest {
             androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2" }
             androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.6.2" }
             androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version = "2.7.6" }
+            androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
             """.trimIndent() + "\n"
 
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
-                libraries = LibraryConstants.CORE_ANDROID_LIBRARIES,
+                libraries = LibraryConstants.CORE_ANDROID_LIBRARIES + LibraryConstants.VIEW_LIBRARIES,
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
 

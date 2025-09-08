@@ -75,7 +75,7 @@ class ArchitectureModulesContentGenerator(
                 if (enableCompose) {
                     LibraryConstants.COMPOSE_LIBRARIES + LibraryConstants.COMPOSE_TESTING_LIBRARIES
                 } else {
-                    emptyList()
+                    LibraryConstants.VIEW_LIBRARIES
                 } +
                 LibraryConstants.TESTING_LIBRARIES +
                 LibraryConstants.NETWORK_LIBRARIES

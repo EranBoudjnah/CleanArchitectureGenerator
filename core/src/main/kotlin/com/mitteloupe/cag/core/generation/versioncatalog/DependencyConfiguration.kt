@@ -272,11 +272,16 @@ object LibraryConstants {
             ANDROIDX_LIFECYCLE_RUNTIME_KTX,
             KOTLINX_COROUTINES_CORE,
             MATERIAL,
-            OKHTTP3,
+            OKHTTP3
+        )
+
+    val VIEW_LIBRARIES =
+        listOf(
             ANDROIDX_APPCOMPAT,
             ANDROIDX_RECYCLERVIEW,
             ANDROIDX_FRAGMENT_KTX,
-            ANDROIDX_NAVIGATION_FRAGMENT_KTX
+            ANDROIDX_NAVIGATION_FRAGMENT_KTX,
+            ANDROIDX_CONSTRAINTLAYOUT
         )
 
     val COMPOSE_LIBRARIES =
@@ -288,7 +293,8 @@ object LibraryConstants {
             COMPOSE_MATERIAL3,
             COMPOSE_NAVIGATION,
             ANDROIDX_UI_TOOLING,
-            ANDROIDX_UI_TEST_MANIFEST
+            ANDROIDX_UI_TEST_MANIFEST,
+            ANDROIDX_ACTIVITY_COMPOSE
         )
 
     val TESTING_LIBRARIES =
