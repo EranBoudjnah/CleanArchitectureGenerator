@@ -93,6 +93,15 @@ interface CoroutineContextProvider {
         // Given
         val projectRoot = temporaryDirectory
         val architecturePackageName = "com.example.architecture"
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
 
         // When
         classUnderTest.generate(projectRoot, architecturePackageName)
@@ -100,15 +109,6 @@ interface CoroutineContextProvider {
         // Then
         val buildGradleFile = File(projectRoot, "coroutine/build.gradle.kts")
         val buildGradleContent = buildGradleFile.readText()
-        assertEquals(
-            "build.gradle.kts should contain project-java-library plugin",
-            true,
-            buildGradleContent.contains("id(\"project-java-library\")")
-        )
-        assertEquals(
-            "build.gradle.kts should not contain android library plugin",
-            false,
-            buildGradleContent.contains("id(\"com.android.library\")")
-        )
+        assertEquals("build.gradle.kts should have exact content", expectedContent, buildGradleContent)
     }
 }

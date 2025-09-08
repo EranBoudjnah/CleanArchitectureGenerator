@@ -27,32 +27,63 @@ pluginManagement {
     @Test
     fun `Given buildSrc settings gradle script when buildBuildSrcSettingsGradleScript then includes rootProject name`() {
         // Given
+        val expectedContent = """rootProject.name = "buildSrc"
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+"""
+
         // When
         val result = buildBuildSrcSettingsGradleScript()
 
         // Then
-        assertEquals("Should include rootProject name", true, result.contains("rootProject.name = \"buildSrc\""))
+        assertEquals("Should have exact content", expectedContent, result)
     }
 
     @Test
     fun `Given buildSrc settings gradle script when buildBuildSrcSettingsGradleScript then includes pluginManagement block`() {
         // Given
+        val expectedContent = """rootProject.name = "buildSrc"
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+"""
+
         // When
         val result = buildBuildSrcSettingsGradleScript()
 
         // Then
-        assertEquals("Should include pluginManagement block", true, result.contains("pluginManagement {"))
+        assertEquals("Should have exact content", expectedContent, result)
     }
 
     @Test
     fun `Given buildSrc settings gradle script when buildBuildSrcSettingsGradleScript then includes all required repositories`() {
         // Given
+        val expectedContent = """rootProject.name = "buildSrc"
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+"""
+
         // When
         val result = buildBuildSrcSettingsGradleScript()
 
         // Then
-        assertEquals("Should include google repository", true, result.contains("google()"))
-        assertEquals("Should include mavenCentral repository", true, result.contains("mavenCentral()"))
-        assertEquals("Should include gradlePluginPortal repository", true, result.contains("gradlePluginPortal()"))
+        assertEquals("Should have exact content", expectedContent, result)
     }
 }

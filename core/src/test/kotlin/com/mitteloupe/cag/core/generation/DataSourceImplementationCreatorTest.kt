@@ -40,7 +40,12 @@ class DataSourceImplementationCreatorTest {
 
         val implementationFile = File(targetDirectory, "TestDataSourceImpl.kt")
         assertTrue(implementationFile.exists())
-        assertTrue(implementationFile.readText().contains("class TestDataSourceImpl"))
+        val expectedContent = """package com.example.datasource.test.datasource
+
+class TestDataSourceImpl : TestDataSource {
+}
+"""
+        assertEquals("Implementation file should have exact content", expectedContent, implementationFile.readText())
     }
 
     @Test
@@ -107,7 +112,12 @@ class DataSourceImplementationCreatorTest {
         assertTrue(targetDirectory.exists())
 
         val implementationFile = File(targetDirectory, "TestDataSourceImpl.kt")
-        assertTrue(implementationFile.readText().contains("package com.example.datasource.test.datasource"))
+        val expectedContent = """package com.example.datasource.test.datasource
+
+class TestDataSourceImpl : TestDataSource {
+}
+"""
+        assertEquals("Implementation file should have exact content", expectedContent, implementationFile.readText())
     }
 
     @Test(expected = GenerationException::class)

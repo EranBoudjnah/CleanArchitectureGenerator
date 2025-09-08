@@ -9,12 +9,54 @@ class SettingsGradleScriptBuilderTest {
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
+        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "TestProject"
+include(":app")
+include(":coroutine")
+
+setOf(
+    "ui",
+    "instrumentation-test", 
+    "presentation",
+    "presentation-test",
+    "domain"
+).forEach { module ->
+    include(":architecture:${'$'}module")
+}
+
+setOf("ui", "presentation", "domain", "data").forEach { layer ->
+   include("features:samplefeature:${'$'}layer")
+}
+
+setOf(
+    "source",
+    "implementation"
+).forEach { module ->
+    include(":datasource:${'$'}module")
+}"""
 
         // When
         val result = buildSettingsGradleScript(projectName, featureNames)
 
         // Then
-        assertEquals("Settings should include coroutine module", true, result.contains("include(\":coroutine\")"))
+        assertEquals("Settings should have exact content", expectedContent, result)
     }
 
     @Test
@@ -22,12 +64,54 @@ class SettingsGradleScriptBuilderTest {
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
+        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "TestProject"
+include(":app")
+include(":coroutine")
+
+setOf(
+    "ui",
+    "instrumentation-test", 
+    "presentation",
+    "presentation-test",
+    "domain"
+).forEach { module ->
+    include(":architecture:${'$'}module")
+}
+
+setOf("ui", "presentation", "domain", "data").forEach { layer ->
+   include("features:samplefeature:${'$'}layer")
+}
+
+setOf(
+    "source",
+    "implementation"
+).forEach { module ->
+    include(":datasource:${'$'}module")
+}"""
 
         // When
         val result = buildSettingsGradleScript(projectName, featureNames)
 
         // Then
-        assertEquals("Settings should include app module", true, result.contains("include(\":app\")"))
+        assertEquals("Settings should have exact content", expectedContent, result)
     }
 
     @Test
@@ -35,11 +119,53 @@ class SettingsGradleScriptBuilderTest {
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
+        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "TestProject"
+include(":app")
+include(":coroutine")
+
+setOf(
+    "ui",
+    "instrumentation-test", 
+    "presentation",
+    "presentation-test",
+    "domain"
+).forEach { module ->
+    include(":architecture:${'$'}module")
+}
+
+setOf("ui", "presentation", "domain", "data").forEach { layer ->
+   include("features:samplefeature:${'$'}layer")
+}
+
+setOf(
+    "source",
+    "implementation"
+).forEach { module ->
+    include(":datasource:${'$'}module")
+}"""
 
         // When
         val result = buildSettingsGradleScript(projectName, featureNames)
 
         // Then
-        assertEquals("Settings should include architecture modules", true, result.contains("include(\":architecture:\$module\")"))
+        assertEquals("Settings should have exact content", expectedContent, result)
     }
 }

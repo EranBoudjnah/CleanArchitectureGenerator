@@ -40,7 +40,12 @@ class DataSourceInterfaceCreatorTest {
 
         val interfaceFile = File(targetDirectory, "TestDataSource.kt")
         assertTrue(interfaceFile.exists())
-        assertTrue(interfaceFile.readText().contains("interface TestDataSource"))
+        val expectedContent = """package com.example.datasource.test.datasource
+
+interface TestDataSource {
+}
+"""
+        assertEquals("Interface file should have exact content", expectedContent, interfaceFile.readText())
     }
 
     @Test
@@ -108,7 +113,12 @@ class DataSourceInterfaceCreatorTest {
         assertTrue(targetDirectory.exists())
 
         val interfaceFile = File(targetDirectory, "TestDataSource.kt")
-        assertTrue(interfaceFile.readText().contains("package com.example.datasource.test.datasource"))
+        val expectedContent = """package com.example.datasource.test.datasource
+
+interface TestDataSource {
+}
+"""
+        assertEquals("Interface file should have exact content", expectedContent, interfaceFile.readText())
     }
 
     @Test(expected = GenerationException::class)

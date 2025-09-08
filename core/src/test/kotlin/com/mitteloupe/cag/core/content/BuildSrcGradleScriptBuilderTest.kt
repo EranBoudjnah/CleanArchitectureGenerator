@@ -25,34 +25,57 @@ repositories {
     @Test
     fun `Given buildSrc gradle script when buildBuildSrcGradleScript then includes kotlin-dsl plugin`() {
         // Given
+        val expectedContent = """plugins {
+    `kotlin-dsl`
+}
+
+repositories {
+    mavenCentral()
+}
+"""
+
         // When
         val result = buildBuildSrcGradleScript()
 
         // Then
-        assertEquals("Should include kotlin-dsl plugin", true, result.contains("`kotlin-dsl`"))
+        assertEquals("Should have exact content", expectedContent, result)
     }
 
     @Test
     fun `Given buildSrc gradle script when buildBuildSrcGradleScript then includes mavenCentral repository`() {
         // Given
+        val expectedContent = """plugins {
+    `kotlin-dsl`
+}
+
+repositories {
+    mavenCentral()
+}
+"""
+
         // When
         val result = buildBuildSrcGradleScript()
 
         // Then
-        assertEquals("Should include mavenCentral repository", true, result.contains("mavenCentral()"))
+        assertEquals("Should have exact content", expectedContent, result)
     }
 
     @Test
     fun `Given buildSrc gradle script when buildBuildSrcGradleScript then includes repositories block`() {
         // Given
+        val expectedContent = """plugins {
+    `kotlin-dsl`
+}
+
+repositories {
+    mavenCentral()
+}
+"""
+
         // When
         val result = buildBuildSrcGradleScript()
 
         // Then
-        assertEquals(
-            "Should include repositories block",
-            true,
-            result.contains("repositories {")
-        )
+        assertEquals("Should have exact content", expectedContent, result)
     }
 }

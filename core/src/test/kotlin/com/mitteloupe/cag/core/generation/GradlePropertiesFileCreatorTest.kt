@@ -2,7 +2,6 @@ package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -70,7 +69,6 @@ class GradlePropertiesFileCreatorTest {
 
         // Then
         val actualContent = gradlePropertiesFile.readText()
-        assertFalse(actualContent.contains(existingContent))
         assertEquals(expectedGradlePropertiesContent, actualContent)
     }
 

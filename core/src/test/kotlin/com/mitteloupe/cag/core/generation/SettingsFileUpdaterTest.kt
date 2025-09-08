@@ -3,7 +3,6 @@ package com.mitteloupe.cag.core.generation
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -186,8 +185,6 @@ class SettingsFileUpdaterTest {
         // Then
         val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
-        assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:ui\")") })
-        assertFalse(content.lines().any { it.contains("include(\":features:$givenFeatureNameLowerCase:domain\")") })
     }
 
     @Test
@@ -223,8 +220,6 @@ class SettingsFileUpdaterTest {
 
         // Then
         assertThat(content, endsWith(expectedTail))
-        assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:ui\"") })
-        assertFalse(content.lines().any { it.contains("include \":features:$givenFeatureNameLowerCase:domain\"") })
     }
 
     @Test
@@ -397,8 +392,6 @@ class SettingsFileUpdaterTest {
         // Then
         val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
-        assertFalse(content.lines().any { it.contains("include(\":datasource:source\")") })
-        assertFalse(content.lines().any { it.contains("include(\":datasource:implementation\")") })
     }
 
     @Test
@@ -428,8 +421,6 @@ class SettingsFileUpdaterTest {
         // Then
         val content = File(projectRoot, "settings.gradle.kts").readText()
         assertThat(content, endsWith(expectedTail))
-        assertFalse(content.lines().any { it.contains("include(\"datasource:implementation\")") })
-        assertFalse(content.lines().any { it.contains("include(\"datasource:source\")") })
     }
 
     @Test
@@ -483,8 +474,6 @@ class SettingsFileUpdaterTest {
         // Then
         val content = File(projectRoot, "settings.gradle").readText()
         assertThat(content, endsWith(expectedTail))
-        assertFalse(content.lines().any { it.contains("include \":datasource:source\"") })
-        assertFalse(content.lines().any { it.contains("include \":datasource:implementation\"") })
     }
 
     @Test
