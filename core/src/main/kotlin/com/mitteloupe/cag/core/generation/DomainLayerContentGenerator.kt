@@ -28,7 +28,7 @@ class DomainLayerContentGenerator(
     ) {
         val packageSuffixRegex = USE_CASE_PACKAGE_SUFFIX.replace(".", "\\.") + "$"
         val packageName =
-            derivePackageNameForDirectory(destinationDirectory)
+            PackageNameDeriver.derivePackageNameForDirectory(destinationDirectory)
                 ?.replace(packageSuffixRegex.toRegex(), "")
                 ?: throw GenerationException(
                     "Could not determine package name from directory: " +
@@ -125,19 +125,6 @@ class DomainLayerContentGenerator(
     }
 
     private fun deriveRepositoryNameFromUseCaseName(useCaseName: String): String = useCaseName.removeSuffix("UseCase") + "Repository"
-
-    private fun derivePackageNameForDirectory(directory: File): String? {
-        val absolutePath = directory.absolutePath
-        val marker =
-            listOf("src/main/java", "src/main/kotlin").firstOrNull { absolutePath.contains(it) }
-                ?: return null
-        val afterMarker = absolutePath.substringAfter(marker).trimStart(File.separatorChar)
-        if (afterMarker.isEmpty()) {
-            return null
-        }
-        val segments = afterMarker.split(File.separatorChar).filter { it.isNotEmpty() }
-        return segments.joinToString(separator = ".")
-    }
 
     private fun extractProjectNamespace(packageName: String): String {
         val segments = packageName.split(".")

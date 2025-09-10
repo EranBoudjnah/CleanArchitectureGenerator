@@ -158,6 +158,50 @@ class GeneratorTest {
         // Then
     }
 
+    @Test
+    fun `Given valid view model request when generateViewModel then returns success`() {
+        // Given
+        val featureRoot = File(tempDirectory, "src/main/java/com/example/feature")
+        val viewModelDirectory = File(featureRoot, "presentation/viewmodel")
+        viewModelDirectory.mkdirs()
+        val request =
+            GenerateViewModelRequest(
+                viewModelName = "TestViewModel",
+                destinationDirectory = viewModelDirectory,
+                featurePackageName = "com.example.feature",
+                projectNamespace = "com.example"
+            )
+        val expectedPath = "presentation/src/main/java/com/example/feature/viewmodel/TestViewModelViewModel.kt"
+
+        // When
+        classUnderTest.generateViewModel(request)
+        val actualViewModelFile = File(viewModelDirectory, expectedPath)
+
+        // Then
+        assertTrue("ViewModel file should be created", actualViewModelFile.exists())
+    }
+
+    @Test
+    fun `Given invalid directory when generateViewModel then creates directory and file`() {
+        // Given
+        val invalidDirectory = File(tempDirectory, "invalid/path")
+        val request =
+            GenerateViewModelRequest(
+                viewModelName = "TestViewModel",
+                destinationDirectory = invalidDirectory,
+                featurePackageName = "com.example.feature",
+                projectNamespace = "com.example"
+            )
+        val expectedPath = "presentation/src/main/java/com/example/feature/viewmodel/TestViewModelViewModel.kt"
+
+        // When
+        classUnderTest.generateViewModel(request)
+        val actualViewModelFile = File(invalidDirectory, expectedPath)
+
+        // Then
+        assertTrue("ViewModel file should be created", actualViewModelFile.exists())
+    }
+
     @Test(expected = GenerationException::class)
     fun `Given empty architecture package name when generateArchitecture then throws exception`() {
         // Given

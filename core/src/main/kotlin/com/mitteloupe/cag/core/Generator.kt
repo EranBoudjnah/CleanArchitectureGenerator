@@ -109,7 +109,7 @@ class Generator {
                 content = buildPresentationGradleScript(featureNameLowerCase, catalogUpdater)
             )
             PresentationLayerContentGenerator()
-                .generate(
+                .generatePresentationLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
@@ -175,6 +175,19 @@ class Generator {
                 useCaseName = useCaseName,
                 inputDataType = request.inputDataType,
                 outputDataType = request.outputDataType
+            )
+    }
+
+    fun generateViewModel(request: GenerateViewModelRequest) {
+        val destinationDirectory = request.destinationDirectory
+        val viewModelName = request.viewModelName.trim()
+
+        PresentationLayerContentGenerator()
+            .generateViewModel(
+                destinationDirectory = destinationDirectory,
+                viewModelName = viewModelName,
+                featurePackageName = request.featurePackageName,
+                projectNamespace = request.projectNamespace
             )
     }
 

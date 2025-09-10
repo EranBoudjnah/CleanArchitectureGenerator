@@ -12,7 +12,7 @@ import java.io.File
 class PresentationLayerContentGenerator(
     private val kotlinFileCreator: KotlinFileCreator = KotlinFileCreator()
 ) {
-    fun generate(
+    fun generatePresentationLayer(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String,
@@ -127,6 +127,20 @@ class PresentationLayerContentGenerator(
                     featurePackageName = featurePackageName,
                     featureName = featureName.capitalized
                 )
+        )
+    }
+
+    fun generateViewModel(
+        destinationDirectory: File,
+        viewModelName: String,
+        featurePackageName: String,
+        projectNamespace: String
+    ) {
+        writePresentationViewModelFile(
+            featureRoot = destinationDirectory,
+            projectNamespace = projectNamespace,
+            featurePackageName = featurePackageName,
+            featureName = viewModelName
         )
     }
 }
