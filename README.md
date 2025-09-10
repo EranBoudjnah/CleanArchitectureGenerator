@@ -1,6 +1,6 @@
 ## Clean Architecture Generator
 
-A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, use cases, and architecture packages.
+A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, use cases, ViewModels, and architecture packages.
 
 ### CLI usage
 
@@ -8,6 +8,7 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate in
 
 ```bash
 ./gradlew :cli:run --args="--new-feature --name=MyFeature"
+./gradlew :cli:run --args="--new-view-model --name=MyViewModel"
 ```
 
 - **Run via installed script:**
@@ -15,6 +16,7 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate in
 ```bash
 ./gradlew :cli:installDist
 "./cli/build/install/cli/bin/cli" --new-feature --name=MyFeature
+"./cli/build/install/cli/bin/cli" --new-view-model --name=MyViewModel
 ```
 
 - **Run the fat jar:**
@@ -22,6 +24,7 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate in
 ```bash
 ./gradlew :cli:shadowJar
 java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
+java -jar "cli/build/libs/cli-all.jar" --new-view-model --name=MyViewModel
 ```
 
 #### Options
@@ -29,7 +32,7 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
 Usage:
 
 ```bash
-cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]...
 ```
 
 ##### New Architecture Options
@@ -75,6 +78,15 @@ cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature 
     By default, Unit is used
 ```
 
+##### New ViewModel Options
+```bash
+  --new-view-model --name=<ViewModelName> | --new-view-model --name <ViewModelName> | -nvm --name=<ViewModelName> | -nvm --name <ViewModelName>
+    Generate a new ViewModel named <ViewModelName>ViewModel.
+  --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
+    (Optional) Specify the target directory for the preceding ViewModel
+    By default, the target path is determined by the current location
+```
+
 ##### Other Options
 ```bash
   --help, -h
@@ -92,3 +104,4 @@ When run without arguments, the command prints a short usage and suggests using 
 
 - Context menu items:
   - New use case in domain modules
+  - New ViewModel in presentation modules
