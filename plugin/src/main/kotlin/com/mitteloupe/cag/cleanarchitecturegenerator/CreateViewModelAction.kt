@@ -76,10 +76,7 @@ class CreateViewModelAction : AnAction() {
             ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(
                 project,
-                CleanArchitectureGeneratorBundle.message(
-                    "info.viewmodel.generator.confirmation",
-                    "Success!"
-                ),
+                CleanArchitectureGeneratorBundle.message("info.viewmodel.generator.confirmation"),
                 CleanArchitectureGeneratorBundle.message("info.viewmodel.generator.title")
             )
         } catch (e: GenerationException) {
