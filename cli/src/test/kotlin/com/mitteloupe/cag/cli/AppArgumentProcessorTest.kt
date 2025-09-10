@@ -4,6 +4,7 @@ import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
+import com.mitteloupe.cag.cli.request.ViewModelRequest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
@@ -19,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses
     AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorDataSourcesTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorUseCasesTest::class,
+    AppArgumentProcessorTest.AppArgumentProcessorViewModelsTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorProjectTemplateTest::class,
     AppArgumentProcessorTest.UnknownFlagsValidation::class
 )
@@ -781,6 +783,87 @@ class AppArgumentProcessorTest {
             } catch (exception: IllegalArgumentException) {
                 // Then
                 assertEquals("Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.", exception.message)
+            }
+        }
+    }
+
+    class AppArgumentProcessorViewModelsTest {
+        private lateinit var classUnderTest: AppArgumentProcessor
+
+        @Before
+        fun setUp() {
+            classUnderTest = AppArgumentProcessor()
+        }
+
+        @Test
+        fun `Given view models with optional paths when getNewViewModels then maps in order`() {
+            // Given
+            val givenArguments =
+                arrayOf("--new-view-model", "--name=First", "--path=/path1", "--new-view-model", "--name=Second")
+
+            // When
+            val result = classUnderTest.getNewViewModels(givenArguments)
+
+            // Then
+            assertEquals(listOf(ViewModelRequest("First", "/path1"), ViewModelRequest("Second", null)), result)
+        }
+
+        @Test
+        fun `Given short flags when getNewViewModels then parses correctly`() {
+            // Given
+            val givenArguments = arrayOf("-nvm", "-nThird", "-p", "/path3", "-nvm", "-n=Fourth", "-p/path4")
+
+            // When
+            val result = classUnderTest.getNewViewModels(givenArguments)
+
+            // Then
+            assertEquals(listOf(ViewModelRequest("Third", "/path3"), ViewModelRequest("Fourth", "/path4")), result)
+        }
+
+        @Test
+        fun `Given view model with missing name when getNewViewModels then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-view-model")
+
+            // When
+            try {
+                classUnderTest.getNewViewModels(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("ViewModel name is required. Use --name=ViewModelName or -n=ViewModelName", exception.message)
+            }
+        }
+
+        @Test
+        fun `Given view model with mixed long and short forms when getNewViewModels then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("--new-view-model", "-n", "TestViewModel")
+            val expectedErrorMessage =
+                "Cannot mix long form (--new-view-model) with short form secondary flags (-n). Use --name instead."
+
+            // When
+            try {
+                classUnderTest.getNewViewModels(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals(expectedErrorMessage, exception.message)
+            }
+        }
+
+        @Test
+        fun `Given view model with mixed short and long forms when getNewViewModels then throws exception`() {
+            // Given
+            val givenArguments = arrayOf("-nvm", "--name", "TestViewModel")
+
+            // When
+            try {
+                classUnderTest.getNewViewModels(givenArguments)
+                fail("Expected IllegalArgumentException to be thrown")
+            } catch (exception: IllegalArgumentException) {
+                // Then
+                assertEquals("Cannot mix short form (-nvm) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
     }

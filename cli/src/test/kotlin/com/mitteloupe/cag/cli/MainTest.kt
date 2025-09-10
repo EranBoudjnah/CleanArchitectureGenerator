@@ -64,7 +64,8 @@ class MainTest {
                     "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
                     "[--new-feature --name=FeatureName [--package=PackageName]]... " +
                     "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-                    "[--new-use-case --name=UseCaseName [--path=TargetPath]]...\n" +
+                    "[--new-use-case --name=UseCaseName [--path=TargetPath]]... " +
+                    "[--new-view-model --name=ViewModelName [--path=TargetPath]]...\n" +
                     "\n" +
                     "Run with --help or -h for more options.\n",
                 output.toString()
@@ -93,7 +94,7 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+                """usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]...
 
 Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
@@ -140,6 +141,12 @@ Options:
         Specify the use case name (required)
     --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
         Specify the target directory for the preceding use case
+  --new-view-model | -nvm
+      Generate a new ViewModel
+    --name=ViewModelName | -n=ViewModelName | -n ViewModelName | -nViewModelName
+        Specify the ViewModel name (required)
+    --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+        Specify the target directory for the preceding ViewModel
   --help, -h
       Show this help message and exit
 """

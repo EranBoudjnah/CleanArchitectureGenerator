@@ -97,6 +97,21 @@ interface PrimaryFlag {
             )
     }
 
+    data object NewViewModelPrimary : PrimaryFlag {
+        override val long = "--new-view-model"
+        override val short = "-nvm"
+        override val secondaryFlags =
+            listOf(
+                SecondaryFlag(
+                    SecondaryFlagConstants.NAME,
+                    "-n",
+                    isMandatory = true,
+                    missingErrorMessage = "ViewModel name is required. Use ${SecondaryFlagConstants.NAME}=ViewModelName or -n=ViewModelName"
+                ),
+                SecondaryFlag(SecondaryFlagConstants.PATH, "-p")
+            )
+    }
+
     data object HelpPrimary : PrimaryFlag {
         override val long = "--help"
         override val short = "-h"

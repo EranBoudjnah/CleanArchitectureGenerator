@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
+import com.mitteloupe.cag.core.GenerateViewModelRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.findGradleProjectRoot
@@ -12,6 +13,12 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.UUID
 import kotlin.system.exitProcess
+
+private const val USAGE_SYNTAX =
+    "usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
+        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... " +
+        "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
+        "[--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]..."
 
 fun main(arguments: Array<String>) {
     val argumentProcessor = AppArgumentProcessor()
@@ -37,11 +44,13 @@ fun main(arguments: Array<String>) {
     val featureRequests = argumentProcessor.getNewFeatures(arguments)
     val dataSourceRequests = argumentProcessor.getNewDataSources(arguments)
     val useCaseRequests = argumentProcessor.getNewUseCases(arguments)
+    val viewModelRequests = argumentProcessor.getNewViewModels(arguments)
     if (projectTemplateRequests.isEmpty() &&
         architectureRequests.isEmpty() &&
         featureRequests.isEmpty() &&
         dataSourceRequests.isEmpty() &&
-        useCaseRequests.isEmpty()
+        useCaseRequests.isEmpty() &&
+        viewModelRequests.isEmpty()
     ) {
         printUsageMessage()
         return
@@ -145,12 +154,40 @@ fun main(arguments: Array<String>) {
             generator.generateUseCase(useCaseRequest)
         }
     }
+
+    viewModelRequests.forEach { request ->
+        val targetDirectory =
+            if (request.targetPath != null) {
+                val path = Paths.get(request.targetPath)
+                if (path.isAbsolute) {
+                    path.toFile()
+                } else {
+                    File(destinationRootDir, request.targetPath)
+                }
+            } else {
+                Paths.get("").toAbsolutePath().toFile()
+            }
+
+        val featurePackageName = basePackage ?: "com.example"
+
+        val viewModelRequest =
+            GenerateViewModelRequest.Builder(
+                destinationDirectory = targetDirectory,
+                viewModelName = request.viewModelName,
+                featurePackageName = featurePackageName,
+                projectNamespace = projectNamespace
+            ).build()
+
+        executeAndReport {
+            generator.generateViewModel(viewModelRequest)
+        }
+    }
 }
 
 private fun printUsageMessage() {
     println(
         """
-        usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+        $USAGE_SYNTAX
 
         Run with --help or -h for more options.
         """.trimIndent()
@@ -160,7 +197,7 @@ private fun printUsageMessage() {
 private fun printHelpMessage() {
     println(
         """
-        usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]...
+        $USAGE_SYNTAX
 
         Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
@@ -207,6 +244,12 @@ private fun printHelpMessage() {
                 Specify the use case name (required)
             --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
                 Specify the target directory for the preceding use case
+          --new-view-model | -nvm
+              Generate a new ViewModel
+            --name=ViewModelName | -n=ViewModelName | -n ViewModelName | -nViewModelName
+                Specify the ViewModel name (required)
+            --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
+                Specify the target directory for the preceding ViewModel
           --help, -h
               Show this help message and exit
         """.trimIndent()

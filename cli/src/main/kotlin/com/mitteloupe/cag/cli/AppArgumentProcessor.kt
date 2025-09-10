@@ -7,12 +7,14 @@ import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewDataSourcePrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewFeaturePrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewProjectPrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewUseCasePrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewViewModelPrimary
 import com.mitteloupe.cag.cli.flag.SecondaryFlagConstants
 import com.mitteloupe.cag.cli.request.ArchitectureRequest
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
+import com.mitteloupe.cag.cli.request.ViewModelRequest
 
 private val PRIMARY_FLAGS =
     setOf(
@@ -21,6 +23,7 @@ private val PRIMARY_FLAGS =
         NewFeaturePrimary,
         NewDataSourcePrimary,
         NewUseCasePrimary,
+        NewViewModelPrimary,
         HelpPrimary
     )
 
@@ -83,6 +86,17 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 targetPath = secondaries[SecondaryFlagConstants.PATH],
                 inputDataType = secondaries[SecondaryFlagConstants.INPUT_TYPE],
                 outputDataType = secondaries[SecondaryFlagConstants.OUTPUT_TYPE]
+            )
+        }
+
+    fun getNewViewModels(arguments: Array<String>): List<ViewModelRequest> =
+        parseWithNameFlag(
+            arguments = arguments,
+            primaryFlag = NewViewModelPrimary
+        ) { secondaries ->
+            ViewModelRequest(
+                viewModelName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
+                targetPath = secondaries[SecondaryFlagConstants.PATH]
             )
         }
 
