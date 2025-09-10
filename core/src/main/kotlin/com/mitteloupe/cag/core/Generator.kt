@@ -53,6 +53,7 @@ class Generator {
             DependencyConfiguration(
                 versions =
                     VersionCatalogConstants.BASIC_VERSIONS +
+                        VersionCatalogConstants.ANDROID_VERSIONS +
                         if (request.enableCompose) {
                             VersionCatalogConstants.COMPOSE_VERSIONS
                         } else {
@@ -223,7 +224,7 @@ class Generator {
         val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -522,7 +523,7 @@ class Generator {
         val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
                     PluginConstants.KOTLIN_PLUGINS +

@@ -438,6 +438,8 @@ class GeneratorTest {
             """
             [versions]
             $existingVersions
+            targetSdk = "35"
+            androidGradlePlugin = "8.12.2"
             composeBom = "2025.08.01"
             composeNavigation = "2.9.3"
             composeCompiler = "1.5.8"
@@ -498,6 +500,8 @@ class GeneratorTest {
             minSdk = "24"
             junit4 = "4.13.2"
             ksp = "2.2.10-2.0.2"
+            targetSdk = "35"
+            androidGradlePlugin = "8.12.2"
             
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -555,6 +559,8 @@ class GeneratorTest {
             """
             [versions]
             $existingVersions
+            targetSdk = "35"
+            androidGradlePlugin = "8.12.2"
 
             [libraries]
             $existingLibraries

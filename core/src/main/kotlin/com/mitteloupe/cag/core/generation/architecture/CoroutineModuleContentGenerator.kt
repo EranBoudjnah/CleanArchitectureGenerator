@@ -34,7 +34,7 @@ class CoroutineModuleContentGenerator {
         val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = LibraryConstants.CORE_ANDROID_LIBRARIES,
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
