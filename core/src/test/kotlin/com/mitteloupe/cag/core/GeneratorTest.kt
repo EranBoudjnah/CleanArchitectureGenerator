@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -341,13 +342,12 @@ class GeneratorTest {
 
         // Then
         val architectureRoot = File(tempDirectory, "architecture")
-        assertTrue(architectureRoot.exists())
         assertTrue(architectureRoot.isDirectory)
 
         val layers = listOf("domain", "presentation", "ui")
         layers.forEach { layer ->
-            val layerDir = File(architectureRoot, "$layer/src/main/java")
-            assertTrue("Layer $layer should exist", layerDir.exists())
+            val layerDirectory = File(architectureRoot, "$layer/src/main/java")
+            assertTrue("Layer $layer should exist", layerDirectory.isDirectory)
         }
     }
 
@@ -362,19 +362,18 @@ class GeneratorTest {
                 enableKtlint = true,
                 enableDetekt = true
             )
+        val architectureRoot = File(tempDirectory, "architecture")
 
         // When
         classUnderTest.generateArchitecture(request)
 
         // Then
-        val architectureRoot = File(tempDirectory, "architecture")
-        assertTrue(architectureRoot.exists())
         assertTrue(architectureRoot.isDirectory)
 
         val layers = listOf("domain", "presentation", "ui")
         layers.forEach { layer ->
-            val layerDir = File(architectureRoot, "$layer/src/main/java")
-            assertTrue("Layer $layer should exist", layerDir.exists())
+            val layerDirectory = File(architectureRoot, "$layer/src/main/java")
+            assertTrue("Layer $layer should exist", layerDirectory.isDirectory)
         }
     }
 
@@ -404,5 +403,176 @@ class GeneratorTest {
         val implementationModule = File(datasourceRoot, "implementation")
         assertTrue(sourceModule.exists())
         assertTrue(implementationModule.exists())
+    }
+
+    @Test
+    fun `Given existing version catalog without compose versions when generateFeature with compose enabled then adds compose versions`() {
+        val gradleDirectory = File(tempDirectory, "gradle")
+        gradleDirectory.mkdirs()
+        val catalogFile = File(gradleDirectory, "libs.versions.toml")
+        val existingVersions = """kotlin = "2.2.10"
+            compileSdk = "35"
+            minSdk = "24"
+            junit4 = "4.13.2"
+            ksp = "2.2.10-2.0.2""""
+        val existingLibraries = """androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.12.0" }"""
+        catalogFile.writeText(
+            """
+            [versions]
+            $existingVersions
+
+            [libraries]
+            $existingLibraries
+            """.trimIndent()
+        )
+
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.feature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example",
+                enableCompose = true
+            )
+        val expectedContent =
+            """
+            [versions]
+            $existingVersions
+            composeBom = "2025.08.01"
+            composeNavigation = "2.9.3"
+            composeCompiler = "1.5.8"
+
+            [libraries]
+            $existingLibraries
+            compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+            compose-ui = { module = "androidx.compose.ui:ui" }
+            compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+            compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+            compose-material3 = { module = "androidx.compose.material3:material3" }
+            compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+            compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+            compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+            androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.8.2" }
+
+            [plugins]
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+            compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.generateFeature(request)
+        val catalogContent = catalogFile.readText()
+
+        // Then
+        assertEquals("Generated catalog should match expected content", expectedContent, catalogContent)
+    }
+
+    @Test
+    fun `Given compose disabled feature request when generateFeature then does not update version catalog with compose versions`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.feature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example",
+                enableCompose = false
+            )
+        val catalogFile = File(tempDirectory, "gradle/libs.versions.toml")
+
+        // When
+        classUnderTest.generateFeature(request)
+
+        // Then
+        val catalogContent = catalogFile.readText()
+        val expectedContent =
+            """
+            [versions]
+            kotlin = "2.2.10"
+            compileSdk = "35"
+            minSdk = "24"
+            junit4 = "4.13.2"
+            ksp = "2.2.10-2.0.2"
+            
+            [plugins]
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+
+            """.trimIndent()
+
+        println("Actual (compose disabled):")
+        println(catalogContent)
+        println("Expected (compose disabled):")
+        println(expectedContent)
+
+        assertEquals(
+            "Generated catalog should match expected content (no compose)",
+            expectedContent,
+            catalogContent
+        )
+    }
+
+    @Test
+    @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
+    fun `Given existing version catalog, no compose versions, compose disabled when generateFeature then does not add compose versions`() {
+        // Given
+        val gradleDirectory = File(tempDirectory, "gradle")
+        gradleDirectory.mkdirs()
+        val catalogFile = File(gradleDirectory, "libs.versions.toml")
+        val existingVersions = """kotlin = "2.2.10"
+            compileSdk = "35"
+            minSdk = "24"
+            junit4 = "4.13.2"
+            ksp = "2.2.10-2.0.2""""
+        val existingLibraries = """androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.12.0" }"""
+        catalogFile.writeText(
+            """
+            [versions]
+            $existingVersions
+
+            [libraries]
+            $existingLibraries
+            """.trimIndent()
+        )
+
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.feature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example",
+                enableCompose = false
+            )
+        val expectedContent =
+            """
+            [versions]
+            $existingVersions
+
+            [libraries]
+            $existingLibraries
+
+            [plugins]
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+            kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+            ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+            android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+            android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.generateFeature(request)
+        val catalogContent = catalogFile.readText()
+
+        // Then
+        assertEquals("Generated catalog should match expected content (no compose)", expectedContent, catalogContent)
     }
 }

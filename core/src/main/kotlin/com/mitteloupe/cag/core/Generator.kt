@@ -51,7 +51,13 @@ class Generator {
         val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions =
+                    VersionCatalogConstants.BASIC_VERSIONS +
+                        if (request.enableCompose) {
+                            VersionCatalogConstants.COMPOSE_VERSIONS
+                        } else {
+                            emptyList()
+                        },
                 libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
                     PluginConstants.KOTLIN_PLUGINS +
