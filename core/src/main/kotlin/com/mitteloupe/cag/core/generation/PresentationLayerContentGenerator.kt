@@ -35,7 +35,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "model",
+            relativePackageSubPath = "presentation/model",
             fileName = "${featureName.capitalized}ViewState.kt",
             content =
                 buildPresentationViewStateKotlinFile(
@@ -53,7 +53,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "model",
+            relativePackageSubPath = "presentation/model",
             fileName = "StubPresentationModel.kt",
             content =
                 buildPresentationModelKotlinFile(featurePackageName)
@@ -68,7 +68,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "mapper",
+            relativePackageSubPath = "presentation/mapper",
             fileName = "StubPresentationMapper.kt",
             content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
         )
@@ -82,7 +82,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "mapper",
+            relativePackageSubPath = "presentation/mapper",
             fileName = "StubDomainMapper.kt",
             content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
         )
@@ -98,7 +98,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "viewmodel",
+            relativePackageSubPath = "presentation/viewmodel",
             fileName = "${featureName.capitalized}ViewModel.kt",
             content =
                 buildPresentationViewModelKotlinFile(

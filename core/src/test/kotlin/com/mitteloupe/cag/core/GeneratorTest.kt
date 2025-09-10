@@ -171,7 +171,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 projectNamespace = "com.example"
             )
-        val expectedPath = "presentation/src/main/java/com/example/feature/viewmodel/TestViewModelViewModel.kt"
+        val expectedPath = "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModelViewModel.kt"
 
         // When
         classUnderTest.generateViewModel(request)
@@ -192,7 +192,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 projectNamespace = "com.example"
             )
-        val expectedPath = "presentation/src/main/java/com/example/feature/viewmodel/TestViewModelViewModel.kt"
+        val expectedPath = "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModelViewModel.kt"
 
         // When
         classUnderTest.generateViewModel(request)
@@ -200,6 +200,80 @@ class GeneratorTest {
 
         // Then
         assertTrue("ViewModel file should be created", actualViewModelFile.exists())
+    }
+
+    @Test
+    fun `Given feature root directory when generateViewModel then creates ViewModel in correct presentation layer structure`() {
+        // Given
+        val featureRoot = File(tempDirectory, "features/samplefeature")
+        val request =
+            GenerateViewModelRequest(
+                viewModelName = "SampleViewModel",
+                destinationDirectory = featureRoot,
+                featurePackageName = "com.example.app.examplefeature",
+                projectNamespace = "com.example.app"
+            )
+        val expectedViewModelFile =
+            File(
+                featureRoot,
+                "presentation/src/main/java/com/example/app/examplefeature/presentation/viewmodel/SampleViewModelViewModel.kt"
+            )
+
+        // When
+        classUnderTest.generateViewModel(request)
+
+        // Then
+        assertTrue("ViewModel should be a file", expectedViewModelFile.isFile)
+    }
+
+    @Test
+    fun `Given valid feature request when generateFeature then creates presentation model in correct directory structure`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.app.testfeature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example.app",
+                enableCompose = true
+            )
+        val featureRoot = File(tempDirectory, "features/testfeature")
+        val expectedPresentationModelFile =
+            File(
+                featureRoot,
+                "presentation/src/main/java/com/example/app/testfeature/presentation/model/StubPresentationModel.kt"
+            )
+
+        // When
+        classUnderTest.generateFeature(request)
+
+        // Then
+        assertTrue("Presentation model should be a file", expectedPresentationModelFile.isFile)
+    }
+
+    @Test
+    fun `Given valid feature request when generateFeature then creates presentation mapper in correct directory structure`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.app.testfeature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example.app",
+                enableCompose = true
+            )
+        val featureRoot = File(tempDirectory, "features/testfeature")
+        val expectedPresentationMapperFile =
+            File(
+                featureRoot,
+                "presentation/src/main/java/com/example/app/testfeature/presentation/mapper/StubPresentationMapper.kt"
+            )
+
+        // When
+        classUnderTest.generateFeature(request)
+
+        // Then
+        assertTrue("Presentation mapper should be a file", expectedPresentationMapperFile.isFile)
     }
 
     @Test(expected = GenerationException::class)

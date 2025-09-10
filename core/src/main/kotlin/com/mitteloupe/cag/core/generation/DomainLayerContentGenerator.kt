@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.content.USE_CASE_PACKAGE_SUFFIX
 import com.mitteloupe.cag.core.content.buildDomainModelKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
+import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
 
 class DomainLayerContentGenerator(

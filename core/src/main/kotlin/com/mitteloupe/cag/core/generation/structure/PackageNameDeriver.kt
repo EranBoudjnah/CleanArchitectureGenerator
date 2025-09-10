@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.structure
 
 import java.io.File
 

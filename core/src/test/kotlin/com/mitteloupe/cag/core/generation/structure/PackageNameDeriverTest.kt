@@ -1,12 +1,10 @@
-package com.mitteloupe.cag.core.generation
+package com.mitteloupe.cag.core.generation.structure
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.junit.runners.Parameterized.Parameters
 import org.junit.runners.Suite.SuiteClasses
 import java.io.File
 
@@ -28,7 +26,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertNull(result)
+            Assert.assertNull(result)
         }
 
         @Test
@@ -40,7 +38,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertNull(result)
+            Assert.assertNull(result)
         }
     }
 
@@ -52,7 +50,7 @@ class PackageNameDeriverTest {
     ) {
         companion object {
             @JvmStatic
-            @Parameters(name = "{2}: Given ''{0}'' then returns {1}")
+            @Parameterized.Parameters(name = "{2}: Given ''{0}'' then returns {1}")
             fun parameters(): Collection<Array<Any>> =
                 listOf(
                     testCase(
@@ -113,7 +111,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("Unexpected result for '$directoryPath'", expectedPackageName, result)
+            Assert.assertEquals("Unexpected result for '$directoryPath'", expectedPackageName, result)
         }
     }
 
@@ -125,7 +123,7 @@ class PackageNameDeriverTest {
     ) {
         companion object {
             @JvmStatic
-            @Parameters(name = "{2}: Given ''{0}'' then returns {1}")
+            @Parameterized.Parameters(name = "{2}: Given ''{0}'' then returns {1}")
             fun parameters(): Collection<Array<Any>> =
                 listOf(
                     testCase(
@@ -186,7 +184,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("Unexpected result for '$directoryPath'", expectedPackageName, result)
+            Assert.assertEquals("Unexpected result for '$directoryPath'", expectedPackageName, result)
         }
     }
 
@@ -201,7 +199,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals(expectedPackageName, result)
+            Assert.assertEquals(expectedPackageName, result)
         }
 
         @Test
@@ -214,7 +212,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals(expectedPackageName, result)
+            Assert.assertEquals(expectedPackageName, result)
         }
 
         @Test
@@ -226,7 +224,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature", result)
+            Assert.assertEquals("com.example.feature", result)
         }
 
         @Test
@@ -238,7 +236,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature", result)
+            Assert.assertEquals("com.example.feature", result)
         }
 
         @Test
@@ -250,7 +248,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature", result)
+            Assert.assertEquals("com.example.feature", result)
         }
 
         @Test
@@ -262,7 +260,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature.extra.path", result)
+            Assert.assertEquals("com.example.feature.extra.path", result)
         }
 
         @Test
@@ -274,7 +272,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature.extra.path", result)
+            Assert.assertEquals("com.example.feature.extra.path", result)
         }
 
         @Test
@@ -287,7 +285,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature.src.main.kotlin.other", result)
+            Assert.assertEquals("com.example.feature.src.main.kotlin.other", result)
         }
 
         @Test
@@ -300,7 +298,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("a.b.c", result)
+            Assert.assertEquals("a.b.c", result)
         }
 
         @Test
@@ -312,7 +310,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.my_feature", result)
+            Assert.assertEquals("com.example.my_feature", result)
         }
 
         @Test
@@ -324,7 +322,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature2", result)
+            Assert.assertEquals("com.example.feature2", result)
         }
 
         @Test
@@ -336,7 +334,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.MyFeature", result)
+            Assert.assertEquals("com.example.MyFeature", result)
         }
 
         @Test
@@ -348,7 +346,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertNull(result)
+            Assert.assertNull(result)
         }
 
         @Test
@@ -360,7 +358,7 @@ class PackageNameDeriverTest {
             val result = PackageNameDeriver.derivePackageNameForDirectory(directory)
 
             // Then
-            assertEquals("com.example.feature", result)
+            Assert.assertEquals("com.example.feature", result)
         }
     }
 }
