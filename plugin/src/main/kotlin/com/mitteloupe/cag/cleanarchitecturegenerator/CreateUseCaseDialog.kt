@@ -19,11 +19,9 @@ import com.mitteloupe.cag.cleanarchitecturegenerator.validation.SymbolValidator
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
 import java.io.File
-import javax.swing.Box
-import javax.swing.BoxLayout
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
-import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import javax.swing.text.AbstractDocument
 
 private const val USE_CASE_SUFFIX = "UseCase"
@@ -44,6 +42,7 @@ class CreateUseCaseDialog(
 
     private val inputWarningLabel = JBLabel()
     private val outputWarningLabel = JBLabel()
+    private var documentListenersSetup = false
 
     val useCaseNameWithSuffix: String
         get() = "$useCaseName$USE_CASE_SUFFIX"
@@ -93,60 +92,28 @@ class CreateUseCaseDialog(
     override fun show() {
         super.show()
 
-        javax.swing.SwingUtilities.invokeLater {
+        SwingUtilities.invokeLater {
             validateFieldOnChange()
         }
     }
 
     override fun createCenterPanel(): JComponent {
-        val suffixLabel =
-            JBLabel(USE_CASE_SUFFIX).apply {
-                foreground = UIUtil.getLabelDisabledForeground()
-            }
-
-        val nameWithSuffixPanel =
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.X_AXIS)
-                add(useCaseNameTextField)
-                add(Box.createHorizontalStrut(4))
-                add(suffixLabel)
-            }
-
-        val inputTypePanel =
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.X_AXIS)
-                add(inputDataTypeComboBox)
-                add(Box.createHorizontalStrut(8))
-                add(
-                    inputWarningLabel.apply {
-                        preferredSize = java.awt.Dimension(150, preferredSize.height)
-                        minimumSize = java.awt.Dimension(150, minimumSize.height)
-                    }
-                )
-            }
-
-        val outputTypePanel =
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.X_AXIS)
-                add(outputDataTypeComboBox)
-                add(Box.createHorizontalStrut(8))
-                add(
-                    outputWarningLabel.apply {
-                        preferredSize = java.awt.Dimension(150, preferredSize.height)
-                        minimumSize = java.awt.Dimension(150, minimumSize.height)
-                    }
-                )
-            }
-
         return panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
-                cell(nameWithSuffixPanel)
+                cell(useCaseNameTextField)
+                cell(
+                    JBLabel(USE_CASE_SUFFIX).apply {
+                        foreground = UIUtil.getLabelDisabledForeground()
+                    }
+                )
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label")) {
-                cell(inputTypePanel)
+                cell(inputDataTypeComboBox)
+                cell(inputWarningLabel)
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label")) {
-                cell(outputTypePanel)
+                cell(outputDataTypeComboBox)
+                cell(outputWarningLabel)
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label")) {
                 cell(directoryField)
@@ -200,42 +167,17 @@ class CreateUseCaseDialog(
         outputDataTypeComboBox.addFocusListener(focusAdapter)
     }
 
-    private var documentListenersSetup = false
-
     private fun setupDocumentListenersIfNeeded() {
-        if (documentListenersSetup) return
+        if (documentListenersSetup) {
+            return
+        }
 
         val inputEditor = inputDataTypeComboBox.editor.editorComponent as? JBTextField
         val outputEditor = outputDataTypeComboBox.editor.editorComponent as? JBTextField
 
         if (inputEditor != null && outputEditor != null) {
-            inputEditor.document.addDocumentListener(
-                OnChangeDocumentListener {
-                    validateFieldOnChange()
-                }
-            )
-
-            outputEditor.document.addDocumentListener(
-                OnChangeDocumentListener {
-                    validateFieldOnChange()
-                }
-            )
-
-            inputEditor.addFocusListener(
-                object : FocusAdapter() {
-                    override fun focusLost(event: FocusEvent) {
-                        validateFieldOnChange()
-                    }
-                }
-            )
-
-            outputEditor.addFocusListener(
-                object : FocusAdapter() {
-                    override fun focusLost(event: FocusEvent) {
-                        validateFieldOnChange()
-                    }
-                }
-            )
+            inputEditor.validateOnChange()
+            outputEditor.validateOnChange()
 
             documentListenersSetup = true
         }
@@ -344,5 +286,17 @@ class CreateUseCaseDialog(
     private fun <T> ComboBox<T>.populateComboBox(options: List<T>) {
         model = DefaultComboBoxModel<T>().apply { addAll(options) }
         selectedItem = DEFAULT_DATA_TYPE
+    }
+
+    private fun JBTextField.validateOnChange() {
+        val validateOnChangeDocument = OnChangeDocumentListener { validateFieldOnChange() }
+        val validateOnFocusLost =
+            object : FocusAdapter() {
+                override fun focusLost(event: FocusEvent) {
+                    validateFieldOnChange()
+                }
+            }
+        document.addDocumentListener(validateOnChangeDocument)
+        addFocusListener(validateOnFocusLost)
     }
 }
