@@ -57,6 +57,9 @@ class CreateUseCaseDialog(
     val outputDataType: String?
         get() = (outputDataTypeComboBox.selectedItem as? String)?.trim()?.takeIf { it.isNotEmpty() }
 
+    val destinationDirectory: File?
+        get() = directoryField.text.trim().takeIf { it.isNotEmpty() }?.let { File(it) }
+
     init {
         title = CleanArchitectureGeneratorBundle.message("info.usecase.generator.title")
         init()
@@ -83,213 +86,6 @@ class CreateUseCaseDialog(
         updateComboBoxOptions()
         setupWarningLabels()
         setupValidationListeners()
-    }
-
-    private fun setupComboBoxes() {
-        inputDataTypeComboBox.isEditable = true
-        inputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-        outputDataTypeComboBox.isEditable = true
-        outputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-    }
-
-    private fun setupWarningLabels() {
-        clearInputWarning()
-        clearOutputWarning()
-    }
-
-    private fun setupValidationListeners() {
-        inputDataTypeComboBox.addActionListener {
-            validateFieldOnChange()
-        }
-
-        outputDataTypeComboBox.addActionListener {
-            validateFieldOnChange()
-        }
-
-        val focusAdapter =
-            object : FocusAdapter() {
-                override fun focusGained(event: FocusEvent) {
-                    setupDocumentListenersIfNeeded()
-                }
-
-                override fun focusLost(event: FocusEvent) {
-                    validateFieldOnChange()
-                }
-            }
-
-        inputDataTypeComboBox.addFocusListener(focusAdapter)
-        outputDataTypeComboBox.addFocusListener(focusAdapter)
-    }
-
-    private var documentListenersSetup = false
-
-    private fun setupDocumentListenersIfNeeded() {
-        if (documentListenersSetup) return
-
-        val inputEditor = inputDataTypeComboBox.editor.editorComponent as? JBTextField
-        val outputEditor = outputDataTypeComboBox.editor.editorComponent as? JBTextField
-
-        if (inputEditor != null && outputEditor != null) {
-            inputEditor.document.addDocumentListener(
-                OnChangeDocumentListener {
-                    validateFieldOnChange()
-                }
-            )
-
-            outputEditor.document.addDocumentListener(
-                OnChangeDocumentListener {
-                    validateFieldOnChange()
-                }
-            )
-
-            inputEditor.addFocusListener(
-                object : FocusAdapter() {
-                    override fun focusLost(event: FocusEvent) {
-                        validateFieldOnChange()
-                    }
-                }
-            )
-
-            outputEditor.addFocusListener(
-                object : FocusAdapter() {
-                    override fun focusLost(event: FocusEvent) {
-                        validateFieldOnChange()
-                    }
-                }
-            )
-
-            documentListenersSetup = true
-        }
-    }
-
-    private fun validateFieldOnChange() {
-        validateInputField()
-        validateOutputField()
-    }
-
-    private fun showFieldWarning(
-        component: JComponent?,
-        message: String
-    ) {
-        val label =
-            when (component) {
-                inputDataTypeComboBox -> inputWarningLabel
-                outputDataTypeComboBox -> outputWarningLabel
-                else -> return
-            }
-        label.icon = AllIcons.General.Warning
-        label.text = message
-    }
-
-    private fun validateInputOutputTypes(): ValidationInfo? {
-        val destinationDir = destinationDirectory ?: return null
-
-        val inputType = inputDataType
-        val outputType = outputDataType
-
-        if (inputType != null) {
-            if (!symbolValidator.isValidSymbolSyntax(inputType)) {
-                return ValidationInfo(
-                    "Invalid type syntax: $inputType",
-                    inputDataTypeComboBox
-                ).asWarning()
-            } else if (!symbolValidator.isValidSymbolInContext(inputType, destinationDir)) {
-                return ValidationInfo(
-                    CleanArchitectureGeneratorBundle.message("validation.usecase.input.type.not.found", inputType),
-                    inputDataTypeComboBox
-                ).asWarning()
-            }
-        }
-
-        if (outputType != null) {
-            if (!symbolValidator.isValidSymbolSyntax(outputType)) {
-                return ValidationInfo(
-                    "Invalid type syntax: $outputType",
-                    outputDataTypeComboBox
-                ).asWarning()
-            } else if (!symbolValidator.isValidSymbolInContext(outputType, destinationDir)) {
-                return ValidationInfo(
-                    CleanArchitectureGeneratorBundle.message("validation.usecase.output.type.not.found", outputType),
-                    outputDataTypeComboBox
-                ).asWarning()
-            }
-        }
-
-        return null
-    }
-
-    private fun validateInputField() {
-        val inputType = inputDataType
-
-        if (inputType == null || inputType.isEmpty()) {
-            clearInputWarning()
-            return
-        }
-
-        if (!symbolValidator.isValidSymbolSyntax(inputType)) {
-            showFieldWarning(inputDataTypeComboBox, "Invalid type syntax: $inputType")
-            return
-        }
-
-        val destinationDir = destinationDirectory
-        if (destinationDir != null && !symbolValidator.isValidSymbolInContext(inputType, destinationDir)) {
-            showFieldWarning(inputDataTypeComboBox, SYMBOL_NOT_FOUND_ERROR_MESSAGE)
-        } else {
-            clearInputWarning()
-        }
-    }
-
-    private fun validateOutputField() {
-        val outputType = outputDataType
-
-        if (outputType == null || outputType.isEmpty()) {
-            clearOutputWarning()
-            return
-        }
-
-        if (!symbolValidator.isValidSymbolSyntax(outputType)) {
-            showFieldWarning(outputDataTypeComboBox, "Invalid type syntax: $outputType")
-            return
-        }
-
-        val destinationDir = destinationDirectory
-        if (destinationDir != null && !symbolValidator.isValidSymbolInContext(outputType, destinationDir)) {
-            showFieldWarning(outputDataTypeComboBox, SYMBOL_NOT_FOUND_ERROR_MESSAGE)
-        } else {
-            clearOutputWarning()
-        }
-    }
-
-    private fun clearInputWarning() {
-        inputWarningLabel.icon = null
-        inputWarningLabel.text = " "
-    }
-
-    private fun clearOutputWarning() {
-        outputWarningLabel.icon = null
-        outputWarningLabel.text = " "
-    }
-
-    private fun updateComboBoxOptions() {
-        val destinationDirectory = destinationDirectory
-        if (destinationDirectory != null) {
-            val modelClasses = modelClassFinder.findModelClasses(destinationDirectory)
-            val allOptions = ModelClassFinder.PRIMITIVE_TYPES + modelClasses
-
-            val inputModel = DefaultComboBoxModel<String>()
-            val outputModel = DefaultComboBoxModel<String>()
-
-            allOptions.forEach { option ->
-                inputModel.addElement(option)
-                outputModel.addElement(option)
-            }
-
-            inputDataTypeComboBox.model = inputModel
-            outputDataTypeComboBox.model = outputModel
-
-            inputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-            outputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-        }
     }
 
     override fun getPreferredFocusedComponent(): JComponent = useCaseNameTextField
@@ -368,6 +164,185 @@ class CreateUseCaseDialog(
             validateInputOutputTypes()
         }
 
-    val destinationDirectory: File?
-        get() = directoryField.text.trim().takeIf { it.isNotEmpty() }?.let { File(it) }
+    private fun setupComboBoxes() {
+        inputDataTypeComboBox.isEditable = true
+        inputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
+        outputDataTypeComboBox.isEditable = true
+        outputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
+    }
+
+    private fun setupWarningLabels() {
+        inputWarningLabel.clearWarning()
+        outputWarningLabel.clearWarning()
+    }
+
+    private fun setupValidationListeners() {
+        inputDataTypeComboBox.addActionListener {
+            validateFieldOnChange()
+        }
+
+        outputDataTypeComboBox.addActionListener {
+            validateFieldOnChange()
+        }
+
+        val focusAdapter =
+            object : FocusAdapter() {
+                override fun focusGained(event: FocusEvent) {
+                    setupDocumentListenersIfNeeded()
+                }
+
+                override fun focusLost(event: FocusEvent) {
+                    validateFieldOnChange()
+                }
+            }
+
+        inputDataTypeComboBox.addFocusListener(focusAdapter)
+        outputDataTypeComboBox.addFocusListener(focusAdapter)
+    }
+
+    private var documentListenersSetup = false
+
+    private fun setupDocumentListenersIfNeeded() {
+        if (documentListenersSetup) return
+
+        val inputEditor = inputDataTypeComboBox.editor.editorComponent as? JBTextField
+        val outputEditor = outputDataTypeComboBox.editor.editorComponent as? JBTextField
+
+        if (inputEditor != null && outputEditor != null) {
+            inputEditor.document.addDocumentListener(
+                OnChangeDocumentListener {
+                    validateFieldOnChange()
+                }
+            )
+
+            outputEditor.document.addDocumentListener(
+                OnChangeDocumentListener {
+                    validateFieldOnChange()
+                }
+            )
+
+            inputEditor.addFocusListener(
+                object : FocusAdapter() {
+                    override fun focusLost(event: FocusEvent) {
+                        validateFieldOnChange()
+                    }
+                }
+            )
+
+            outputEditor.addFocusListener(
+                object : FocusAdapter() {
+                    override fun focusLost(event: FocusEvent) {
+                        validateFieldOnChange()
+                    }
+                }
+            )
+
+            documentListenersSetup = true
+        }
+    }
+
+    private fun validateFieldOnChange() {
+        validateInputField()
+        validateOutputField()
+    }
+
+    private fun JBLabel.showFieldWarning(message: String) {
+        icon = AllIcons.General.Warning
+        text = message
+    }
+
+    private fun validateInputOutputTypes(): ValidationInfo? {
+        val destinationDirectory = this@CreateUseCaseDialog.destinationDirectory ?: return null
+
+        inputDataType?.let { inputType ->
+            if (!symbolValidator.isValidSymbolSyntax(inputType)) {
+                return ValidationInfo(
+                    "Invalid type syntax: $inputType",
+                    inputDataTypeComboBox
+                ).asWarning()
+            } else if (!symbolValidator.isValidSymbolInContext(inputType, destinationDirectory)) {
+                return ValidationInfo(
+                    CleanArchitectureGeneratorBundle.message("validation.usecase.input.type.not.found", inputType),
+                    inputDataTypeComboBox
+                ).asWarning()
+            }
+        }
+
+        outputDataType?.let { outputType ->
+            if (!symbolValidator.isValidSymbolSyntax(outputType)) {
+                return ValidationInfo(
+                    "Invalid type syntax: $outputType",
+                    outputDataTypeComboBox
+                ).asWarning()
+            } else if (!symbolValidator.isValidSymbolInContext(outputType, destinationDirectory)) {
+                return ValidationInfo(
+                    CleanArchitectureGeneratorBundle.message("validation.usecase.output.type.not.found", outputType),
+                    outputDataTypeComboBox
+                ).asWarning()
+            }
+        }
+
+        return null
+    }
+
+    private fun validateInputField() {
+        val inputType = inputDataType
+
+        if (inputType.isNullOrEmpty()) {
+            inputWarningLabel.clearWarning()
+            return
+        }
+
+        if (!symbolValidator.isValidSymbolSyntax(inputType)) {
+            inputWarningLabel.showFieldWarning("Invalid type syntax: $inputType")
+            return
+        }
+
+        val destinationDir = destinationDirectory
+        if (destinationDir != null && !symbolValidator.isValidSymbolInContext(inputType, destinationDir)) {
+            inputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
+        } else {
+            inputWarningLabel.clearWarning()
+        }
+    }
+
+    private fun validateOutputField() {
+        val outputDataType = outputDataType
+        if (outputDataType.isNullOrEmpty()) {
+            outputWarningLabel.clearWarning()
+            return
+        }
+
+        if (!symbolValidator.isValidSymbolSyntax(outputDataType)) {
+            outputWarningLabel.showFieldWarning("Invalid type syntax: $outputDataType")
+            return
+        }
+
+        val destinationDirectory = this@CreateUseCaseDialog.destinationDirectory
+        if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(outputDataType, destinationDirectory)) {
+            outputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
+        } else {
+            outputWarningLabel.clearWarning()
+        }
+    }
+
+    private fun JBLabel.clearWarning() {
+        icon = null
+        text = " "
+    }
+
+    private fun updateComboBoxOptions() {
+        destinationDirectory?.let { destinationDirectory ->
+            val modelClasses = modelClassFinder.findModelClasses(destinationDirectory)
+            val allOptions = ModelClassFinder.PRIMITIVE_TYPES + modelClasses
+
+            inputDataTypeComboBox.populateComboBox(allOptions)
+            outputDataTypeComboBox.populateComboBox(allOptions)
+        }
+    }
+
+    private fun <T> ComboBox<T>.populateComboBox(options: List<T>) {
+        model = DefaultComboBoxModel<T>().apply { addAll(options) }
+        selectedItem = DEFAULT_DATA_TYPE
+    }
 }
