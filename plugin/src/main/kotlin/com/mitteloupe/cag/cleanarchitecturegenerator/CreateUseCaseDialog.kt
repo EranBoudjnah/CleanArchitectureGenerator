@@ -71,7 +71,7 @@ class CreateUseCaseDialog(
             val chosen = FileChooser.chooseFile(descriptor, project, initialDirectory)
             if (chosen != null) {
                 directoryField.text = chosen.path
-                updateComboBoxOptions()
+                setupDataTypeComboBoxes()
             }
         }
 
@@ -81,10 +81,8 @@ class CreateUseCaseDialog(
         (useCaseNameTextField.document as AbstractDocument).documentFilter =
             PredicateDocumentFilter { !it.isWhitespace() }
 
-        setupComboBoxes()
-        updateComboBoxOptions()
+        setupDataTypeComboBoxes()
         setupWarningLabels()
-        setupValidationListeners()
     }
 
     override fun getPreferredFocusedComponent(): JComponent = useCaseNameTextField
@@ -131,40 +129,9 @@ class CreateUseCaseDialog(
             validateInputOutputTypes()
         }
 
-    private fun setupComboBoxes() {
-        inputDataTypeComboBox.isEditable = true
-        inputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-        outputDataTypeComboBox.isEditable = true
-        outputDataTypeComboBox.selectedItem = DEFAULT_DATA_TYPE
-    }
-
     private fun setupWarningLabels() {
         inputWarningLabel.clearWarning()
         outputWarningLabel.clearWarning()
-    }
-
-    private fun setupValidationListeners() {
-        inputDataTypeComboBox.addActionListener {
-            validateFieldOnChange()
-        }
-
-        outputDataTypeComboBox.addActionListener {
-            validateFieldOnChange()
-        }
-
-        val focusAdapter =
-            object : FocusAdapter() {
-                override fun focusGained(event: FocusEvent) {
-                    setupDocumentListenersIfNeeded()
-                }
-
-                override fun focusLost(event: FocusEvent) {
-                    validateFieldOnChange()
-                }
-            }
-
-        inputDataTypeComboBox.addFocusListener(focusAdapter)
-        outputDataTypeComboBox.addFocusListener(focusAdapter)
     }
 
     private fun setupDocumentListenersIfNeeded() {
@@ -273,30 +240,38 @@ class CreateUseCaseDialog(
         text = " "
     }
 
-    private fun updateComboBoxOptions() {
+    private fun setupDataTypeComboBoxes() {
         destinationDirectory?.let { destinationDirectory ->
             val modelClasses = modelClassFinder.findModelClasses(destinationDirectory)
             val allOptions = ModelClassFinder.PRIMITIVE_TYPES + modelClasses
 
-            inputDataTypeComboBox.populateComboBox(allOptions)
-            outputDataTypeComboBox.populateComboBox(allOptions)
+            inputDataTypeComboBox.enableAndPopulateComboBox(allOptions)
+            outputDataTypeComboBox.enableAndPopulateComboBox(allOptions)
         }
     }
 
-    private fun <T> ComboBox<T>.populateComboBox(options: List<T>) {
+    private fun <T> ComboBox<T>.enableAndPopulateComboBox(options: List<T>) {
+        isEditable = true
+        addActionListener {
+            validateFieldOnChange()
+        }
         model = DefaultComboBoxModel<T>().apply { addAll(options) }
         selectedItem = DEFAULT_DATA_TYPE
     }
 
     private fun JBTextField.validateOnChange() {
-        val validateOnChangeDocument = OnChangeDocumentListener { validateFieldOnChange() }
-        val validateOnFocusLost =
+        document.addDocumentListener(OnChangeDocumentListener { validateFieldOnChange() })
+        addFocusListener(
             object : FocusAdapter() {
+                override fun focusGained(event: FocusEvent) {
+                    setupDocumentListenersIfNeeded()
+                }
+
                 override fun focusLost(event: FocusEvent) {
                     validateFieldOnChange()
                 }
             }
-        document.addDocumentListener(validateOnChangeDocument)
-        addFocusListener(validateOnFocusLost)
+        )
+        addActionListener { validateFieldOnChange() }
     }
 }
