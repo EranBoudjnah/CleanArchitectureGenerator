@@ -130,9 +130,9 @@ class DomainLayerContentGenerator(
     private fun extractProjectNamespace(packageName: String): String {
         val segments = packageName.split(".")
         return if (segments.size >= 3) {
-            segments.take(3).joinToString(".") + "."
+            segments.take(3).joinToString(".")
         } else {
-            "$packageName."
+            packageName
         }
     }
 }

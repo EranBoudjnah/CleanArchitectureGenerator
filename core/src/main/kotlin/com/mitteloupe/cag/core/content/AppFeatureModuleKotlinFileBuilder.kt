@@ -26,10 +26,10 @@ import $featurePackageName.presentation.viewmodel.${className}ViewModel
 import $featurePackageName.presentation.navigation.${className}PresentationNavigationEvent
 import $featurePackageName.ui.di.${className}Dependencies
 import $featurePackageName.ui.mapper.StubUiMapper
-import ${projectNamespace.trimEnd('.')}.architecture.domain.UseCaseExecutor
-import ${projectNamespace.trimEnd('.')}.architecture.presentation.notification.PresentationNotification
-import ${projectNamespace.trimEnd('.')}.architecture.ui.navigation.mapper.NavigationEventDestinationMapper
-import ${projectNamespace.trimEnd('.')}.architecture.ui.notification.mapper.NotificationUiMapper
+import $projectNamespace.architecture.domain.UseCaseExecutor
+import $projectNamespace.architecture.presentation.notification.PresentationNotification
+import $projectNamespace.architecture.ui.navigation.mapper.NavigationEventDestinationMapper
+import $projectNamespace.architecture.ui.notification.mapper.NotificationUiMapper
 """.optimizeImports()
     }
 @Module

@@ -15,14 +15,13 @@ class DataSourceModuleCreator {
         projectNamespace: String,
         dataSourceName: String
     ) {
-        val basePackage = projectNamespace.trimEnd('.')
         val projectRoot = findGradleProjectRoot(destinationRootDirectory, DirectoryFinder()) ?: destinationRootDirectory
         val appModuleDirectory =
             AppModuleDirectoryFinder(DirectoryFinder())
                 .findAndroidAppModuleDirectories(projectRoot)
                 .firstOrNull() ?: return
         val appSourceRoot = File(appModuleDirectory, "src/main/java")
-        val basePackageDirectory = buildPackageDirectory(appSourceRoot, basePackage.toSegments())
+        val basePackageDirectory = buildPackageDirectory(appSourceRoot, projectNamespace.toSegments())
         val targetDirectory = File(basePackageDirectory, "di")
 
         FileCreator.createDirectoryIfNotExists(targetDirectory)
@@ -31,12 +30,12 @@ class DataSourceModuleCreator {
         val targetFile = File(targetDirectory, fileName)
         val dataSourceBaseName = dataSourceName.removeSuffix("DataSource")
         val dataSourcePackageName =
-            (listOf(basePackage) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
+            (listOf(projectNamespace) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
                 .joinToString(".")
 
         val content =
             buildDataSourceModuleKotlinFile(
-                appPackageName = basePackage,
+                appPackageName = projectNamespace,
                 dataSourcePackageName = dataSourcePackageName,
                 dataSourceName = dataSourceName
             )

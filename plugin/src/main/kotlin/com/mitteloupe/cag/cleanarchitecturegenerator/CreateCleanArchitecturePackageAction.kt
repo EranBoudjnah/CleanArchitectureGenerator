@@ -23,7 +23,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
         if (dialog.showAndGet()) {
             val architecturePackageName =
                 basePackage?.let {
-                    it.trimEnd('.') + ".architecture"
+                    "$it.architecture"
                 } ?: "com.example.architecture"
             val generator = Generator()
             val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")

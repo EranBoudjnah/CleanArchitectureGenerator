@@ -12,9 +12,9 @@ fun buildPresentationViewModelKotlinFile(
 
 ${
         """
-import ${projectNamespace.trimEnd('.')}.architecture.domain.UseCaseExecutor
-import ${projectNamespace.trimEnd('.')}.architecture.presentation.notification.PresentationNotification
-import ${projectNamespace.trimEnd('.')}.architecture.presentation.viewmodel.BaseViewModel
+import $projectNamespace.architecture.domain.UseCaseExecutor
+import $projectNamespace.architecture.presentation.notification.PresentationNotification
+import $projectNamespace.architecture.presentation.viewmodel.BaseViewModel
 import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME
 import $featurePackageName.domain.usecase.PerformActionUseCase
 import $featurePackageName.presentation.mapper.StubDomainMapper

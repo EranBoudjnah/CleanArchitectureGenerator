@@ -11,7 +11,7 @@ fun buildPresentationNavigationEventKotlinFile(
 
 ${
         """
-import ${projectNamespace.trimEnd('.')}.architecture.presentation.navigation.PresentationNavigationEvent
+import $projectNamespace.architecture.presentation.navigation.PresentationNavigationEvent
 """.optimizeImports()
     }
 sealed interface ${featureName}PresentationNavigationEvent : PresentationNavigationEvent {

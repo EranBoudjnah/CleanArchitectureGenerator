@@ -30,7 +30,7 @@ class DataSourceModuleCreatorTest {
             }
             """.trimIndent()
         )
-        val givenNamespace = "com.example.app."
+        val givenNamespace = "com.example.app"
         val targetDir = File(appRoot, "com/example/app/di")
 
         // When

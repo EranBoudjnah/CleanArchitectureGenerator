@@ -12,11 +12,10 @@ class DataSourceImplementationCreator {
         projectNamespace: String,
         dataSourceName: String
     ) {
-        val basePackage = projectNamespace.trimEnd('.')
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val implSourceRoot = File(datasourceRoot, "implementation/src/main/java")
 
-        val basePackageDirectory = buildPackageDirectory(implSourceRoot, basePackage.toSegments())
+        val basePackageDirectory = buildPackageDirectory(implSourceRoot, projectNamespace.toSegments())
 
         val dataSourceBaseName = dataSourceName.removeSuffix("DataSource")
         val targetDirectory =
@@ -30,7 +29,7 @@ class DataSourceImplementationCreator {
         val fileName = "${dataSourceName}Impl.kt"
         val targetFile = File(targetDirectory, fileName)
         val packageName =
-            (listOf(basePackage) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
+            (listOf(projectNamespace) + listOf("datasource", dataSourceBaseName.lowercase(), "datasource"))
                 .joinToString(".")
 
         val content =

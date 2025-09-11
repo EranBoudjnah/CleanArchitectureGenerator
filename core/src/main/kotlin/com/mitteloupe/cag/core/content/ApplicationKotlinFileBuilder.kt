@@ -1,11 +1,10 @@
 package com.mitteloupe.cag.core.content
 
 fun buildApplicationKotlinFile(projectNamespace: String): String {
-    val packageName = projectNamespace.trimEnd('.')
-    val appName = packageName.split('.').last().capitalized
+    val appName = projectNamespace.split('.').last().capitalized
 
     return """
-        package $packageName
+        package $projectNamespace
 
         import android.app.Application
 

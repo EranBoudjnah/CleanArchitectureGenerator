@@ -97,29 +97,6 @@ class TestDataSourceImpl : TestDataSource {
         assertEquals("existing content", existingFile.readText())
     }
 
-    @Test
-    fun `Given project namespace with trailing dot when writeDataSourceImplementation then trims dot`() {
-        // Given
-        val destinationRootDirectory = tempDirectory
-        val projectNamespace = "com.example."
-        val dataSourceName = "TestDataSource"
-
-        // When
-        classUnderTest.writeDataSourceImplementation(destinationRootDirectory, projectNamespace, dataSourceName)
-
-        // Then
-        val targetDirectory = File(tempDirectory, "datasource/implementation/src/main/java/com/example/datasource/test/datasource")
-        assertTrue(targetDirectory.exists())
-
-        val implementationFile = File(targetDirectory, "TestDataSourceImpl.kt")
-        val expectedContent = """package com.example.datasource.test.datasource
-
-class TestDataSourceImpl : TestDataSource {
-}
-"""
-        assertEquals("Implementation file should have exact content", expectedContent, implementationFile.readText())
-    }
-
     @Test(expected = GenerationException::class)
     fun `Given directory creation fails when writeDataSourceImplementation then throws exception`() {
         // Given

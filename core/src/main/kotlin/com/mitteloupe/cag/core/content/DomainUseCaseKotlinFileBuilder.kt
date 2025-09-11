@@ -13,7 +13,7 @@ fun buildDomainUseCaseKotlinFile(
     outputDataType: String? = null
 ): String {
     val imports = mutableListOf<String>()
-    imports.add("import ${projectNamespace.trimEnd('.')}.architecture.domain.usecase.UseCase")
+    imports.add("import $projectNamespace.architecture.domain.usecase.UseCase")
 
     if (inputDataType == null && outputDataType == null) {
         imports.add("import $featurePackageName.domain.model.$DOMAIN_MODEL_NAME")

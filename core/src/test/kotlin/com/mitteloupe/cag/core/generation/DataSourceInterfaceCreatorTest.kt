@@ -98,29 +98,6 @@ interface TestDataSource {
         assertEquals("existing content", existingFile.readText())
     }
 
-    @Test
-    fun `Given project namespace with trailing dot when writeDataSourceInterface then trims dot`() {
-        // Given
-        val destinationRootDirectory = tempDirectory
-        val projectNamespace = "com.example."
-        val dataSourceName = "TestDataSource"
-
-        // When
-        classUnderTest.writeDataSourceInterface(destinationRootDirectory, projectNamespace, dataSourceName)
-
-        // Then
-        val targetDirectory = File(tempDirectory, "datasource/source/src/main/java/com/example/datasource/test/datasource")
-        assertTrue(targetDirectory.exists())
-
-        val interfaceFile = File(targetDirectory, "TestDataSource.kt")
-        val expectedContent = """package com.example.datasource.test.datasource
-
-interface TestDataSource {
-}
-"""
-        assertEquals("Interface file should have exact content", expectedContent, interfaceFile.readText())
-    }
-
     @Test(expected = GenerationException::class)
     fun `Given directory creation fails when writeDataSourceInterface then throws exception`() {
         // Given

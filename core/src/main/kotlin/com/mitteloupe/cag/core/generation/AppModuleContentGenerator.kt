@@ -32,9 +32,8 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
             AppModuleDirectoryFinder(directoryFinder)
                 .findAndroidAppModuleDirectories(projectRoot).firstOrNull()
                 ?: return
-        val packageName = projectNamespace.trimEnd('.')
         val sourceRoot = File(appModuleDirectory, "src/main/java")
-        val basePackageDir = buildPackageDirectory(sourceRoot, packageName.toSegments())
+        val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
         val dependencyInjectionDirectory = File(basePackageDir, "di")
         FileCreator.createDirectoryIfNotExists(dependencyInjectionDirectory)
         val filename = "${featureName.capitalized}Module.kt"
@@ -50,9 +49,8 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         enableCompose: Boolean
     ) {
         val appModuleDirectory = File(startDirectory, "app")
-        val packageName = projectNamespace.trimEnd('.')
         val sourceRoot = File(appModuleDirectory, "src/main/java")
-        val basePackageDir = buildPackageDirectory(sourceRoot, packageName.toSegments())
+        val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
 
         FileCreator.createDirectoryIfNotExists(basePackageDir)
 
@@ -72,7 +70,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         generateAndroidResources(
             appModuleDirectory = appModuleDirectory,
             appName = appName,
-            packageName = packageName,
+            packageName = projectNamespace,
             enableCompose = enableCompose
         )
     }

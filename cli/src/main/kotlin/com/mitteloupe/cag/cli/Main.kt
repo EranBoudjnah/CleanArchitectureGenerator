@@ -85,7 +85,7 @@ fun main(arguments: Array<String>) {
     }
 
     architectureRequests.forEach { request ->
-        val architecturePackageName = basePackage?.let { it.trimEnd('.') + ".architecture" } ?: "com.unknown.app.architecture"
+        val architecturePackageName = basePackage?.let { "$it.architecture" } ?: "com.unknown.app.architecture"
         val architectureRequest =
             GenerateArchitectureRequest(
                 destinationRootDirectory = destinationRootDirectory,
