@@ -108,7 +108,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                         throw RuntimeException(
                             CleanArchitectureGeneratorBundle.message(
                                 "wizard.error.generation.failed",
-                                exception.message ?: ""
+                                exception.message.orEmpty()
                             ),
                             exception
                         )
