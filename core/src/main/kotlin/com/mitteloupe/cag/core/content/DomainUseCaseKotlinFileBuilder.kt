@@ -23,9 +23,11 @@ fun buildDomainUseCaseKotlinFile(
         imports.add("import $featurePackageName.domain.repository.$repositoryName")
     }
 
+    val optimizedImports = imports.joinToString("\n").optimizeImports()
+
     return """package $featurePackageName$USE_CASE_PACKAGE_SUFFIX
 
-${imports.joinToString("\n").optimizeImports()}
+$optimizedImports
 class $useCaseName(${
         if (repositoryName == null) {
             ""
