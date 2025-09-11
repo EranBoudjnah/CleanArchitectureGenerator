@@ -150,8 +150,8 @@ class CreateUseCaseDialog(
     }
 
     private fun validateFieldOnChange() {
-        validateInputField()
-        validateOutputField()
+        inputDataType.validateDataType(inputWarningLabel)
+        outputDataType.validateDataType(outputWarningLabel)
     }
 
     private fun JBLabel.showFieldWarning(message: String) {
@@ -193,44 +193,22 @@ class CreateUseCaseDialog(
         return null
     }
 
-    private fun validateInputField() {
-        val inputDataType = inputDataType
-
-        if (inputDataType.isNullOrEmpty()) {
-            inputWarningLabel.clearWarning()
+    private fun String?.validateDataType(warningLabel: JBLabel) {
+        if (isNullOrEmpty()) {
+            warningLabel.clearWarning()
             return
         }
 
-        if (!symbolValidator.isValidSymbolSyntax(inputDataType)) {
-            inputWarningLabel.showFieldWarning("Invalid type syntax: $inputDataType")
-            return
-        }
-
-        val destinationDirectory = destinationDirectory
-        if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(inputDataType, destinationDirectory)) {
-            inputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
-        } else {
-            inputWarningLabel.clearWarning()
-        }
-    }
-
-    private fun validateOutputField() {
-        val outputDataType = outputDataType
-        if (outputDataType.isNullOrEmpty()) {
-            outputWarningLabel.clearWarning()
-            return
-        }
-
-        if (!symbolValidator.isValidSymbolSyntax(outputDataType)) {
-            outputWarningLabel.showFieldWarning("Invalid type syntax: $outputDataType")
+        if (!symbolValidator.isValidSymbolSyntax(this)) {
+            warningLabel.showFieldWarning("Invalid type syntax: $this")
             return
         }
 
         val destinationDirectory = destinationDirectory
-        if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(outputDataType, destinationDirectory)) {
-            outputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
+        if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(this, destinationDirectory)) {
+            warningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
         } else {
-            outputWarningLabel.clearWarning()
+            warningLabel.clearWarning()
         }
     }
 
