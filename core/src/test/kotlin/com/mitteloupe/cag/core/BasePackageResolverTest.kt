@@ -11,7 +11,7 @@ import java.io.File
 import kotlin.io.path.createTempDirectory
 
 class BasePackageResolverTest {
-    private lateinit var classUnderTest: BasePackageResolver
+    private lateinit var classUnderTest: NamespaceResolver
 
     @MockK(relaxed = false)
     lateinit var projectModel: ProjectModel
@@ -19,7 +19,7 @@ class BasePackageResolverTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        classUnderTest = BasePackageResolver()
+        classUnderTest = NamespaceResolver()
     }
 
     @Test

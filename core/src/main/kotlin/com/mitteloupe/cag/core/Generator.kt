@@ -193,6 +193,7 @@ class Generator {
             .generateViewModel(
                 destinationDirectory = destinationDirectory,
                 viewModelName = viewModelName,
+                viewModelPackageName = request.viewModelPackageName,
                 featurePackageName = request.featurePackageName,
                 projectNamespace = request.projectNamespace
             )

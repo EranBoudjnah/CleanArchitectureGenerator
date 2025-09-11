@@ -4,10 +4,10 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
-import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
+import com.mitteloupe.cag.core.NamespaceResolver
 import java.io.File
 
 class CreateCleanArchitecturePackageAction : AnAction() {
@@ -18,7 +18,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val projectModel = IntellijProjectModel(event)
-        val basePackage = BasePackageResolver().determineBasePackage(projectModel)
+        val basePackage = NamespaceResolver().determineBasePackage(projectModel)
         val dialog = CreateCleanArchitecturePackageDialog(project)
         if (dialog.showAndGet()) {
             val architecturePackageName =

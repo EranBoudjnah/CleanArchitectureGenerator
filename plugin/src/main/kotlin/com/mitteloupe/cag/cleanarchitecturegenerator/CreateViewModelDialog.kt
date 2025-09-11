@@ -15,8 +15,8 @@ import java.io.File
 import javax.swing.JComponent
 import javax.swing.text.AbstractDocument
 
-private val VIEW_MODEL_SUFFIX = CleanArchitectureGeneratorBundle.message("constants.viewmodel.suffix")
-private val DEFAULT_VIEW_MODEL_NAME = CleanArchitectureGeneratorBundle.message("constants.viewmodel.default.name")
+private const val VIEW_MODEL_SUFFIX = "ViewModel"
+private const val DEFAULT_VIEW_MODEL_NAME = "My$VIEW_MODEL_SUFFIX"
 
 class CreateViewModelDialog(
     project: Project?,
@@ -24,8 +24,6 @@ class CreateViewModelDialog(
 ) : DialogWrapper(project) {
     private val viewModelNameTextField = JBTextField()
     private val directoryField = TextFieldWithBrowseButton()
-    private val featurePackageNameTextField = JBTextField()
-    private val projectNamespaceTextField = JBTextField()
     private val symbolValidator = SymbolValidator()
 
     val viewModelNameWithSuffix: String
@@ -33,12 +31,6 @@ class CreateViewModelDialog(
 
     private val viewModelName: String
         get() = viewModelNameTextField.text.trim()
-
-    val featurePackageName: String
-        get() = featurePackageNameTextField.text.trim()
-
-    val projectNamespace: String
-        get() = projectNamespaceTextField.text.trim()
 
     val destinationDirectory: File?
         get() = if (directoryField.text.isNotEmpty()) File(directoryField.text) else null
@@ -63,9 +55,6 @@ class CreateViewModelDialog(
 
         (viewModelNameTextField.document as AbstractDocument).documentFilter =
             PredicateDocumentFilter { !it.isWhitespace() }
-
-        featurePackageNameTextField.text = CleanArchitectureGeneratorBundle.message("constants.viewmodel.default.feature.package")
-        projectNamespaceTextField.text = CleanArchitectureGeneratorBundle.message("constants.viewmodel.default.project.namespace")
     }
 
     override fun createCenterPanel(): JComponent =
@@ -78,16 +67,6 @@ class CreateViewModelDialog(
             row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.field.label")) {
                 cell(directoryField)
                     .comment(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.comment"))
-            }
-
-            row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.feature.package.label")) {
-                cell(featurePackageNameTextField)
-                    .comment(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.feature.package.comment"))
-            }
-
-            row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.project.namespace.label")) {
-                cell(projectNamespaceTextField)
-                    .comment(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.project.namespace.comment"))
             }
         }
 
@@ -107,36 +86,6 @@ class CreateViewModelDialog(
             )
         }
 
-        if (featurePackageName.isEmpty()) {
-            return ValidationInfo(CleanArchitectureGeneratorBundle.message("validation.viewmodel.feature.package.required"))
-        }
-
-        if (!isValidPackageName(featurePackageName)) {
-            return ValidationInfo(
-                CleanArchitectureGeneratorBundle.message("validation.viewmodel.feature.package.invalid", featurePackageName)
-            )
-        }
-
-        if (projectNamespace.isEmpty()) {
-            return ValidationInfo(CleanArchitectureGeneratorBundle.message("validation.viewmodel.project.namespace.required"))
-        }
-
-        if (!isValidPackageName(projectNamespace)) {
-            return ValidationInfo(
-                CleanArchitectureGeneratorBundle.message("validation.viewmodel.project.namespace.invalid", projectNamespace)
-            )
-        }
-
         return null
-    }
-
-    private fun isValidPackageName(packageName: String): Boolean {
-        if (packageName.isEmpty()) {
-            return false
-        }
-        return packageName.split(".").all { part ->
-            part.isNotEmpty() && part.all { it.isLetterOrDigit() || it == '_' } &&
-                part.first().isLetter()
-        }
     }
 }

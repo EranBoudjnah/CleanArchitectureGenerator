@@ -3,10 +3,10 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
-import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
+import com.mitteloupe.cag.core.NamespaceResolver
 import java.io.File
 
 class CreateCleanArchitectureFeatureAction : AnAction() {
@@ -15,8 +15,8 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project
         val projectModel = IntellijProjectModel(event)
-        val defaultPrefix = BasePackageResolver().determineBasePackage(projectModel)
-        val dialog = CreateCleanArchitectureFeatureDialog(project, defaultPrefix)
+        val defaultNamespace = NamespaceResolver().determineBasePackage(projectModel)
+        val dialog = CreateCleanArchitectureFeatureDialog(project, defaultNamespace)
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
@@ -25,7 +25,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val request =
                 GenerateFeatureRequestBuilder(
                     destinationRootDir = projectRootDir,
-                    projectNamespace = defaultPrefix ?: "com.unknown.app.",
+                    projectNamespace = defaultNamespace ?: "com.unknown.app",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
                     .enableCompose(true)

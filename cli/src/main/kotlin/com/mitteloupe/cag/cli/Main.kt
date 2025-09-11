@@ -1,6 +1,5 @@
 package com.mitteloupe.cag.cli
 
-import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
@@ -8,6 +7,7 @@ import com.mitteloupe.cag.core.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.GenerateViewModelRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
+import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import java.io.File
 import java.nio.file.Paths
@@ -24,7 +24,7 @@ fun main(arguments: Array<String>) {
     val argumentProcessor = AppArgumentProcessor()
     val projectRoot = findGradleProjectRoot(Paths.get("").toAbsolutePath().toFile()) ?: Paths.get("").toAbsolutePath().toFile()
     val projectModel = FilesystemProjectModel(projectRoot)
-    val basePackage = BasePackageResolver().determineBasePackage(projectModel)
+    val basePackage = NamespaceResolver().determineBasePackage(projectModel)
 
     if (argumentProcessor.isHelpRequested(arguments)) {
         printHelpMessage()
@@ -57,7 +57,7 @@ fun main(arguments: Array<String>) {
     }
 
     val generator = Generator()
-    val destinationRootDir = projectModel.selectedModuleRootDir() ?: projectRoot
+    val destinationRootDirectory = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
     projectTemplateRequests.forEach { request ->
@@ -65,7 +65,7 @@ fun main(arguments: Array<String>) {
             if (projectModel.selectedModuleRootDir() != null) {
                 projectRoot
             } else {
-                destinationRootDir
+                destinationRootDirectory
             }
         val projectTemplateRequest =
             GenerateProjectTemplateRequest(
@@ -88,7 +88,7 @@ fun main(arguments: Array<String>) {
         val architecturePackageName = basePackage?.let { it.trimEnd('.') + ".architecture" } ?: "com.unknown.app.architecture"
         val architectureRequest =
             GenerateArchitectureRequest(
-                destinationRootDirectory = destinationRootDir,
+                destinationRootDirectory = destinationRootDirectory,
                 architecturePackageName = architecturePackageName,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
@@ -105,7 +105,7 @@ fun main(arguments: Array<String>) {
 
         val request =
             GenerateFeatureRequestBuilder(
-                destinationRootDir = destinationRootDir,
+                destinationRootDir = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 featureName = requestFeature.featureName
             ).featurePackageName(packageName)
@@ -119,7 +119,7 @@ fun main(arguments: Array<String>) {
     dataSourceRequests.forEach { request ->
         executeAndReport {
             generator.generateDataSource(
-                destinationRootDirectory = destinationRootDir,
+                destinationRootDirectory = destinationRootDirectory,
                 dataSourceName = request.dataSourceName,
                 projectNamespace = projectNamespace,
                 useKtor = request.useKtor,
@@ -129,17 +129,7 @@ fun main(arguments: Array<String>) {
     }
 
     useCaseRequests.forEach { request ->
-        val targetDirectory =
-            if (request.targetPath != null) {
-                val path = Paths.get(request.targetPath)
-                if (path.isAbsolute) {
-                    path.toFile()
-                } else {
-                    File(destinationRootDir, request.targetPath)
-                }
-            } else {
-                Paths.get("").toAbsolutePath().toFile()
-            }
+        val targetDirectory = request.targetPath.toDirectory(destinationRootDirectory)
 
         val useCaseRequest =
             GenerateUseCaseRequest.Builder(
@@ -156,17 +146,7 @@ fun main(arguments: Array<String>) {
     }
 
     viewModelRequests.forEach { request ->
-        val targetDirectory =
-            if (request.targetPath != null) {
-                val path = Paths.get(request.targetPath)
-                if (path.isAbsolute) {
-                    path.toFile()
-                } else {
-                    File(destinationRootDir, request.targetPath)
-                }
-            } else {
-                Paths.get("").toAbsolutePath().toFile()
-            }
+        val targetDirectory = request.targetPath.toDirectory(destinationRootDirectory)
 
         val featurePackageName = basePackage ?: "com.example"
 
@@ -174,6 +154,7 @@ fun main(arguments: Array<String>) {
             GenerateViewModelRequest.Builder(
                 destinationDirectory = targetDirectory,
                 viewModelName = request.viewModelName,
+                viewModelPackageName = "$featurePackageName.presentation.viewmodel",
                 featurePackageName = featurePackageName,
                 projectNamespace = projectNamespace
             ).build()
@@ -183,6 +164,18 @@ fun main(arguments: Array<String>) {
         }
     }
 }
+
+private fun String?.toDirectory(destinationRootDirectory: File) =
+    if (this == null) {
+        Paths.get("").toAbsolutePath().toFile()
+    } else {
+        val path = Paths.get(this)
+        if (path.isAbsolute) {
+            path.toFile()
+        } else {
+            File(destinationRootDirectory, this)
+        }
+    }
 
 private fun printUsageMessage() {
     println(

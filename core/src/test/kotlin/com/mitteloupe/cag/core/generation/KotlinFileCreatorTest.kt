@@ -28,7 +28,7 @@ class KotlinFileCreatorTest {
         val fileName = "GetUserUseCase.kt"
         val content = "class GetUserUseCase"
         featureRoot.mkdirs()
-        val expectedFile = File(featureRoot, "$layer/src/main/java/com/example/feature/usecase/$fileName")
+        val expectedFile = File(featureRoot, "$layer/src/main/java/com/example/feature/domain/usecase/$fileName")
 
         // When
         classUnderTest.writeKotlinFileInLayer(
@@ -41,7 +41,6 @@ class KotlinFileCreatorTest {
         )
 
         // Then
-        assertTrue(expectedFile.exists())
         assertEquals(content, expectedFile.readText())
     }
 
@@ -87,7 +86,7 @@ class KotlinFileCreatorTest {
         val content = "class GetUserUseCase"
         featureRoot.mkdirs()
 
-        val conflictingFile = File(featureRoot, "$layer/src/main/java/com/example/feature/usecase")
+        val conflictingFile = File(featureRoot, "$layer/src/main/java/com/example/feature/domain/usecase")
         conflictingFile.parentFile?.mkdirs()
         conflictingFile.writeText("conflicting file")
 
@@ -115,7 +114,7 @@ class KotlinFileCreatorTest {
         val content = "class GetUserUseCase"
         featureRoot.mkdirs()
 
-        val targetDirectory = File(featureRoot, "$layer/src/main/java/com/example/feature/usecase")
+        val targetDirectory = File(featureRoot, "$layer/src/main/java/com/example/feature/$layer/usecase")
         targetDirectory.mkdirs()
         val conflictingDirectory = File(targetDirectory, fileName)
         conflictingDirectory.mkdirs()
@@ -134,7 +133,7 @@ class KotlinFileCreatorTest {
     }
 
     @Test
-    fun `Given valid parameters when writeKotlinFileInLayer with target directory then creates file`() {
+    fun `Given valid parameters when writeKotlinFileInDirectory with target directory then creates file`() {
         // Given
         val targetDirectory = File(temporaryDirectory, "target")
         targetDirectory.mkdirs()
@@ -143,7 +142,7 @@ class KotlinFileCreatorTest {
         val expectedFile = File(targetDirectory, fileName)
 
         // When
-        classUnderTest.writeKotlinFileInLayer(
+        classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
             fileName = fileName,
             content = content
@@ -155,7 +154,7 @@ class KotlinFileCreatorTest {
     }
 
     @Test
-    fun `Given existing file when writeKotlinFileInLayer with target directory then does not overwrite`() {
+    fun `Given existing file when writeKotlinFileInDirectory with target directory then does not overwrite`() {
         // Given
         val targetDirectory = File(temporaryDirectory, "target")
         targetDirectory.mkdirs()
@@ -166,7 +165,7 @@ class KotlinFileCreatorTest {
         targetFile.writeText(originalContent)
 
         // When
-        classUnderTest.writeKotlinFileInLayer(
+        classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
             fileName = fileName,
             content = newContent
@@ -177,7 +176,7 @@ class KotlinFileCreatorTest {
     }
 
     @Test(expected = GenerationException::class)
-    fun `Given file write fails when writeKotlinFileInLayer with target directory then throws exception`() {
+    fun `Given file write fails when writeKotlinFileInDirectory with target directory then throws exception`() {
         // Given
         val targetDirectory = File(temporaryDirectory, "target")
         targetDirectory.mkdirs()
@@ -188,7 +187,7 @@ class KotlinFileCreatorTest {
         conflictingDirectory.mkdirs()
 
         // When
-        classUnderTest.writeKotlinFileInLayer(
+        classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
             fileName = fileName,
             content = content

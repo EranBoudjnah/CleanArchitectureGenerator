@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.content.buildPresentationToDomainMapperKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewModelKotlinFile
 import com.mitteloupe.cag.core.content.buildPresentationViewStateKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
 class PresentationLayerContentGenerator(
@@ -35,7 +36,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/model",
+            relativePackageSubPath = "model",
             fileName = "${featureName.capitalized}ViewState.kt",
             content =
                 buildPresentationViewStateKotlinFile(
@@ -53,7 +54,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/model",
+            relativePackageSubPath = "model",
             fileName = "StubPresentationModel.kt",
             content =
                 buildPresentationModelKotlinFile(featurePackageName)
@@ -68,7 +69,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/mapper",
+            relativePackageSubPath = "mapper",
             fileName = "StubPresentationMapper.kt",
             content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
         )
@@ -82,27 +83,49 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/mapper",
+            relativePackageSubPath = "mapper",
             fileName = "StubDomainMapper.kt",
             content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
         )
     }
 
+    private fun writePresentationViewModelFileToDirectory(
+        destinationDirectory: File,
+        projectNamespace: String,
+        viewModelPackageName: String,
+        featurePackageName: String,
+        featureName: String
+    ) {
+        FileCreator.createDirectoryIfNotExists(destinationDirectory)
+        kotlinFileCreator.writeKotlinFileInDirectory(
+            targetDirectory = destinationDirectory,
+            fileName = "${featureName.capitalized}ViewModel.kt",
+            content =
+                buildPresentationViewModelKotlinFile(
+                    projectNamespace = projectNamespace,
+                    viewModelPackageName = viewModelPackageName,
+                    featurePackageName = featurePackageName,
+                    featureName = featureName.capitalized
+                )
+        )
+    }
+
     private fun writePresentationViewModelFile(
-        featureRoot: File,
+        destinationDirectory: File,
         projectNamespace: String,
         featurePackageName: String,
         featureName: String
     ) {
         kotlinFileCreator.writeKotlinFileInLayer(
-            featureRoot = featureRoot,
+            featureRoot = destinationDirectory,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/viewmodel",
+            relativePackageSubPath = "viewmodel",
             fileName = "${featureName.capitalized}ViewModel.kt",
             content =
                 buildPresentationViewModelKotlinFile(
                     projectNamespace = projectNamespace,
+                    viewModelPackageName = "$featurePackageName.presentation.viewmodel",
                     featurePackageName = featurePackageName,
                     featureName = featureName.capitalized
                 )
@@ -119,7 +142,7 @@ class PresentationLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "presentation",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "presentation/navigation",
+            relativePackageSubPath = "navigation",
             fileName = "${featureName.capitalized}PresentationNavigationEvent.kt",
             content =
                 buildPresentationNavigationEventKotlinFile(
@@ -133,14 +156,17 @@ class PresentationLayerContentGenerator(
     fun generateViewModel(
         destinationDirectory: File,
         viewModelName: String,
+        viewModelPackageName: String,
         featurePackageName: String,
         projectNamespace: String
     ) {
-        writePresentationViewModelFile(
-            featureRoot = destinationDirectory,
+        val featureName = viewModelName.removeSuffix("ViewModel")
+        writePresentationViewModelFileToDirectory(
+            destinationDirectory = destinationDirectory,
             projectNamespace = projectNamespace,
+            viewModelPackageName = viewModelPackageName,
             featurePackageName = featurePackageName,
-            featureName = viewModelName
+            featureName = featureName
         )
     }
 }

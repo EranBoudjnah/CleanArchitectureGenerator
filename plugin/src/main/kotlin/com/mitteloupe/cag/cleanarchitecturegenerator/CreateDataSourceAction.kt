@@ -3,9 +3,9 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
-import com.mitteloupe.cag.core.BasePackageResolver
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
+import com.mitteloupe.cag.core.NamespaceResolver
 import java.io.File
 
 class CreateDataSourceAction : AnAction() {
@@ -15,7 +15,7 @@ class CreateDataSourceAction : AnAction() {
         val project = event.project
         val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
         val projectModel = IntellijProjectModel(event)
-        val defaultPrefix = BasePackageResolver().determineBasePackage(projectModel) ?: "com.unknown.app."
+        val defaultPrefix = NamespaceResolver().determineBasePackage(projectModel) ?: "com.unknown.app."
 
         val dialog = CreateDataSourceDialog(project)
         if (!dialog.showAndGet()) return

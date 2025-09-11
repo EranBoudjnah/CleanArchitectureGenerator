@@ -17,7 +17,7 @@ class KotlinFileCreator {
     ) {
         val sourceRoot = File(featureRoot, "$layer/src/main/java")
         val packageSegments = featurePackageName.toSegments()
-        val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments)
+        val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments + layer)
         val targetDirectory =
             relativePackageSubPath.toSegments()
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
@@ -28,10 +28,10 @@ class KotlinFileCreator {
             throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath} (Not a directory)")
         }
 
-        writeKotlinFileInLayer(targetDirectory, fileName, content)
+        writeKotlinFileInDirectory(targetDirectory, fileName, content)
     }
 
-    fun writeKotlinFileInLayer(
+    fun writeKotlinFileInDirectory(
         targetDirectory: File,
         fileName: String,
         content: String

@@ -101,29 +101,25 @@ private fun suggestUseCaseDirectory(
     virtualFile: VirtualFile?
 ): File? {
     if (project == null || virtualFile == null) return null
-    val startingDir = if (virtualFile.isDirectory) virtualFile else virtualFile.parent
+    val startingDirectory = if (virtualFile.isDirectory) virtualFile else virtualFile.parent
 
-    // First, try to find usecase directory starting from the clicked directory
-    val byCurrent = findUseCaseDirectoryIn(startingDir)
-    if (byCurrent != null) {
-        return File(byCurrent.path)
+    val suggestedDirectoryFromCurrent = findUseCaseDirectoryIn(startingDirectory)
+    if (suggestedDirectoryFromCurrent != null) {
+        return File(suggestedDirectoryFromCurrent.path)
     }
 
-    // If not found, try searching from the parent directory to find siblings
-    val byParent = startingDir.parent?.let { findUseCaseDirectoryIn(it) }
-    if (byParent != null) {
-        return File(byParent.path)
+    val suggestionSiblingDirectory = startingDirectory.parent?.let { findUseCaseDirectoryIn(it) }
+    if (suggestionSiblingDirectory != null) {
+        return File(suggestionSiblingDirectory.path)
     }
 
-    val module = ModuleUtilCore.findModuleForFile(startingDir, project) ?: return null
+    val module = ModuleUtilCore.findModuleForFile(startingDirectory, project) ?: return null
     val contentRoots = ModuleRootManager.getInstance(module).contentRoots
-    contentRoots.forEach { root ->
-        val found = findUseCaseDirectoryIn(root)
-        if (found != null) {
-            return File(found.path)
-        }
-    }
-    return null
+    return contentRoots
+        .asSequence()
+        .map(::findUseCaseDirectoryIn)
+        .firstOrNull()
+        ?.let { File(it.path) }
 }
 
 private fun findUseCaseDirectoryIn(directory: VirtualFile?): VirtualFile? {

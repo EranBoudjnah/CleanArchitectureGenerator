@@ -54,7 +54,7 @@ class DomainLayerContentGenerator(
         inputDataType: String? = null,
         outputDataType: String? = null
     ) {
-        kotlinFileCreator.writeKotlinFileInLayer(
+        kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
             fileName = "$useCaseName.kt",
             content =
@@ -81,7 +81,7 @@ class DomainLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "domain/usecase",
+            relativePackageSubPath = "usecase",
             fileName = "$useCaseName.kt",
             content =
                 buildDomainUseCaseKotlinFile(
@@ -103,7 +103,7 @@ class DomainLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "domain/repository",
+            relativePackageSubPath = "repository",
             fileName = "$repositoryName.kt",
             content =
                 buildDomainRepositoryKotlinFile(featurePackageName, repositoryName)
@@ -118,7 +118,7 @@ class DomainLayerContentGenerator(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
-            relativePackageSubPath = "domain/model",
+            relativePackageSubPath = "model",
             fileName = "StubDomainModel.kt",
             content =
                 buildDomainModelKotlinFile(featurePackageName)

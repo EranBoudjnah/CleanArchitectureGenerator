@@ -15,6 +15,8 @@ import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.core.GenerateViewModelRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
+import com.mitteloupe.cag.core.NamespaceResolver
+import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
 
 class CreateViewModelAction : AnAction() {
@@ -49,7 +51,7 @@ class CreateViewModelAction : AnAction() {
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
-        val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
+        val projectRootDirectory = event.project?.basePath?.let { File(it) } ?: File(".")
 
         val selectedDirectory = event.getData(CommonDataKeys.VIRTUAL_FILE)
         val suggestedDirectory = suggestViewModelDirectory(project, selectedDirectory)
@@ -59,21 +61,27 @@ class CreateViewModelAction : AnAction() {
             return
         }
 
-        val destination = dialog.destinationDirectory ?: suggestedDirectory
+        val destination = dialog.destinationDirectory ?: suggestedDirectory ?: File(projectRootDirectory, "")
         val viewModelName = dialog.viewModelNameWithSuffix
 
+        val projectModel = IntellijProjectModel(event)
+        val projectNamespace = NamespaceResolver().determineBasePackage(projectModel)
+
+        val viewModelPackageName = PackageNameDeriver.derivePackageNameForDirectory(destination).orEmpty()
+        val featurePackageName = viewModelPackageName.substringBeforeLast(".presentation")
         val request =
             GenerateViewModelRequest.Builder(
-                destinationDirectory = destination ?: File(projectRootDir, ""),
+                destinationDirectory = destination,
                 viewModelName = viewModelName,
-                featurePackageName = dialog.featurePackageName,
-                projectNamespace = dialog.projectNamespace
+                featurePackageName = featurePackageName,
+                viewModelPackageName = viewModelPackageName,
+                projectNamespace = projectNamespace ?: "com.unknown.app"
             ).build()
 
         try {
             Generator().generateViewModel(request)
-            ideBridge.refreshIde(projectRootDir)
-            ideBridge.synchronizeGradle(project, projectRootDir)
+            ideBridge.refreshIde(projectRootDirectory)
+            ideBridge.synchronizeGradle(project, projectRootDirectory)
             Messages.showInfoMessage(
                 project,
                 CleanArchitectureGeneratorBundle.message("info.viewmodel.generator.confirmation"),
@@ -98,13 +106,11 @@ private fun suggestViewModelDirectory(
 ): File? {
     val startingDir = if (virtualFile?.isDirectory == true) virtualFile else virtualFile?.parent
 
-    // First, try to find viewmodel directory starting from the clicked directory
     val byCurrent = findViewModelDirectoryIn(startingDir)
     if (byCurrent != null) {
         return File(byCurrent.path)
     }
 
-    // If not found, try searching from the parent directory to find siblings
     val byParent = startingDir?.parent?.let { findViewModelDirectoryIn(it) }
     if (byParent != null) {
         return File(byParent.path)

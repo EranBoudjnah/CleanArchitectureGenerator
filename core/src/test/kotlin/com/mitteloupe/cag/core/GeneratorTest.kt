@@ -160,19 +160,19 @@ class GeneratorTest {
     }
 
     @Test
-    fun `Given valid view model request when generateViewModel then returns success`() {
+    fun `Given existing directory when generateViewModel then returns success`() {
         // Given
-        val featureRoot = File(tempDirectory, "src/main/java/com/example/feature")
-        val viewModelDirectory = File(featureRoot, "presentation/viewmodel")
+        val viewModelDirectory = File(tempDirectory, "src/main/java/com/example/featurepresentation/viewmodel")
         viewModelDirectory.mkdirs()
         val request =
             GenerateViewModelRequest(
                 viewModelName = "TestViewModel",
                 destinationDirectory = viewModelDirectory,
                 featurePackageName = "com.example.feature",
+                viewModelPackageName = "com.example.feature.presentation.viewmodel",
                 projectNamespace = "com.example"
             )
-        val expectedPath = "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModelViewModel.kt"
+        val expectedPath = "TestViewModel.kt"
 
         // When
         classUnderTest.generateViewModel(request)
@@ -183,42 +183,18 @@ class GeneratorTest {
     }
 
     @Test
-    fun `Given invalid directory when generateViewModel then creates directory and file`() {
+    fun `Given new directory when generateViewModel then creates ViewModel in correct presentation layer structure`() {
         // Given
-        val invalidDirectory = File(tempDirectory, "invalid/path")
-        val request =
-            GenerateViewModelRequest(
-                viewModelName = "TestViewModel",
-                destinationDirectory = invalidDirectory,
-                featurePackageName = "com.example.feature",
-                projectNamespace = "com.example"
-            )
-        val expectedPath = "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModelViewModel.kt"
-
-        // When
-        classUnderTest.generateViewModel(request)
-        val actualViewModelFile = File(invalidDirectory, expectedPath)
-
-        // Then
-        assertTrue("ViewModel file should be created", actualViewModelFile.exists())
-    }
-
-    @Test
-    fun `Given feature root directory when generateViewModel then creates ViewModel in correct presentation layer structure`() {
-        // Given
-        val featureRoot = File(tempDirectory, "features/samplefeature")
+        val targetDirectory = File(tempDirectory, "features/samplefeature")
         val request =
             GenerateViewModelRequest(
                 viewModelName = "SampleViewModel",
-                destinationDirectory = featureRoot,
-                featurePackageName = "com.example.app.examplefeature",
+                destinationDirectory = targetDirectory,
+                featurePackageName = "com.example.app",
+                viewModelPackageName = "com.example.app.examplefeature",
                 projectNamespace = "com.example.app"
             )
-        val expectedViewModelFile =
-            File(
-                featureRoot,
-                "presentation/src/main/java/com/example/app/examplefeature/presentation/viewmodel/SampleViewModelViewModel.kt"
-            )
+        val expectedViewModelFile = File(targetDirectory, "SampleViewModel.kt")
 
         // When
         classUnderTest.generateViewModel(request)
