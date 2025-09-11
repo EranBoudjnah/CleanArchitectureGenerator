@@ -49,10 +49,8 @@ object FileCreator {
     ) {
         createDirectoryIfNotExists(targetDirectory)
 
-        val resourceUrl = classLoader.getResource(resourcePath)
-        if (resourceUrl == null) {
-            throw GenerationException("Resource directory not found: $resourcePath")
-        }
+        classLoader.getResource(resourcePath)
+            ?: throw GenerationException("Resource directory not found: $resourcePath")
 
         try {
             copyResourceDirectoryContents(targetDirectory, resourcePath, classLoader)

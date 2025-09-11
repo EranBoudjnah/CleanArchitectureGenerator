@@ -626,66 +626,120 @@ class AppArgumentProcessorTest {
             // Given
             val givenArguments =
                 arrayOf("--new-project", "--name=MyApp", "--package=com.example", "--ktlint", "--detekt", "--ktor", "--retrofit")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = "MyApp",
+                    packageName = "com.example",
+                    enableCompose = true,
+                    enableKtlint = true,
+                    enableDetekt = true,
+                    enableKtor = true,
+                    enableRetrofit = true
+                )
 
             // When
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            assertEquals(listOf(ProjectTemplateRequest("MyApp", "com.example", true, true, true, true, true)), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
         fun `Given project template with short flags when getNewProjectTemplate then parses correctly`() {
             // Given
             val givenArguments = arrayOf("-np", "-n=TestApp", "-p", "com.test", "-nc", "-kl", "-d", "-kt", "-rt")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = "TestApp",
+                    packageName = "com.test",
+                    enableCompose = false,
+                    enableKtlint = true,
+                    enableDetekt = true,
+                    enableKtor = true,
+                    enableRetrofit = true
+                )
 
             // When
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            assertEquals(listOf(ProjectTemplateRequest("TestApp", "com.test", false, true, true, true, true)), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
         fun `Given project template with only name when getNewProjectTemplate then returns request with defaults`() {
             // Given
             val givenArguments = arrayOf("--new-project", "--name=MinimalApp")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = "MinimalApp",
+                    packageName = "",
+                    enableCompose = true,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false
+                )
 
             // When
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            assertEquals(listOf(ProjectTemplateRequest("MinimalApp", "", true, false, false, false, false)), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
         fun `Given project template with no compose when getNewProjectTemplate then disables compose`() {
             // Given
             val givenArguments = arrayOf("--new-project", "--name=NoComposeApp", "--no-compose")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = "NoComposeApp",
+                    packageName = "",
+                    enableCompose = false,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false
+                )
 
             // When
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            assertEquals(listOf(ProjectTemplateRequest("NoComposeApp", "", false, false, false, false, false)), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
         fun `Given multiple project templates when getNewProjectTemplate then returns all requests`() {
             // Given
             val givenArguments = arrayOf("--new-project", "--name=First", "--package=com.first", "--new-project", "--name=Second")
+            val expectedRequest1 =
+                ProjectTemplateRequest(
+                    projectName = "First",
+                    packageName = "com.first",
+                    enableCompose = true,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false
+                )
+            val expectedRequest2 =
+                ProjectTemplateRequest(
+                    projectName = "Second",
+                    packageName = "",
+                    enableCompose = true,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false
+                )
 
             // When
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            assertEquals(
-                listOf(
-                    ProjectTemplateRequest("First", "com.first", true, false, false, false, false),
-                    ProjectTemplateRequest("Second", "", true, false, false, false, false)
-                ),
-                result
-            )
+            assertEquals(listOf(expectedRequest1, expectedRequest2), result)
         }
 
         @Test
