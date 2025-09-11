@@ -95,8 +95,8 @@ class CreateUseCaseDialog(
         }
     }
 
-    override fun createCenterPanel(): JComponent {
-        return panel {
+    override fun createCenterPanel(): JComponent =
+        panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
                 cell(useCaseNameTextField)
                 cell(
@@ -117,7 +117,6 @@ class CreateUseCaseDialog(
                 cell(directoryField)
             }
         }
-    }
 
     override fun doValidate(): ValidationInfo? =
         if (useCaseName.isEmpty()) {
@@ -161,7 +160,7 @@ class CreateUseCaseDialog(
     }
 
     private fun validateInputOutputTypes(): ValidationInfo? {
-        val destinationDirectory = this@CreateUseCaseDialog.destinationDirectory ?: return null
+        val destinationDirectory = destinationDirectory ?: return null
 
         inputDataType?.let { inputType ->
             if (!symbolValidator.isValidSymbolSyntax(inputType)) {
@@ -195,20 +194,20 @@ class CreateUseCaseDialog(
     }
 
     private fun validateInputField() {
-        val inputType = inputDataType
+        val inputDataType = inputDataType
 
-        if (inputType.isNullOrEmpty()) {
+        if (inputDataType.isNullOrEmpty()) {
             inputWarningLabel.clearWarning()
             return
         }
 
-        if (!symbolValidator.isValidSymbolSyntax(inputType)) {
-            inputWarningLabel.showFieldWarning("Invalid type syntax: $inputType")
+        if (!symbolValidator.isValidSymbolSyntax(inputDataType)) {
+            inputWarningLabel.showFieldWarning("Invalid type syntax: $inputDataType")
             return
         }
 
-        val destinationDir = destinationDirectory
-        if (destinationDir != null && !symbolValidator.isValidSymbolInContext(inputType, destinationDir)) {
+        val destinationDirectory = destinationDirectory
+        if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(inputDataType, destinationDirectory)) {
             inputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
         } else {
             inputWarningLabel.clearWarning()
@@ -227,7 +226,7 @@ class CreateUseCaseDialog(
             return
         }
 
-        val destinationDirectory = this@CreateUseCaseDialog.destinationDirectory
+        val destinationDirectory = destinationDirectory
         if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(outputDataType, destinationDirectory)) {
             outputWarningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
         } else {
