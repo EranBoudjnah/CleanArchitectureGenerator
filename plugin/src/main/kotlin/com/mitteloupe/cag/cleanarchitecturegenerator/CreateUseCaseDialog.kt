@@ -27,7 +27,6 @@ import javax.swing.text.AbstractDocument
 private const val USE_CASE_SUFFIX = "UseCase"
 private const val DEFAULT_USE_CASE_NAME = "DoSomething"
 private const val DEFAULT_DATA_TYPE = "Unit"
-private const val SYMBOL_NOT_FOUND_ERROR_MESSAGE = "Symbol not found."
 
 class CreateUseCaseDialog(
     project: Project?,
@@ -36,12 +35,12 @@ class CreateUseCaseDialog(
     private val useCaseNameTextField = JBTextField()
     private val directoryField = TextFieldWithBrowseButton()
     private val inputDataTypeComboBox = ComboBox<String>()
+    private val inputWarningLabel = JBLabel()
     private val outputDataTypeComboBox = ComboBox<String>()
+    private val outputWarningLabel = JBLabel()
     private val modelClassFinder = ModelClassFinder()
     private val symbolValidator = SymbolValidator()
 
-    private val inputWarningLabel = JBLabel()
-    private val outputWarningLabel = JBLabel()
     private var documentListenersSetup = false
 
     val useCaseNameWithSuffix: String
@@ -154,11 +153,6 @@ class CreateUseCaseDialog(
         outputDataType.validateDataType(outputWarningLabel)
     }
 
-    private fun JBLabel.showFieldWarning(message: String) {
-        icon = AllIcons.General.Warning
-        text = message
-    }
-
     private fun validateInputOutputTypes(): ValidationInfo? {
         val destinationDirectory = destinationDirectory ?: return null
 
@@ -206,7 +200,9 @@ class CreateUseCaseDialog(
 
         val destinationDirectory = destinationDirectory
         if (destinationDirectory != null && !symbolValidator.isValidSymbolInContext(this, destinationDirectory)) {
-            warningLabel.showFieldWarning(SYMBOL_NOT_FOUND_ERROR_MESSAGE)
+            warningLabel.showFieldWarning(
+                CleanArchitectureGeneratorBundle.message("error.symbol.not.found")
+            )
         } else {
             warningLabel.clearWarning()
         }
@@ -215,6 +211,11 @@ class CreateUseCaseDialog(
     private fun JBLabel.clearWarning() {
         icon = null
         text = " "
+    }
+
+    private fun JBLabel.showFieldWarning(message: String) {
+        icon = AllIcons.General.Warning
+        text = message
     }
 
     private fun setupDataTypeComboBoxes() {
