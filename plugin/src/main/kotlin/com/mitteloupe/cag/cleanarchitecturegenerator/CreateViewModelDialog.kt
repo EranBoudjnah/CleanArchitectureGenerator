@@ -8,7 +8,9 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import com.mitteloupe.cag.cleanarchitecturegenerator.validation.SymbolValidator
 import java.io.File
@@ -16,7 +18,7 @@ import javax.swing.JComponent
 import javax.swing.text.AbstractDocument
 
 private const val VIEW_MODEL_SUFFIX = "ViewModel"
-private const val DEFAULT_VIEW_MODEL_NAME = "My$VIEW_MODEL_SUFFIX"
+private const val DEFAULT_VIEW_MODEL_NAME = "My"
 
 class CreateViewModelDialog(
     project: Project?,
@@ -27,7 +29,7 @@ class CreateViewModelDialog(
     private val symbolValidator = SymbolValidator()
 
     val viewModelNameWithSuffix: String
-        get() = "$viewModelName$VIEW_MODEL_SUFFIX"
+        get() = viewModelName.removeSuffix(VIEW_MODEL_SUFFIX) + VIEW_MODEL_SUFFIX
 
     private val viewModelName: String
         get() = viewModelNameTextField.text.trim()
@@ -61,12 +63,14 @@ class CreateViewModelDialog(
         panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.name.label")) {
                 cell(viewModelNameTextField)
-                    .comment(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.name.comment"))
+                label(VIEW_MODEL_SUFFIX)
+                    .applyToComponent { foreground = UIUtil.getLabelDisabledForeground() }
             }
 
             row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.field.label")) {
                 cell(directoryField)
                     .comment(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.comment"))
+                    .align(Align.FILL)
             }
         }
 

@@ -22,26 +22,44 @@ class PresentationLayerContentGenerator(
         writePresentationModelFile(featureRoot, featurePackageName)
         writeDomainToPresentationMapperFile(featureRoot, featurePackageName)
         writePresentationToDomainMapperFile(featureRoot, featurePackageName)
-        writePresentationViewState(featureRoot, featurePackageName, featureName)
+        writePresentationViewStateForFeature(featureRoot, featurePackageName, featureName)
         writePresentationNavigationEvent(featureRoot, projectNamespace, featurePackageName, featureName)
-        writePresentationViewModelFile(featureRoot, projectNamespace, featurePackageName, featureName)
+        writePresentationViewModelFileForFeature(featureRoot, projectNamespace, featurePackageName, featureName)
     }
 
-    private fun writePresentationViewState(
-        featureRoot: File,
+    private fun writePresentationViewStateToDirectory(
+        destinationDirectory: File,
         featurePackageName: String,
         featureName: String
     ) {
-        kotlinFileCreator.writeKotlinFileInLayer(
-            featureRoot = featureRoot,
-            layer = "presentation",
-            featurePackageName = featurePackageName,
-            relativePackageSubPath = "model",
+        FileCreator.createDirectoryIfNotExists(destinationDirectory)
+        kotlinFileCreator.writeKotlinFileInDirectory(
+            targetDirectory = destinationDirectory,
             fileName = "${featureName.capitalized}ViewState.kt",
             content =
                 buildPresentationViewStateKotlinFile(
                     featurePackageName = featurePackageName,
                     featureName = featureName.capitalized
+                )
+        )
+    }
+
+    private fun writePresentationViewStateForFeature(
+        featureRoot: File,
+        featurePackageName: String,
+        featureName: String
+    ) {
+        val capitalizedFeatureName = featureName.capitalized
+        kotlinFileCreator.writeKotlinFileInLayer(
+            featureRoot = featureRoot,
+            layer = "presentation",
+            featurePackageName = featurePackageName,
+            relativePackageSubPath = "model",
+            fileName = "${capitalizedFeatureName}ViewState.kt",
+            content =
+                buildPresentationViewStateKotlinFile(
+                    featurePackageName = featurePackageName,
+                    featureName = capitalizedFeatureName
                 )
         )
     }
@@ -110,7 +128,7 @@ class PresentationLayerContentGenerator(
         )
     }
 
-    private fun writePresentationViewModelFile(
+    private fun writePresentationViewModelFileForFeature(
         destinationDirectory: File,
         projectNamespace: String,
         featurePackageName: String,
@@ -150,6 +168,18 @@ class PresentationLayerContentGenerator(
                     featurePackageName = featurePackageName,
                     featureName = featureName.capitalized
                 )
+        )
+    }
+
+    fun generateViewState(
+        destinationDirectory: File,
+        featurePackageName: String,
+        featureName: String
+    ) {
+        writePresentationViewStateToDirectory(
+            destinationDirectory = destinationDirectory,
+            featurePackageName = featurePackageName,
+            featureName = featureName
         )
     }
 

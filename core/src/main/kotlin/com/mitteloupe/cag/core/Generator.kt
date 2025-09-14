@@ -188,8 +188,17 @@ class Generator {
     fun generateViewModel(request: GenerateViewModelRequest) {
         val destinationDirectory = request.destinationDirectory
         val viewModelName = request.viewModelName.trim()
+        val featureName = viewModelName.removeSuffix("ViewModel")
 
-        PresentationLayerContentGenerator()
+        val presentationLayerContentGenerator = PresentationLayerContentGenerator()
+        presentationLayerContentGenerator
+            .generateViewState(
+                destinationDirectory = File(destinationDirectory.parentFile, "model"),
+                featurePackageName = request.featurePackageName,
+                featureName = featureName
+            )
+
+        presentationLayerContentGenerator
             .generateViewModel(
                 destinationDirectory = destinationDirectory,
                 viewModelName = viewModelName,

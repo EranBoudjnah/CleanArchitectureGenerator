@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
@@ -44,7 +45,7 @@ class CreateUseCaseDialog(
     private var documentListenersSetup = false
 
     val useCaseNameWithSuffix: String
-        get() = "$useCaseName$USE_CASE_SUFFIX"
+        get() = useCaseName.removeSuffix(USE_CASE_SUFFIX) + USE_CASE_SUFFIX
 
     private val useCaseName: String
         get() = useCaseNameTextField.text.trim()
@@ -114,6 +115,8 @@ class CreateUseCaseDialog(
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label")) {
                 cell(directoryField)
+                    .comment(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.comment"))
+                    .align(Align.FILL)
             }
         }
 
