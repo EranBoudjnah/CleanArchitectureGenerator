@@ -23,42 +23,39 @@ class BasePackageResolverTest {
     }
 
     @Test
-    fun `Given module has namespace when determineBasePackage then returns namespace with dot`() {
+    fun `Given module has namespace when determineBasePackage then returns namespace`() {
         // Given
-        val givenNamespace = "com.example.app"
+        val namespace = "com.example.app"
         every { projectModel.selectedModuleRootDir() } returns
-            createTemporaryAppModuleDirectory(namespace = givenNamespace)
-
-        val expectedPackageNamePrefix = "$givenNamespace."
+            createTemporaryAppModuleDirectory(namespace = namespace)
 
         // When
         val actualResult = classUnderTest.determineBasePackage(projectModel)
 
         // Then
-        assertEquals(expectedPackageNamePrefix, actualResult)
+        assertEquals(namespace, actualResult)
     }
 
     @Test
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
-    fun `Given no selected module, other modules with namespace when determineBasePackage then returns the app module namespace with dot`() {
+    fun `Given no selected module, other modules with namespace when determineBasePackage then returns the app module namespace`() {
         // Given
         every { projectModel.selectedModuleRootDir() } returns null
         val otherNamespace1 = "com.sample.app.other"
         val otherNamespace2 = "com.sample.app.another"
-        val givenNamespace = "com.sample.app"
+        val namespace = "com.sample.app"
         every { projectModel.allModuleRootDirs() } returns
             listOf(
                 createTemporaryGenericModuleDirectory(namespace = otherNamespace1),
-                createTemporaryAppModuleDirectory(namespace = givenNamespace),
+                createTemporaryAppModuleDirectory(namespace = namespace),
                 createTemporaryGenericModuleDirectory(namespace = otherNamespace2)
             )
-        val expectedPackageNamePrefix = "$givenNamespace."
 
         // When
         val result = classUnderTest.determineBasePackage(projectModel)
 
         // Then
-        assertEquals(expectedPackageNamePrefix, result)
+        assertEquals(namespace, result)
     }
 
     @Test
@@ -75,19 +72,17 @@ class BasePackageResolverTest {
     }
 
     @Test
-    fun `Given module uses version catalog alias when determineBasePackage then returns namespace with dot`() {
+    fun `Given module uses version catalog alias when determineBasePackage then returns namespace`() {
         // Given
-        val givenNamespace = "com.example.catalog"
+        val namespace = "com.example.catalog"
         every { projectModel.selectedModuleRootDir() } returns
-            createTemporaryAppModuleDirectoryWithCatalog(namespace = givenNamespace)
-
-        val expectedPackageNamePrefix = "$givenNamespace."
+            createTemporaryAppModuleDirectoryWithCatalog(namespace = namespace)
 
         // When
         val actualResult = classUnderTest.determineBasePackage(projectModel)
 
         // Then
-        assertEquals(expectedPackageNamePrefix, actualResult)
+        assertEquals(namespace, actualResult)
     }
 
     @Test

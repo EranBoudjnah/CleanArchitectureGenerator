@@ -9,13 +9,13 @@ class NamespaceResolver() {
         val selectedModule = projectModel.selectedModuleRootDir()
         val namespace = readAndroidNamespace(selectedModule)
         if (!namespace.isNullOrBlank()) {
-            return ensureTrailingDot(namespace)
+            return namespace
         }
 
         projectModel.allModuleRootDirs().forEach { moduleDir ->
             val moduleNamespace = readAndroidNamespace(moduleDir)
             if (!moduleNamespace.isNullOrBlank()) {
-                return ensureTrailingDot(moduleNamespace)
+                return moduleNamespace
             }
         }
 
@@ -42,6 +42,4 @@ class NamespaceResolver() {
 
         return namespaceRegex.find(fileContents)?.groupValues?.get(1)?.trim()
     }
-
-    private fun ensureTrailingDot(name: String): String = if (name.endsWith('.')) name else "$name."
 }
