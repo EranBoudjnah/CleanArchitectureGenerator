@@ -78,7 +78,8 @@ class ArchitectureModulesContentGenerator(
                     LibraryConstants.VIEW_LIBRARIES
                 } +
                 LibraryConstants.TESTING_LIBRARIES +
-                LibraryConstants.NETWORK_LIBRARIES
+                LibraryConstants.NETWORK_LIBRARIES +
+                LibraryConstants.ANDROIDX_RECYCLERVIEW
         val plugins =
             PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
                 if (enableCompose) {
@@ -87,14 +88,12 @@ class ArchitectureModulesContentGenerator(
                     emptyList()
                 } +
                 if (enableKtlint) {
-                    PluginConstants.CODE_QUALITY_PLUGINS.filter { it.id == "org.jlleitschuh.gradle.ktlint" }
+                    listOf(PluginConstants.KTLINT)
                 } else {
                     emptyList()
                 } +
                 if (enableDetekt) {
-                    PluginConstants.CODE_QUALITY_PLUGINS.filter {
-                        it.id == "io.gitlab.arturbosch.detekt"
-                    }
+                    listOf(PluginConstants.DETEKT)
                 } else {
                     emptyList()
                 }
