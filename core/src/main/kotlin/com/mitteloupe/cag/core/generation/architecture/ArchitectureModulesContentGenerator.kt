@@ -73,13 +73,16 @@ class ArchitectureModulesContentGenerator(
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
                 if (enableCompose) {
-                    LibraryConstants.COMPOSE_LIBRARIES + LibraryConstants.COMPOSE_TESTING_LIBRARIES
+                    LibraryConstants.COMPOSE_LIBRARIES +
+                        LibraryConstants.COMPOSE_TESTING_LIBRARIES +
+                        LibraryConstants.ANDROIDX_RECYCLERVIEW +
+                        LibraryConstants.ANDROIDX_FRAGMENT_KTX +
+                        LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
                 } else {
                     LibraryConstants.VIEW_LIBRARIES
                 } +
                 LibraryConstants.TESTING_LIBRARIES +
-                LibraryConstants.NETWORK_LIBRARIES +
-                LibraryConstants.ANDROIDX_RECYCLERVIEW
+                LibraryConstants.NETWORK_LIBRARIES
         val plugins =
             PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
                 if (enableCompose) {
