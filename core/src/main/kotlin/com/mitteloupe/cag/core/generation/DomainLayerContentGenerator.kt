@@ -14,11 +14,8 @@ class DomainLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreat
         projectNamespace: String,
         featurePackageName: String
     ) {
-        println("ERAN: Writing domain model")
         writeDomainModelFile(featureRoot, featurePackageName)
-        println("ERAN: Writing domain repository")
         writeDomainRepositoryInterface(featureRoot, featurePackageName)
-        println("ERAN: Writing domain use case")
         writeDomainUseCaseFile(featureRoot, projectNamespace, featurePackageName)
     }
 

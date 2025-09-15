@@ -23,13 +23,10 @@ class KotlinFileCreator(private val fileCreator: FileCreator) {
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
 
         if (!targetDirectory.exists()) {
-            println("ERAN: Creating directory $targetDirectory")
             fileCreator.createDirectoryIfNotExists(targetDirectory)
         } else if (!targetDirectory.isDirectory) {
             throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath} (Not a directory)")
         }
-
-        println("ERAN: Creating file in $targetDirectory")
 
         writeKotlinFileInDirectory(targetDirectory, fileName, content)
     }
