@@ -55,7 +55,6 @@ class Generator(
 ) {
     fun generateFeature(request: GenerateFeatureRequest) {
         val featurePackageName = request.featurePackageName?.trim()
-        println("ERAN: Creating $featurePackageName")
         if (featurePackageName.isNullOrEmpty()) {
             throw GenerationException("Feature package name is missing.")
         }
@@ -64,8 +63,6 @@ class Generator(
         if (pathSegments.isEmpty()) {
             throw GenerationException("Feature package name is invalid.")
         }
-
-        println("ERAN: Creating $pathSegments")
 
         val featureNameLowerCase = request.featureName.lowercase()
         val dependencyConfiguration =
@@ -92,7 +89,6 @@ class Generator(
             projectRootDir = request.destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
-        println("ERAN: Updated version catalog")
         val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
@@ -109,7 +105,6 @@ class Generator(
 
         val allCreated =
             layers.map { layerName ->
-                println("ERAN: Creating $layerName")
                 val layerSourceRoot = File(featureRoot, "$layerName/src/main/java")
                 val destinationDirectory = buildPackageDirectory(layerSourceRoot, pathSegments)
                 if (destinationDirectory.exists()) {
@@ -125,20 +120,17 @@ class Generator(
                 layer = "domain",
                 content = buildDomainGradleScript(catalogUpdater)
             )
-            println("ERAN: Wrote domain gradle file")
             domainLayerContentGenerator
                 .generateDomainLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
                 )
-            println("ERAN: Wrote domain files")
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "presentation",
                 content = buildPresentationGradleScript(featureNameLowerCase, catalogUpdater)
             )
-            println("ERAN: Wrote presentation gradle file")
             presentationLayerContentGenerator
                 .generatePresentationLayer(
                     featureRoot = featureRoot,
@@ -146,20 +138,17 @@ class Generator(
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            println("ERAN: Wrote presentation files")
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "data",
                 content = buildDataGradleScript(featureNameLowerCase, catalogUpdater)
             )
-            println("ERAN: Wrote data gradle file")
             dataLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            println("ERAN: Wrote data files")
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "ui",
@@ -171,7 +160,6 @@ class Generator(
                         catalog = catalogUpdater
                     )
             )
-            println("ERAN: Wrote ui gradle file")
             uiLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
@@ -179,7 +167,6 @@ class Generator(
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            println("ERAN: Wrote ui files")
             settingsFileUpdater.updateProjectSettingsIfPresent(
                 request.destinationRootDirectory,
                 featureNameLowerCase
@@ -241,7 +228,6 @@ class Generator(
         useKtor: Boolean,
         useRetrofit: Boolean
     ) {
-        println("ERAN: Starting data source generation!")
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
@@ -251,12 +237,9 @@ class Generator(
                 if (moduleDirectory.exists()) {
                     moduleDirectory.isDirectory
                 } else {
-                    println("ERAN: Making $moduleDirectory!")
                     moduleDirectory.mkdirs()
                 }
             }
-
-        println("ERAN: All created!")
 
         if (!allCreated) {
             throw GenerationException("Failed to create directories for datasource.")
@@ -272,8 +255,6 @@ class Generator(
             projectRootDir = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
-
-        println("ERAN: Updating catalog!")
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
@@ -432,7 +413,7 @@ class Generator(
                 } else {
                     emptyList<SectionEntryRequirement.PluginRequirement>() +
                         if (request.enableKtlint) {
-                            PluginConstants.CODE_QUALITY_PLUGINS.filter { it.id == "org.jlleitschuh.gradle.ktlint" }
+                            listOf(PluginConstants.KTLINT)
                         } else {
                             emptyList<SectionEntryRequirement.PluginRequirement>() +
                                 if (request.enableDetekt) {
