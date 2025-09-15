@@ -12,8 +12,7 @@ fun buildProjectGradleScript(
     val ktlintPlugins =
         if (enableKtlint) {
             """
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false
-"""
+            id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false"""
         } else {
             ""
         }
@@ -21,8 +20,7 @@ fun buildProjectGradleScript(
     val detektPlugins =
         if (enableDetekt) {
             """
-    id("io.gitlab.arturbosch.detekt") version "1.23.6" apply false
-"""
+            id("io.gitlab.arturbosch.detekt") version "1.23.6" apply false"""
         } else {
             ""
         }
@@ -36,13 +34,14 @@ fun buildProjectGradleScript(
     val aliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
     return """
+        // Top-level build file where you can add configuration options common to all sub-projects/modules.
         import org.jetbrains.kotlin.gradle.dsl.JvmTarget
         import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
         plugins {
             alias(libs.plugins.$aliasAndroidApplication) apply false
             alias(libs.plugins.$aliasAndroidLibrary) apply false
-            alias(libs.plugins.$aliasKotlinAndroid) apply false$ktlintPlugins$detektPlugins
+            alias(libs.plugins.$aliasKotlinAndroid) apply false
             alias(libs.plugins.$aliasKotlinJvm) apply false$ktlintPlugins$detektPlugins
         }
 
