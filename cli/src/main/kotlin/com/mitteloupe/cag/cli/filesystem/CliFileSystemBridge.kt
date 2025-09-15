@@ -18,6 +18,9 @@ class CliFileSystemBridge : FileSystemBridge {
         file: File,
         content: String
     ) {
+        if (file.exists()) {
+            delete(file)
+        }
         file.writeText(content)
     }
 

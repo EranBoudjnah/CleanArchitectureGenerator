@@ -16,10 +16,6 @@ class FileCreator(val fileSystemBridge: FileSystemBridge) {
         file: File,
         contentProvider: () -> String
     ) {
-        if (fileSystemBridge.exists(file)) {
-            fileSystemBridge.delete(file)
-        }
-
         val content = contentProvider()
         runCatching { fileSystemBridge.writeToFile(file, content) }
             .onFailure {

@@ -1,10 +1,13 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.filesystem
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.findOrCreateFile
 import com.intellij.openapi.vfs.writeBytes
+import com.intellij.util.ModalityUiUtil
 import com.mitteloupe.cag.core.filesystem.FileSystemBridge
 import java.io.File
 
@@ -42,10 +45,19 @@ class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge
         content: ByteArray
     ) {
         if (file.exists()) {
-            performWriteAction {
-                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)?.writeBytes(content) ?: let {
-                    file.writeBytes(content)
-                    updateAsync(file)
+            ModalityUiUtil.invokeLaterIfNeeded(ModalityState.defaultModalityState()) {
+                performWriteAction {
+                    LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)?.let { virtualFile ->
+                        val parent = virtualFile.parent
+                        virtualFile.delete(this)
+                        val newFile = parent.findOrCreateFile(file.name)
+                        newFile.writeBytes(content)
+                    } ?: let {
+                        file.delete()
+                        file.createNewFile()
+                        file.writeBytes(content)
+                        updateAsync(file)
+                    }
                 }
             }
         } else {
@@ -75,7 +87,7 @@ class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge
         val command = {
             LocalFileSystem.getInstance().refreshIoFiles(listOf(file), false, false, null)
         }
-        ApplicationManager.getApplication().invokeLater {
+        ModalityUiUtil.invokeLaterIfNeeded(ModalityState.defaultModalityState()) {
             performWriteAction(command)
         }
     }
