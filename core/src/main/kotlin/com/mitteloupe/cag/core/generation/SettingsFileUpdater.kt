@@ -163,7 +163,7 @@ class SettingsFileUpdater(private val fileCreator: FileCreator) {
     ) {
         val settingsFile = File(projectRoot, "settings.gradle.kts")
         val content = buildSettingsGradleScript(projectName, featureNames)
-        runCatching { settingsFile.writeText(content) }
+        runCatching { fileCreator.createOrUpdateFile(settingsFile) { content } }
             .onFailure { throw GenerationException("Failed to create settings.gradle.kts: ${it.message}") }
     }
 }
