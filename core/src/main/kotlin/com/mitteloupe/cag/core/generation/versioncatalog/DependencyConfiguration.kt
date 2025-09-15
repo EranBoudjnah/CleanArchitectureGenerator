@@ -270,6 +270,7 @@ object LibraryConstants {
         listOf(
             ANDROIDX_CORE_KTX,
             ANDROIDX_LIFECYCLE_RUNTIME_KTX,
+            ANDROIDX_APPCOMPAT,
             KOTLINX_COROUTINES_CORE,
             MATERIAL,
             OKHTTP3
@@ -277,7 +278,6 @@ object LibraryConstants {
 
     val VIEW_LIBRARIES =
         listOf(
-            ANDROIDX_APPCOMPAT,
             ANDROIDX_RECYCLERVIEW,
             ANDROIDX_FRAGMENT_KTX,
             ANDROIDX_NAVIGATION_FRAGMENT_KTX,

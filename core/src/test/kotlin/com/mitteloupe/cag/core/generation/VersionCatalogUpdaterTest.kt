@@ -361,10 +361,10 @@ class VersionCatalogUpdaterTest {
             [libraries]
             androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.12.0" }
             androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.7.0" }
+            androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.6.1" }
             kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.7.3" }
             material = { module = "com.google.android.material:material", version = "1.11.0" }
             okhttp3 = { module = "com.squareup.okhttp3:okhttp", version = "4.12.0" }
-            androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.6.1" }
             androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2" }
             androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.6.2" }
             androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version = "2.7.6" }
