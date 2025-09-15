@@ -3,9 +3,10 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.buildSettingsGradleScript
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class SettingsFileUpdater {
+class SettingsFileUpdater(private val fileCreator: FileCreator) {
     fun updateProjectSettingsIfPresent(
         startDirectory: File,
         featureNameLowerCase: String
@@ -146,9 +147,7 @@ class SettingsFileUpdater {
                 }
             }
 
-        val updatedFileContent = filteredContent + contentToAppend
-
-        runCatching { settingsFile.writeText(updatedFileContent) }
+        runCatching { fileCreator.createOrUpdateFile(settingsFile) { filteredContent + contentToAppend } }
             .exceptionOrNull()
             ?.let { throw GenerationException("Failed to update ${settingsFile.name}: ${it.message}") }
     }

@@ -1,6 +1,10 @@
 package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
@@ -49,8 +53,11 @@ class ArchitectureModulesContentGeneratorTest {
         fun setUp() {
             MockKAnnotations.init(this)
             temporaryDirectory = createTempDirectory(prefix = "test").toFile()
+            val fileCreator = FileCreator(FakeFileSystemBridge())
             classUnderTest =
                 ArchitectureModulesContentGenerator(
+                    gradleFileCreator = GradleFileCreator(fileCreator),
+                    catalogUpdater = VersionCatalogUpdater(fileCreator),
                     domainModuleCreator = domainModuleCreator,
                     instrumentationTestModuleCreator = instrumentationTestModuleCreator,
                     presentationModuleCreator = presentationModuleCreator,
@@ -2361,7 +2368,13 @@ abstract class ResponseStore {
 
         @Before
         fun setUp() {
-            classUnderTest = ArchitectureModulesContentGenerator()
+            val fileCreator = FileCreator(FakeFileSystemBridge())
+            val catalogUpdater = VersionCatalogUpdater(fileCreator)
+            classUnderTest =
+                ArchitectureModulesContentGenerator(
+                    gradleFileCreator = GradleFileCreator(fileCreator),
+                    catalogUpdater = catalogUpdater
+                )
             temporaryDirectory = createTempDirectory(prefix = "test").toFile()
         }
 

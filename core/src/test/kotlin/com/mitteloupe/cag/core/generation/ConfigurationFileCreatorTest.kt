@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -14,7 +16,7 @@ class ConfigurationFileCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = ConfigurationFileCreator()
+        classUnderTest = ConfigurationFileCreator(FileCreator(FakeFileSystemBridge()))
         projectRoot = createTempDirectory(prefix = "projectRoot").toFile()
     }
 

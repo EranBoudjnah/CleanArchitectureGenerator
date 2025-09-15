@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +14,7 @@ class GradleFileCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = GradleFileCreator()
+        classUnderTest = GradleFileCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

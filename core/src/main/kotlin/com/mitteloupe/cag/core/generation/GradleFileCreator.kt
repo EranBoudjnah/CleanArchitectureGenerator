@@ -6,7 +6,7 @@ import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import java.io.File
 
-class GradleFileCreator {
+class GradleFileCreator(private val fileCreator: FileCreator) {
     fun writeGradleFileIfMissing(
         featureRoot: File,
         layer: String,
@@ -14,7 +14,7 @@ class GradleFileCreator {
     ) {
         val moduleDirectory = File(featureRoot, layer)
         val buildGradleFile = File(moduleDirectory, "build.gradle.kts")
-        FileCreator.createFileIfNotExists(buildGradleFile) { content }
+        fileCreator.createFileIfNotExists(buildGradleFile) { content }
     }
 
     fun writeProjectGradleFile(
@@ -25,7 +25,7 @@ class GradleFileCreator {
     ) {
         val buildGradleFile = File(projectRoot, "build.gradle.kts")
         val content = buildProjectGradleScript(enableKtlint, enableDetekt, catalog)
-        FileCreator.createFileIfNotExists(buildGradleFile) { content }
+        fileCreator.createOrUpdateFile(buildGradleFile) { content }
     }
 
     fun writeAppGradleFile(
@@ -36,6 +36,6 @@ class GradleFileCreator {
     ) {
         val appGradleFile = File(projectRoot, "app/build.gradle.kts")
         val content = buildAppGradleScript(packageName, enableCompose, catalog)
-        FileCreator.createFileIfNotExists(appGradleFile) { content }
+        fileCreator.createFileIfNotExists(appGradleFile) { content }
     }
 }

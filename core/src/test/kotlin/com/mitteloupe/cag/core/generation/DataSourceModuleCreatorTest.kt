@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertTrue
@@ -14,7 +16,7 @@ class DataSourceModuleCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = DataSourceModuleCreator()
+        classUnderTest = DataSourceModuleCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

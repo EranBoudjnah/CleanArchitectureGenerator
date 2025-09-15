@@ -9,7 +9,7 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class DataSourceModuleCreator {
+class DataSourceModuleCreator(private val fileCreator: FileCreator) {
     fun writeDataSourceModule(
         destinationRootDirectory: File,
         projectNamespace: String,
@@ -24,7 +24,7 @@ class DataSourceModuleCreator {
         val basePackageDirectory = buildPackageDirectory(appSourceRoot, projectNamespace.toSegments())
         val targetDirectory = File(basePackageDirectory, "di")
 
-        FileCreator.createDirectoryIfNotExists(targetDirectory)
+        fileCreator.createDirectoryIfNotExists(targetDirectory)
 
         val fileName = "${dataSourceName}Module.kt"
         val targetFile = File(targetDirectory, fileName)
@@ -40,6 +40,6 @@ class DataSourceModuleCreator {
                 dataSourceName = dataSourceName
             )
 
-        FileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile) { content }
     }
 }

@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +13,7 @@ class BuildSrcContentCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = BuildSrcContentCreator()
+        classUnderTest = BuildSrcContentCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

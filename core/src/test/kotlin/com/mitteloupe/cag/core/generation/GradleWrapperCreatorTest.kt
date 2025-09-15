@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.content.buildGradleWrapperPropertiesFile
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -13,7 +15,7 @@ class GradleWrapperCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = GradleWrapperCreator()
+        classUnderTest = GradleWrapperCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

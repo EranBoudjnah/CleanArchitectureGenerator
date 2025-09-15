@@ -4,9 +4,7 @@ import com.mitteloupe.cag.core.content.buildDataRepositoryKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
 import java.io.File
 
-class DataLayerContentGenerator(
-    private val kotlinFileCreator: KotlinFileCreator = KotlinFileCreator()
-) {
+class DataLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreator) {
     fun generate(
         featureRoot: File,
         featurePackageName: String,

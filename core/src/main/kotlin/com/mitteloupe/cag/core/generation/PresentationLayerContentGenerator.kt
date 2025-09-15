@@ -11,7 +11,8 @@ import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
 class PresentationLayerContentGenerator(
-    private val kotlinFileCreator: KotlinFileCreator = KotlinFileCreator()
+    private val kotlinFileCreator: KotlinFileCreator,
+    private val fileCreator: FileCreator
 ) {
     fun generatePresentationLayer(
         featureRoot: File,
@@ -32,7 +33,7 @@ class PresentationLayerContentGenerator(
         featurePackageName: String,
         featureName: String
     ) {
-        FileCreator.createDirectoryIfNotExists(destinationDirectory)
+        fileCreator.createDirectoryIfNotExists(destinationDirectory)
         kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = destinationDirectory,
             fileName = "${featureName.capitalized}ViewState.kt",
@@ -114,7 +115,7 @@ class PresentationLayerContentGenerator(
         featurePackageName: String,
         featureName: String
     ) {
-        FileCreator.createDirectoryIfNotExists(destinationDirectory)
+        fileCreator.createDirectoryIfNotExists(destinationDirectory)
         kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = destinationDirectory,
             fileName = "${featureName.capitalized}ViewModel.kt",

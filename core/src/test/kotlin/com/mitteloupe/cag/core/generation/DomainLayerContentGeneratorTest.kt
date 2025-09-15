@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +14,8 @@ class DomainLayerContentGeneratorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = DomainLayerContentGenerator()
+        val fileCreator = FileCreator(FakeFileSystemBridge())
+        classUnderTest = DomainLayerContentGenerator(KotlinFileCreator(fileCreator))
         tempDirectory = createTempDirectory(prefix = "DomainLayerContentGeneratorTest").toFile()
     }
 

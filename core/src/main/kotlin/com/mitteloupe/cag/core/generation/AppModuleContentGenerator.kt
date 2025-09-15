@@ -20,7 +20,10 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = DirectoryFinder()) {
+class AppModuleContentGenerator(
+    private val fileCreator: FileCreator,
+    private val directoryFinder: DirectoryFinder
+) {
     fun writeFeatureModuleIfPossible(
         startDirectory: File,
         projectNamespace: String,
@@ -35,11 +38,11 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         val sourceRoot = File(appModuleDirectory, "src/main/java")
         val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
         val dependencyInjectionDirectory = File(basePackageDir, "di")
-        FileCreator.createDirectoryIfNotExists(dependencyInjectionDirectory)
+        fileCreator.createDirectoryIfNotExists(dependencyInjectionDirectory)
         val filename = "${featureName.capitalized}Module.kt"
         val targetFile = File(dependencyInjectionDirectory, filename)
         val content = buildAppFeatureModuleKotlinFile(projectNamespace, featurePackageName, featureName)
-        FileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile) { content }
     }
 
     fun writeAppModule(
@@ -52,7 +55,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         val sourceRoot = File(appModuleDirectory, "src/main/java")
         val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
 
-        FileCreator.createDirectoryIfNotExists(basePackageDir)
+        fileCreator.createDirectoryIfNotExists(basePackageDir)
 
         val mainActivityFile = File(basePackageDir, "MainActivity.kt")
         val mainActivityContent =
@@ -61,11 +64,11 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
                 projectNamespace = projectNamespace,
                 enableCompose = enableCompose
             )
-        FileCreator.createFileIfNotExists(mainActivityFile) { mainActivityContent }
+        fileCreator.createFileIfNotExists(mainActivityFile) { mainActivityContent }
 
         val applicationFile = File(basePackageDir, "Application.kt")
         val applicationContent = buildApplicationKotlinFile(projectNamespace)
-        FileCreator.createFileIfNotExists(applicationFile) { applicationContent }
+        fileCreator.createFileIfNotExists(applicationFile) { applicationContent }
 
         generateAndroidResources(
             appModuleDirectory = appModuleDirectory,
@@ -82,36 +85,36 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
         enableCompose: Boolean
     ) {
         val manifestFile = File(appModuleDirectory, "src/main/AndroidManifest.xml")
-        FileCreator.createFileIfNotExists(manifestFile) { buildAndroidManifest(appName) }
+        fileCreator.createFileIfNotExists(manifestFile) { buildAndroidManifest(appName) }
 
         val valuesDirectory = File(appModuleDirectory, "src/main/res/values")
-        FileCreator.createDirectoryIfNotExists(valuesDirectory)
+        fileCreator.createDirectoryIfNotExists(valuesDirectory)
         val stringsFile = File(valuesDirectory, "strings.xml")
-        FileCreator.createFileIfNotExists(stringsFile) { buildStringsXml(packageName) }
+        fileCreator.createFileIfNotExists(stringsFile) { buildStringsXml(packageName) }
         val xmlDirectory = File(appModuleDirectory, "src/main/res/xml")
-        FileCreator.createDirectoryIfNotExists(xmlDirectory)
+        fileCreator.createDirectoryIfNotExists(xmlDirectory)
 
         if (enableCompose) {
             val themeFile = File(valuesDirectory, "themes.xml")
-            FileCreator.createFileIfNotExists(themeFile) { buildThemesXml(appName) }
+            fileCreator.createFileIfNotExists(themeFile) { buildThemesXml(appName) }
 
             val uiDirectory = File(appModuleDirectory, "src/main/java/${packageName.replace('.', '/')}/ui/theme")
-            FileCreator.createDirectoryIfNotExists(uiDirectory)
+            fileCreator.createDirectoryIfNotExists(uiDirectory)
             val themeKtFile = File(uiDirectory, "Theme.kt")
-            FileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(appName = appName, packageName = packageName) }
+            fileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(appName = appName, packageName = packageName) }
 
             val colorsKtFile = File(uiDirectory, "Color.kt")
-            FileCreator.createFileIfNotExists(colorsKtFile) { buildColorsKt(packageName) }
+            fileCreator.createFileIfNotExists(colorsKtFile) { buildColorsKt(packageName) }
 
             val typographyKtFile = File(uiDirectory, "Type.kt")
-            FileCreator.createFileIfNotExists(typographyKtFile) { buildTypographyKt(packageName) }
+            fileCreator.createFileIfNotExists(typographyKtFile) { buildTypographyKt(packageName) }
         }
 
         val backupRulesFile = File(xmlDirectory, "backup_rules.xml")
-        FileCreator.createFileIfNotExists(backupRulesFile) { buildBackupRulesXml() }
+        fileCreator.createFileIfNotExists(backupRulesFile) { buildBackupRulesXml() }
 
         val dataExtractionRulesFile = File(xmlDirectory, "data_extraction_rules.xml")
-        FileCreator.createFileIfNotExists(dataExtractionRulesFile) { buildDataExtractionRulesXml() }
+        fileCreator.createFileIfNotExists(dataExtractionRulesFile) { buildDataExtractionRulesXml() }
 
         copyMipmapResources(appModuleDirectory)
     }
@@ -130,7 +133,7 @@ class AppModuleContentGenerator(private val directoryFinder: DirectoryFinder = D
 
         mipmapDirectories.forEach { mipmapDirectory ->
             val targetDirectory = File(appModuleDirectory, "src/main/res/$mipmapDirectory")
-            FileCreator.copyResourceDirectoryIfNotExists(
+            fileCreator.copyResourceDirectoryIfNotExists(
                 targetDirectory = targetDirectory,
                 resourcePath = mipmapDirectory,
                 classLoader = javaClass.classLoader

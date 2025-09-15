@@ -40,6 +40,7 @@ sealed class SectionEntryRequirement(val header: String) {
 }
 
 class VersionCatalogUpdater(
+    private val fileCreator: FileCreator,
     private val contentUpdater: VersionCatalogContentUpdater = VersionCatalogContentUpdater()
 ) : VersionCatalogReader {
     private var resolvedPluginIdToAlias: Map<String, String> = emptyMap()
@@ -185,7 +186,7 @@ class VersionCatalogUpdater(
         }
 
         val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
-        FileCreator.createFileIfNotExists(catalogFile) { "" }
+        fileCreator.createFileIfNotExists(catalogFile) { "" }
 
         val pluginRequirements =
             dependencyConfiguration.plugins.map { desired ->

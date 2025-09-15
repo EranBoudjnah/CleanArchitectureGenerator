@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
@@ -13,7 +15,7 @@ class SettingsFileUpdaterTest {
 
     @Before
     fun setUp() {
-        classUnderTest = SettingsFileUpdater()
+        classUnderTest = SettingsFileUpdater(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

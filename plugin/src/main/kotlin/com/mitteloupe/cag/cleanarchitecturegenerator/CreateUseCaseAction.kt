@@ -12,9 +12,9 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.core.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.Generator
 import java.io.File
 
 class CreateUseCaseAction : AnAction() {
@@ -48,8 +48,8 @@ class CreateUseCaseAction : AnAction() {
     }
 
     override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project
-        val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
+        val project = event.project ?: return
+        val projectRootDir = project.basePath?.let { File(it) } ?: File(".")
 
         val selectedDirectory = event.getData(CommonDataKeys.VIRTUAL_FILE)
         val suggestedDirectory = suggestUseCaseDirectory(project, selectedDirectory)
@@ -72,7 +72,7 @@ class CreateUseCaseAction : AnAction() {
                 .build()
 
         try {
-            Generator().generateUseCase(request)
+            GeneratorProvider().generator(project).generateUseCase(request)
             ideBridge.refreshIde(projectRootDir)
             ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(

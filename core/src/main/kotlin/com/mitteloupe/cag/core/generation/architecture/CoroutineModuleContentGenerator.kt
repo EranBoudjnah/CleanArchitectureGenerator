@@ -12,7 +12,10 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class CoroutineModuleContentGenerator {
+class CoroutineModuleContentGenerator(
+    private val gradleFileCreator: GradleFileCreator,
+    private val catalogUpdater: VersionCatalogUpdater
+) {
     fun generate(
         projectRoot: File,
         coroutinePackageName: String
@@ -31,7 +34,6 @@ class CoroutineModuleContentGenerator {
             }
         }
 
-        val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
@@ -43,7 +45,7 @@ class CoroutineModuleContentGenerator {
             dependencyConfiguration = dependencyConfiguration
         )
 
-        GradleFileCreator().writeGradleFileIfMissing(
+        gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = coroutineRoot,
             layer = "",
             content = buildCoroutineGradleScript(catalogUpdater)

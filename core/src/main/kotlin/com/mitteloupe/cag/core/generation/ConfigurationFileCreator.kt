@@ -3,17 +3,17 @@ package com.mitteloupe.cag.core.generation
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class ConfigurationFileCreator {
+class ConfigurationFileCreator(private val fileCreator: FileCreator) {
     fun writeDetektConfigurationFile(projectRoot: File) {
         val detektFile = File(projectRoot, "detekt.yml")
         val content = buildDetektConfiguration()
-        FileCreator.createFileIfNotExists(detektFile) { content }
+        fileCreator.createFileIfNotExists(detektFile) { content }
     }
 
     fun writeEditorConfigFile(projectRoot: File) {
         val editorConfigFile = File(projectRoot, ".editorconfig")
         val content = buildEditorConfig()
-        FileCreator.createFileIfNotExists(editorConfigFile) { content }
+        fileCreator.createFileIfNotExists(editorConfigFile) { content }
     }
 
     private fun buildDetektConfiguration(): String {

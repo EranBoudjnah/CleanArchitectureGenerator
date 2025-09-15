@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.NamespaceResolver
 import java.io.File
 
@@ -25,7 +25,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                 basePackage?.let {
                     "$it.architecture"
                 } ?: "com.example.architecture"
-            val generator = Generator()
+            val generator = GeneratorProvider().generator(project)
             val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
             val request =
                 GenerateArchitectureRequest(

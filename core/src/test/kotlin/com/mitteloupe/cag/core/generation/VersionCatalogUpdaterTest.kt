@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
@@ -18,7 +20,7 @@ class VersionCatalogUpdaterTest {
 
     @Before
     fun setUp() {
-        classUnderTest = VersionCatalogUpdater()
+        classUnderTest = VersionCatalogUpdater(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

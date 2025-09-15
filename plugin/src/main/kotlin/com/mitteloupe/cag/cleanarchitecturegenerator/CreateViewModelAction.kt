@@ -12,9 +12,9 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.core.GenerateViewModelRequest
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
@@ -51,7 +51,7 @@ class CreateViewModelAction : AnAction() {
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
-        val projectRootDirectory = event.project?.basePath?.let { File(it) } ?: File(".")
+        val projectRootDirectory = project.basePath?.let { File(it) } ?: File(".")
 
         val selectedDirectory = event.getData(CommonDataKeys.VIRTUAL_FILE)
         val suggestedDirectory = suggestViewModelDirectory(project, selectedDirectory)
@@ -79,7 +79,7 @@ class CreateViewModelAction : AnAction() {
             ).build()
 
         try {
-            Generator().generateViewModel(request)
+            GeneratorProvider().generator(project).generateViewModel(request)
             ideBridge.refreshIde(projectRootDirectory)
             ideBridge.synchronizeGradle(project, projectRootDirectory)
             Messages.showInfoMessage(

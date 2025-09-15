@@ -6,7 +6,7 @@ import com.mitteloupe.cag.core.content.buildBuildSrcSettingsGradleScript
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class BuildSrcContentCreator {
+class BuildSrcContentCreator(private val fileCreator: FileCreator) {
     fun writeGradleFile(projectRoot: File) {
         val buildSrcDirectory = File(projectRoot, "buildSrc")
         if (!buildSrcDirectory.exists()) {
@@ -14,7 +14,7 @@ class BuildSrcContentCreator {
         }
         val buildSrcGradleFile = File(buildSrcDirectory, "build.gradle.kts")
         val content = buildBuildSrcGradleScript()
-        FileCreator.createFileIfNotExists(buildSrcGradleFile) { content }
+        fileCreator.createFileIfNotExists(buildSrcGradleFile) { content }
     }
 
     fun writeSettingsGradleFile(projectRoot: File) {
@@ -24,7 +24,7 @@ class BuildSrcContentCreator {
         }
         val buildSrcSettingsFile = File(buildSrcDirectory, "settings.gradle.kts")
         val content = buildBuildSrcSettingsGradleScript()
-        FileCreator.createFileIfNotExists(buildSrcSettingsFile) { content }
+        fileCreator.createFileIfNotExists(buildSrcSettingsFile) { content }
     }
 
     fun writeProjectJavaLibraryFile(projectRoot: File) {
@@ -34,6 +34,6 @@ class BuildSrcContentCreator {
         }
         val projectJavaLibraryGradleFile = File(projectJavaLibrarySrcDirectory, "project-java-library.gradle.kts")
         val content = buildBuildSrcProjectJavaLibraryGradleScript()
-        FileCreator.createFileIfNotExists(projectJavaLibraryGradleFile) { content }
+        fileCreator.createFileIfNotExists(projectJavaLibraryGradleFile) { content }
     }
 }

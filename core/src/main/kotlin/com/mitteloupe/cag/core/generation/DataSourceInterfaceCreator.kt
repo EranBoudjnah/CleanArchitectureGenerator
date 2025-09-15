@@ -6,7 +6,7 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class DataSourceInterfaceCreator {
+class DataSourceInterfaceCreator(private val fileCreator: FileCreator) {
     fun writeDataSourceInterface(
         destinationRootDirectory: File,
         projectNamespace: String,
@@ -24,7 +24,7 @@ class DataSourceInterfaceCreator {
                     File(parent, segment)
                 }
 
-        FileCreator.createDirectoryIfNotExists(targetDirectory)
+        fileCreator.createDirectoryIfNotExists(targetDirectory)
 
         val targetFile = File(targetDirectory, "$dataSourceName.kt")
         val packageName =
@@ -35,6 +35,6 @@ class DataSourceInterfaceCreator {
                 packageName = packageName,
                 dataSourceName = dataSourceName
             )
-        FileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile) { content }
     }
 }

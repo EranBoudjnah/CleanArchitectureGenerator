@@ -6,7 +6,7 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class KotlinFileCreator {
+class KotlinFileCreator(private val fileCreator: FileCreator) {
     fun writeKotlinFileInLayer(
         featureRoot: File,
         layer: String,
@@ -23,10 +23,13 @@ class KotlinFileCreator {
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
 
         if (!targetDirectory.exists()) {
-            FileCreator.createDirectoryIfNotExists(targetDirectory)
+            println("ERAN: Creating directory $targetDirectory")
+            fileCreator.createDirectoryIfNotExists(targetDirectory)
         } else if (!targetDirectory.isDirectory) {
             throw GenerationException("Failed to create directory: ${targetDirectory.absolutePath} (Not a directory)")
         }
+
+        println("ERAN: Creating file in $targetDirectory")
 
         writeKotlinFileInDirectory(targetDirectory, fileName, content)
     }
@@ -40,6 +43,6 @@ class KotlinFileCreator {
         if (targetFile.exists() && !targetFile.isFile) {
             throw GenerationException("Failed to create file: ${targetFile.absolutePath} (it's a directory)")
         }
-        FileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile) { content }
     }
 }

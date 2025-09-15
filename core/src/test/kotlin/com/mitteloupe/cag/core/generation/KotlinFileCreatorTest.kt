@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -15,7 +17,7 @@ class KotlinFileCreatorTest {
     @Before
     fun setUp() {
         temporaryDirectory = createTempDirectory(prefix = "KotlinFileCreatorTest").toFile()
-        classUnderTest = KotlinFileCreator()
+        classUnderTest = KotlinFileCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test

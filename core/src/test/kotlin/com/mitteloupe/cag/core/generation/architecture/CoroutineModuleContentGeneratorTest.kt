@@ -1,6 +1,10 @@
 package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +17,12 @@ class CoroutineModuleContentGeneratorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = CoroutineModuleContentGenerator()
+        val fileCreator = FileCreator(FakeFileSystemBridge())
+        classUnderTest =
+            CoroutineModuleContentGenerator(
+                gradleFileCreator = GradleFileCreator(fileCreator),
+                catalogUpdater = VersionCatalogUpdater(fileCreator)
+            )
         temporaryDirectory = createTempDirectory(prefix = "test").toFile()
     }
 

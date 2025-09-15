@@ -17,15 +17,18 @@ import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.template
 import com.intellij.openapi.application.ApplicationManager
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
+import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.Generator
 import java.io.File
 import java.lang.reflect.Field
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
+    private val ideBridge = IdeBridge()
+
     private val processedRequests = ConcurrentHashMap<String, Boolean>()
 
     private val executionId = UUID.randomUUID().toString()
@@ -104,6 +107,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                             enableKtor,
                             enableRetrofit
                         )
+                        ideBridge.refreshIde(projectRootDirectory)
                     } catch (exception: GenerationException) {
                         throw RuntimeException(
                             CleanArchitectureGeneratorBundle.message(
@@ -140,7 +144,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     enableRetrofit = enableRetrofit.value
                 )
 
-            Generator().generateProjectTemplate(request)
+            GeneratorProvider().generator(project = null).generateProjectTemplate(request)
         }
     }
 

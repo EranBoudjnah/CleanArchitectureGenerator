@@ -5,29 +5,29 @@ import com.mitteloupe.cag.core.content.buildGradleWrapperPropertiesFile
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class GradleWrapperCreator {
+class GradleWrapperCreator(private val fileCreator: FileCreator) {
     fun writeGradleWrapperFiles(projectRoot: File) {
         val gradleWrapperDirectory = File(projectRoot, "gradle/wrapper")
-        FileCreator.createDirectoryIfNotExists(gradleWrapperDirectory)
+        fileCreator.createDirectoryIfNotExists(gradleWrapperDirectory)
 
         val gradleWrapperPropertiesFile = File(gradleWrapperDirectory, "gradle-wrapper.properties")
         val gradleWrapperPropertiesContent = buildGradleWrapperPropertiesFile()
 
-        FileCreator.createFileIfNotExists(gradleWrapperPropertiesFile) { gradleWrapperPropertiesContent }
+        fileCreator.createFileIfNotExists(gradleWrapperPropertiesFile) { gradleWrapperPropertiesContent }
 
         val gradleWrapperJarFile = File(gradleWrapperDirectory, "gradle-wrapper.jar")
-        FileCreator.createBinaryFileIfNotExists(gradleWrapperJarFile) { getGradleWrapperResourceAsBytes() }
+        fileCreator.createBinaryFileIfNotExists(gradleWrapperJarFile) { getGradleWrapperResourceAsBytes() }
 
         val gradlewFile = File(projectRoot, "gradlew")
         val gradlewContent = getResourceAsString("gradlew")
-        FileCreator.createFileIfNotExists(gradlewFile) { gradlewContent }
+        fileCreator.createFileIfNotExists(gradlewFile) { gradlewContent }
         if (!gradlewFile.setExecutable(true)) {
             throw GenerationException("Failed to make gradlew executable")
         }
 
         val gradlewBatFile = File(projectRoot, "gradlew.bat")
         val gradlewBatContent = getResourceAsString("gradlew.bat")
-        FileCreator.createFileIfNotExists(gradlewBatFile) { gradlewBatContent }
+        fileCreator.createFileIfNotExists(gradlewBatFile) { gradlewBatContent }
     }
 
     private fun getGradleWrapperResourceAsBytes(): ByteArray {

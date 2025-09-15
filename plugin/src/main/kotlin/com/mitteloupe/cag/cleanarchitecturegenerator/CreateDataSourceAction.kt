@@ -3,8 +3,8 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
+import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.NamespaceResolver
 import java.io.File
 
@@ -12,17 +12,19 @@ class CreateDataSourceAction : AnAction() {
     private val ideBridge = IdeBridge()
 
     override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project
-        val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
+        val project = event.project ?: return
+        val projectRootDir = project.basePath?.let { File(it) } ?: File(".")
         val projectModel = IntellijProjectModel(event)
         val defaultPrefix = NamespaceResolver().determineBasePackage(projectModel) ?: "com.unknown.app."
 
         val dialog = CreateDataSourceDialog(project)
-        if (!dialog.showAndGet()) return
+        if (!dialog.showAndGet()) {
+            return
+        }
         val dataSourceName = dialog.dataSourceNameWithSuffix
 
         try {
-            Generator().generateDataSource(
+            GeneratorProvider().generator(project).generateDataSource(
                 destinationRootDirectory = projectRootDir,
                 dataSourceName = dataSourceName,
                 projectNamespace = defaultPrefix,

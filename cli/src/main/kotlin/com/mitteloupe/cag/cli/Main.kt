@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
+import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
@@ -9,6 +11,24 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.findGradleProjectRoot
+import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
+import com.mitteloupe.cag.core.generation.BuildSrcContentCreator
+import com.mitteloupe.cag.core.generation.ConfigurationFileCreator
+import com.mitteloupe.cag.core.generation.DataLayerContentGenerator
+import com.mitteloupe.cag.core.generation.DataSourceImplementationCreator
+import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
+import com.mitteloupe.cag.core.generation.DataSourceModuleCreator
+import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
+import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.GradleWrapperCreator
+import com.mitteloupe.cag.core.generation.KotlinFileCreator
+import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
+import com.mitteloupe.cag.core.generation.SettingsFileUpdater
+import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
+import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
+import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import java.io.File
 import java.nio.file.Paths
 import java.util.UUID
@@ -56,7 +76,7 @@ fun main(arguments: Array<String>) {
         return
     }
 
-    val generator = Generator()
+    val generator = produceGenerator()
     val destinationRootDirectory = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
@@ -246,6 +266,32 @@ private fun printHelpMessage() {
           --help, -h
               Show this help message and exit
         """.trimIndent()
+    )
+}
+
+private fun produceGenerator(): Generator {
+    val fileCreator = FileCreator(CliFileSystemBridge())
+    val directoryFinder = DirectoryFinder()
+    val kotlinFileCreator = KotlinFileCreator(fileCreator)
+    val gradleFileCreator = GradleFileCreator(fileCreator)
+    val catalogUpdater = VersionCatalogUpdater(fileCreator)
+    return Generator(
+        GradleFileCreator(fileCreator),
+        GradleWrapperCreator(fileCreator),
+        AppModuleContentGenerator(fileCreator, directoryFinder),
+        BuildSrcContentCreator(fileCreator),
+        ConfigurationFileCreator(fileCreator),
+        UiLayerContentGenerator(kotlinFileCreator),
+        PresentationLayerContentGenerator(kotlinFileCreator, fileCreator),
+        DomainLayerContentGenerator(kotlinFileCreator),
+        DataLayerContentGenerator(kotlinFileCreator),
+        DataSourceModuleCreator(fileCreator),
+        DataSourceInterfaceCreator(fileCreator),
+        DataSourceImplementationCreator(fileCreator),
+        ArchitectureModulesContentGenerator(gradleFileCreator, catalogUpdater),
+        CoroutineModuleContentGenerator(gradleFileCreator, catalogUpdater),
+        VersionCatalogUpdater(fileCreator),
+        SettingsFileUpdater(fileCreator)
     )
 }
 

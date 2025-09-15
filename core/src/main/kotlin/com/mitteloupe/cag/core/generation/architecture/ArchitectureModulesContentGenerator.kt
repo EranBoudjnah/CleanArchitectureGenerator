@@ -17,12 +17,13 @@ import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
 class ArchitectureModulesContentGenerator(
+    private val gradleFileCreator: GradleFileCreator,
+    private val catalogUpdater: VersionCatalogUpdater,
     private val domainModuleCreator: DomainModuleCreator = DomainModuleCreator(),
     private val instrumentationTestModuleCreator: InstrumentationTestModuleCreator = InstrumentationTestModuleCreator(),
     private val presentationModuleCreator: PresentationModuleCreator = PresentationModuleCreator(),
     private val presentationTestModuleCreator: PresentationTestModuleCreator = PresentationTestModuleCreator(),
-    private val uiModuleCreator: UiModuleCreator = UiModuleCreator(),
-    private val gradleFileCreator: GradleFileCreator = GradleFileCreator()
+    private val uiModuleCreator: UiModuleCreator = UiModuleCreator()
 ) {
     fun generate(
         architectureRoot: File,
@@ -52,7 +53,6 @@ class ArchitectureModulesContentGenerator(
             throw GenerationException("Failed to create directories for architecture package '$architecturePackageName'.")
         }
 
-        val catalogUpdater = VersionCatalogUpdater()
         val versions =
             VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS +
                 if (enableCompose) {

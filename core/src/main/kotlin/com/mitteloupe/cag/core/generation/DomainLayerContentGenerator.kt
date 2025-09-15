@@ -8,16 +8,17 @@ import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
 
-class DomainLayerContentGenerator(
-    private val kotlinFileCreator: KotlinFileCreator = KotlinFileCreator()
-) {
+class DomainLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreator) {
     fun generateDomainLayer(
         featureRoot: File,
         projectNamespace: String,
         featurePackageName: String
     ) {
+        println("ERAN: Writing domain model")
         writeDomainModelFile(featureRoot, featurePackageName)
+        println("ERAN: Writing domain repository")
         writeDomainRepositoryInterface(featureRoot, featurePackageName)
+        println("ERAN: Writing domain use case")
         writeDomainUseCaseFile(featureRoot, projectNamespace, featurePackageName)
     }
 

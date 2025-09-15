@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.core.generation
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -14,7 +16,7 @@ class DataSourceInterfaceCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = DataSourceInterfaceCreator()
+        classUnderTest = DataSourceInterfaceCreator(FileCreator(FakeFileSystemBridge()))
         tempDirectory = createTempDirectory(prefix = "test").toFile()
     }
 

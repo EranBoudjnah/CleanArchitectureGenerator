@@ -6,16 +6,16 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class DataSourceImplementationCreator {
+class DataSourceImplementationCreator(private val fileCreator: FileCreator) {
     fun writeDataSourceImplementation(
         destinationRootDirectory: File,
         projectNamespace: String,
         dataSourceName: String
     ) {
-        val datasourceRoot = File(destinationRootDirectory, "datasource")
-        val implSourceRoot = File(datasourceRoot, "implementation/src/main/java")
+        val dataSourceRoot = File(destinationRootDirectory, "datasource")
+        val implementationSourceRoot = File(dataSourceRoot, "implementation/src/main/java")
 
-        val basePackageDirectory = buildPackageDirectory(implSourceRoot, projectNamespace.toSegments())
+        val basePackageDirectory = buildPackageDirectory(implementationSourceRoot, projectNamespace.toSegments())
 
         val dataSourceBaseName = dataSourceName.removeSuffix("DataSource")
         val targetDirectory =
@@ -24,7 +24,7 @@ class DataSourceImplementationCreator {
                     File(parent, segment)
                 }
 
-        FileCreator.createDirectoryIfNotExists(targetDirectory)
+        fileCreator.createDirectoryIfNotExists(targetDirectory)
 
         val fileName = "${dataSourceName}Impl.kt"
         val targetFile = File(targetDirectory, fileName)
@@ -38,6 +38,6 @@ class DataSourceImplementationCreator {
                 dataSourceName = dataSourceName
             )
 
-        FileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile) { content }
     }
 }

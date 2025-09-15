@@ -1,13 +1,31 @@
 package com.mitteloupe.cag.core.generation.filesystem
 
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.filesystem.FileSystemBridge
 import java.io.File
 
-object FileCreator {
+class FileCreator(val fileSystemBridge: FileSystemBridge) {
     fun createDirectoryIfNotExists(directory: File) {
         if (!directory.exists()) {
-            runCatching { directory.mkdirs() }.getOrElse { GenerationException("Failed to create directory: ${directory.absolutePath}") }
+            runCatching { fileSystemBridge.createDirectoryIfNotExists(directory) }
+                .getOrElse { GenerationException("Failed to create directory: ${directory.absolutePath}") }
         }
+    }
+
+    fun createOrUpdateFile(
+        file: File,
+        contentProvider: () -> String
+    ) {
+        if (fileSystemBridge.exists(file)) {
+            fileSystemBridge.delete(file)
+        }
+
+        val content = contentProvider()
+        runCatching { fileSystemBridge.writeToFile(file, content) }
+            .onFailure {
+                val absolutePath = file.absolutePath
+                throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
+            }
     }
 
     fun createFileIfNotExists(
@@ -19,7 +37,7 @@ object FileCreator {
         }
 
         val content = contentProvider()
-        runCatching { file.writeText(content) }
+        runCatching { fileSystemBridge.writeToFile(file, content) }
             .onFailure {
                 val absolutePath = file.absolutePath
                 throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
@@ -35,7 +53,7 @@ object FileCreator {
         }
 
         val content = contentProvider()
-        runCatching { file.writeBytes(content) }
+        runCatching { fileSystemBridge.writeToFile(file, content) }
             .onFailure {
                 val absolutePath = file.absolutePath
                 throw GenerationException("Failed to create file: $absolutePath: ${it.message}")
@@ -92,7 +110,7 @@ object FileCreator {
                         createDirectoryIfNotExists(targetFile.parentFile)
 
                         jarFile.getInputStream(entry).use { inputStream ->
-                            targetFile.writeBytes(inputStream.readBytes())
+                            fileSystemBridge.writeToFile(targetFile, inputStream.readBytes())
                         }
                     }
                 }
@@ -113,7 +131,7 @@ object FileCreator {
                 if (sourceFile.isDirectory) {
                     copyResourceDirectoryIfNotExists(targetFile, "$resourcePath/${sourceFile.name}", classLoader)
                 } else if (!targetFile.exists()) {
-                    sourceFile.copyTo(targetFile, overwrite = false)
+                    fileSystemBridge.copyFile(sourceFile, targetFile, overwrite = false)
                 }
             }
         }

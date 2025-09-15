@@ -35,9 +35,27 @@ import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 import kotlin.String
 
-class Generator {
+class Generator(
+    private val gradleFileCreator: GradleFileCreator,
+    private val gradleWrapperCreator: GradleWrapperCreator,
+    private val appModuleContentGenerator: AppModuleContentGenerator,
+    private val buildSrcContentCreator: BuildSrcContentCreator,
+    private val configurationFileCreator: ConfigurationFileCreator,
+    private val uiLayerContentGenerator: UiLayerContentGenerator,
+    private val presentationLayerContentGenerator: PresentationLayerContentGenerator,
+    private val domainLayerContentGenerator: DomainLayerContentGenerator,
+    private val dataLayerContentGenerator: DataLayerContentGenerator,
+    private val dataSourceModuleCreator: DataSourceModuleCreator,
+    private val dataSourceInterfaceCreator: DataSourceInterfaceCreator,
+    private val dataSourceImplementationCreator: DataSourceImplementationCreator,
+    private val architectureModulesContentGenerator: ArchitectureModulesContentGenerator,
+    private val coroutineModuleContentGenerator: CoroutineModuleContentGenerator,
+    private val catalogUpdater: VersionCatalogUpdater,
+    private val settingsFileUpdater: SettingsFileUpdater
+) {
     fun generateFeature(request: GenerateFeatureRequest) {
         val featurePackageName = request.featurePackageName?.trim()
+        println("ERAN: Creating $featurePackageName")
         if (featurePackageName.isNullOrEmpty()) {
             throw GenerationException("Feature package name is missing.")
         }
@@ -47,8 +65,9 @@ class Generator {
             throw GenerationException("Feature package name is invalid.")
         }
 
+        println("ERAN: Creating $pathSegments")
+
         val featureNameLowerCase = request.featureName.lowercase()
-        val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions =
@@ -73,6 +92,7 @@ class Generator {
             projectRootDir = request.destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
+        println("ERAN: Updated version catalog")
         val featureRoot = File(request.destinationRootDirectory, "features/$featureNameLowerCase")
 
         if (featureRoot.exists()) {
@@ -89,6 +109,7 @@ class Generator {
 
         val allCreated =
             layers.map { layerName ->
+                println("ERAN: Creating $layerName")
                 val layerSourceRoot = File(featureRoot, "$layerName/src/main/java")
                 val destinationDirectory = buildPackageDirectory(layerSourceRoot, pathSegments)
                 if (destinationDirectory.exists()) {
@@ -99,41 +120,47 @@ class Generator {
             }.all { it }
 
         if (allCreated) {
-            GradleFileCreator().writeGradleFileIfMissing(
+            gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "domain",
                 content = buildDomainGradleScript(catalogUpdater)
             )
-            DomainLayerContentGenerator()
+            println("ERAN: Wrote domain gradle file")
+            domainLayerContentGenerator
                 .generateDomainLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName
                 )
-            GradleFileCreator().writeGradleFileIfMissing(
+            println("ERAN: Wrote domain files")
+            gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "presentation",
                 content = buildPresentationGradleScript(featureNameLowerCase, catalogUpdater)
             )
-            PresentationLayerContentGenerator()
+            println("ERAN: Wrote presentation gradle file")
+            presentationLayerContentGenerator
                 .generatePresentationLayer(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            GradleFileCreator().writeGradleFileIfMissing(
+            println("ERAN: Wrote presentation files")
+            gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "data",
                 content = buildDataGradleScript(featureNameLowerCase, catalogUpdater)
             )
-            DataLayerContentGenerator()
+            println("ERAN: Wrote data gradle file")
+            dataLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            GradleFileCreator().writeGradleFileIfMissing(
+            println("ERAN: Wrote data files")
+            gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "ui",
                 content =
@@ -144,18 +171,20 @@ class Generator {
                         catalog = catalogUpdater
                     )
             )
-            UiLayerContentGenerator()
+            println("ERAN: Wrote ui gradle file")
+            uiLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
                     projectNamespace = request.projectNamespace,
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
-            SettingsFileUpdater().updateProjectSettingsIfPresent(
+            println("ERAN: Wrote ui files")
+            settingsFileUpdater.updateProjectSettingsIfPresent(
                 request.destinationRootDirectory,
                 featureNameLowerCase
             )
-            AppModuleContentGenerator().writeFeatureModuleIfPossible(
+            appModuleContentGenerator.writeFeatureModuleIfPossible(
                 startDirectory = request.destinationRootDirectory,
                 projectNamespace = request.projectNamespace,
                 featureName = request.featureName,
@@ -176,7 +205,7 @@ class Generator {
         val destinationDirectory = request.destinationDirectory
         val useCaseName = request.useCaseName.trim()
 
-        DomainLayerContentGenerator()
+        domainLayerContentGenerator
             .generateUseCase(
                 destinationDirectory = destinationDirectory,
                 useCaseName = useCaseName,
@@ -190,7 +219,6 @@ class Generator {
         val viewModelName = request.viewModelName.trim()
         val featureName = viewModelName.removeSuffix("ViewModel")
 
-        val presentationLayerContentGenerator = PresentationLayerContentGenerator()
         presentationLayerContentGenerator
             .generateViewState(
                 destinationDirectory = File(destinationDirectory.parentFile, "model"),
@@ -213,6 +241,7 @@ class Generator {
         useKtor: Boolean,
         useRetrofit: Boolean
     ) {
+        println("ERAN: Starting data source generation!")
         val datasourceRoot = File(destinationRootDirectory, "datasource")
         val modules = listOf("source", "implementation")
 
@@ -222,16 +251,17 @@ class Generator {
                 if (moduleDirectory.exists()) {
                     moduleDirectory.isDirectory
                 } else {
+                    println("ERAN: Making $moduleDirectory!")
                     moduleDirectory.mkdirs()
                 }
             }
+
+        println("ERAN: All created!")
 
         if (!allCreated) {
             throw GenerationException("Failed to create directories for datasource.")
         }
 
-        val gradleFileCreator = GradleFileCreator()
-        val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
@@ -242,6 +272,8 @@ class Generator {
             projectRootDir = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
+
+        println("ERAN: Updating catalog!")
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
@@ -260,7 +292,7 @@ class Generator {
                 )
         )
 
-        SettingsFileUpdater().updateDataSourceSettingsIfPresent(destinationRootDirectory)
+        settingsFileUpdater.updateDataSourceSettingsIfPresent(destinationRootDirectory)
     }
 
     fun generateDataSource(
@@ -272,21 +304,21 @@ class Generator {
     ) {
         generateDataSourceModules(destinationRootDirectory, useKtor, useRetrofit)
 
-        DataSourceInterfaceCreator()
+        dataSourceInterfaceCreator
             .writeDataSourceInterface(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
             )
 
-        DataSourceImplementationCreator()
+        dataSourceImplementationCreator
             .writeDataSourceImplementation(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 dataSourceName = dataSourceName
             )
 
-        DataSourceModuleCreator()
+        dataSourceModuleCreator
             .writeDataSourceModule(
                 destinationRootDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
@@ -321,13 +353,13 @@ class Generator {
             throw GenerationException("Failed to create architecture directory.")
         }
 
-        CoroutineModuleContentGenerator()
+        coroutineModuleContentGenerator
             .generate(
                 projectRoot = request.destinationRootDirectory,
                 coroutinePackageName = architecturePackageName.replaceAfterLast(".", "coroutine")
             )
 
-        ArchitectureModulesContentGenerator()
+        architectureModulesContentGenerator
             .generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
@@ -336,16 +368,14 @@ class Generator {
                 enableDetekt = request.enableDetekt
             )
 
-        SettingsFileUpdater().updateArchitectureSettingsIfPresent(
+        settingsFileUpdater.updateArchitectureSettingsIfPresent(
             request.destinationRootDirectory
         )
 
-        val buildSrcContentCreator = BuildSrcContentCreator()
         buildSrcContentCreator.writeGradleFile(request.destinationRootDirectory)
         buildSrcContentCreator.writeSettingsGradleFile(request.destinationRootDirectory)
         buildSrcContentCreator.writeProjectJavaLibraryFile(request.destinationRootDirectory)
 
-        val configurationFileCreator = ConfigurationFileCreator()
         if (request.enableDetekt) {
             configurationFileCreator.writeDetektConfigurationFile(request.destinationRootDirectory)
         }
@@ -387,7 +417,6 @@ class Generator {
             throw GenerationException("Failed to create project directory.")
         }
 
-        val catalogUpdater = VersionCatalogUpdater()
         val versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
@@ -425,21 +454,21 @@ class Generator {
         )
 
         generateProjectStructure(projectRoot)
-        SettingsFileUpdater().writeProjectSettings(
-            projectRoot = projectRoot,
-            projectName = projectName,
-            featureNames = listOf("SampleFeature")
-        )
         generateArchitectureModules(projectRoot, "$packageName.architecture", request)
+        generateDataSourceModules(projectRoot, request)
         generateSampleFeature(
             projectRoot = projectRoot,
             featureName = "SampleFeature",
             packageName = packageName,
             request = request
         )
-        generateDataSourceModules(projectRoot, request)
         generateAppModule(projectRoot = projectRoot, appName = projectName, packageName = packageName, request = request)
         generateGradleFiles(projectRoot, packageName, request)
+        settingsFileUpdater.writeProjectSettings(
+            projectRoot = projectRoot,
+            projectName = projectName,
+            featureNames = listOf("SampleFeature")
+        )
     }
 
     private fun generateProjectStructure(projectRoot: File) {
@@ -514,7 +543,6 @@ class Generator {
         packageName: String,
         request: GenerateProjectTemplateRequest
     ) {
-        val appModuleContentGenerator = AppModuleContentGenerator()
         appModuleContentGenerator.writeAppModule(
             startDirectory = projectRoot,
             appName = appName,
@@ -528,9 +556,7 @@ class Generator {
         packageName: String,
         request: GenerateProjectTemplateRequest
     ) {
-        val gradleFileCreator = GradleFileCreator()
         val gradlePropertiesFileCreator = GradlePropertiesFileCreator()
-        val catalogUpdater = VersionCatalogUpdater()
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
@@ -563,15 +589,13 @@ class Generator {
             catalog = catalogUpdater
         )
 
-        val buildSrcContentCreator = BuildSrcContentCreator()
         buildSrcContentCreator.writeGradleFile(projectRoot)
         buildSrcContentCreator.writeSettingsGradleFile(projectRoot)
         buildSrcContentCreator.writeProjectJavaLibraryFile(projectRoot)
 
         gradlePropertiesFileCreator.writeGradlePropertiesFile(projectRoot)
-        GradleWrapperCreator().writeGradleWrapperFiles(projectRoot)
+        gradleWrapperCreator.writeGradleWrapperFiles(projectRoot)
 
-        val configurationFileCreator = ConfigurationFileCreator()
         if (request.enableDetekt) {
             configurationFileCreator.writeDetektConfigurationFile(projectRoot)
         }
