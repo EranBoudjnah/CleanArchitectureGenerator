@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
@@ -12,7 +13,7 @@ fun buildProjectGradleScript(
     val ktlintPlugins =
         if (enableKtlint) {
             """
-            id("org.jlleitschuh.gradle.ktlint") version "12.1.1" apply false"""
+            ${GradleFileExtender().buildKtlintPluginLine(catalog)} apply false"""
         } else {
             ""
         }
@@ -20,7 +21,7 @@ fun buildProjectGradleScript(
     val detektPlugins =
         if (enableDetekt) {
             """
-            id("io.gitlab.arturbosch.detekt") version "1.23.6" apply false"""
+            ${GradleFileExtender().buildDetektPluginLine(catalog)} apply false"""
         } else {
             ""
         }
