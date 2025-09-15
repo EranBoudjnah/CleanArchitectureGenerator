@@ -396,10 +396,4 @@ object PluginConstants {
         listOf(
             COMPOSE_COMPILER
         )
-
-    val CODE_QUALITY_PLUGINS =
-        listOf(
-            KTLINT,
-            DETEKT
-        )
 }
