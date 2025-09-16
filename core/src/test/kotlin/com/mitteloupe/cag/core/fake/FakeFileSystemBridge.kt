@@ -18,6 +18,10 @@ class FakeFileSystemBridge : FileSystemBridge {
         file: File,
         content: String
     ) {
+        if (file.exists()) {
+            delete(file)
+        }
+        file.createNewFile()
         file.writeText(content)
     }
 

@@ -5,35 +5,38 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 class GradleFileExtender internal constructor() {
-    fun buildComposePluginLine(catalog: VersionCatalogReader): String {
-        return if (catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {
+    fun buildComposePluginLine(catalog: VersionCatalogReader): String =
+        if (catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {
             val aliasComposeCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.COMPOSE_COMPILER).asAccessor
             "\n    alias(libs.plugins.$aliasComposeCompiler)"
         } else {
             ""
         }
-    }
 
-    fun buildKtlintPluginLine(catalog: VersionCatalogReader): String {
-        return if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
+    fun buildKtlintPluginLine(
+        catalog: VersionCatalogReader,
+        indentation: Int = 1
+    ): String =
+        if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
             val aliasKtlintCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.KTLINT).asAccessor
-            "\n    alias(libs.plugins.$aliasKtlintCompiler)"
+            "\n${"    ".repeat(indentation)}alias(libs.plugins.$aliasKtlintCompiler)"
         } else {
             ""
         }
-    }
 
-    fun buildDetektPluginLine(catalog: VersionCatalogReader): String {
-        return if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
+    fun buildDetektPluginLine(
+        catalog: VersionCatalogReader,
+        indentation: Int = 1
+    ): String =
+        if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
             val aliasDetektCompiler = catalog.getResolvedPluginAliasFor(PluginConstants.DETEKT).asAccessor
-            "\n    alias(libs.plugins.$aliasDetektCompiler)"
+            "\n${"    ".repeat(indentation)}alias(libs.plugins.$aliasDetektCompiler)"
         } else {
             ""
         }
-    }
 
-    fun buildKtlintConfiguration(catalog: VersionCatalogReader): String {
-        return if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
+    fun buildKtlintConfiguration(catalog: VersionCatalogReader): String =
+        if (catalog.isPluginAvailable(PluginConstants.KTLINT)) {
             """
     ktlint {
         version.set("1.7.1")
@@ -43,10 +46,9 @@ class GradleFileExtender internal constructor() {
         } else {
             ""
         }
-    }
 
-    fun buildDetektConfiguration(catalog: VersionCatalogReader): String {
-        return if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
+    fun buildDetektConfiguration(catalog: VersionCatalogReader): String =
+        if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
             """
     detekt {
         config.setFrom("${'$'}projectDir/../../detekt.yml")
@@ -55,5 +57,4 @@ class GradleFileExtender internal constructor() {
         } else {
             ""
         }
-    }
 }

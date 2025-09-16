@@ -21,6 +21,7 @@ class CliFileSystemBridge : FileSystemBridge {
         if (file.exists()) {
             delete(file)
         }
+        file.createNewFile()
         file.writeText(content)
     }
 

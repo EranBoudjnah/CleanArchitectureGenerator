@@ -12,16 +12,26 @@ fun buildProjectGradleScript(
 ): String {
     val ktlintPlugins =
         if (enableKtlint) {
-            """
-            ${GradleFileExtender().buildKtlintPluginLine(catalog)} apply false"""
+            GradleFileExtender().buildKtlintPluginLine(catalog, 3).let { pluginLine ->
+                if (pluginLine.isNotEmpty()) {
+                    "$pluginLine apply false"
+                } else {
+                    ""
+                }
+            }
         } else {
             ""
         }
 
     val detektPlugins =
         if (enableDetekt) {
-            """
-            ${GradleFileExtender().buildDetektPluginLine(catalog)} apply false"""
+            GradleFileExtender().buildDetektPluginLine(catalog, 3).let { pluginLine ->
+                if (pluginLine.isNotEmpty()) {
+                    "$pluginLine apply false"
+                } else {
+                    ""
+                }
+            }
         } else {
             ""
         }

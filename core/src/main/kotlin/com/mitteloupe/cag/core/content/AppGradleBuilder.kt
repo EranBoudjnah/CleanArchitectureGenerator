@@ -98,9 +98,9 @@ fun buildAppGradleScript(
             }${
             if (enableCompose) {
                 """
-                        buildFeatures {
-                            compose = true
-                        }"""
+            buildFeatures {
+                compose = true
+            }"""
             } else {
                 ""
             }
