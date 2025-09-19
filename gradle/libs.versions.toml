@@ -14,7 +14,7 @@ junit4 = { module = "junit:junit", version.ref = "junit4" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 
 [plugins]
-"kotlin-jvm" = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-"intellij-platform" = { id = "org.jetbrains.intellij.platform", version.ref = "intellijPlatform" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellijPlatform" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

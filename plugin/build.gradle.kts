@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("java")
     alias(libs.plugins.kotlin.jvm)
@@ -36,19 +38,29 @@ intellijPlatform {
 }
 
 tasks {
-    withType<JavaCompile> {
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
+    signPlugin {
+        certificateChain = System.getenv("CAG_CERTIFICATE_CHAIN")
+        privateKey = System.getenv("CAG_PRIVATE_KEY")
+        password = System.getenv("CAG_PRIVATE_KEY_PASSWORD")
     }
 
-    named("buildSearchableOptions").configure {
+    publishPlugin {
+        token = System.getenv("CAG_PUBLISH_TOKEN")
+    }
+
+    withType<JavaCompile> {
+        sourceCompatibility = JvmTarget.JVM_21.target
+        targetCompatibility = JvmTarget.JVM_21.target
+    }
+
+    buildSearchableOptions.configure {
         enabled = false
     }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 

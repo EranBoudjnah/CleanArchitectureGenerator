@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     id("java-library")
@@ -15,7 +17,7 @@ java {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
