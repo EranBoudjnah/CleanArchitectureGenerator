@@ -38,6 +38,7 @@ bin/
 /local.properties
 private.pem
 private_encrypted.pem
+chain.crt
 
 .intellijPlatform/
 .kotlin/
