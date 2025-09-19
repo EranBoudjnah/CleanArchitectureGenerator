@@ -5,7 +5,7 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>Clean Architecture Generator</name>
+    <name>Clean Architecture Generator (CAG)</name>
 
     <version>0.1.0</version>
 
