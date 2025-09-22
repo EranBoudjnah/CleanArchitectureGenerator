@@ -2,7 +2,24 @@
 
 A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, use cases, ViewModels, and architecture packages.
 
+### Android Studio plugin
+
+Adds multiple time-saving code generation shortcuts to Android Studio. 
+
+Key features:
+
+- New Clean Architecture project template
+
+- New menu items:
+    - New architecture package
+    - New feature
+    - New use case in domain modules
+    - New ViewModel in presentation modules
+    - New data source
+
 ### CLI usage
+
+Helps generate Android Clean Architecture code from the terminal.
 
 - **Run via Gradle (no install):**
 
@@ -94,14 +111,3 @@ cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature 
 ```
 
 When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.
-
-### Android Studio plugin
-
-- New menu items:
-  - New architecture package
-  - New feature
-  - New data source
-
-- Context menu items:
-  - New use case in domain modules
-  - New ViewModel in presentation modules
