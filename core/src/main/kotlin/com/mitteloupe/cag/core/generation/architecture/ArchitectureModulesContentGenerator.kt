@@ -54,22 +54,18 @@ class ArchitectureModulesContentGenerator(
         }
 
         val versions =
-            VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS +
+            buildList {
+                addAll(VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
                 if (enableCompose) {
-                    VersionCatalogConstants.COMPOSE_VERSIONS
-                } else {
-                    emptySet()
-                } +
-                if (enableKtlint) {
-                    VersionCatalogConstants.KTLINT_VERSIONS
-                } else {
-                    emptySet()
-                } +
-                if (enableDetekt) {
-                    VersionCatalogConstants.DETEKT_VERSIONS
-                } else {
-                    emptySet()
+                    addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
                 }
+                if (enableKtlint) {
+                    addAll(VersionCatalogConstants.KTLINT_VERSIONS)
+                }
+                if (enableDetekt) {
+                    addAll(VersionCatalogConstants.DETEKT_VERSIONS)
+                }
+            }
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
                 if (enableCompose) {
@@ -84,22 +80,18 @@ class ArchitectureModulesContentGenerator(
                 LibraryConstants.TESTING_LIBRARIES +
                 LibraryConstants.NETWORK_LIBRARIES
         val plugins =
-            PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
+            buildList {
+                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
                 if (enableCompose) {
-                    setOf(PluginConstants.COMPOSE_COMPILER)
-                } else {
-                    emptySet()
-                } +
-                if (enableKtlint) {
-                    setOf(PluginConstants.KTLINT)
-                } else {
-                    emptySet()
-                } +
-                if (enableDetekt) {
-                    setOf(PluginConstants.DETEKT)
-                } else {
-                    emptySet()
+                    add(PluginConstants.COMPOSE_COMPILER)
                 }
+                if (enableKtlint) {
+                    add(PluginConstants.KTLINT)
+                }
+                if (enableDetekt) {
+                    add(PluginConstants.DETEKT)
+                }
+            }
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = versions,

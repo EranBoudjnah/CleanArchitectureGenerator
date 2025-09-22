@@ -72,22 +72,20 @@ class Generator(
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions =
-                    VersionCatalogConstants.BASIC_VERSIONS +
-                        VersionCatalogConstants.ANDROID_VERSIONS +
+                    buildList {
+                        addAll(VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
                         if (request.enableCompose) {
-                            VersionCatalogConstants.COMPOSE_VERSIONS
-                        } else {
-                            emptyList()
-                        },
+                            addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
+                        }
+                    },
                 libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
-                    PluginConstants.KOTLIN_PLUGINS +
-                        PluginConstants.ANDROID_PLUGINS +
+                    buildList {
+                        addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
                         if (request.enableCompose) {
-                            setOf(PluginConstants.COMPOSE_COMPILER)
-                        } else {
-                            emptySet()
+                            add(PluginConstants.COMPOSE_COMPILER)
                         }
+                    }
             )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = request.destinationRootDirectory,
@@ -411,22 +409,18 @@ class Generator(
                     LibraryConstants.VIEW_LIBRARIES + LibraryConstants.TESTING_LIBRARIES
                 }
         val plugins =
-            PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
+            buildList {
+                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
                 if (request.enableCompose) {
-                    setOf(PluginConstants.COMPOSE_COMPILER)
-                } else {
-                    emptySet()
-                } +
-                if (request.enableKtlint) {
-                    setOf(PluginConstants.KTLINT)
-                } else {
-                    emptySet()
-                } +
-                if (request.enableDetekt) {
-                    setOf(PluginConstants.DETEKT)
-                } else {
-                    emptySet()
+                    add(PluginConstants.COMPOSE_COMPILER)
                 }
+                if (request.enableKtlint) {
+                    add(PluginConstants.KTLINT)
+                }
+                if (request.enableDetekt) {
+                    add(PluginConstants.DETEKT)
+                }
+            }
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = versions,
@@ -547,13 +541,12 @@ class Generator(
                 versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
-                    PluginConstants.KOTLIN_PLUGINS +
-                        PluginConstants.ANDROID_PLUGINS +
+                    buildList {
+                        addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
                         if (request.enableCompose) {
-                            setOf(PluginConstants.COMPOSE_COMPILER)
-                        } else {
-                            emptySet()
+                            add(PluginConstants.COMPOSE_COMPILER)
                         }
+                    }
             )
         catalogUpdater.updateVersionCatalogIfPresent(
             projectRootDir = projectRoot,
