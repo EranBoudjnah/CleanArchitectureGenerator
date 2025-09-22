@@ -13,8 +13,8 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
-import com.mitteloupe.cag.core.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
 import java.io.File
 
 class CreateUseCaseAction : AnAction() {

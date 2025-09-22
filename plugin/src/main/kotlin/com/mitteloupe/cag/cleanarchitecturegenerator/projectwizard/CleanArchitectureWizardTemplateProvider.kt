@@ -19,8 +19,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
-import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import java.io.File
 import java.lang.reflect.Field
 import java.util.UUID

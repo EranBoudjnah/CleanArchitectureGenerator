@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.core
+package com.mitteloupe.cag.core.request
 
 import java.io.File
 

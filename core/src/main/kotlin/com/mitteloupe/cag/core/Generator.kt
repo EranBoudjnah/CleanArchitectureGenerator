@@ -32,6 +32,11 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.generation.withoutSpaces
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
+import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
+import com.mitteloupe.cag.core.request.GenerateFeatureRequest
+import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
+import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
+import com.mitteloupe.cag.core.request.GenerateViewModelRequest
 import java.io.File
 import kotlin.String
 
