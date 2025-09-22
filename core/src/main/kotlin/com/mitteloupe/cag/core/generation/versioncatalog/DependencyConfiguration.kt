@@ -391,9 +391,4 @@ object PluginConstants {
             ANDROID_APPLICATION,
             ANDROID_LIBRARY
         )
-
-    val COMPOSE_PLUGINS =
-        listOf(
-            COMPOSE_COMPILER
-        )
 }
