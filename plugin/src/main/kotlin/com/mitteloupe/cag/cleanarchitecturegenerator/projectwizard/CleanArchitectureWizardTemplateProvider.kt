@@ -89,7 +89,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             )
 
             thumb {
-                File("empty-activity").resolve("template_empty_activity.png")
+                File("viewmodel-activity").resolve("template_blank_activity.png")
             }
 
             recipe = { data: TemplateData ->
