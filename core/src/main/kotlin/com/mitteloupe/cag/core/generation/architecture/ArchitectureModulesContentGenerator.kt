@@ -58,17 +58,17 @@ class ArchitectureModulesContentGenerator(
                 if (enableCompose) {
                     VersionCatalogConstants.COMPOSE_VERSIONS
                 } else {
-                    emptyList()
+                    emptySet()
                 } +
                 if (enableKtlint) {
                     VersionCatalogConstants.KTLINT_VERSIONS
                 } else {
-                    emptyList()
+                    emptySet()
                 } +
                 if (enableDetekt) {
                     VersionCatalogConstants.DETEKT_VERSIONS
                 } else {
-                    emptyList()
+                    emptySet()
                 }
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
@@ -86,19 +86,19 @@ class ArchitectureModulesContentGenerator(
         val plugins =
             PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
                 if (enableCompose) {
-                    PluginConstants.COMPOSE_PLUGINS
+                    setOf(PluginConstants.COMPOSE_COMPILER)
                 } else {
-                    emptyList()
+                    emptySet()
                 } +
                 if (enableKtlint) {
-                    listOf(PluginConstants.KTLINT)
+                    setOf(PluginConstants.KTLINT)
                 } else {
-                    emptyList()
+                    emptySet()
                 } +
                 if (enableDetekt) {
-                    listOf(PluginConstants.DETEKT)
+                    setOf(PluginConstants.DETEKT)
                 } else {
-                    emptyList()
+                    emptySet()
                 }
         val dependencyConfiguration =
             DependencyConfiguration(

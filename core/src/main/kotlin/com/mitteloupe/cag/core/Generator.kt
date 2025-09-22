@@ -26,7 +26,6 @@ import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGen
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
-import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.generation.withoutSpaces
@@ -85,9 +84,9 @@ class Generator(
                     PluginConstants.KOTLIN_PLUGINS +
                         PluginConstants.ANDROID_PLUGINS +
                         if (request.enableCompose) {
-                            PluginConstants.COMPOSE_PLUGINS
+                            setOf(PluginConstants.COMPOSE_COMPILER)
                         } else {
-                            emptyList()
+                            emptySet()
                         }
             )
         catalogUpdater.updateVersionCatalogIfPresent(
@@ -414,19 +413,19 @@ class Generator(
         val plugins =
             PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
                 if (request.enableCompose) {
-                    PluginConstants.COMPOSE_PLUGINS
+                    setOf(PluginConstants.COMPOSE_COMPILER)
                 } else {
-                    emptyList<SectionEntryRequirement.PluginRequirement>() +
-                        if (request.enableKtlint) {
-                            listOf(PluginConstants.KTLINT)
-                        } else {
-                            emptyList<SectionEntryRequirement.PluginRequirement>() +
-                                if (request.enableDetekt) {
-                                    setOf(PluginConstants.DETEKT)
-                                } else {
-                                    emptySet()
-                                }
-                        }
+                    emptySet()
+                } +
+                if (request.enableKtlint) {
+                    setOf(PluginConstants.KTLINT)
+                } else {
+                    emptySet()
+                } +
+                if (request.enableDetekt) {
+                    setOf(PluginConstants.DETEKT)
+                } else {
+                    emptySet()
                 }
         val dependencyConfiguration =
             DependencyConfiguration(
@@ -449,7 +448,7 @@ class Generator(
             request = request
         )
         generateAppModule(projectRoot = projectRoot, appName = projectName, packageName = packageName, request = request)
-        generateGradleFiles(projectRoot, packageName, request)
+        generateTemplateProjectGradleFiles(projectRoot, packageName, request)
         settingsFileUpdater.writeProjectSettings(
             projectRoot = projectRoot,
             projectName = projectName,
@@ -537,7 +536,7 @@ class Generator(
         )
     }
 
-    private fun generateGradleFiles(
+    private fun generateTemplateProjectGradleFiles(
         projectRoot: File,
         packageName: String,
         request: GenerateProjectTemplateRequest
@@ -551,9 +550,9 @@ class Generator(
                     PluginConstants.KOTLIN_PLUGINS +
                         PluginConstants.ANDROID_PLUGINS +
                         if (request.enableCompose) {
-                            PluginConstants.COMPOSE_PLUGINS
+                            setOf(PluginConstants.COMPOSE_COMPILER)
                         } else {
-                            emptyList()
+                            emptySet()
                         }
             )
         catalogUpdater.updateVersionCatalogIfPresent(
