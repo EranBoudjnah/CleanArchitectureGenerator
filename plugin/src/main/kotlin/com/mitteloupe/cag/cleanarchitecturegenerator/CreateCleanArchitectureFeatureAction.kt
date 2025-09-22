@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
-import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
+import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
 import java.io.File
 
 class CreateCleanArchitectureFeatureAction : AnAction() {

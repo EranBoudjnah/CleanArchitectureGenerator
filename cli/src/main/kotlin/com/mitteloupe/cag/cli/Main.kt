@@ -2,11 +2,6 @@ package com.mitteloupe.cag.cli
 
 import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
 import com.mitteloupe.cag.core.DirectoryFinder
-import com.mitteloupe.cag.core.GenerateArchitectureRequest
-import com.mitteloupe.cag.core.GenerateFeatureRequestBuilder
-import com.mitteloupe.cag.core.GenerateProjectTemplateRequest
-import com.mitteloupe.cag.core.GenerateUseCaseRequest
-import com.mitteloupe.cag.core.GenerateViewModelRequest
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.NamespaceResolver
@@ -29,6 +24,11 @@ import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesConten
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
+import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
+import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
+import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
+import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
+import com.mitteloupe.cag.core.request.GenerateViewModelRequest
 import java.io.File
 import java.nio.file.Paths
 import java.util.UUID
