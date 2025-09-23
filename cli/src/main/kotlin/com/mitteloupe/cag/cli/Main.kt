@@ -15,6 +15,7 @@ import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
 import com.mitteloupe.cag.core.generation.DataSourceModuleCreator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.GradlePropertiesFileCreator
 import com.mitteloupe.cag.core.generation.GradleWrapperCreator
 import com.mitteloupe.cag.core.generation.KotlinFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
@@ -288,6 +289,7 @@ private fun produceGenerator(): Generator {
         DataSourceModuleCreator(fileCreator),
         DataSourceInterfaceCreator(fileCreator),
         DataSourceImplementationCreator(fileCreator),
+        GradlePropertiesFileCreator(fileCreator),
         ArchitectureModulesContentGenerator(gradleFileCreator, catalogUpdater),
         CoroutineModuleContentGenerator(gradleFileCreator, catalogUpdater),
         VersionCatalogUpdater(fileCreator),

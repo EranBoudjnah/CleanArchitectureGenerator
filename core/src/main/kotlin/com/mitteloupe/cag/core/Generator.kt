@@ -52,6 +52,7 @@ class Generator(
     private val dataSourceModuleCreator: DataSourceModuleCreator,
     private val dataSourceInterfaceCreator: DataSourceInterfaceCreator,
     private val dataSourceImplementationCreator: DataSourceImplementationCreator,
+    private val gradlePropertiesFileCreator: GradlePropertiesFileCreator,
     private val architectureModulesContentGenerator: ArchitectureModulesContentGenerator,
     private val coroutineModuleContentGenerator: CoroutineModuleContentGenerator,
     private val catalogUpdater: VersionCatalogUpdater,
@@ -73,7 +74,7 @@ class Generator(
             DependencyConfiguration(
                 versions =
                     buildList {
-                        addAll(VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
+                        addAll(VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
                         if (request.enableCompose) {
                             addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
                         }
@@ -249,7 +250,7 @@ class Generator(
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -400,13 +401,23 @@ class Generator(
             throw GenerationException("Failed to create project directory.")
         }
 
-        val versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS
+        val versions =
+            buildList {
+                addAll(
+                    VersionCatalogConstants.KOTLIN_VERSIONS +
+                        VersionCatalogConstants.ANDROID_VERSIONS +
+                        VersionCatalogConstants.TESTING_VERSIONS
+                )
+                if (request.enableCompose) {
+                    addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
+                }
+            }
         val libraries =
-            LibraryConstants.CORE_ANDROID_LIBRARIES +
+            LibraryConstants.CORE_ANDROID_LIBRARIES + LibraryConstants.TESTING_LIBRARIES +
                 if (request.enableCompose) {
                     LibraryConstants.COMPOSE_LIBRARIES
                 } else {
-                    LibraryConstants.VIEW_LIBRARIES + LibraryConstants.TESTING_LIBRARIES
+                    LibraryConstants.VIEW_LIBRARIES
                 }
         val plugins =
             buildList {
@@ -535,24 +546,6 @@ class Generator(
         packageName: String,
         request: GenerateProjectTemplateRequest
     ) {
-        val gradlePropertiesFileCreator = GradlePropertiesFileCreator()
-        val dependencyConfiguration =
-            DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
-                libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
-                plugins =
-                    buildList {
-                        addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
-                        if (request.enableCompose) {
-                            add(PluginConstants.COMPOSE_COMPILER)
-                        }
-                    }
-            )
-        catalogUpdater.updateVersionCatalogIfPresent(
-            projectRootDir = projectRoot,
-            dependencyConfiguration = dependencyConfiguration
-        )
-
         gradleFileCreator.writeProjectGradleFile(
             projectRoot = projectRoot,
             enableKtlint = request.enableKtlint,

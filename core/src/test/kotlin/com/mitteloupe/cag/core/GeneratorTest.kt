@@ -10,6 +10,7 @@ import com.mitteloupe.cag.core.generation.DataSourceInterfaceCreator
 import com.mitteloupe.cag.core.generation.DataSourceModuleCreator
 import com.mitteloupe.cag.core.generation.DomainLayerContentGenerator
 import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.GradlePropertiesFileCreator
 import com.mitteloupe.cag.core.generation.GradleWrapperCreator
 import com.mitteloupe.cag.core.generation.KotlinFileCreator
 import com.mitteloupe.cag.core.generation.PresentationLayerContentGenerator
@@ -495,10 +496,9 @@ class GeneratorTest {
             """
             [versions]
             kotlin = "2.2.10"
+            ksp = "2.2.10-2.0.2"
             compileSdk = "35"
             minSdk = "24"
-            junit4 = "4.13.2"
-            ksp = "2.2.10-2.0.2"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
             
@@ -600,6 +600,7 @@ class GeneratorTest {
             DataSourceModuleCreator(fileCreator),
             DataSourceInterfaceCreator(fileCreator),
             DataSourceImplementationCreator(fileCreator),
+            GradlePropertiesFileCreator(fileCreator),
             ArchitectureModulesContentGenerator(gradleFileCreator, catalogUpdater),
             CoroutineModuleContentGenerator(gradleFileCreator, catalogUpdater),
             VersionCatalogUpdater(fileCreator),
