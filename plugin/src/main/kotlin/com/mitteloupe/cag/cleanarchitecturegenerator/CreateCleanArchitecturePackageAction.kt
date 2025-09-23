@@ -59,7 +59,15 @@ class CreateCleanArchitecturePackageAction : AnAction() {
     }
 
     override fun update(event: AnActionEvent) {
-        val project = event.project
-        event.presentation.isEnabledAndVisible = project != null
+        val hasArchitectureModule =
+            event.project?.basePath?.let { basePath ->
+                architectureModuleExists(File(basePath))
+            }
+        event.presentation.isEnabledAndVisible = hasArchitectureModule == false
+    }
+
+    private fun architectureModuleExists(projectRoot: File): Boolean {
+        val architectureDirectory = File(projectRoot, "architecture")
+        return architectureDirectory.exists() && architectureDirectory.isDirectory
     }
 }
