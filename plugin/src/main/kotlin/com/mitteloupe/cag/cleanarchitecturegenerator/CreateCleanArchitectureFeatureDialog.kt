@@ -1,12 +1,14 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.panel
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
+import java.io.File
 import javax.swing.JComponent
 import javax.swing.text.AbstractDocument
 
@@ -14,17 +16,32 @@ private const val PLACEHOLDER = "FEATURE_NAME"
 
 class CreateCleanArchitectureFeatureDialog(
     project: Project?,
-    private val defaultPackagePrefix: String? = null
+    private val defaultPackagePrefix: String? = null,
+    private val appModuleDirectories: List<File>
 ) : DialogWrapper(project) {
     private val featureNameTextField = JBTextField()
     private val featurePackageTextField = JBTextField()
     private var lastFeatureName: String = PLACEHOLDER
+    private val appModuleComboBox = ComboBox(appModuleDirectories.map { it.name }.toTypedArray())
 
     val featureName: String
         get() = featureNameTextField.text
 
     val featurePackageName: String
         get() = featurePackageTextField.text.trim()
+
+    val selectedAppModuleDirectory: File?
+        get() =
+            if (appModuleDirectories.isEmpty()) {
+                null
+            } else {
+                val selectedIndex = appModuleComboBox.selectedIndex
+                if (selectedIndex in appModuleDirectories.indices) {
+                    appModuleDirectories[selectedIndex]
+                } else {
+                    null
+                }
+            }
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
@@ -73,6 +90,11 @@ class CreateCleanArchitectureFeatureDialog(
 
     override fun createCenterPanel(): JComponent =
         panel {
+            if (appModuleDirectories.size >= 2) {
+                row(CleanArchitectureGeneratorBundle.message("dialog.feature.app.module.label")) {
+                    cell(appModuleComboBox)
+                }
+            }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.name.label")) {
                 cell(featureNameTextField)
             }

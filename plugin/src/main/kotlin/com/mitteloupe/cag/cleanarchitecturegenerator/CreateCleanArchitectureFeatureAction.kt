@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
+import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
@@ -11,29 +12,33 @@ import java.io.File
 
 class CreateCleanArchitectureFeatureAction : AnAction() {
     private val ideBridge = IdeBridge()
+    private val appModuleDirectoryFinder = AppModuleDirectoryFinder()
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val projectModel = IntellijProjectModel(event)
         val defaultNamespace = NamespaceResolver().determineBasePackage(projectModel)
-        val dialog = CreateCleanArchitectureFeatureDialog(project, defaultNamespace)
+        val projectRootDirectory = project.basePath?.let { File(it) } ?: File(".")
+        val appModuleDirectories = appModuleDirectoryFinder.findAndroidAppModuleDirectories(projectRootDirectory)
+        val dialog = CreateCleanArchitectureFeatureDialog(project, defaultNamespace, appModuleDirectories)
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
             val generator = GeneratorProvider().generator(project)
-            val projectRootDir = project.basePath?.let { File(it) } ?: File(".")
+            val selectedAppModule = dialog.selectedAppModuleDirectory
             val request =
                 GenerateFeatureRequestBuilder(
-                    destinationRootDir = projectRootDir,
+                    destinationRootDir = projectRootDirectory,
                     projectNamespace = defaultNamespace ?: "com.unknown.app",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
                     .enableCompose(true)
+                    .appModuleDirectory(selectedAppModule)
                     .build()
             try {
                 generator.generateFeature(request)
-                ideBridge.refreshIde(projectRootDir)
-                ideBridge.synchronizeGradle(project, projectRootDir)
+                ideBridge.refreshIde(projectRootDirectory)
+                ideBridge.synchronizeGradle(project, projectRootDirectory)
                 Messages.showInfoMessage(
                     project,
                     CleanArchitectureGeneratorBundle.message(

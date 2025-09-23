@@ -178,11 +178,13 @@ class Generator(
                 startDirectory = request.destinationRootDirectory,
                 projectNamespace = request.projectNamespace,
                 featureName = request.featureName,
-                featurePackageName = featurePackageName
+                featurePackageName = featurePackageName,
+                appModuleDirectory = request.appModuleDirectory
             )
             AppModuleGradleUpdater().updateAppModuleDependenciesIfPresent(
                 startDirectory = request.destinationRootDirectory,
-                featureNameLowerCase = featureNameLowerCase
+                featureNameLowerCase = featureNameLowerCase,
+                appModuleDirectory = request.appModuleDirectory
             )
         }
 
@@ -515,7 +517,8 @@ class Generator(
                 featureName = featureName,
                 featurePackageName = "$packageName.${featureName.lowercase()}",
                 projectNamespace = packageName,
-                enableCompose = request.enableCompose
+                enableCompose = request.enableCompose,
+                appModuleDirectory = null
             )
         generateFeature(featureRequest)
     }

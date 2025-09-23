@@ -11,16 +11,23 @@ private val FEATURE_LAYERS = listOf("ui", "presentation", "domain", "data")
 class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = DirectoryFinder()) {
     fun updateAppModuleDependenciesIfPresent(
         startDirectory: File,
-        featureNameLowerCase: String
+        featureNameLowerCase: String,
+        appModuleDirectory: File?
     ) {
-        val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
-        val appModuleDirectory =
-            AppModuleDirectoryFinder(directoryFinder)
-                .findAndroidAppModuleDirectories(projectRoot)
-                .firstOrNull() ?: return
+        val generationRootDirectory =
+            appModuleDirectory ?: run {
+                val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
+                val appModuleDirectories =
+                    AppModuleDirectoryFinder(directoryFinder).findAndroidAppModuleDirectories(projectRoot)
+                if (appModuleDirectories.isEmpty()) {
+                    return
+                } else {
+                    appModuleDirectories.first()
+                }
+            }
 
-        val kotlinDslFile = File(appModuleDirectory, "build.gradle.kts")
-        val groovyDslFile = File(appModuleDirectory, "build.gradle")
+        val kotlinDslFile = File(generationRootDirectory, "build.gradle.kts")
+        val groovyDslFile = File(generationRootDirectory, "build.gradle")
 
         when {
             kotlinDslFile.exists() -> updateDslFile(kotlinDslFile, featureNameLowerCase, isKotlinDsl = true)
