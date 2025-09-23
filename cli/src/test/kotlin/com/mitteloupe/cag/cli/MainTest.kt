@@ -10,8 +10,10 @@ import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Suite.SuiteClasses
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.OutputStream
 import java.io.PrintStream
+import java.nio.file.Files
 
 @RunWith(Enclosed::class)
 @SuiteClasses(
@@ -38,7 +40,10 @@ class MainTest {
             System.setOut(originalOutput)
         }
 
-        protected fun runMainInSeparateProcess(arguments: Array<String>): Int {
+        protected fun runMainInSeparateProcess(
+            arguments: Array<String>,
+            workingDirectory: File = Files.createTempDirectory("cag-cli-test").toFile()
+        ): Int {
             val processBuilder =
                 ProcessBuilder(
                     System.getProperty("java.home") + "/bin/java",
@@ -46,6 +51,7 @@ class MainTest {
                     System.getProperty("java.class.path"),
                     "com.mitteloupe.cag.cli.MainKt"
                 )
+            processBuilder.directory(workingDirectory)
             processBuilder.command().addAll(arguments.toList())
             return processBuilder.start().waitFor()
         }
@@ -167,8 +173,17 @@ Options:
     class GenerationException : BaseMainTest() {
         @Test
         fun `Given generation exception when main then process exits with code 1`() {
+            // Given
+            val temporaryDirectory = Files.createTempDirectory("cag-cli-test-").toFile()
+            val existingProjectDirectory = File(temporaryDirectory, "TestProject")
+            existingProjectDirectory.mkdirs()
+
             // When
-            val exitCode = runMainInSeparateProcess(arrayOf("--new-project", "--name=TestProject", "--package=com.test"))
+            val exitCode =
+                runMainInSeparateProcess(
+                    arrayOf("--new-project", "--name=TestProject", "--package=com.test"),
+                    temporaryDirectory
+                )
 
             // Then
             assertEquals(1, exitCode)
