@@ -16,7 +16,7 @@ class FeatureGradleScriptBuildersTest {
     }
 
     @Test
-    fun `buildDomainGradleScript placeholder`() {
+    fun `Given catalog with ktlint, detekt when buildDomainGradleScript then generates domain Gradle script`() {
         // Given
         val expected = """plugins {
     id("project-java-library")
@@ -47,7 +47,7 @@ dependencies {
     }
 
     @Test
-    fun `buildPresentationGradleScript placeholder`() {
+    fun `Given catalog with ktlint, detekt when buildPresentationGradleScript then generates presentation Gradle script`() {
         val expected = """plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
@@ -79,7 +79,7 @@ dependencies {
     }
 
     @Test
-    fun `buildDataGradleScript placeholder`() {
+    fun `Given catalog with ktlint, detekt when buildDataGradleScript then generates data Gradle script`() {
         // Given
         val expected = """plugins {
     id("project-java-library")
@@ -113,7 +113,7 @@ dependencies {
     }
 
     @Test
-    fun `buildUiGradleScript placeholder`() {
+    fun `Given catalog with ktlint, detekt when buildUiGradleScript then generates UI Gradle script`() {
         // Given
         val expected = """plugins {
     alias(libs.plugins.android.library)
