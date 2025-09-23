@@ -37,7 +37,8 @@ import kotlin.system.exitProcess
 
 private const val USAGE_SYNTAX =
     "usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
-        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... " +
+        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
+        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt]]... " +
         "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
         "[--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]..."
 
@@ -122,7 +123,7 @@ fun main(arguments: Array<String>) {
 
     featureRequests.forEach { requestFeature ->
         val packageName =
-            requestFeature.packageName ?: basePackage?.let { "$it${requestFeature.featureName.lowercase()}" }
+            requestFeature.packageName ?: basePackage?.let { "${'$'}it${'$'}{requestFeature.featureName.lowercase()}" }
 
         val request =
             GenerateFeatureRequestBuilder(
@@ -131,6 +132,8 @@ fun main(arguments: Array<String>) {
                 featureName = requestFeature.featureName
             ).featurePackageName(packageName)
                 .enableCompose(true)
+                .enableKtlint(requestFeature.enableKtlint)
+                .enableDetekt(requestFeature.enableDetekt)
                 .build()
         executeAndReport {
             generator.generateFeature(request)
@@ -246,6 +249,10 @@ private fun printHelpMessage() {
                 Specify the feature name (required)
             --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
                 Override the feature package for the preceding feature
+            --ktlint | -kl
+              Enable ktlint for the preceding feature (adds plugin and .editorconfig if missing)
+            --detekt | -d
+              Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
           --new-datasource | -nds
               Generate a new data source
             --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName

@@ -26,6 +26,8 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
             val featurePackageName = dialog.featurePackageName
             val generator = GeneratorProvider().generator(project)
             val selectedAppModule = dialog.selectedAppModuleDirectory
+            val enableKtlint = dialog.enableKtlint
+            val enableDetekt = dialog.enableDetekt
             val request =
                 GenerateFeatureRequestBuilder(
                     destinationRootDir = projectRootDirectory,
@@ -34,6 +36,8 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                 ).featurePackageName(featurePackageName)
                     .enableCompose(true)
                     .appModuleDirectory(selectedAppModule)
+                    .enableKtlint(enableKtlint)
+                    .enableDetekt(enableDetekt)
                     .build()
             try {
                 generator.generateFeature(request)

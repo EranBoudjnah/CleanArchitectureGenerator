@@ -47,11 +47,14 @@ class GradleFileExtender internal constructor() {
             ""
         }
 
-    fun buildDetektConfiguration(catalog: VersionCatalogReader): String =
+    fun buildDetektConfiguration(
+        catalog: VersionCatalogReader,
+        configRelativePathFromModule: String = "../../detekt.yml"
+    ): String =
         if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
             """
     detekt {
-        config.setFrom("${'$'}projectDir/../../detekt.yml")
+        config.setFrom("${'$'}projectDir/$configRelativePathFromModule")
     }
     """
         } else {

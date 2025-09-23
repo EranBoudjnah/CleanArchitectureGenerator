@@ -78,6 +78,12 @@ class Generator(
                         if (request.enableCompose) {
                             addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
                         }
+                        if (request.enableKtlint) {
+                            addAll(VersionCatalogConstants.KTLINT_VERSIONS)
+                        }
+                        if (request.enableDetekt) {
+                            addAll(VersionCatalogConstants.DETEKT_VERSIONS)
+                        }
                     },
                 libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
@@ -85,6 +91,12 @@ class Generator(
                         addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
                         if (request.enableCompose) {
                             add(PluginConstants.COMPOSE_COMPILER)
+                        }
+                        if (request.enableKtlint) {
+                            add(PluginConstants.KTLINT)
+                        }
+                        if (request.enableDetekt) {
+                            add(PluginConstants.DETEKT)
                         }
                     }
             )
@@ -170,6 +182,12 @@ class Generator(
                     featurePackageName = featurePackageName,
                     featureName = request.featureName
                 )
+            if (request.enableDetekt) {
+                configurationFileCreator.writeDetektConfigurationFile(request.destinationRootDirectory)
+            }
+            if (request.enableKtlint) {
+                configurationFileCreator.writeEditorConfigFile(request.destinationRootDirectory)
+            }
             settingsFileUpdater.updateProjectSettingsIfPresent(
                 request.destinationRootDirectory,
                 featureNameLowerCase
@@ -518,6 +536,8 @@ class Generator(
                 featurePackageName = "$packageName.${featureName.lowercase()}",
                 projectNamespace = packageName,
                 enableCompose = request.enableCompose,
+                enableKtlint = request.enableKtlint,
+                enableDetekt = request.enableDetekt,
                 appModuleDirectory = null
             )
         generateFeature(featureRequest)

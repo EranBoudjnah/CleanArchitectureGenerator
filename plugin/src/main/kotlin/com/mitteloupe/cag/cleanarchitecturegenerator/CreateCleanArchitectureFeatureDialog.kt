@@ -9,6 +9,7 @@ import com.intellij.ui.dsl.builder.panel
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import java.io.File
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.text.AbstractDocument
 
@@ -23,6 +24,8 @@ class CreateCleanArchitectureFeatureDialog(
     private val featurePackageTextField = JBTextField()
     private var lastFeatureName: String = PLACEHOLDER
     private val appModuleComboBox = ComboBox(appModuleDirectories.map { it.name }.toTypedArray())
+    private val ktlintCheckBox = JCheckBox("ktlint")
+    private val detektCheckBox = JCheckBox("detekt")
 
     val featureName: String
         get() = featureNameTextField.text
@@ -42,6 +45,12 @@ class CreateCleanArchitectureFeatureDialog(
                     null
                 }
             }
+
+    val enableKtlint: Boolean
+        get() = ktlintCheckBox.isSelected
+
+    val enableDetekt: Boolean
+        get() = detektCheckBox.isSelected
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.feature.generator.title")
@@ -100,6 +109,10 @@ class CreateCleanArchitectureFeatureDialog(
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.package.label")) {
                 cell(featurePackageTextField)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.feature.code.quality.label")) {
+                cell(ktlintCheckBox)
+                cell(detektCheckBox)
             }
         }
 

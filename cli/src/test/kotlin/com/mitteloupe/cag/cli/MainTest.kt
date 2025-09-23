@@ -15,6 +15,14 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 
+private const val SHORT_USAGE =
+    "usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
+        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
+        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt]]... " +
+        "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
+        "[--new-use-case --name=UseCaseName [--path=TargetPath]]... " +
+        "[--new-view-model --name=ViewModelName [--path=TargetPath]]..."
+
 @RunWith(Enclosed::class)
 @SuiteClasses(
     MainTest.NoArguments::class,
@@ -60,22 +68,16 @@ class MainTest {
     class NoArguments : BaseMainTest() {
         @Test
         fun `Given no args when main then prints updated usage`() {
+            // Give
+            val expected =
+                "$SHORT_USAGE\n\n" +
+                    "Run with --help or -h for more options.\n"
+
             // When
             main(emptyArray())
 
             // Then
-            assertEquals(
-                "usage: cag [--new-project --name=ProjectName --package=PackageName " +
-                    "[--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
-                    "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
-                    "[--new-feature --name=FeatureName [--package=PackageName]]... " +
-                    "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-                    "[--new-use-case --name=UseCaseName [--path=TargetPath]]... " +
-                    "[--new-view-model --name=ViewModelName [--path=TargetPath]]...\n" +
-                    "\n" +
-                    "Run with --help or -h for more options.\n",
-                output.toString()
-            )
+            assertEquals(expected, output.toString())
         }
     }
 
@@ -100,7 +102,7 @@ class MainTest {
 
         companion object {
             private const val EXPECTED_HELP =
-                """usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]...
+                """$SHORT_USAGE
 
 Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 
@@ -135,6 +137,10 @@ Options:
         Specify the feature name (required)
     --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
         Override the feature package for the preceding feature
+    --ktlint | -kl
+      Enable ktlint for the preceding feature (adds plugin and .editorconfig if missing)
+    --detekt | -d
+      Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
   --new-datasource | -nds
       Generate a new data source
     --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
