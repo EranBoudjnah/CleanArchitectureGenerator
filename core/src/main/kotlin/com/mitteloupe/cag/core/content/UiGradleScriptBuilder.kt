@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core.content
 
+import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
@@ -29,6 +30,11 @@ fun buildUiGradleScript(
         } else {
             ""
         }
+    val gradleFileExtender = GradleFileExtender()
+    val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
+    val detektPluginLine = gradleFileExtender.buildDetektPluginLine(catalog)
+    val ktlintConfiguration = gradleFileExtender.buildKtlintConfiguration(catalog)
+    val detektConfiguration = gradleFileExtender.buildDetektConfiguration(catalog, "../../../detekt.yml")
     val composeBuildFeaturesSection =
         if (enableCompose) {
             """
@@ -55,9 +61,10 @@ fun buildUiGradleScript(
             ""
         }
 
+    val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
     return """plugins {
     alias(libs.plugins.$pluginAliasAndroidLibrary)
-    alias(libs.plugins.$pluginAliasKotlinAndroid)$composePluginLine
+    alias(libs.plugins.$pluginAliasKotlinAndroid)$composePluginLine$ktlintPluginLine$detektPluginLine
 }
 
 android {
@@ -82,12 +89,18 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 $composeBuildFeaturesSection}
-
+${ if (configurations.isEmpty()) {
+        ""
+    } else {
+        "\n$configurations\n"
+    }
+    }
 dependencies {
     implementation(projects.features.$featureNameLowerCase.presentation)
     implementation(projects.architecture.ui)

@@ -8,6 +8,8 @@ data class GenerateFeatureRequest(
     val projectNamespace: String,
     val destinationRootDirectory: File,
     val enableCompose: Boolean,
+    val enableKtlint: Boolean,
+    val enableDetekt: Boolean,
     val appModuleDirectory: File?
 )
 
@@ -19,6 +21,8 @@ class GenerateFeatureRequestBuilder(
     private var featurePackageName: String? = null
     private var enableCompose: Boolean = false
     private var appModuleDirectory: File? = null
+    private var enableKtlint: Boolean = false
+    private var enableDetekt: Boolean = false
 
     fun featurePackageName(featurePackageName: String?) =
         apply {
@@ -35,6 +39,16 @@ class GenerateFeatureRequestBuilder(
             this.appModuleDirectory = appModuleDirectory
         }
 
+    fun enableKtlint(enable: Boolean) =
+        apply {
+            this.enableKtlint = enable
+        }
+
+    fun enableDetekt(enable: Boolean) =
+        apply {
+            this.enableDetekt = enable
+        }
+
     fun build(): GenerateFeatureRequest =
         GenerateFeatureRequest(
             featureName = featureName,
@@ -42,6 +56,8 @@ class GenerateFeatureRequestBuilder(
             projectNamespace = projectNamespace,
             destinationRootDirectory = destinationRootDir,
             enableCompose = enableCompose,
+            enableKtlint = enableKtlint,
+            enableDetekt = enableDetekt,
             appModuleDirectory = appModuleDirectory
         )
 }

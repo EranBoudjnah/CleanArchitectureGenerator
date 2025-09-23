@@ -61,7 +61,9 @@ interface PrimaryFlag {
                     isMandatory = true,
                     missingErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName"
                 ),
-                SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p")
+                SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p"),
+                SecondaryFlag(SecondaryFlagConstants.KTLINT, "-kl", isBoolean = true),
+                SecondaryFlag(SecondaryFlagConstants.DETEKT, "-d", isBoolean = true)
             )
     }
 

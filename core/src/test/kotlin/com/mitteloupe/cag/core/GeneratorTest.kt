@@ -34,11 +34,12 @@ import kotlin.io.path.createTempDirectory
 
 class GeneratorTest {
     private lateinit var classUnderTest: Generator
-    private lateinit var tempDirectory: File
+
+    private lateinit var temporaryDirectory: File
 
     @Before
     fun setUp() {
-        tempDirectory = createTempDirectory(prefix = "test").toFile()
+        temporaryDirectory = createTempDirectory(prefix = "test").toFile()
         classUnderTest = produceGenerator()
     }
 
@@ -49,9 +50,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -68,9 +71,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = null,
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -87,9 +92,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "...",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -102,15 +109,17 @@ class GeneratorTest {
     @Test(expected = GenerationException::class)
     fun `Given existing feature directory when generateFeature then throws exception`() {
         // Given
-        val existingFeatureDir = File(tempDirectory, "features/testfeature")
+        val existingFeatureDir = File(temporaryDirectory, "features/testfeature")
         existingFeatureDir.mkdirs()
         val request =
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -123,7 +132,7 @@ class GeneratorTest {
     @Test(expected = GenerationException::class)
     fun `Given existing file with feature name when generateFeature then throws exception`() {
         // Given
-        val featuresDirectory = File(tempDirectory, "features")
+        val featuresDirectory = File(temporaryDirectory, "features")
         featuresDirectory.mkdirs()
         val existingFeatureFile = File(featuresDirectory, "testfeature")
         existingFeatureFile.createNewFile()
@@ -131,9 +140,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -150,9 +161,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
 
@@ -160,7 +173,7 @@ class GeneratorTest {
         classUnderTest.generateFeature(request)
 
         // Then
-        val featureRoot = File(tempDirectory, "features/testfeature")
+        val featureRoot = File(temporaryDirectory, "features/testfeature")
         assertTrue(featureRoot.exists())
         assertTrue(featureRoot.isDirectory)
 
@@ -174,7 +187,7 @@ class GeneratorTest {
     @Test
     fun `Given valid use case request when generateUseCase then returns success`() {
         // Given
-        val useCaseDir = File(tempDirectory, "src/main/java/com/example/feature/domain/usecase")
+        val useCaseDir = File(temporaryDirectory, "src/main/java/com/example/feature/domain/usecase")
         useCaseDir.mkdirs()
         val request =
             GenerateUseCaseRequest(
@@ -193,7 +206,7 @@ class GeneratorTest {
     @Test
     fun `Given existing directory when generateViewModel then returns success`() {
         // Given
-        val viewModelDirectory = File(tempDirectory, "src/main/java/com/example/featurepresentation/viewmodel")
+        val viewModelDirectory = File(temporaryDirectory, "src/main/java/com/example/featurepresentation/viewmodel")
         viewModelDirectory.mkdirs()
         val request =
             GenerateViewModelRequest(
@@ -216,7 +229,7 @@ class GeneratorTest {
     @Test
     fun `Given new directory when generateViewModel then creates ViewModel in correct presentation layer structure`() {
         // Given
-        val targetDirectory = File(tempDirectory, "features/samplefeature")
+        val targetDirectory = File(temporaryDirectory, "features/samplefeature")
         val request =
             GenerateViewModelRequest(
                 viewModelName = "SampleViewModel",
@@ -241,12 +254,14 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.app.testfeature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
-        val featureRoot = File(tempDirectory, "features/testfeature")
+        val featureRoot = File(temporaryDirectory, "features/testfeature")
         val expectedPresentationModelFile =
             File(
                 featureRoot,
@@ -267,12 +282,14 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.app.testfeature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
-        val featureRoot = File(tempDirectory, "features/testfeature")
+        val featureRoot = File(temporaryDirectory, "features/testfeature")
         val expectedPresentationMapperFile =
             File(
                 featureRoot,
@@ -292,7 +309,7 @@ class GeneratorTest {
         val request =
             GenerateArchitectureRequest(
                 architecturePackageName = "",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 enableCompose = true
             )
 
@@ -308,7 +325,7 @@ class GeneratorTest {
         val request =
             GenerateArchitectureRequest(
                 architecturePackageName = "...",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 enableCompose = true
             )
 
@@ -321,12 +338,12 @@ class GeneratorTest {
     @Test(expected = GenerationException::class)
     fun `Given existing architecture directory when generateArchitecture then throws exception`() {
         // Given
-        val existingArchitectureDir = File(tempDirectory, "architecture")
+        val existingArchitectureDir = File(temporaryDirectory, "architecture")
         existingArchitectureDir.mkdirs()
         val request =
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 enableCompose = true
             )
 
@@ -342,7 +359,7 @@ class GeneratorTest {
         val request =
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 enableCompose = true
             )
 
@@ -350,7 +367,7 @@ class GeneratorTest {
         classUnderTest.generateArchitecture(request)
 
         // Then
-        val architectureRoot = File(tempDirectory, "architecture")
+        val architectureRoot = File(temporaryDirectory, "architecture")
         assertTrue(architectureRoot.isDirectory)
 
         val layers = listOf("domain", "presentation", "ui")
@@ -366,12 +383,12 @@ class GeneratorTest {
         val request =
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true
             )
-        val architectureRoot = File(tempDirectory, "architecture")
+        val architectureRoot = File(temporaryDirectory, "architecture")
 
         // When
         classUnderTest.generateArchitecture(request)
@@ -396,7 +413,7 @@ class GeneratorTest {
 
         // When
         classUnderTest.generateDataSource(
-            destinationRootDirectory = tempDirectory,
+            destinationRootDirectory = temporaryDirectory,
             dataSourceName = dataSourceName,
             projectNamespace = projectNamespace,
             useKtor = useKtor,
@@ -405,7 +422,7 @@ class GeneratorTest {
 
         // Then
 
-        val datasourceRoot = File(tempDirectory, "datasource")
+        val datasourceRoot = File(temporaryDirectory, "datasource")
         assertTrue(datasourceRoot.exists())
 
         val sourceModule = File(datasourceRoot, "source")
@@ -416,7 +433,7 @@ class GeneratorTest {
 
     @Test
     fun `Given existing version catalog without compose versions when generateFeature with compose enabled then adds compose versions`() {
-        val gradleDirectory = File(tempDirectory, "gradle")
+        val gradleDirectory = File(temporaryDirectory, "gradle")
         gradleDirectory.mkdirs()
         val catalogFile = File(gradleDirectory, "libs.versions.toml")
         val existingVersions = """kotlin = "2.2.10"
@@ -439,9 +456,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
         val expectedContent =
@@ -491,12 +510,14 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = false,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
-        val catalogFile = File(tempDirectory, "gradle/libs.versions.toml")
+        val catalogFile = File(temporaryDirectory, "gradle/libs.versions.toml")
 
         // When
         classUnderTest.generateFeature(request)
@@ -538,7 +559,7 @@ class GeneratorTest {
     @Suppress("MaxLineLength", "ktlint:standard:max-line-length")
     fun `Given existing version catalog, no compose versions, compose disabled when generateFeature then does not add compose versions`() {
         // Given
-        val gradleDirectory = File(tempDirectory, "gradle")
+        val gradleDirectory = File(temporaryDirectory, "gradle")
         gradleDirectory.mkdirs()
         val catalogFile = File(gradleDirectory, "libs.versions.toml")
         val existingVersions = """kotlin = "2.2.10"
@@ -561,9 +582,11 @@ class GeneratorTest {
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.feature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
                 enableCompose = false,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = null
             )
         val expectedContent =
@@ -596,18 +619,20 @@ class GeneratorTest {
     @Test
     fun `Given explicit app module directory when generateFeature then updates only specified module`() {
         // Given
-        val appModuleA = File(tempDirectory, "appA").apply { mkdirs() }
+        val appModuleA = File(temporaryDirectory, "appA").apply { mkdirs() }
         File(appModuleA, "build.gradle.kts").writeText("")
-        val appModuleB = File(tempDirectory, "appB").apply { mkdirs() }
+        val appModuleB = File(temporaryDirectory, "appB").apply { mkdirs() }
         File(appModuleB, "build.gradle.kts").writeText("")
 
         val request =
             GenerateFeatureRequest(
                 featureName = "TestFeature",
                 featurePackageName = "com.example.app.testfeature",
-                destinationRootDirectory = tempDirectory,
+                destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
                 enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false,
                 appModuleDirectory = appModuleB
             )
 
@@ -622,6 +647,232 @@ class GeneratorTest {
         val unexpectedDiFileInModuleA =
             File(appModuleA, "src/main/java/com/example/app/di/TestFeatureModule.kt")
         assertFalse("DI module should not be created in non-selected module", unexpectedDiFileInModuleA.exists())
+    }
+
+    @Test
+    fun `Given ktlint, detekt enabled when generateFeature then generates domain Gradle file`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "Sample",
+                featurePackageName = "com.example.sample",
+                projectNamespace = "com.example",
+                destinationRootDirectory = temporaryDirectory,
+                enableCompose = true,
+                enableKtlint = true,
+                enableDetekt = true,
+                appModuleDirectory = null
+            )
+        val featureRoot = File(temporaryDirectory, "features/sample")
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.architecture.domain)
+}
+"""
+
+        // When
+        classUnderTest.generateFeature(request)
+        val domainGradle = File(featureRoot, "domain/build.gradle.kts").readText()
+
+        // Then
+        assertEquals(expectedContent, domainGradle)
+    }
+
+    @Test
+    fun `Given ktlint, detekt enabled when generateFeature then generates presentation Gradle file`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "Sample",
+                featurePackageName = "com.example.sample",
+                projectNamespace = "com.example",
+                destinationRootDirectory = temporaryDirectory,
+                enableCompose = true,
+                enableKtlint = true,
+                enableDetekt = true,
+                appModuleDirectory = null
+            )
+        val featureRoot = File(temporaryDirectory, "features/sample")
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.features.sample.domain)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+}
+"""
+
+        // When
+        classUnderTest.generateFeature(request)
+        val presentationGradle = File(featureRoot, "presentation/build.gradle.kts").readText()
+
+        // Then
+        assertEquals(expectedContent, presentationGradle)
+    }
+
+    @Test
+    fun `Given ktlint, detekt enabled when generateFeature then generates data Gradle file`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "Sample",
+                featurePackageName = "com.example.sample",
+                projectNamespace = "com.example",
+                destinationRootDirectory = temporaryDirectory,
+                enableCompose = true,
+                enableKtlint = true,
+                enableDetekt = true,
+                appModuleDirectory = null
+            )
+        val featureRoot = File(temporaryDirectory, "features/sample")
+        val expectedContent = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.features.sample.domain)
+    implementation(projects.architecture.domain)
+
+    implementation(projects.datasource.source)
+}
+"""
+
+        // When
+        classUnderTest.generateFeature(request)
+        val dataGradle = File(featureRoot, "data/build.gradle.kts").readText()
+
+        // Then
+        assertEquals(expectedContent, dataGradle)
+    }
+
+    @Test
+    fun `Given ktlint, detekt enabled when generateFeature then generates UI Gradle file`() {
+        // Given
+        val request =
+            GenerateFeatureRequest(
+                featureName = "Sample",
+                featurePackageName = "com.example.sample",
+                projectNamespace = "com.example",
+                destinationRootDirectory = temporaryDirectory,
+                enableCompose = true,
+                enableKtlint = true,
+                enableDetekt = true,
+                appModuleDirectory = null
+            )
+        val featureRoot = File(temporaryDirectory, "features/sample")
+        val expectedContent = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+}
+
+android {
+    namespace = "com.example.sample.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose = true
+    }
+}
+
+ktlint {
+    version.set("1.7.1")
+    android.set(true)
+}
+
+detekt {
+    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+}
+
+dependencies {
+    implementation(projects.features.sample.presentation)
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling)
+    implementation(libs.compose.navigation)
+    implementation(libs.compose.ui.tooling.preview)
+}
+"""
+
+        // When
+        classUnderTest.generateFeature(request)
+        val uiGradle = File(featureRoot, "ui/build.gradle.kts").readText()
+
+        // Then
+        assertEquals(expectedContent, uiGradle)
     }
 
     private fun produceGenerator(): Generator {

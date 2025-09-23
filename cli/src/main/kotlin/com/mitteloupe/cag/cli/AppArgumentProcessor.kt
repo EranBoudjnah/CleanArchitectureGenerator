@@ -57,7 +57,9 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         ) { secondaries ->
             FeatureRequest(
                 featureName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
-                packageName = secondaries[SecondaryFlagConstants.PACKAGE]
+                packageName = secondaries[SecondaryFlagConstants.PACKAGE],
+                enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
+                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT)
             )
         }
 

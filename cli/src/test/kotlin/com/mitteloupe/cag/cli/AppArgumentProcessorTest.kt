@@ -56,6 +56,48 @@ class AppArgumentProcessorTest {
             // Then
             assertEquals(true, result)
         }
+
+        @Test
+        fun `Given --new-feature with --ktlint when getNewFeatures then returns FeatureRequest with ktlint enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=Quality", "--ktlint")
+            val expectedRequests =
+                listOf(
+                    FeatureRequest(
+                        featureName = "Quality",
+                        packageName = null,
+                        enableKtlint = true,
+                        enableDetekt = false
+                    )
+                )
+
+            // When
+            val result = classUnderTest.getNewFeatures(givenArguments)
+
+            // Then
+            assertEquals(expectedRequests, result)
+        }
+
+        @Test
+        fun `Given short flags -nf -kl -d when getNewFeatures then returns FeatureRequest with both enabled`() {
+            // Given
+            val givenArguments = arrayOf("-nf", "-n=Quality", "-kl", "-d")
+            val expectedRequests =
+                listOf(
+                    FeatureRequest(
+                        featureName = "Quality",
+                        packageName = null,
+                        enableKtlint = true,
+                        enableDetekt = true
+                    )
+                )
+
+            // When
+            val result = classUnderTest.getNewFeatures(givenArguments)
+
+            // Then
+            assertEquals(expectedRequests, result)
+        }
     }
 
     class Features {
@@ -71,24 +113,54 @@ class AppArgumentProcessorTest {
             // Given
             val givenArguments =
                 arrayOf("--new-feature", "--name=First", "--package=com.first", "--new-feature", "--name=Second")
+            val expectedRequests =
+                listOf(
+                    FeatureRequest(
+                        featureName = "First",
+                        packageName = "com.first",
+                        enableKtlint = false,
+                        enableDetekt = false
+                    ),
+                    FeatureRequest(
+                        featureName = "Second",
+                        packageName = null,
+                        enableKtlint = false,
+                        enableDetekt = false
+                    )
+                )
 
             // When
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            assertEquals(listOf(FeatureRequest("First", "com.first"), FeatureRequest("Second", null)), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
         fun `Given short flags when getNewFeatures then parses correctly`() {
             // Given
             val givenArguments = arrayOf("-nf", "-nThird", "-p", "com.third", "-nf", "-n=Fourth", "-pcom.fourth")
+            val expectedRequests =
+                listOf(
+                    FeatureRequest(
+                        featureName = "Third",
+                        packageName = "com.third",
+                        enableKtlint = false,
+                        enableDetekt = false
+                    ),
+                    FeatureRequest(
+                        featureName = "Fourth",
+                        packageName = "com.fourth",
+                        enableKtlint = false,
+                        enableDetekt = false
+                    )
+                )
 
             // When
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            assertEquals(listOf(FeatureRequest("Third", "com.third"), FeatureRequest("Fourth", "com.fourth")), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
