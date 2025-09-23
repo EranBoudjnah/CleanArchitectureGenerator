@@ -57,7 +57,11 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = feature,
+            appModuleDirectory = null
+        )
         val content = buildFile.readText()
 
         // Then
@@ -89,7 +93,11 @@ class AppModuleGradleUpdaterTest {
         val expectedComplete = "$givenGradleContent\n$expectedTail\n"
 
         // When
-        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = feature,
+            appModuleDirectory = null
+        )
         val content = buildFile.readText()
 
         // Then
@@ -124,7 +132,11 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = feature,
+            appModuleDirectory = null
+        )
         val content = buildFile.readText()
 
         // Then
@@ -171,11 +183,52 @@ class AppModuleGradleUpdaterTest {
             """.trimIndent() + "\n"
 
         // When
-        classUnderTest.updateAppModuleDependenciesIfPresent(startDirectory, feature)
+        classUnderTest.updateAppModuleDependenciesIfPresent(
+            startDirectory = startDirectory,
+            featureNameLowerCase = feature,
+            appModuleDirectory = null
+        )
         val content = buildFile.readText()
 
         // Then
         assertEquals(expectedContentGroovy, content)
+    }
+
+    @Test
+    fun `Given explicit app module directory when update then only that module is updated`() {
+        // Given
+        val feature = "selected"
+        val projectRoot = createTempDirectory(prefix = "projExplicit").toFile()
+        val appA = File(projectRoot, "appA").apply { mkdirs() }
+        val appB = File(projectRoot, "appB").apply { mkdirs() }
+        val givenGradleAContent = "---"
+        val appAGradle = File(appA, "build.gradle.kts").apply { writeText(givenGradleAContent) }
+        val givenGradleBContent = "..."
+        val appBGradle = File(appB, "build.gradle.kts").apply { writeText(givenGradleBContent) }
+        val expectedTail =
+            """
+            dependencies {
+                implementation(projects.features.$feature.ui)
+                implementation(projects.features.$feature.presentation)
+                implementation(projects.features.$feature.domain)
+                implementation(projects.features.$feature.data)
+            }
+            """.trimIndent()
+        val expectedComplete = "$givenGradleBContent\n$expectedTail\n"
+
+        // When
+        classUnderTest.updateAppModuleDependenciesIfPresent(
+            startDirectory = projectRoot,
+            featureNameLowerCase = feature,
+            appModuleDirectory = appB
+        )
+
+        // Then
+        val appBContent = appBGradle.readText()
+        assertEquals(expectedComplete, appBContent)
+
+        val appAContent = appAGradle.readText()
+        assertEquals(givenGradleAContent, appAContent)
     }
 
     private fun givenBuildFile(

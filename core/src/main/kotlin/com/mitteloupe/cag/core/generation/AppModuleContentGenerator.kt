@@ -28,14 +28,21 @@ class AppModuleContentGenerator(
         startDirectory: File,
         projectNamespace: String,
         featureName: String,
-        featurePackageName: String
+        featurePackageName: String,
+        appModuleDirectory: File?
     ) {
-        val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
-        val appModuleDirectory =
-            AppModuleDirectoryFinder(directoryFinder)
-                .findAndroidAppModuleDirectories(projectRoot).firstOrNull()
-                ?: return
-        val sourceRoot = File(appModuleDirectory, "src/main/java")
+        val rootDirectory =
+            appModuleDirectory ?: run {
+                val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
+                val appModuleDirectories =
+                    AppModuleDirectoryFinder(directoryFinder).findAndroidAppModuleDirectories(projectRoot)
+                if (appModuleDirectories.isEmpty()) {
+                    return
+                } else {
+                    appModuleDirectories.first()
+                }
+            }
+        val sourceRoot = File(rootDirectory, "src/main/java")
         val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
         val dependencyInjectionDirectory = File(basePackageDir, "di")
         fileCreator.createDirectoryIfNotExists(dependencyInjectionDirectory)

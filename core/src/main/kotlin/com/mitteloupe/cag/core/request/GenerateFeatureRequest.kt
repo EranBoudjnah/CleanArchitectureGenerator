@@ -7,7 +7,8 @@ data class GenerateFeatureRequest(
     val featurePackageName: String?,
     val projectNamespace: String,
     val destinationRootDirectory: File,
-    val enableCompose: Boolean
+    val enableCompose: Boolean,
+    val appModuleDirectory: File?
 )
 
 class GenerateFeatureRequestBuilder(
@@ -17,6 +18,7 @@ class GenerateFeatureRequestBuilder(
 ) {
     private var featurePackageName: String? = null
     private var enableCompose: Boolean = false
+    private var appModuleDirectory: File? = null
 
     fun featurePackageName(featurePackageName: String?) =
         apply {
@@ -28,12 +30,18 @@ class GenerateFeatureRequestBuilder(
             this.enableCompose = enable
         }
 
+    fun appModuleDirectory(appModuleDirectory: File?) =
+        apply {
+            this.appModuleDirectory = appModuleDirectory
+        }
+
     fun build(): GenerateFeatureRequest =
         GenerateFeatureRequest(
             featureName = featureName,
             featurePackageName = featurePackageName,
             projectNamespace = projectNamespace,
             destinationRootDirectory = destinationRootDir,
-            enableCompose = enableCompose
+            enableCompose = enableCompose,
+            appModuleDirectory = appModuleDirectory
         )
 }

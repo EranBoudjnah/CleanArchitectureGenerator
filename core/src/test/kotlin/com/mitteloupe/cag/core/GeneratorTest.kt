@@ -25,6 +25,7 @@ import com.mitteloupe.cag.core.request.GenerateFeatureRequest
 import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.request.GenerateViewModelRequest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -50,7 +51,8 @@ class GeneratorTest {
                 featurePackageName = "",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -68,7 +70,8 @@ class GeneratorTest {
                 featurePackageName = null,
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -86,7 +89,8 @@ class GeneratorTest {
                 featurePackageName = "...",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -106,7 +110,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -128,7 +133,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -146,7 +152,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
 
         // When
@@ -236,7 +243,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.app.testfeature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example.app",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
         val featureRoot = File(tempDirectory, "features/testfeature")
         val expectedPresentationModelFile =
@@ -261,7 +269,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.app.testfeature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example.app",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
         val featureRoot = File(tempDirectory, "features/testfeature")
         val expectedPresentationMapperFile =
@@ -432,7 +441,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = true
+                enableCompose = true,
+                appModuleDirectory = null
             )
         val expectedContent =
             """
@@ -483,7 +493,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = false
+                enableCompose = false,
+                appModuleDirectory = null
             )
         val catalogFile = File(tempDirectory, "gradle/libs.versions.toml")
 
@@ -552,7 +563,8 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = tempDirectory,
                 projectNamespace = "com.example",
-                enableCompose = false
+                enableCompose = false,
+                appModuleDirectory = null
             )
         val expectedContent =
             """
@@ -579,6 +591,37 @@ class GeneratorTest {
 
         // Then
         assertEquals("Generated catalog should match expected content (no compose)", expectedContent, catalogContent)
+    }
+
+    @Test
+    fun `Given explicit app module directory when generateFeature then updates only specified module`() {
+        // Given
+        val appModuleA = File(tempDirectory, "appA").apply { mkdirs() }
+        File(appModuleA, "build.gradle.kts").writeText("")
+        val appModuleB = File(tempDirectory, "appB").apply { mkdirs() }
+        File(appModuleB, "build.gradle.kts").writeText("")
+
+        val request =
+            GenerateFeatureRequest(
+                featureName = "TestFeature",
+                featurePackageName = "com.example.app.testfeature",
+                destinationRootDirectory = tempDirectory,
+                projectNamespace = "com.example.app",
+                enableCompose = true,
+                appModuleDirectory = appModuleB
+            )
+
+        // When
+        classUnderTest.generateFeature(request)
+
+        // Then
+        val expectedDiFileInModuleB =
+            File(appModuleB, "src/main/java/com/example/app/di/TestFeatureModule.kt")
+        assertTrue("DI module should be created in the selected app module", expectedDiFileInModuleB.isFile)
+
+        val unexpectedDiFileInModuleA =
+            File(appModuleA, "src/main/java/com/example/app/di/TestFeatureModule.kt")
+        assertFalse("DI module should not be created in non-selected module", unexpectedDiFileInModuleA.exists())
     }
 
     private fun produceGenerator(): Generator {
