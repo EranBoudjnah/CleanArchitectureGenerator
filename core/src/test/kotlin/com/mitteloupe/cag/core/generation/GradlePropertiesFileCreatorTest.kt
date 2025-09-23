@@ -1,6 +1,7 @@
 package com.mitteloupe.cag.core.generation
 
-import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +40,7 @@ class GradlePropertiesFileCreatorTest {
 
     @Before
     fun setUp() {
-        classUnderTest = GradlePropertiesFileCreator()
+        classUnderTest = GradlePropertiesFileCreator(FileCreator(FakeFileSystemBridge()))
     }
 
     @Test
@@ -57,7 +58,7 @@ class GradlePropertiesFileCreatorTest {
     }
 
     @Test
-    fun `Given project root with existing gradle properties when writeGradlePropertiesFile then overwrites file`() {
+    fun `Given project root with existing gradle properties when writeGradlePropertiesFile then skips update`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "projectRoot2").toFile()
         val gradlePropertiesFile = File(projectRoot, "gradle.properties")
@@ -69,20 +70,6 @@ class GradlePropertiesFileCreatorTest {
 
         // Then
         val actualContent = gradlePropertiesFile.readText()
-        assertEquals(expectedGradlePropertiesContent, actualContent)
-    }
-
-    @Test(expected = GenerationException::class)
-    fun `Given read-only project root when writeGradlePropertiesFile then throws exception`() {
-        // Given
-        val projectRoot = createTempDirectory(prefix = "projectRoot3").toFile()
-        val gradlePropertiesFile = File(projectRoot, "gradle.properties")
-        gradlePropertiesFile.createNewFile()
-        gradlePropertiesFile.setReadOnly()
-
-        // When
-        classUnderTest.writeGradlePropertiesFile(projectRoot)
-
-        // Then throws GenerationException
+        assertEquals(existingContent, actualContent)
     }
 }

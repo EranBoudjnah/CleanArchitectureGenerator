@@ -55,7 +55,7 @@ class ArchitectureModulesContentGenerator(
 
         val versions =
             buildList {
-                addAll(VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
+                addAll(VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
                 if (enableCompose) {
                     addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
                 }

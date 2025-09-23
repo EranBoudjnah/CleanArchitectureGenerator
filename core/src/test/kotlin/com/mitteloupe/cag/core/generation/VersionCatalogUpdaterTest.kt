@@ -50,10 +50,9 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             kotlin = "2.2.10"
+            ksp = "2.2.10-2.0.2"
             compileSdk = "35"
             minSdk = "24"
-            junit4 = "4.13.2"
-            ksp = "2.2.10-2.0.2"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
 
@@ -67,7 +66,7 @@ class VersionCatalogUpdaterTest {
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -236,10 +235,9 @@ class VersionCatalogUpdaterTest {
             [versions]
             agp = "35"
             kotlin = "2.2.10"
+            ksp = "2.2.10-2.0.2"
             compileSdk = "35"
             minSdk = "24"
-            junit4 = "4.13.2"
-            ksp = "2.2.10-2.0.2"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
 
@@ -253,7 +251,7 @@ class VersionCatalogUpdaterTest {
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -266,7 +264,7 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given compose enabled when updateVersionCatalogIfPresent then adds compose dependencies`() {
+    fun `Given compose when updateVersionCatalogIfPresent then adds compose dependencies`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -284,7 +282,6 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "35"
             minSdk = "24"
-            junit4 = "4.13.2"
             ksp = "2.2.10-2.0.2"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
@@ -315,11 +312,13 @@ class VersionCatalogUpdaterTest {
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions =
-                    VersionCatalogConstants.BASIC_VERSIONS +
+                    VersionCatalogConstants.KOTLIN_VERSIONS +
                         VersionCatalogConstants.ANDROID_VERSIONS +
                         VersionCatalogConstants.COMPOSE_VERSIONS,
                 libraries = LibraryConstants.COMPOSE_LIBRARIES,
-                plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS + PluginConstants.COMPOSE_PLUGINS
+                plugins =
+                    PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS +
+                        PluginConstants.COMPOSE_COMPILER
             )
 
         // When
@@ -348,7 +347,6 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "35"
             minSdk = "24"
-            junit4 = "4.13.2"
             ksp = "2.2.10-2.0.2"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
@@ -375,7 +373,7 @@ class VersionCatalogUpdaterTest {
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = LibraryConstants.CORE_ANDROID_LIBRARIES + LibraryConstants.VIEW_LIBRARIES,
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -393,7 +391,7 @@ class VersionCatalogUpdaterTest {
         val projectRoot = createTempDirectory(prefix = "newCatalog").toFile()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS,
                 libraries = LibraryConstants.CORE_ANDROID_LIBRARIES.take(2),
                 plugins = PluginConstants.KOTLIN_PLUGINS.take(2)
             )
@@ -430,7 +428,7 @@ class VersionCatalogUpdaterTest {
             )
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.BASIC_VERSIONS,
+                versions = VersionCatalogConstants.KOTLIN_VERSIONS,
                 libraries = LibraryConstants.CORE_ANDROID_LIBRARIES.take(1),
                 plugins = PluginConstants.KOTLIN_PLUGINS.take(1)
             )

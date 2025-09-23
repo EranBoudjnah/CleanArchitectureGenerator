@@ -28,17 +28,16 @@ object VersionCatalogConstants {
     val KTLINT_VERSION = VersionRequirement(key = "ktlint", version = "13.1.0")
     val DETEKT_VERSION = VersionRequirement(key = "detekt", version = "1.23.6")
 
-    val BASIC_VERSIONS =
+    val KOTLIN_VERSIONS =
         listOf(
             KOTLIN_VERSION,
-            COMPILE_SDK_VERSION,
-            MIN_SDK_VERSION,
-            JUNIT4_VERSION,
             KSP_VERSION
         )
 
     val ANDROID_VERSIONS =
         listOf(
+            COMPILE_SDK_VERSION,
+            MIN_SDK_VERSION,
             TARGET_SDK_VERSION,
             ANDROID_GRADLE_PLUGIN_VERSION
         )
@@ -49,6 +48,8 @@ object VersionCatalogConstants {
             COMPOSE_NAVIGATION_VERSION,
             COMPOSE_COMPILER_VERSION
         )
+
+    val TESTING_VERSIONS = listOf(JUNIT4_VERSION)
 
     val KTLINT_VERSIONS = listOf(KTLINT_VERSION)
 
