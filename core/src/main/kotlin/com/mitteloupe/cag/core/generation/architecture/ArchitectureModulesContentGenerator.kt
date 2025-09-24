@@ -53,19 +53,6 @@ class ArchitectureModulesContentGenerator(
             throw GenerationException("Failed to create directories for architecture package '$architecturePackageName'.")
         }
 
-        val versions =
-            buildList {
-                addAll(VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
-                if (enableCompose) {
-                    addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
-                }
-                if (enableKtlint) {
-                    addAll(VersionCatalogConstants.KTLINT_VERSIONS)
-                }
-                if (enableDetekt) {
-                    addAll(VersionCatalogConstants.DETEKT_VERSIONS)
-                }
-            }
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
                 if (enableCompose) {
@@ -94,7 +81,7 @@ class ArchitectureModulesContentGenerator(
             }
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = versions,
+                versions = VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = libraries,
                 plugins = plugins
             )

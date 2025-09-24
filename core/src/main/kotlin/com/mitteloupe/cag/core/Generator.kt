@@ -72,20 +72,13 @@ class Generator(
         val featureNameLowerCase = request.featureName.lowercase()
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions =
-                    buildList {
-                        addAll(VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS)
-                        if (request.enableCompose) {
-                            addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
-                        }
-                        if (request.enableKtlint) {
-                            addAll(VersionCatalogConstants.KTLINT_VERSIONS)
-                        }
-                        if (request.enableDetekt) {
-                            addAll(VersionCatalogConstants.DETEKT_VERSIONS)
-                        }
+                versions = VersionCatalogConstants.ANDROID_VERSIONS,
+                libraries =
+                    if (request.enableCompose) {
+                        LibraryConstants.COMPOSE_LIBRARIES
+                    } else {
+                        emptyList()
                     },
-                libraries = if (request.enableCompose) LibraryConstants.COMPOSE_LIBRARIES else emptyList(),
                 plugins =
                     buildList {
                         addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
@@ -270,7 +263,7 @@ class Generator(
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.KOTLIN_VERSIONS + VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
@@ -421,17 +414,6 @@ class Generator(
             throw GenerationException("Failed to create project directory.")
         }
 
-        val versions =
-            buildList {
-                addAll(
-                    VersionCatalogConstants.KOTLIN_VERSIONS +
-                        VersionCatalogConstants.ANDROID_VERSIONS +
-                        VersionCatalogConstants.TESTING_VERSIONS
-                )
-                if (request.enableCompose) {
-                    addAll(VersionCatalogConstants.COMPOSE_VERSIONS)
-                }
-            }
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES + LibraryConstants.TESTING_LIBRARIES +
                 if (request.enableCompose) {
@@ -454,7 +436,7 @@ class Generator(
             }
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = versions,
+                versions = VersionCatalogConstants.ANDROID_VERSIONS,
                 libraries = libraries,
                 plugins = plugins
             )

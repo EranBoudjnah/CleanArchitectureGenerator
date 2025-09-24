@@ -471,7 +471,7 @@ class GeneratorTest {
             androidGradlePlugin = "8.12.2"
             composeBom = "2025.08.01"
             composeNavigation = "2.9.3"
-            composeCompiler = "1.5.8"
+            androidxActivityCompose = "1.8.2"
 
             [libraries]
             $existingLibraries
@@ -483,7 +483,7 @@ class GeneratorTest {
             compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
             compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
             compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
-            androidx-activity-compose = { module = "androidx.activity:activity-compose", version = "1.8.2" }
+            androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -527,12 +527,12 @@ class GeneratorTest {
         val expectedContent =
             """
             [versions]
-            kotlin = "2.2.10"
-            ksp = "2.2.10-2.0.2"
             compileSdk = "35"
             minSdk = "24"
             targetSdk = "35"
             androidGradlePlugin = "8.12.2"
+            kotlin = "2.2.10"
+            ksp = "2.2.10-2.0.2"
             
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -542,11 +542,6 @@ class GeneratorTest {
             android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 
             """.trimIndent()
-
-        println("Actual (compose disabled):")
-        println(catalogContent)
-        println("Expected (compose disabled):")
-        println(expectedContent)
 
         assertEquals(
             "Generated catalog should match expected content (no compose)",
