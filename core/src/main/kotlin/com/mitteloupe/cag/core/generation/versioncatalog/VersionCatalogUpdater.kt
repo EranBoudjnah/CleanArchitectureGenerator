@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.VersionRequirement
 import java.io.File
 
 data class SectionTransaction<SECTION_TYPE : SectionEntryRequirement>(
@@ -23,8 +24,7 @@ sealed class SectionEntryRequirement(val header: String) {
     data class LibraryRequirement(
         override val key: String,
         val module: String,
-        val versionRefKey: String? = null,
-        val versionLiteral: String? = null
+        val version: VersionRequirement? = null
     ) : SectionEntryRequirement("libraries")
 
     data class BundleRequirement(
@@ -35,7 +35,7 @@ sealed class SectionEntryRequirement(val header: String) {
     data class PluginRequirement(
         override val key: String,
         val id: String,
-        val versionRefKey: String
+        val version: VersionRequirement
     ) : SectionEntryRequirement("plugins")
 }
 
@@ -101,7 +101,7 @@ class VersionCatalogUpdater(
                 PluginRequirement(
                     key = candidateAlias,
                     id = desired.id,
-                    versionRefKey = desired.versionRefKey
+                    version = desired.version
                 )
             )
         }
@@ -141,8 +141,7 @@ class VersionCatalogUpdater(
                 LibraryRequirement(
                     key = candidateAlias,
                     module = desired.module,
-                    versionRefKey = desired.versionRefKey,
-                    versionLiteral = desired.versionLiteral
+                    version = desired.version
                 )
             )
         }
@@ -155,7 +154,9 @@ class VersionCatalogUpdater(
                 listOf(
                     SectionTransaction(
                         insertPositionIfMissing = CatalogInsertPosition.Start,
-                        requirements = dependencyConfiguration.versions
+                        requirements =
+                            (dependencyConfiguration.versions + pluginRequirements.versions + libraryRequirements.versions)
+                                .distinct()
                     ),
                     SectionTransaction(
                         insertPositionIfMissing = CatalogInsertPosition.End,
@@ -193,7 +194,7 @@ class VersionCatalogUpdater(
                 PluginRequirement(
                     key = desired.key,
                     id = desired.id,
-                    versionRefKey = desired.versionRefKey
+                    version = desired.version
                 )
             }
 
@@ -202,12 +203,13 @@ class VersionCatalogUpdater(
                 LibraryRequirement(
                     key = desired.key,
                     module = desired.module,
-                    versionRefKey = desired.versionRefKey,
-                    versionLiteral = desired.versionLiteral
+                    version = desired.version
                 )
             }
 
-        val versionRequirements = dependencyConfiguration.versions
+        val versionRequirements =
+            (dependencyConfiguration.versions + pluginRequirements.versions + libraryRequirements.versions)
+                .distinct()
 
         updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,
@@ -270,4 +272,14 @@ class VersionCatalogUpdater(
                 module to alias
             }
     }
+
+    private val List<SectionEntryRequirement>.versions
+        get() =
+            mapNotNull {
+                when (it) {
+                    is LibraryRequirement -> it.version
+                    is PluginRequirement -> it.version
+                    else -> null
+                }
+            }
 }

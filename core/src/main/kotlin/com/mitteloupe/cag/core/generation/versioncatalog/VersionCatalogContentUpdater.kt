@@ -116,10 +116,7 @@ class VersionCatalogContentUpdater {
             }
             is SectionEntryRequirement.LibraryRequirement -> {
                 val parts = mutableListOf("module = \"${req.module}\"")
-                when {
-                    req.versionRefKey != null -> parts.add("version.ref = \"${req.versionRefKey}\"")
-                    req.versionLiteral != null -> parts.add("version = \"${req.versionLiteral}\"")
-                }
+                if (req.version != null) parts.add("version.ref = \"${req.version.key}\"")
                 "${req.key} = { ${parts.joinToString(", ")} }"
             }
             is SectionEntryRequirement.BundleRequirement -> {
@@ -127,7 +124,7 @@ class VersionCatalogContentUpdater {
                 "${req.key} = [ $members ]"
             }
             is SectionEntryRequirement.PluginRequirement -> {
-                "${req.key} = { id = \"${req.id}\", version.ref = \"${req.versionRefKey}\" }"
+                "${req.key} = { id = \"${req.id}\", version.ref = \"${req.version.key}\" }"
             }
         }
 
