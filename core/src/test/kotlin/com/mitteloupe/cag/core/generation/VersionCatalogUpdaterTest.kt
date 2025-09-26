@@ -331,15 +331,15 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "35"
             minSdk = "24"
-            kotlinxCoroutinesCore = "1.7.3"
+            kotlinxCoroutines = "1.7.3"
 
             [libraries]
-            kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+            kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
             """.trimIndent() + "\n"
 
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = listOf(VersionCatalogConstants.KOTLINX_COROUTINES_CORE_VERSION),
+                versions = listOf(VersionCatalogConstants.KOTLINX_COROUTINES_VERSION),
                 libraries = listOf(LibraryConstants.KOTLINX_COROUTINES_CORE),
                 plugins = emptyList()
             )

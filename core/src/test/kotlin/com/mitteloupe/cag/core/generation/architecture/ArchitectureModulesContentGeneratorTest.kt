@@ -26,7 +26,8 @@ import kotlin.io.path.createTempDirectory
     ArchitectureModulesContentGeneratorTest.PresentationTestModule::class,
     ArchitectureModulesContentGeneratorTest.CoroutineModule::class,
     ArchitectureModulesContentGeneratorTest.InstrumentationTestModule::class,
-    ArchitectureModulesContentGeneratorTest.GradleFileGeneration::class
+    ArchitectureModulesContentGeneratorTest.GradleFileGeneration::class,
+    ArchitectureModulesContentGeneratorTest.GenerateFunction::class
 )
 class ArchitectureModulesContentGeneratorTest {
     @RunWith(Enclosed::class)
@@ -301,6 +302,252 @@ class ArchitectureModulesContentGeneratorTest {
                     architecturePackageNameSegments = listOf("com", "example", "architecture", "test")
                 )
             }
+        }
+    }
+
+    class GenerateFunction {
+        private lateinit var classUnderTest: ArchitectureModulesContentGenerator
+        private lateinit var temporaryDirectory: File
+
+        @Before
+        fun setUp() {
+            temporaryDirectory = createTempDirectory(prefix = "test").toFile()
+            val fileCreator = FileCreator(FakeFileSystemBridge())
+            val catalogUpdater = VersionCatalogUpdater(fileCreator)
+            classUnderTest =
+                ArchitectureModulesContentGenerator(
+                    gradleFileCreator = GradleFileCreator(fileCreator),
+                    catalogUpdater = catalogUpdater
+                )
+        }
+
+        @Test
+        fun `Given valid inputs when generate then writes domain gradle file`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val expectedDomain = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.coroutine)
+    implementation(libs.kotlinx.coroutines.core)
+}
+"""
+            val domainGradle = File(architectureRoot, "domain/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            assertEquals(expectedDomain, domainGradle.readText())
+        }
+
+        @Test
+        fun `Given valid inputs when generate then writes presentation gradle file`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val expectedPresentation = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+dependencies {
+    implementation(projects.architecture.domain)
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.test.junit)
+}
+"""
+            val presentationGradle = File(architectureRoot, "presentation/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            assertEquals(expectedPresentation, presentationGradle.readText())
+        }
+
+        @Test
+        fun `Given valid inputs when generate then writes UI gradle file`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val expectedUi = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
+
+}
+
+android {
+    namespace = "com.example.architecture.ui"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+dependencies {
+    implementation(projects.architecture.presentation)
+
+    implementation(projects.coroutine)
+
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+}
+"""
+            val uiGradle = File(architectureRoot, "ui/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            assertEquals(expectedUi, uiGradle.readText())
+        }
+
+        @Test
+        fun `Given valid inputs when generate then writes presentation-test gradle file`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val expectedPresentationTest = """plugins {
+    id("project-java-library")
+    alias(libs.plugins.kotlin.jvm)
+}
+
+dependencies {
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+
+    implementation(libs.kotlinx.coroutines.core)
+
+    implementation(libs.test.junit)
+    implementation(libs.test.kotlinx.coroutines)
+    implementation(libs.test.mockito.core)
+    implementation(libs.test.mockito.kotlin)
+    implementation(libs.test.mockito.android)
+    implementation(projects.coroutine)
+}
+"""
+            val presentationTestGradle = File(architectureRoot, "presentation-test/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            assertEquals(expectedPresentationTest, presentationTestGradle.readText())
+        }
+
+        @Test
+        fun `Given valid inputs when generate then writes instrumentation test gradle file`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableCompose = true
+            val expectedInstrumentationTest = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+}
+
+android {
+    namespace = "com.example.test"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+dependencies {
+    implementation(libs.material)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+
+    implementation(libs.test.junit)
+    implementation(libs.test.androidx.junit)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.test.compose.ui.junit4)
+    implementation(libs.test.android.hilt)
+    implementation(libs.test.android.uiautomator)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.okhttp3)
+    implementation(libs.test.android.mockwebserver)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.test.androidx.rules)
+    implementation(libs.androidx.recyclerview)
+    implementation(kotlin("reflect"))
+}
+"""
+            val instrumentationTestGradle = File(architectureRoot, "instrumentation-test/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+
+            // Then
+            assertEquals(expectedInstrumentationTest, instrumentationTestGradle.readText())
         }
     }
 
@@ -2597,6 +2844,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.test.junit)
+    implementation(libs.test.kotlinx.coroutines)
+    implementation(libs.test.mockito.core)
+    implementation(libs.test.mockito.kotlin)
+    implementation(libs.test.mockito.android)
     implementation(projects.coroutine)
 }
 """
