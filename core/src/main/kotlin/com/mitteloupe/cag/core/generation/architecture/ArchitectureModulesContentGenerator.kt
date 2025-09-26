@@ -55,6 +55,11 @@ class ArchitectureModulesContentGenerator(
 
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
+                LibraryConstants.TESTING_LIBRARIES +
+                LibraryConstants.TEST_KOTLINX_COROUTINES +
+                LibraryConstants.NETWORK_LIBRARIES +
+                LibraryConstants.TEST_MOCKITO_LIBRARIES +
+                LibraryConstants.TEST_MOCKITO_ANDROID +
                 if (enableCompose) {
                     LibraryConstants.COMPOSE_LIBRARIES +
                         LibraryConstants.COMPOSE_TESTING_LIBRARIES +
@@ -63,9 +68,7 @@ class ArchitectureModulesContentGenerator(
                         LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
                 } else {
                     LibraryConstants.VIEW_LIBRARIES
-                } +
-                LibraryConstants.TESTING_LIBRARIES +
-                LibraryConstants.NETWORK_LIBRARIES
+                }
         val plugins =
             buildList {
                 addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)

@@ -16,7 +16,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.COMPOSE_NAVIGATION_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.DETEKT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.JUNIT4_VERSION
-import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLINX_COROUTINES_CORE_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLINX_COROUTINES_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLIN_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KSP_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KTLINT_VERSION
@@ -31,6 +31,9 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROID_HILT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROID_MOCKWEBSERVER_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROID_UI_AUTOMATOR_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_MOCKITO_ANDROID_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_MOCKITO_CORE_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_MOCKITO_KOTLIN_VERSION
 
 data class DependencyConfiguration(
     val versions: List<VersionRequirement>,
@@ -39,46 +42,50 @@ data class DependencyConfiguration(
 )
 
 object VersionCatalogConstants {
-    val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.10")
-    val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "35")
-    val MIN_SDK_VERSION = VersionRequirement(key = "minSdk", version = "24")
-    val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "35")
+    internal val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.10")
+    internal val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "35")
+    internal val MIN_SDK_VERSION = VersionRequirement(key = "minSdk", version = "24")
+    internal val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "35")
 
-    val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.12.2")
+    internal val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.12.2")
 
-    val COMPOSE_BOM_VERSION = VersionRequirement(key = "composeBom", version = "2025.08.01")
-    val COMPOSE_NAVIGATION_VERSION = VersionRequirement(key = "composeNavigation", version = "2.9.3")
+    internal val COMPOSE_BOM_VERSION = VersionRequirement(key = "composeBom", version = "2025.08.01")
+    internal val COMPOSE_NAVIGATION_VERSION = VersionRequirement(key = "composeNavigation", version = "2.9.3")
 
-    val JUNIT4_VERSION = VersionRequirement(key = "junit4", version = "4.13.2")
-    val KSP_VERSION = VersionRequirement(key = "ksp", version = "2.2.10-2.0.2")
+    internal val JUNIT4_VERSION = VersionRequirement(key = "junit4", version = "4.13.2")
+    internal val KSP_VERSION = VersionRequirement(key = "ksp", version = "2.2.10-2.0.2")
 
-    val KTLINT_VERSION = VersionRequirement(key = "ktlint", version = "13.1.0")
-    val DETEKT_VERSION = VersionRequirement(key = "detekt", version = "1.23.6")
+    internal val KTLINT_VERSION = VersionRequirement(key = "ktlint", version = "13.1.0")
+    internal val DETEKT_VERSION = VersionRequirement(key = "detekt", version = "1.23.6")
 
-    val ANDROIDX_CORE_KTX_VERSION = VersionRequirement(key = "androidxCoreKtx", version = "1.12.0")
-    val ANDROIDX_LIFECYCLE_RUNTIME_KTX_VERSION = VersionRequirement(key = "androidxLifecycleRuntimeKtx", version = "2.7.0")
-    val KOTLINX_COROUTINES_CORE_VERSION = VersionRequirement(key = "kotlinxCoroutinesCore", version = "1.7.3")
-    val MATERIAL_VERSION = VersionRequirement(key = "material", version = "1.11.0")
-    val OKHTTP3_VERSION = VersionRequirement(key = "okhttp3", version = "4.12.0")
-    val ANDROIDX_APPCOMPAT_VERSION = VersionRequirement(key = "androidxAppcompat", version = "1.6.1")
+    internal val ANDROIDX_CORE_KTX_VERSION = VersionRequirement(key = "androidxCoreKtx", version = "1.12.0")
+    internal val ANDROIDX_LIFECYCLE_RUNTIME_KTX_VERSION = VersionRequirement(key = "androidxLifecycleRuntimeKtx", version = "2.7.0")
+    internal val KOTLINX_COROUTINES_VERSION = VersionRequirement(key = "kotlinxCoroutines", version = "1.7.3")
+    internal val MATERIAL_VERSION = VersionRequirement(key = "material", version = "1.11.0")
+    internal val OKHTTP3_VERSION = VersionRequirement(key = "okhttp3", version = "4.12.0")
+    internal val ANDROIDX_APPCOMPAT_VERSION = VersionRequirement(key = "androidxAppcompat", version = "1.6.1")
 
-    val ANDROIDX_RECYCLER_VIEW_VERSION = VersionRequirement(key = "androidxRecyclerView", version = "1.3.2")
-    val ANDROIDX_FRAGMENT_KTX_VERSION = VersionRequirement(key = "androidxFragmentKtx", version = "1.6.2")
-    val ANDROIDX_NAVIGATION_FRAGMENT_KTX_VERSION = VersionRequirement(key = "androidxNavigationFragmentKtx", version = "2.7.6")
-    val ANDROIDX_CONSTRAINT_LAYOUT_VERSION = VersionRequirement(key = "androidxConstraintLayout", version = "2.1.4")
+    internal val ANDROIDX_RECYCLER_VIEW_VERSION = VersionRequirement(key = "androidxRecyclerView", version = "1.3.2")
+    internal val ANDROIDX_FRAGMENT_KTX_VERSION = VersionRequirement(key = "androidxFragmentKtx", version = "1.6.2")
+    internal val ANDROIDX_NAVIGATION_FRAGMENT_KTX_VERSION = VersionRequirement(key = "androidxNavigationFragmentKtx", version = "2.7.6")
+    internal val ANDROIDX_CONSTRAINT_LAYOUT_VERSION = VersionRequirement(key = "androidxConstraintLayout", version = "2.1.4")
 
-    val ANDROIDX_ACTIVITY_COMPOSE_VERSION = VersionRequirement(key = "androidxActivityCompose", version = "1.8.2")
+    internal val ANDROIDX_ACTIVITY_COMPOSE_VERSION = VersionRequirement(key = "androidxActivityCompose", version = "1.8.2")
 
-    val KTOR_VERSION = VersionRequirement(key = "ktor", version = "3.0.3")
-    val RETROFIT_VERSION = VersionRequirement(key = "retrofit", version = "2.11.0")
-    val OKHTTP3_LOGGING_INTERCEPTOR_VERSION = VersionRequirement(key = "okhttp3LoggingInterceptor", version = "4.12.0")
+    internal val KTOR_VERSION = VersionRequirement(key = "ktor", version = "3.0.3")
+    internal val RETROFIT_VERSION = VersionRequirement(key = "retrofit", version = "2.11.0")
+    internal val OKHTTP3_LOGGING_INTERCEPTOR_VERSION = VersionRequirement(key = "okhttp3LoggingInterceptor", version = "4.12.0")
 
-    val TEST_ANDROIDX_JUNIT_VERSION = VersionRequirement(key = "androidxJunit", version = "1.1.5")
-    val TEST_ANDROIDX_ESPRESSO_CORE_VERSION = VersionRequirement(key = "androidxEspressoCore", version = "3.5.1")
-    val TEST_ANDROID_HILT_VERSION = VersionRequirement(key = "androidHilt", version = "2.48")
-    val TEST_ANDROID_UI_AUTOMATOR_VERSION = VersionRequirement(key = "androidxUiautomator", version = "2.2.0")
-    val TEST_ANDROID_MOCKWEBSERVER_VERSION = VersionRequirement(key = "mockwebserver", version = "4.12.0")
-    val TEST_ANDROIDX_RULES_VERSION = VersionRequirement(key = "androidxTestRules", version = "1.5.0")
+    internal val TEST_MOCKITO_CORE_VERSION = VersionRequirement(key = "mockitoCore", version = "5.20.0")
+    internal val TEST_MOCKITO_KOTLIN_VERSION = VersionRequirement(key = "mockitoKotlin", version = "6.0.0")
+    internal val TEST_MOCKITO_ANDROID_VERSION = VersionRequirement(key = "mockitoAndroid", version = "2.28.6")
+
+    internal val TEST_ANDROIDX_JUNIT_VERSION = VersionRequirement(key = "androidxJunit", version = "1.1.5")
+    internal val TEST_ANDROIDX_ESPRESSO_CORE_VERSION = VersionRequirement(key = "androidxEspressoCore", version = "3.5.1")
+    internal val TEST_ANDROID_HILT_VERSION = VersionRequirement(key = "androidHilt", version = "2.48")
+    internal val TEST_ANDROID_UI_AUTOMATOR_VERSION = VersionRequirement(key = "androidxUiautomator", version = "2.2.0")
+    internal val TEST_ANDROID_MOCKWEBSERVER_VERSION = VersionRequirement(key = "mockwebserver", version = "4.12.0")
+    internal val TEST_ANDROIDX_RULES_VERSION = VersionRequirement(key = "androidxTestRules", version = "1.5.0")
 
     val ANDROID_VERSIONS =
         listOf(
@@ -108,7 +115,14 @@ object LibraryConstants {
         LibraryRequirement(
             key = "kotlinx-coroutines-core",
             module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
-            version = KOTLINX_COROUTINES_CORE_VERSION
+            version = KOTLINX_COROUTINES_VERSION
+        )
+
+    val TEST_KOTLINX_COROUTINES =
+        LibraryRequirement(
+            key = "test-kotlinx-coroutines",
+            module = "org.jetbrains.kotlinx:kotlinx-coroutines-test",
+            version = KOTLINX_COROUTINES_VERSION
         )
 
     val COMPOSE_BOM =
@@ -300,6 +314,27 @@ object LibraryConstants {
             version = OKHTTP3_LOGGING_INTERCEPTOR_VERSION
         )
 
+    val TEST_MOCKITO_CORE =
+        LibraryRequirement(
+            key = "test-mockito-core",
+            module = "org.mockito:mockito-core",
+            version = TEST_MOCKITO_CORE_VERSION
+        )
+
+    val TEST_MOCKITO_KOTLIN =
+        LibraryRequirement(
+            key = "test-mockito-kotlin",
+            module = "org.mockito.kotlin:mockito-kotlin",
+            version = TEST_MOCKITO_KOTLIN_VERSION
+        )
+
+    val TEST_MOCKITO_ANDROID =
+        LibraryRequirement(
+            key = "test-mockito-android",
+            module = "com.linkedin.dexmaker:dexmaker-mockito-inline",
+            version = TEST_MOCKITO_ANDROID_VERSION
+        )
+
     val CORE_ANDROID_LIBRARIES =
         listOf(
             ANDROIDX_CORE_KTX,
@@ -353,6 +388,12 @@ object LibraryConstants {
             KTOR_CLIENT_OKHTTP,
             RETROFIT,
             OKHTTP3_LOGGING_INTERCEPTOR
+        )
+
+    val TEST_MOCKITO_LIBRARIES =
+        listOf(
+            TEST_MOCKITO_CORE,
+            TEST_MOCKITO_KOTLIN
         )
 }
 
