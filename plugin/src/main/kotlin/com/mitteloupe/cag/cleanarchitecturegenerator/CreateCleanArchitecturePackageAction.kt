@@ -12,6 +12,7 @@ import java.io.File
 
 class CreateCleanArchitecturePackageAction : AnAction() {
     private val ideBridge = IdeBridge()
+    private val generatorProvider = GeneratorProvider()
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -25,7 +26,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                 basePackage?.let {
                     "$it.architecture"
                 } ?: "com.example.architecture"
-            val generator = GeneratorProvider().generator(project)
+            val generator = generatorProvider.prepare(project).generate()
             val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
             val request =
                 GenerateArchitectureRequest(

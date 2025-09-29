@@ -21,14 +21,30 @@ import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogSettingsAccessor
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
+import com.mitteloupe.cag.settings.versioncatalog.current.VersionCatalogProjectSettingsService
+import com.mitteloupe.cag.settings.versioncatalog.template.VersionCatalogAppSettingsService
 
 class GeneratorProvider {
-    fun generator(project: Project?): Generator {
+    class GeneratorInitializer internal constructor(
+        private val generatorProvider: GeneratorProvider,
+        val project: Project?
+    ) {
+        fun generate() = generatorProvider.generator(project)
+    }
+
+    fun prepare(project: Project?) =
+        GeneratorInitializer(this, project).also {
+            installVersionProvider(project)
+        }
+
+    private fun generator(project: Project?): Generator {
         val fileCreator = FileCreator(IntelliJFileSystemBridge(project))
         val directoryFinder = DirectoryFinder()
         val kotlinFileCreator = KotlinFileCreator(fileCreator)
         val gradleFileCreator = GradleFileCreator(fileCreator)
+
         val catalogUpdater = VersionCatalogUpdater(fileCreator)
         return Generator(
             GradleFileCreator(fileCreator),
@@ -49,5 +65,18 @@ class GeneratorProvider {
             VersionCatalogUpdater(fileCreator),
             SettingsFileUpdater(fileCreator)
         )
+    }
+
+    private fun installVersionProvider(project: Project?) {
+        val settingsService =
+            if (project == null) {
+                VersionCatalogAppSettingsService.getInstance()
+            } else {
+                VersionCatalogProjectSettingsService.getInstance(project)
+            }
+        VersionCatalogSettingsAccessor.setProvider { key, default ->
+            val values = settingsService.getCurrentValues()
+            values[key] ?: default
+        }
     }
 }

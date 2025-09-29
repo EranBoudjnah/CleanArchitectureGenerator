@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
+    private val generatorProvider = GeneratorProvider()
 
     private val processedRequests = ConcurrentHashMap<String, Boolean>()
 
@@ -144,7 +145,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     enableRetrofit = enableRetrofit.value
                 )
 
-            GeneratorProvider().generator(project = null).generateProjectTemplate(request)
+            generatorProvider.prepare(project = null).generate().generateProjectTemplate(request)
         }
     }
 

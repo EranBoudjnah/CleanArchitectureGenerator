@@ -10,6 +10,7 @@ import java.io.File
 
 class CreateDataSourceAction : AnAction() {
     private val ideBridge = IdeBridge()
+    private val generatorProvider = GeneratorProvider()
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
@@ -24,7 +25,7 @@ class CreateDataSourceAction : AnAction() {
         val dataSourceName = dialog.dataSourceNameWithSuffix
 
         try {
-            GeneratorProvider().generator(project).generateDataSource(
+            generatorProvider.prepare(project).generate().generateDataSource(
                 destinationRootDirectory = projectRootDir,
                 dataSourceName = dataSourceName,
                 projectNamespace = defaultPrefix,
