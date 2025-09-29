@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.configuration.ClientConfigurationLoader
 import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
@@ -24,6 +25,7 @@ import com.mitteloupe.cag.core.generation.UiLayerContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogSettingsAccessor
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
@@ -47,6 +49,7 @@ fun main(arguments: Array<String>) {
     val projectRoot = findGradleProjectRoot(Paths.get("").toAbsolutePath().toFile()) ?: Paths.get("").toAbsolutePath().toFile()
     val projectModel = FilesystemProjectModel(projectRoot)
     val basePackage = NamespaceResolver().determineBasePackage(projectModel)
+    val configuration = ClientConfigurationLoader().load(projectRoot)
 
     if (argumentProcessor.isHelpRequested(arguments)) {
         printHelpMessage()
@@ -102,6 +105,7 @@ fun main(arguments: Array<String>) {
                 enableRetrofit = request.enableRetrofit
             )
         executeAndReport {
+            setVersionProvider(configuration.newProjectVersions)
             generator.generateProjectTemplate(projectTemplateRequest)
         }
     }
@@ -117,6 +121,7 @@ fun main(arguments: Array<String>) {
                 enableDetekt = request.enableDetekt
             )
         executeAndReport {
+            setVersionProvider(configuration.existingProjectVersions)
             generator.generateArchitecture(architectureRequest)
         }
     }
@@ -136,12 +141,14 @@ fun main(arguments: Array<String>) {
                 .enableDetekt(requestFeature.enableDetekt)
                 .build()
         executeAndReport {
+            setVersionProvider(configuration.existingProjectVersions)
             generator.generateFeature(request)
         }
     }
 
     dataSourceRequests.forEach { request ->
         executeAndReport {
+            setVersionProvider(configuration.existingProjectVersions)
             generator.generateDataSource(
                 destinationRootDirectory = destinationRootDirectory,
                 dataSourceName = request.dataSourceName,
@@ -165,6 +172,7 @@ fun main(arguments: Array<String>) {
                 .build()
 
         executeAndReport {
+            setVersionProvider(configuration.existingProjectVersions)
             generator.generateUseCase(useCaseRequest)
         }
     }
@@ -184,6 +192,7 @@ fun main(arguments: Array<String>) {
             ).build()
 
         executeAndReport {
+            setVersionProvider(configuration.existingProjectVersions)
             generator.generateViewModel(viewModelRequest)
         }
     }
@@ -312,3 +321,9 @@ private fun executeAndReport(operation: () -> Unit) =
         println("Error: ${exception.message}")
         exitProcess(1)
     }
+
+private fun setVersionProvider(overrides: Map<String, String>) {
+    VersionCatalogSettingsAccessor.setProvider { key, default ->
+        overrides[key] ?: default
+    }
+}

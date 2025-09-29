@@ -111,3 +111,44 @@ cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature 
 ```
 
 When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.
+
+### CLI configuration (.cagrc)
+
+You can configure library and plugin versions used by the CLI via a simple INI-style config file named `.cagrc`.
+
+- Locations:
+  - Project root: `./.cagrc`
+  - User home: `~/.cagrc`
+
+- Precedence:
+  - Values in the project `.cagrc` override values in `~/.cagrc`.
+
+- Sections:
+  - `[new.versions]` — applied when generating new projects (e.g., `--new-project`).
+  - `[existing.versions]` — applied when generating into an existing project (e.g., new architecture, feature, data source, use case, or view model).
+
+- Keys correspond to version keys used by the generator, for example: `kotlin`, `androidGradlePlugin`, `composeBom`, `composeNavigation`, `retrofit`, `ktor`, `okhttp3`, etc.
+
+Example `~/.cagrc`:
+
+```
+[new.versions]
+kotlin=2.2.10
+composeBom=2025.08.01
+
+[existing.versions]
+retrofit=2.11.0
+ktor=3.0.3
+```
+
+Example `./.cagrc` (project overrides):
+
+```
+[new.versions]
+composeBom=2025.09.01
+
+[existing.versions]
+okhttp3=4.12.0
+```
+
+With the above, new projects will use `composeBom=2025.09.01` (from project), `kotlin=2.2.10` (from home). For operations on existing projects, `retrofit=2.11.0` (home) and `okhttp3=4.12.0` (project) will be applied.
