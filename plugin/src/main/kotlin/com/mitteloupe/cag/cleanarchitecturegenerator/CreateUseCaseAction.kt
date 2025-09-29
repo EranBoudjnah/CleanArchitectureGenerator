@@ -19,6 +19,7 @@ import java.io.File
 
 class CreateUseCaseAction : AnAction() {
     private val ideBridge = IdeBridge()
+    private val generatorProvider = GeneratorProvider()
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -72,7 +73,7 @@ class CreateUseCaseAction : AnAction() {
                 .build()
 
         try {
-            GeneratorProvider().generator(project).generateUseCase(request)
+            generatorProvider.prepare(project).generate().generateUseCase(request)
             ideBridge.refreshIde(projectRootDir)
             ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(

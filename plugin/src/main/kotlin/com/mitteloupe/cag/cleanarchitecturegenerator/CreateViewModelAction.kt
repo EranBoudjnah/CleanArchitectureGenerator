@@ -21,6 +21,7 @@ import java.io.File
 
 class CreateViewModelAction : AnAction() {
     private val ideBridge = IdeBridge()
+    private val generatorProvider = GeneratorProvider()
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -79,7 +80,7 @@ class CreateViewModelAction : AnAction() {
             ).build()
 
         try {
-            GeneratorProvider().generator(project).generateViewModel(request)
+            generatorProvider.prepare(project).generate().generateViewModel(request)
             ideBridge.refreshIde(projectRootDirectory)
             ideBridge.synchronizeGradle(project, projectRootDirectory)
             Messages.showInfoMessage(

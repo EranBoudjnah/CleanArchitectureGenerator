@@ -13,6 +13,7 @@ import java.io.File
 class CreateCleanArchitectureFeatureAction : AnAction() {
     private val ideBridge = IdeBridge()
     private val appModuleDirectoryFinder = AppModuleDirectoryFinder()
+    private val generatorProvider = GeneratorProvider()
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
@@ -24,7 +25,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
-            val generator = GeneratorProvider().generator(project)
+            val generator = generatorProvider.prepare(project).generate()
             val selectedAppModule = dialog.selectedAppModuleDirectory
             val enableKtlint = dialog.enableKtlint
             val enableDetekt = dialog.enableDetekt
