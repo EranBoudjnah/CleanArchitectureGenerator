@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.components.service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
@@ -13,6 +14,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
 import java.io.File
@@ -74,6 +76,7 @@ class CreateUseCaseAction : AnAction() {
 
         try {
             generatorProvider.prepare(project).generate().generateUseCase(request)
+            project.service<GitAddQueueService>().flush()
             ideBridge.refreshIde(projectRootDir)
             ideBridge.synchronizeGradle(project, projectRootDir)
             Messages.showInfoMessage(

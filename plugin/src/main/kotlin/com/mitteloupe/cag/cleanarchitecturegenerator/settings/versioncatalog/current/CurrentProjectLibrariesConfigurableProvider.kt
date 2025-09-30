@@ -1,10 +1,10 @@
-package com.mitteloupe.cag.settings.versioncatalog.current
+package com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.current
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurableProvider
 import com.intellij.openapi.project.Project
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
-import com.mitteloupe.cag.settings.versioncatalog.VersionCatalogConfigurable
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.VersionCatalogConfigurable
 
 class CurrentProjectLibrariesConfigurableProvider(private val project: Project) : ConfigurableProvider() {
     override fun createConfigurable(): Configurable =

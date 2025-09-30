@@ -1,10 +1,10 @@
-package com.mitteloupe.cag.settings.versioncatalog.template
+package com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.template
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
-import com.mitteloupe.cag.settings.versioncatalog.VersionCatalogSettingsService
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.VersionCatalogSettingsService
 
 @State(
     name = "CagVersionCatalogAppSettings",

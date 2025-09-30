@@ -3,11 +3,14 @@ package com.mitteloupe.cag.cleanarchitecturegenerator.filesystem
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.findOrCreateFile
 import com.intellij.openapi.vfs.writeBytes
 import com.intellij.util.ModalityUiUtil
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.filesystem.FileSystemBridge
 import java.io.File
 
@@ -52,17 +55,20 @@ class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge
                         virtualFile.delete(this)
                         val newFile = parent.findOrCreateFile(file.name)
                         newFile.writeBytes(content)
+                        enqueueForGitIfEnabled(file)
                     } ?: let {
                         file.delete()
                         file.createNewFile()
                         file.writeBytes(content)
                         updateAsync(file)
+                        enqueueForGitIfEnabled(file)
                     }
                 }
             }
         } else {
             file.writeBytes(content)
             updateAsync(file)
+            enqueueForGitIfEnabled(file)
         }
     }
 
@@ -81,6 +87,7 @@ class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge
 
         sourceFile.copyTo(targetFile, overwrite = overwrite)
         updateAsync(targetFile)
+        enqueueForGitIfEnabled(targetFile)
     }
 
     private fun updateAsync(file: File) {
@@ -89,6 +96,17 @@ class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge
         }
         ModalityUiUtil.invokeLaterIfNeeded(ModalityState.defaultModalityState()) {
             performWriteAction(command)
+        }
+    }
+
+    private fun enqueueForGitIfEnabled(file: File) {
+        val project = project ?: return
+        if (!AppSettingsService.getInstance().autoAddGeneratedFilesToGit) {
+            return
+        }
+        try {
+            project.service<GitAddQueueService>().enqueue(file)
+        } catch (_: Throwable) {
         }
     }
 
