@@ -12,9 +12,9 @@ import com.intellij.openapi.components.service
 )
 @Service(Service.Level.APP)
 class AppSettingsService : PersistentStateComponent<AppSettingsService.State> {
-    data class State(
-        val autoAddGeneratedFilesToGit: Boolean = false
-    )
+    class State {
+        var autoAddGeneratedFilesToGit: Boolean = false
+    }
 
     private var state: State = State()
 
@@ -27,7 +27,7 @@ class AppSettingsService : PersistentStateComponent<AppSettingsService.State> {
     var autoAddGeneratedFilesToGit: Boolean
         get() = state.autoAddGeneratedFilesToGit
         set(value) {
-            state = state.copy(autoAddGeneratedFilesToGit = value)
+            state.autoAddGeneratedFilesToGit = value
         }
 
     companion object {

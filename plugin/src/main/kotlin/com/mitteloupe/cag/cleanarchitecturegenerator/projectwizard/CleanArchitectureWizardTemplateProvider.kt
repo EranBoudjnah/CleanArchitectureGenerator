@@ -15,24 +15,20 @@ import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.template
-import com.intellij.openapi.application.ApplicationManager
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitInitializer
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitStager
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import java.io.File
 import java.lang.reflect.Field
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
-
-    private val processedRequests = ConcurrentHashMap<String, Boolean>()
-
-    private val executionId = UUID.randomUUID().toString()
 
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
@@ -81,12 +77,20 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     help = CleanArchitectureGeneratorBundle.message("wizard.parameter.retrofit.help")
                 }
 
+            val initializeGitRepository =
+                booleanParameter {
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.git.init.name")
+                    default = false
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.git.init.help")
+                }
+
             widgets(
                 CheckBoxWidget(enableKtlint),
                 CheckBoxWidget(enableDetekt),
                 CheckBoxWidget(enableCompose),
                 CheckBoxWidget(enableKtor),
-                CheckBoxWidget(enableRetrofit)
+                CheckBoxWidget(enableRetrofit),
+                CheckBoxWidget(initializeGitRepository)
             )
 
             thumb {
@@ -94,9 +98,9 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             }
 
             recipe = { data: TemplateData ->
-                val moduleData = (data as ModuleTemplateData)
+                if (this !is FindReferencesRecipeExecutor) {
+                    val moduleData = (data as ModuleTemplateData)
 
-                if (processedRequests.putIfAbsent(executionId, true) == null) {
                     try {
                         val projectRootDirectory = moduleData.rootDir.parentFile
                         createProject(
@@ -106,7 +110,8 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                             enableKtlint,
                             enableDetekt,
                             enableKtor,
-                            enableRetrofit
+                            enableRetrofit,
+                            initializeGitRepository
                         )
                         ideBridge.refreshIde(projectRootDirectory)
                     } catch (exception: GenerationException) {
@@ -129,23 +134,33 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
         enableKtlint: BooleanParameter,
         enableDetekt: BooleanParameter,
         enableKtor: BooleanParameter,
-        enableRetrofit: BooleanParameter
+        enableRetrofit: BooleanParameter,
+        initializeGitRepository: BooleanParameter
     ) {
-        ApplicationManager.getApplication().executeOnPooledThread {
-            val request =
-                GenerateProjectTemplateRequest(
-                    requestId = executionId,
-                    destinationRootDirectory = projectRootDirectory,
-                    projectName = readProjectName(projectRootDirectory.name),
-                    packageName = data.packageName,
-                    enableCompose = enableCompose.value,
-                    enableKtlint = enableKtlint.value,
-                    enableDetekt = enableDetekt.value,
-                    enableKtor = enableKtor.value,
-                    enableRetrofit = enableRetrofit.value
-                )
+        val request =
+            GenerateProjectTemplateRequest(
+                destinationRootDirectory = projectRootDirectory,
+                projectName = readProjectName(projectRootDirectory.name),
+                packageName = data.packageName,
+                enableCompose = enableCompose.value,
+                enableKtlint = enableKtlint.value,
+                enableDetekt = enableDetekt.value,
+                enableKtor = enableKtor.value,
+                enableRetrofit = enableRetrofit.value
+            )
 
-            generatorProvider.prepare(project = null).generate().generateProjectTemplate(request)
+        generatorProvider.prepare(project = null).generate().generateProjectTemplate(request)
+
+        val initializeGitRepository = initializeGitRepository.value
+        if (initializeGitRepository) {
+            GitInitializer().initialize(projectRootDirectory)
+        }
+
+        if (AppSettingsService.getInstance().autoAddGeneratedFilesToGit) {
+            val gitDirectory = File(projectRootDirectory, ".git")
+            if (gitDirectory.exists()) {
+                runCatching { GitStager().stageAll(projectRootDirectory) }
+            }
         }
     }
 

@@ -44,7 +44,7 @@ class GitStagerTest {
         every { executor.run(projectRoot, expectedArguments) } returns Unit
 
         // When
-        classUnderTest.stageAll(projectRoot, givenFiles)
+        classUnderTest.stage(projectRoot, givenFiles)
 
         // Then
         verify { executor.run(projectRoot, expectedArguments) }
@@ -53,7 +53,7 @@ class GitStagerTest {
     @Test
     fun `Given empty queue When flush Then does not run git`() {
         // When
-        classUnderTest.stageAll(projectRoot, emptyList())
+        classUnderTest.stage(projectRoot, emptyList())
 
         // Then
         verify(exactly = 0) { executor.run(any(), any()) }
@@ -71,7 +71,7 @@ class GitStagerTest {
 
         try {
             // When
-            classUnderTest.stageAll(projectRoot, givenFiles)
+            classUnderTest.stage(projectRoot, givenFiles)
 
             // Then
             verify { executor.run(projectRoot, expectedArguments) }

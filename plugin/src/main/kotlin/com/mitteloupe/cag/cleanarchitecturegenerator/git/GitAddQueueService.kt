@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 @Service(Service.Level.PROJECT)
 class GitAddQueueService(private val project: Project) {
     private val queue = ConcurrentSkipListSet<String>()
-    private val gitStager = GitStager(ProcessExecutor())
+    private val gitStager = GitStager()
 
     fun enqueue(file: File) {
         val path = file.absolutePath
@@ -27,44 +27,7 @@ class GitAddQueueService(private val project: Project) {
             return
         }
 
-        gitStager.stageAll(projectRoot, items.map(::File))
+        gitStager.stage(projectRoot, items.map(::File))
         queue.removeAll(items)
-    }
-}
-
-internal class GitStager(private val executor: ProcessExecutor) {
-    fun stageAll(
-        projectRoot: File,
-        files: Collection<File>
-    ) {
-        if (files.isEmpty()) {
-            return
-        }
-        val gitCommandWithArguments =
-            listOf("git", "add", "--") +
-                files.map { file ->
-                    val absolutePath = file.absolutePath
-                    val file = File(absolutePath)
-                    file.relativeToOrNull(projectRoot)?.path ?: absolutePath
-                }
-        executor.run(projectRoot, gitCommandWithArguments)
-    }
-}
-
-internal class ProcessExecutor {
-    fun run(
-        directory: File,
-        args: List<String>
-    ) {
-        try {
-            val process =
-                ProcessBuilder(args)
-                    .directory(directory)
-                    .redirectErrorStream(true)
-                    .start()
-            process.inputStream.bufferedReader().use { it.readText() }
-            process.waitFor()
-        } catch (_: Exception) {
-        }
     }
 }
