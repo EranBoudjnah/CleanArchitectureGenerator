@@ -44,73 +44,93 @@ java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
 java -jar "cli/build/libs/cli-all.jar" --new-view-model --name=MyViewModel
 ```
 
-#### Options
+#### Usage and help
 
-Usage:
+Usage (canonical):
 
 ```bash
-cag [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]...
+cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... [--new-architecture [--no-compose] [--ktlint] [--detekt]]... [--new-feature --name=FeatureName [--package=PackageName]]... [--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... [--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]...
 ```
 
-##### New Architecture Options
+- Full reference: `cag --help`
+- Topic help: `cag --help --topic=new-feature` or `cag --help -t new-use-case`
+- Man page: `man cag` (see below for generating/installing locally)
+
+Common examples:
+
 ```bash
-  --new-architecture | -na
-    Generate a new Clean Architecture package with domain, presentation, and UI layers
-  --no-compose | -nc
-    Disable Compose support for the preceding architecture package
-  --ktlint | -kl
-    Enable ktlint for the preceding architecture package
-  --detekt | -d
-    Enable detekt for the preceding architecture package
+# Generate a new project
+cag --new-project --name=MyApp --package=com.example.myapp
+
+# Add architecture to an existing project/module
+cag --new-architecture --ktlint --detekt
+
+# Add a new feature
+cag --new-feature --name=Profile --package=com.example.feature.profile
+
+# Add a data source with Retrofit
+cag --new-datasource --name=User --with=retrofit
+
+# Add a use case
+cag --new-use-case --name=FetchUser --path=architecture/domain/src/main/kotlin
+
+# Add a ViewModel
+cag --new-view-model --name=Profile
 ```
 
-##### New Feature Options
+Manual page (optional):
+
 ```bash
-  --new-feature --name=<FeatureName> | --new-feature --name <FeatureName> | -nf --name=<FeatureName> | -nf --name <FeatureName>
-    Generate a new feature named <FeatureName>
-  --package=<PackageName> | --package <PackageName> | -p=<PackageName> | -p <PackageName> | -p<PackageName>
-    (Optional) Override the feature package for the preceding feature
+# Generate man page (writes cli/build/man/cag.1)
+./gradlew :cli:generateManPage
+
+# Install to a man1 directory (may require sudo for system directories)
+./gradlew :cli:installManPage
+
+# Preview after install
+man cag
 ```
 
-##### New DataSource Options
-```bash
-  --new-datasource --name=<DataSourceName> | --new-datasource --name <Name> | -nds --name=<Name> | -nds --name <Name>
-    Generate a new DataSource named <DataSourceName>DataSource
-  --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
-    Attach dependencies to the preceding new data source
+### CLI configuration (.cagrc)
+
+You can configure library and plugin versions used by the CLI via a simple INI-style config file named `.cagrc`.
+
+- Locations:
+  - Project root: `./.cagrc`
+  - User home: `~/.cagrc`
+
+- Precedence:
+  - Values in the project `.cagrc` override values in `~/.cagrc`.
+
+- Sections:
+  - `[new.versions]` — applied when generating new projects (e.g., `--new-project`).
+  - `[existing.versions]` — applied when generating into an existing project (e.g., new architecture, feature, data source, use case, or view model).
+
+- Keys correspond to version keys used by the generator, for example: `kotlin`, `androidGradlePlugin`, `composeBom`, `composeNavigation`, `retrofit`, `ktor`, `okhttp3`, etc.
+
+Example `~/.cagrc`:
+
+```
+[new.versions]
+kotlin=2.2.10
+composeBom=2025.08.01
+
+[existing.versions]
+retrofit=2.11.0
+ktor=3.0.3
 ```
 
-##### New UseCase Options
-```bash
-  --new-use-case --name=<UseCaseName> | --new-use-case --name <UseCaseName> | -nuc --name=<UseCaseName> | -nuc --name <UseCaseName>
-    Generate a new use case named <UseCaseName>UseCase.
-  --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
-    (Optional) Specify the target directory for the preceding use case
-    By default, the target path is determined by the current location
-  --input-type=<InputType> | --input-type <InputType> | -it=<InputType> | -it <InputType> | -it<InputType>
-    (Optional) Specify the input data type for the preceding use case
-    By default, Unit is used
-  --output-type=<OutputType> | --output-type <OutputType> | -ot=<OutputType> | -ot <OutputType> | -ot<OutputType>
-    (Optional) Specify the output data type for the preceding use case
-    By default, Unit is used
+Example `./.cagrc` (project overrides):
+
+```
+[new.versions]
+composeBom=2025.09.01
+
+[existing.versions]
+okhttp3=4.12.0
 ```
 
-##### New ViewModel Options
-```bash
-  --new-view-model --name=<ViewModelName> | --new-view-model --name <ViewModelName> | -nvm --name=<ViewModelName> | -nvm --name <ViewModelName>
-    Generate a new ViewModel named <ViewModelName>ViewModel.
-  --path=<TargetPath> | --path <TargetPath> | -p=<TargetPath> | -p <TargetPath> | -p<TargetPath>
-    (Optional) Specify the target directory for the preceding ViewModel
-    By default, the target path is determined by the current location
-```
-
-##### Other Options
-```bash
-  --help, -h
-    Show the help document for cag
-```
-
-When run without arguments, the command prints a short usage and suggests using `--help` or `-h` for more options.
+With the above, new projects will use `composeBom=2025.09.01` (from project), `kotlin=2.2.10` (from home). For operations on existing projects, `retrofit=2.11.0` (home) and `okhttp3=4.12.0` (project) will be applied.
 
 ### CLI configuration (.cagrc)
 

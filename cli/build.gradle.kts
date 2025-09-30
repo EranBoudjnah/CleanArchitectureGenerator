@@ -45,3 +45,5 @@ ktlint {
         include("**/*.kts")
     }
 }
+
+apply(from = "man.gradle.kts")

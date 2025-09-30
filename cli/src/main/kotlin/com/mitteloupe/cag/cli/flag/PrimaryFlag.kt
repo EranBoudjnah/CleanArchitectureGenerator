@@ -12,6 +12,8 @@ object SecondaryFlagConstants {
     const val PATH = "--path"
     const val INPUT_TYPE = "--input-type"
     const val OUTPUT_TYPE = "--output-type"
+    const val HELP_TOPIC = "--topic"
+    const val HELP_FORMAT = "--format"
 }
 
 interface PrimaryFlag {
@@ -117,6 +119,10 @@ interface PrimaryFlag {
     data object HelpPrimary : PrimaryFlag {
         override val long = "--help"
         override val short = "-h"
-        override val secondaryFlags: List<SecondaryFlag> = emptyList()
+        override val secondaryFlags: List<SecondaryFlag> =
+            listOf(
+                SecondaryFlag(SecondaryFlagConstants.HELP_TOPIC, "-t"),
+                SecondaryFlag(SecondaryFlagConstants.HELP_FORMAT, "-f")
+            )
     }
 }
