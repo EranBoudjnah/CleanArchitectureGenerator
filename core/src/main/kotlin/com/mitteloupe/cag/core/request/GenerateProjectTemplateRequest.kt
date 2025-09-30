@@ -3,7 +3,6 @@ package com.mitteloupe.cag.core.request
 import java.io.File
 
 data class GenerateProjectTemplateRequest(
-    val requestId: String,
     val destinationRootDirectory: File,
     val projectName: String,
     val packageName: String,
