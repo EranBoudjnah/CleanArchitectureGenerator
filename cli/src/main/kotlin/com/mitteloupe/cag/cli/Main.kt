@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.HelpContent.USAGE_SYNTAX
 import com.mitteloupe.cag.cli.configuration.ClientConfigurationLoader
 import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
 import com.mitteloupe.cag.core.DirectoryFinder
@@ -37,13 +38,6 @@ import java.nio.file.Paths
 import java.util.UUID
 import kotlin.system.exitProcess
 
-private const val USAGE_SYNTAX =
-    "usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
-        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
-        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt]]... " +
-        "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-        "[--new-use-case --name=UseCaseName [--path=TargetPath]]... [--new-view-model --name=ViewModelName [--path=TargetPath]]..."
-
 fun main(arguments: Array<String>) {
     val argumentProcessor = AppArgumentProcessor()
     val projectRoot = findGradleProjectRoot(Paths.get("").toAbsolutePath().toFile()) ?: Paths.get("").toAbsolutePath().toFile()
@@ -52,7 +46,12 @@ fun main(arguments: Array<String>) {
     val configuration = ClientConfigurationLoader().load(projectRoot)
 
     if (argumentProcessor.isHelpRequested(arguments)) {
-        printHelpMessage()
+        val helpOptions = argumentProcessor.getHelpOptions(arguments)
+        when {
+            helpOptions?.format?.lowercase() == "man" -> ManPagePrinter.printManPage(helpOptions.topic)
+            helpOptions?.topic != null -> printHelpMessage(helpOptions.topic)
+            else -> printHelpMessage()
+        }
         return
     }
 
@@ -127,8 +126,7 @@ fun main(arguments: Array<String>) {
     }
 
     featureRequests.forEach { requestFeature ->
-        val packageName =
-            requestFeature.packageName ?: basePackage?.let { "${'$'}it${'$'}{requestFeature.featureName.lowercase()}" }
+        val packageName = requestFeature.packageName ?: basePackage?.let { "$it${requestFeature.featureName.lowercase()}" }
 
         val request =
             GenerateFeatureRequestBuilder(
@@ -284,6 +282,22 @@ private fun printHelpMessage() {
               Show this help message and exit
         """.trimIndent()
     )
+}
+
+private fun printHelpMessage(topic: String?) {
+    val normalized = topic?.lowercase()?.trim()
+    if (normalized.isNullOrEmpty() || normalized == "all" || normalized == "overview") {
+        printHelpMessage()
+        return
+    }
+    val sections = HelpContent.helpSections()
+    val content = sections[normalized]
+    if (content != null) {
+        println(content)
+    } else {
+        println("Unknown help topic: $topic\nAvailable topics: ${sections.keys.sorted().joinToString(", ")}\n")
+        printHelpMessage()
+    }
 }
 
 private fun produceGenerator(): Generator {

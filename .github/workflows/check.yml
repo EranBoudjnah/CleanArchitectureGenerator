@@ -36,6 +36,17 @@ jobs:
     - name: Run check task
       run: ./gradlew check
 
+    - name: Generate CLI man page
+      run: ./gradlew :cli:generateManPage --no-configuration-cache
+
+    - name: Upload CLI man page
+      uses: actions/upload-artifact@v4
+      with:
+        name: cli-manpage
+        path: |
+          cli/build/man/cag.1
+        retention-days: 30
+
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()

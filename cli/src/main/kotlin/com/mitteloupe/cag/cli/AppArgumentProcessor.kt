@@ -30,6 +30,17 @@ private val PRIMARY_FLAGS =
 class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
     fun isHelpRequested(arguments: Array<String>): Boolean = argumentParser.parsePrimaryWithSecondaries(arguments, HelpPrimary).isNotEmpty()
 
+    fun getHelpOptions(arguments: Array<String>): HelpOptions? {
+        val primaryFlagMatches = argumentParser.parsePrimaryWithSecondaries(arguments, HelpPrimary)
+        if (primaryFlagMatches.isEmpty()) {
+            return null
+        }
+        val secondaryFlags = primaryFlagMatches.first()
+        val topic = secondaryFlags[SecondaryFlagConstants.HELP_TOPIC]
+        val format = secondaryFlags[SecondaryFlagConstants.HELP_FORMAT]
+        return HelpOptions(topic = topic, format = format)
+    }
+
     private fun getAllPrimaryFlagStrings(): Set<String> = PRIMARY_FLAGS.flatMap { listOf(it.long, it.short) }.toSet()
 
     fun validateNoUnknownFlags(arguments: Array<String>) {
@@ -233,4 +244,6 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments[firstPrimaryIndex] == primaryFlag.long
         }
     }
+
+    data class HelpOptions(val topic: String?, val format: String?)
 }
