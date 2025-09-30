@@ -17,11 +17,19 @@ abstract class VersionCatalogSettingsService : PersistentStateComponent<VersionC
         this.state = state
     }
 
+    fun initialize() {
+        initializeValuesIfEmpty()
+    }
+
     fun getCurrentValues(): Map<String, String> {
+        initializeValuesIfEmpty()
+        return state.values
+    }
+
+    private fun initializeValuesIfEmpty() {
         if (state.values.isEmpty()) {
             replaceAll(defaultValues())
         }
-        return state.values
     }
 
     fun replaceAll(newValues: Map<String, String>) {
