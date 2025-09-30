@@ -2,8 +2,10 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
@@ -42,6 +44,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                     .build()
             try {
                 generator.generateFeature(request)
+                project.service<GitAddQueueService>().flush()
                 ideBridge.refreshIde(projectRootDirectory)
                 ideBridge.synchronizeGradle(project, projectRootDirectory)
                 Messages.showInfoMessage(

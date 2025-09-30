@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.filesystem
 
 import com.intellij.openapi.project.Project
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.current.VersionCatalogProjectSettingsService
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.template.VersionCatalogAppSettingsService
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.Generator
 import com.mitteloupe.cag.core.generation.AppModuleContentGenerator
@@ -23,8 +25,6 @@ import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGen
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogSettingsAccessor
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
-import com.mitteloupe.cag.settings.versioncatalog.current.VersionCatalogProjectSettingsService
-import com.mitteloupe.cag.settings.versioncatalog.template.VersionCatalogAppSettingsService
 
 class GeneratorProvider {
     class GeneratorInitializer internal constructor(

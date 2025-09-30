@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.settings.versioncatalog
+package com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog
 
 import com.intellij.openapi.options.BoundSearchableConfigurable
 import com.intellij.ui.components.JBTextField
@@ -37,11 +37,10 @@ open class VersionCatalogConfigurable(
 
     override fun createPanel() =
         panel {
-            if (!description.isNullOrBlank()) {
-                row {
-                    text(description)
-                }
+            row {
+                text(description)
             }
+
             val currentMap = settingsService.getCurrentValues()
             versionsModel = VersionsTableModel(currentMap)
 

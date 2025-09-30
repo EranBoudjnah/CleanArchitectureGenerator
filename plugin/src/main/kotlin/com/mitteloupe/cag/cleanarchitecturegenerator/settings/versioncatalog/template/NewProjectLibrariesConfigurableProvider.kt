@@ -1,9 +1,9 @@
-package com.mitteloupe.cag.settings.versioncatalog.template
+package com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.template
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurableProvider
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
-import com.mitteloupe.cag.settings.versioncatalog.VersionCatalogConfigurable
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.VersionCatalogConfigurable
 
 class NewProjectLibrariesConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable =

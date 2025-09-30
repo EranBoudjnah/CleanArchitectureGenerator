@@ -46,20 +46,20 @@
                 id="com.mitteloupe.cag.settings.Settings"
                 key="settings.display.name"
                 parentId="tools"
-                provider="com.mitteloupe.cag.settings.versioncatalog.RootConfigurableProvider"/>
+                provider="com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.RootConfigurableProvider"/>
 
         <applicationConfigurable
                 id="com.mitteloupe.cag.settings.VersionCatalogSettings.NewProjectLibraries"
                 key="settings.versions.new.projects.display.name"
                 parentId="com.mitteloupe.cag.settings.Settings"
-                provider="com.mitteloupe.cag.settings.versioncatalog.template.NewProjectLibrariesConfigurableProvider"/>
+                provider="com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.template.NewProjectLibrariesConfigurableProvider"/>
 
         <projectConfigurable
                 id="com.mitteloupe.cag.settings.VersionCatalogSettings.CurrentProjectLibraries"
                 key="settings.versions.current.project.display.name"
                 parentId="com.mitteloupe.cag.settings.Settings"
                 nonDefaultProject="false"
-                provider="com.mitteloupe.cag.settings.versioncatalog.current.CurrentProjectLibrariesConfigurableProvider"/>
+                provider="com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.current.CurrentProjectLibrariesConfigurableProvider"/>
     </extensions>
 
     <actions>

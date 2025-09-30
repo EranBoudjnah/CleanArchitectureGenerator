@@ -3,8 +3,10 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
+import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
@@ -38,6 +40,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                 )
             try {
                 generator.generateArchitecture(request)
+                project.service<GitAddQueueService>().flush()
                 ideBridge.refreshIde(projectRootDir)
                 ideBridge.synchronizeGradle(project, projectRootDir)
                 Messages.showInfoMessage(

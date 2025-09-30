@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.settings.versioncatalog
+package com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants

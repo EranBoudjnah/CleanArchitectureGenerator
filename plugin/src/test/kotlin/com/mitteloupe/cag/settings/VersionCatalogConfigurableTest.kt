@@ -2,9 +2,9 @@ package com.mitteloupe.cag.settings
 
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBTextField
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.VersionCatalogConfigurable
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.versioncatalog.VersionCatalogSettingsService
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
-import com.mitteloupe.cag.settings.versioncatalog.VersionCatalogConfigurable
-import com.mitteloupe.cag.settings.versioncatalog.VersionCatalogSettingsService
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
