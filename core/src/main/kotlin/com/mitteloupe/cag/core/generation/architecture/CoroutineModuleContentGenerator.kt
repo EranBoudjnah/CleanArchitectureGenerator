@@ -40,7 +40,7 @@ class CoroutineModuleContentGenerator(
                 libraries = listOf(LibraryConstants.KOTLINX_COROUTINES_CORE),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createOrUpdateVersionCatalog(
             projectRootDir = projectRoot,
             dependencyConfiguration = dependencyConfiguration
         )

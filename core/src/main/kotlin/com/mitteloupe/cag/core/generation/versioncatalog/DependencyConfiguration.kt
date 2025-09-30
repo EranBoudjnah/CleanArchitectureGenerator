@@ -42,9 +42,9 @@ data class DependencyConfiguration(
 
 object VersionCatalogConstants {
     internal val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.10")
-    internal val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "35")
+    internal val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "36")
     internal val MIN_SDK_VERSION = VersionRequirement(key = "minSdk", version = "24")
-    internal val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "35")
+    internal val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "36")
 
     internal val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.12.2")
 
@@ -75,7 +75,8 @@ object VersionCatalogConstants {
         get() = VersionRequirement(key = "okhttp3", version = getVersionForKey("okhttp3", "4.12.0"))
     internal val ANDROIDX_APPCOMPAT_VERSION: VersionRequirement
         get() = VersionRequirement(key = "androidxAppcompat", version = getVersionForKey("androidxAppcompat", "1.6.1"))
-
+    internal val HILT_VERSION: VersionRequirement
+        get() = VersionRequirement(key = "hilt", version = getVersionForKey("hilt", "2.57.2"))
     internal val ANDROIDX_RECYCLER_VIEW_VERSION: VersionRequirement
         get() = VersionRequirement(key = "androidxRecyclerView", version = getVersionForKey("androidxRecyclerView", "1.3.2"))
     internal val ANDROIDX_FRAGMENT_KTX_VERSION: VersionRequirement
@@ -280,6 +281,22 @@ object LibraryConstants {
                 version = OKHTTP3_VERSION
             )
 
+    val HILT_ANDROID: LibraryRequirement
+        get() =
+            LibraryRequirement(
+                key = "hilt-android",
+                module = "com.google.dagger:hilt-android",
+                version = VersionCatalogConstants.HILT_VERSION
+            )
+
+    val HILT_ANDROID_COMPILER: LibraryRequirement
+        get() =
+            LibraryRequirement(
+                key = "hilt-android-compiler",
+                module = "com.google.dagger:hilt-android-compiler",
+                version = VersionCatalogConstants.HILT_VERSION
+            )
+
     val ANDROIDX_APPCOMPAT: LibraryRequirement
         get() =
             LibraryRequirement(
@@ -406,7 +423,9 @@ object LibraryConstants {
                 ANDROIDX_APPCOMPAT,
                 KOTLINX_COROUTINES_CORE,
                 MATERIAL,
-                OKHTTP3
+                OKHTTP3,
+                HILT_ANDROID,
+                HILT_ANDROID_COMPILER
             )
 
     val VIEW_LIBRARIES: List<LibraryRequirement>
@@ -497,6 +516,14 @@ object PluginConstants {
                 version = KSP_VERSION
             )
 
+    val HILT_ANDROID: PluginRequirement
+        get() =
+            PluginRequirement(
+                key = "hilt",
+                id = "com.google.dagger.hilt.android",
+                version = VersionCatalogConstants.HILT_VERSION
+            )
+
     val COMPOSE_COMPILER: PluginRequirement
         get() =
             PluginRequirement(
@@ -558,6 +585,7 @@ object PluginConstants {
                 listOf(
                     COMPOSE_COMPILER,
                     KTLINT,
-                    DETEKT
+                    DETEKT,
+                    HILT_ANDROID
                 )
 }

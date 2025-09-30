@@ -53,9 +53,13 @@ fun buildAppGradleScript(
 
     val aliasAndroidApplication = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_APPLICATION).asAccessor
     val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
+    val aliasKsp = catalog.getResolvedPluginAliasFor(PluginConstants.KSP).asAccessor
+    val aliasPluginHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
     val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
     val aliasCoreKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CORE_KTX).asAccessor
     val aliasLifecycleRuntimeKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_LIFECYCLE_RUNTIME_KTX).asAccessor
+    val aliasHiltAndroid = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID).asAccessor
+    val aliasHiltAndroidCompiler = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID_COMPILER).asAccessor
     val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
     val aliasTestAndroidxJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_JUNIT).asAccessor
     val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
@@ -63,7 +67,9 @@ fun buildAppGradleScript(
         """
         plugins {
             alias(libs.plugins.$aliasAndroidApplication)
-            alias(libs.plugins.$aliasKotlinAndroid)$composePlugins
+            alias(libs.plugins.$aliasKotlinAndroid)
+            alias(libs.plugins.$aliasKsp)
+            alias(libs.plugins.$aliasPluginHilt)$composePlugins
         }
         
         android {
@@ -110,7 +116,9 @@ fun buildAppGradleScript(
         dependencies {
             implementation(libs.$aliasMaterial)
             implementation(libs.$aliasCoreKtx)
-            implementation(libs.$aliasLifecycleRuntimeKtx)$viewDependencies
+            implementation(libs.$aliasLifecycleRuntimeKtx)
+            implementation(libs.$aliasHiltAndroid)
+            ksp(libs.$aliasHiltAndroidCompiler)$viewDependencies
             implementation(projects.architecture.ui)
             implementation(projects.architecture.presentation)
             implementation(projects.architecture.domain)

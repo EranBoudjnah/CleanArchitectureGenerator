@@ -36,6 +36,6 @@ class GradleFileCreator(private val fileCreator: FileCreator) {
     ) {
         val appGradleFile = File(projectRoot, "app/build.gradle.kts")
         val content = buildAppGradleScript(packageName, enableCompose, catalog)
-        fileCreator.createFileIfNotExists(appGradleFile) { content }
+        fileCreator.createOrUpdateFile(appGradleFile) { content }
     }
 }

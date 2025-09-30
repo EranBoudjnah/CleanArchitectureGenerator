@@ -88,7 +88,7 @@ class ArchitectureModulesContentGenerator(
                 libraries = libraries,
                 plugins = plugins
             )
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createOrUpdateVersionCatalog(
             projectRootDir = architectureRoot.parentFile,
             dependencyConfiguration = dependencyConfiguration
         )

@@ -437,7 +437,7 @@ class GeneratorTest {
         gradleDirectory.mkdirs()
         val catalogFile = File(gradleDirectory, "libs.versions.toml")
         val existingVersions = """kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
             junit4 = "4.13.2"
             ksp = "2.2.10-2.0.2""""
@@ -467,7 +467,7 @@ class GeneratorTest {
             """
             [versions]
             $existingVersions
-            targetSdk = "35"
+            targetSdk = "36"
             androidGradlePlugin = "8.12.2"
             composeBom = "2025.08.01"
             composeNavigation = "2.9.3"
@@ -527,9 +527,9 @@ class GeneratorTest {
         val expectedContent =
             """
             [versions]
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
-            targetSdk = "35"
+            targetSdk = "36"
             androidGradlePlugin = "8.12.2"
             kotlin = "2.2.10"
             ksp = "2.2.10-2.0.2"
@@ -558,7 +558,7 @@ class GeneratorTest {
         gradleDirectory.mkdirs()
         val catalogFile = File(gradleDirectory, "libs.versions.toml")
         val existingVersions = """kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
             junit4 = "4.13.2"
             ksp = "2.2.10-2.0.2""""
@@ -588,7 +588,7 @@ class GeneratorTest {
             """
             [versions]
             $existingVersions
-            targetSdk = "35"
+            targetSdk = "36"
             androidGradlePlugin = "8.12.2"
 
             [libraries]

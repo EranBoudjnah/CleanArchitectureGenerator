@@ -100,6 +100,8 @@ class GradleFileCreatorTest {
             plugins {
                 alias(libs.plugins.android.application)
                 alias(libs.plugins.kotlin.android)
+                alias(libs.plugins.ksp)
+                alias(libs.plugins.hilt)
             }
 
             android {
@@ -138,6 +140,8 @@ class GradleFileCreatorTest {
                 implementation(libs.material)
                 implementation(libs.androidx.core.ktx)
                 implementation(libs.androidx.lifecycle.runtime.ktx)
+                implementation(libs.hilt.android)
+                ksp(libs.hilt.android.compiler)
                 implementation(libs.androidx.appcompat)
                 implementation(libs.androidx.constraintlayout)
                 implementation(libs.material)
@@ -184,6 +188,8 @@ class GradleFileCreatorTest {
             plugins {
                 alias(libs.plugins.android.application)
                 alias(libs.plugins.kotlin.android)
+                alias(libs.plugins.ksp)
+                alias(libs.plugins.hilt)
                 alias(libs.plugins.compose.compiler)
             }
 
@@ -226,6 +232,8 @@ class GradleFileCreatorTest {
                 implementation(libs.material)
                 implementation(libs.androidx.core.ktx)
                 implementation(libs.androidx.lifecycle.runtime.ktx)
+                implementation(libs.hilt.android)
+                ksp(libs.hilt.android.compiler)
                 implementation(libs.androidx.activity.compose)
                 implementation(platform(libs.compose.bom))
                 implementation(libs.compose.ui)

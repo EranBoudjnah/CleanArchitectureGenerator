@@ -25,7 +25,7 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given no catalog file when updateVersionCatalogIfPresent then does nothing`() {
+    fun `Given no catalog file when createOrUpdateVersionCatalog then does nothing`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "noCatalog").toFile()
         val dependencyConfiguration =
@@ -36,13 +36,13 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then does nothing
     }
 
     @Test
-    fun `Given no versions section when updateVersionCatalogIfPresent then adds desired plugins and versions`() {
+    fun `Given no versions section when createOrUpdateVersionCatalog then adds desired plugins and versions`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -75,14 +75,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given versions section with trailing blanks when updateVersionCatalogIfPresent then trims gaps and adds plugins`() {
+    fun `Given versions section with trailing blanks when createOrUpdateVersionCatalog then trims gaps and adds plugins`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -105,7 +105,7 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.0.0"
             compileSdk = "34"
             minSdk = "23"
-            targetSdk = "35"
+            targetSdk = "36"
             androidGradlePlugin = "8.12.2"
             ksp = "2.2.10-2.0.2"
 
@@ -125,14 +125,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given no plugins section, when updateVersionCatalogIfPresent then appends desired plugins and versions`() {
+    fun `Given no plugins section, when createOrUpdateVersionCatalog then appends desired plugins and versions`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -140,7 +140,7 @@ class VersionCatalogUpdaterTest {
                     """
                     [versions]
                     kotlin = "2.2.10"
-                    compileSdk = "35"
+                    compileSdk = "36"
                     minSdk = "24"
                     """.trimIndent()
             )
@@ -148,9 +148,9 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
-            targetSdk = "35"
+            targetSdk = "36"
             androidGradlePlugin = "8.12.2"
             ksp = "2.2.10-2.0.2"
 
@@ -170,14 +170,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given no plugins section, trailing newline when updateVersionCatalogIfPresent then appends with single separator`() {
+    fun `Given no plugins section, trailing newline when createOrUpdateVersionCatalog then appends with single separator`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -185,7 +185,7 @@ class VersionCatalogUpdaterTest {
                     """
                     [versions]
                     kotlin = "2.2.10"
-                    compileSdk = "35"
+                    compileSdk = "36"
                     minSdk = "24"
                     
                     """.trimIndent()
@@ -194,7 +194,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
             ksp = "2.2.10-2.0.2"
             androidGradlePlugin = "8.12.2"
@@ -215,14 +215,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given plugins section with one desired entry missing when updateVersionCatalogIfPresent then appends missing entries`() {
+    fun `Given plugins section with one desired entry missing when createOrUpdateVersionCatalog then appends missing entries`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -254,14 +254,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given compose when updateVersionCatalogIfPresent then adds compose dependencies`() {
+    fun `Given compose when createOrUpdateVersionCatalog then adds compose dependencies`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -269,7 +269,7 @@ class VersionCatalogUpdaterTest {
                     """
                     [versions]
                     kotlin = "2.2.10"
-                    compileSdk = "35"
+                    compileSdk = "36"
                     minSdk = "24"
                     """.trimIndent()
             )
@@ -277,7 +277,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
             composeBom = "2025.08.01"
             composeNavigation = "2.9.3"
@@ -306,14 +306,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given coroutines when updateVersionCatalogIfPresent then adds coroutine dependencies`() {
+    fun `Given coroutines when createOrUpdateVersionCatalog then adds coroutine dependencies`() {
         // Given
         val (projectRoot, catalogFile) =
             createProjectWithCatalog(
@@ -321,7 +321,7 @@ class VersionCatalogUpdaterTest {
                     """
                     [versions]
                     kotlin = "2.2.10"
-                    compileSdk = "35"
+                    compileSdk = "36"
                     minSdk = "24"
                     """.trimIndent()
             )
@@ -329,7 +329,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             kotlin = "2.2.10"
-            compileSdk = "35"
+            compileSdk = "36"
             minSdk = "24"
             kotlinxCoroutines = "1.7.3"
 
@@ -345,14 +345,14 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
     }
 
     @Test
-    fun `Given new catalog when updateVersionCatalogIfPresent then resolved mappings are populated`() {
+    fun `Given new catalog when createOrUpdateVersionCatalog then resolved mappings are populated`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "newCatalog").toFile()
         val dependencyConfiguration =
@@ -363,7 +363,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals("kotlin-jvm", classUnderTest.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM))
@@ -376,7 +376,7 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given existing catalog when updateVersionCatalogIfPresent then resolved mappings are updated`() {
+    fun `Given existing catalog when createOrUpdateVersionCatalog then resolved mappings are updated`() {
         // Given
         val (projectRoot, _) =
             createProjectWithCatalog(
@@ -400,7 +400,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(
@@ -420,7 +420,7 @@ class VersionCatalogUpdaterTest {
     }
 
     @Test
-    fun `Given no catalog file when updateVersionCatalogIfPresent then resolved mappings remain empty`() {
+    fun `Given no catalog file when createOrUpdateVersionCatalog then resolved mappings remain empty`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "noCatalog").toFile()
         val dependencyConfiguration =
@@ -431,7 +431,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.updateVersionCatalogIfPresent(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals("kotlin-jvm", classUnderTest.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM))
