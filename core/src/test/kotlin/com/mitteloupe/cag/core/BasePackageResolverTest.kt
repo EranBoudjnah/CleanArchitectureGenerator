@@ -13,7 +13,7 @@ import kotlin.io.path.createTempDirectory
 class BasePackageResolverTest {
     private lateinit var classUnderTest: NamespaceResolver
 
-    @MockK(relaxed = false)
+    @MockK
     lateinit var projectModel: ProjectModel
 
     @Before

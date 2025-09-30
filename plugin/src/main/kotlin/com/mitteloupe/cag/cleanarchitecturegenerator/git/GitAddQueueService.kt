@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 @Service(Service.Level.PROJECT)
 class GitAddQueueService(private val project: Project) {
     private val queue = ConcurrentSkipListSet<String>()
+    private val gitStager = GitStager(ProcessExecutor())
 
     fun enqueue(file: File) {
         val path = file.absolutePath
@@ -21,29 +22,49 @@ class GitAddQueueService(private val project: Project) {
             return
         }
 
-        val filePathsToAdd = queue.toSet()
-        if (filePathsToAdd.isEmpty()) {
+        val items = queue.toSet()
+        if (items.isEmpty()) {
             return
         }
 
+        gitStager.stageAll(projectRoot, items.map(::File))
+        queue.removeAll(items)
+    }
+}
+
+internal class GitStager(private val executor: ProcessExecutor) {
+    fun stageAll(
+        projectRoot: File,
+        files: Collection<File>
+    ) {
+        if (files.isEmpty()) {
+            return
+        }
         val gitCommandWithArguments =
             listOf("git", "add", "--") +
-                filePathsToAdd.map { absolutePath ->
+                files.map { file ->
+                    val absolutePath = file.absolutePath
                     val file = File(absolutePath)
                     file.relativeToOrNull(projectRoot)?.path ?: absolutePath
                 }
+        executor.run(projectRoot, gitCommandWithArguments)
+    }
+}
 
+internal class ProcessExecutor {
+    fun run(
+        directory: File,
+        args: List<String>
+    ) {
         try {
             val process =
-                ProcessBuilder(gitCommandWithArguments)
-                    .directory(projectRoot)
+                ProcessBuilder(args)
+                    .directory(directory)
                     .redirectErrorStream(true)
                     .start()
             process.inputStream.bufferedReader().use { it.readText() }
             process.waitFor()
         } catch (_: Exception) {
-        } finally {
-            queue.removeAll(filePathsToAdd)
         }
     }
 }
