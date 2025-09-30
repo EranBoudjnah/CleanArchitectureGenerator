@@ -93,7 +93,7 @@ class Generator(
                         }
                     }
             )
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createOrUpdateVersionCatalog(
             projectRootDir = request.destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
@@ -267,7 +267,7 @@ class Generator(
                 libraries = emptyList(),
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createOrUpdateVersionCatalog(
             projectRootDir = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
@@ -423,7 +423,7 @@ class Generator(
                 }
         val plugins =
             buildList {
-                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
+                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS + PluginConstants.HILT_ANDROID)
                 if (request.enableCompose) {
                     add(PluginConstants.COMPOSE_COMPILER)
                 }
@@ -440,7 +440,7 @@ class Generator(
                 libraries = libraries,
                 plugins = plugins
             )
-        catalogUpdater.updateVersionCatalogIfPresent(
+        catalogUpdater.createOrReplaceVersionCatalog(
             projectRootDir = projectRoot,
             dependencyConfiguration = dependencyConfiguration
         )

@@ -92,7 +92,7 @@ class AppModuleContentGenerator(
         enableCompose: Boolean
     ) {
         val manifestFile = File(appModuleDirectory, "src/main/AndroidManifest.xml")
-        fileCreator.createFileIfNotExists(manifestFile) { buildAndroidManifest(appName) }
+        fileCreator.createOrUpdateFile(manifestFile) { buildAndroidManifest(appName) }
 
         val valuesDirectory = File(appModuleDirectory, "src/main/res/values")
         fileCreator.createDirectoryIfNotExists(valuesDirectory)

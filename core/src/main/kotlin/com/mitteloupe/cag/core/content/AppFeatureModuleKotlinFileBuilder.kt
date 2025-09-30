@@ -42,11 +42,11 @@ object ${className}Module {
     fun providesStubPresentationMapper(): StubPresentationMapper = StubPresentationMapper()
 
     @Provides
-    fun providesPerformExampleRepository(): PerformExampleRepository = ${className}Repository()
+    fun providesPerformActionRepository(): PerformActionRepository = ${className}Repository()
 
     @Provides
     fun providesPerformActionUseCase(
-        repository: PerformExampleRepository
+        repository: PerformActionRepository
     ): PerformActionUseCase = PerformActionUseCase(repository)
 
     @Provides

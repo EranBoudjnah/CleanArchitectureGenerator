@@ -5,7 +5,6 @@ import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
-import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.VersionRequirement
 import java.io.File
 
 data class SectionTransaction<SECTION_TYPE : SectionEntryRequirement>(
@@ -54,7 +53,19 @@ class VersionCatalogUpdater(
     override fun getResolvedLibraryAliasForModule(requirement: LibraryRequirement): String =
         resolvedLibraryModuleToAlias[requirement.module] ?: requirement.key
 
-    fun updateVersionCatalogIfPresent(
+    fun createOrReplaceVersionCatalog(
+        projectRootDir: File,
+        dependencyConfiguration: DependencyConfiguration
+    ) {
+        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        if (catalogFile.exists()) {
+            catalogFile.delete()
+        }
+
+        createNewVersionCatalog(projectRootDir, dependencyConfiguration)
+    }
+
+    fun createOrUpdateVersionCatalog(
         projectRootDir: File,
         dependencyConfiguration: DependencyConfiguration
     ) {
