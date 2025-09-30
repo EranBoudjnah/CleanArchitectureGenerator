@@ -74,6 +74,7 @@ class GeneratorProvider {
             } else {
                 VersionCatalogProjectSettingsService.getInstance(project)
             }
+        settingsService.initialize()
         VersionCatalogSettingsAccessor.setProvider { key, default ->
             val values = settingsService.getCurrentValues()
             values[key] ?: default
