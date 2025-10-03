@@ -6,13 +6,12 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
-import javax.swing.Box
-import javax.swing.BoxLayout
+import java.awt.EventQueue.invokeLater
 import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.text.AbstractDocument
 
 private const val DATA_SOURCE_SUFFIX = "DataSource"
@@ -20,13 +19,12 @@ private const val DATA_SOURCE_SUFFIX = "DataSource"
 class CreateDataSourceDialog(
     project: Project?
 ) : DialogWrapper(project) {
-    private val dataSourceNameTextField = JBTextField()
+    private lateinit var dataSourceNameTextField: JBTextField
 
     val dataSourceNameWithSuffix: String
         get() = "$dataSourceName$DATA_SOURCE_SUFFIX"
 
-    private val dataSourceName: String
-        get() = dataSourceNameTextField.text.trim()
+    private var dataSourceName: String = ""
 
     private var useKtorInternal: Boolean = false
     val useKtor: Boolean
@@ -39,14 +37,7 @@ class CreateDataSourceDialog(
     init {
         title = CleanArchitectureGeneratorBundle.message("info.datasource.generator.title")
         init()
-
-        dataSourceNameTextField.columns = 20
-
-        (dataSourceNameTextField.document as AbstractDocument).documentFilter =
-            PredicateDocumentFilter { !it.isWhitespace() }
     }
-
-    override fun getPreferredFocusedComponent(): JComponent = dataSourceNameTextField
 
     override fun createCenterPanel(): JComponent {
         val suffixLabel =
@@ -54,17 +45,16 @@ class CreateDataSourceDialog(
                 foreground = UIUtil.getLabelDisabledForeground()
             }
 
-        val nameWithSuffixPanel =
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.X_AXIS)
-                add(dataSourceNameTextField)
-                add(Box.createHorizontalStrut(4))
-                add(suffixLabel)
-            }
-
         return panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.datasource.name.label")) {
-                cell(nameWithSuffixPanel)
+                textField()
+                    .bindText({ dataSourceName }, { dataSourceName = it })
+                    .applyToComponent {
+                        (document as AbstractDocument).documentFilter =
+                            PredicateDocumentFilter { !it.isWhitespace() }
+                        dataSourceNameTextField = this
+                    }
+                cell(suffixLabel)
             }
             row {
                 checkBox("Add Ktor dependencies")
@@ -74,6 +64,8 @@ class CreateDataSourceDialog(
                 checkBox("Add Retrofit dependencies")
                     .bindSelected(::useRetrofitInternal)
             }
+        }.apply {
+            invokeLater { dataSourceNameTextField.requestFocusInWindow() }
         }
     }
 
