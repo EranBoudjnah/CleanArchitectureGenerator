@@ -16,8 +16,6 @@ fun buildArchitecturePresentationTestGradleScript(catalog: VersionCatalogReader)
         catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_MOCKITO_CORE).asAccessor
     val aliasTestMockitoKotlin =
         catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_MOCKITO_KOTLIN).asAccessor
-    val aliasTestMockitoAndroid =
-        catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_MOCKITO_ANDROID).asAccessor
 
     val gradleFileExtender = GradleFileExtender()
     val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
@@ -46,7 +44,6 @@ dependencies {
     implementation(libs.$aliasTestKotlinxCoroutines)
     implementation(libs.$aliasTestMockitoCore)
     implementation(libs.$aliasTestMockitoKotlin)
-    implementation(libs.$aliasTestMockitoAndroid)
     implementation(projects.coroutine)
 }
 """
