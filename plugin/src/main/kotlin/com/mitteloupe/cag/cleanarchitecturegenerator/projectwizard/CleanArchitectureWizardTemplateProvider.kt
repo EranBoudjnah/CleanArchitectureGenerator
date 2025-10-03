@@ -137,11 +137,19 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
         enableRetrofit: BooleanParameter,
         initializeGitRepository: BooleanParameter
     ) {
+        val selectedMinSdk: Int? =
+            try {
+                data.apis.minApi.apiLevel
+            } catch (_: Exception) {
+                null
+            }
+
         val request =
             GenerateProjectTemplateRequest(
                 destinationRootDirectory = projectRootDirectory,
                 projectName = readProjectName(projectRootDirectory.name),
                 packageName = data.packageName,
+                overrideMinimumAndroidSdk = selectedMinSdk,
                 enableCompose = enableCompose.value,
                 enableKtlint = enableKtlint.value,
                 enableDetekt = enableDetekt.value,

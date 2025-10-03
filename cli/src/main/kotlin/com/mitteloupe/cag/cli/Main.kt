@@ -98,6 +98,7 @@ fun main(arguments: Array<String>) {
                 destinationRootDirectory = projectTemplateDestinationDirectory,
                 projectName = request.projectName,
                 packageName = request.packageName,
+                overrideMinimumAndroidSdk = null,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt,

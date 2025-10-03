@@ -6,9 +6,10 @@ data class GenerateProjectTemplateRequest(
     val destinationRootDirectory: File,
     val projectName: String,
     val packageName: String,
-    val enableCompose: Boolean = true,
-    val enableKtlint: Boolean = false,
-    val enableDetekt: Boolean = false,
-    val enableKtor: Boolean = false,
-    val enableRetrofit: Boolean = false
+    val overrideMinimumAndroidSdk: Int?,
+    val enableCompose: Boolean,
+    val enableKtlint: Boolean,
+    val enableDetekt: Boolean,
+    val enableKtor: Boolean,
+    val enableRetrofit: Boolean
 )
