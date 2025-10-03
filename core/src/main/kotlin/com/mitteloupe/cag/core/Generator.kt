@@ -26,6 +26,7 @@ import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGen
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.generation.withoutSpaces
@@ -37,7 +38,6 @@ import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.request.GenerateViewModelRequest
 import java.io.File
-import kotlin.String
 
 class Generator(
     private val gradleFileCreator: GradleFileCreator,
@@ -434,9 +434,24 @@ class Generator(
                     add(PluginConstants.DETEKT)
                 }
             }
+        val overrideVersions =
+            if (request.overrideMinimumAndroidSdk == null) {
+                VersionCatalogConstants.ANDROID_VERSIONS
+            } else {
+                VersionCatalogConstants.ANDROID_VERSIONS.map { androidVersion ->
+                    if (androidVersion.key == VersionCatalogConstants.MIN_SDK_VERSION.key) {
+                        SectionEntryRequirement.VersionRequirement(
+                            key = androidVersion.key,
+                            version = request.overrideMinimumAndroidSdk.toString()
+                        )
+                    } else {
+                        androidVersion
+                    }
+                }
+            }
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = VersionCatalogConstants.ANDROID_VERSIONS,
+                versions = overrideVersions,
                 libraries = libraries,
                 plugins = plugins
             )
