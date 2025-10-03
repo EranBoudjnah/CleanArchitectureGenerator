@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
@@ -98,7 +99,8 @@ class CreateUseCaseDialog(
     override fun createCenterPanel(): JComponent =
         panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
-                cell(useCaseNameTextField)
+                textField()
+                    .bindText(useCaseNameTextField::getText, useCaseNameTextField::setText)
                 cell(
                     JBLabel(USE_CASE_SUFFIX).apply {
                         foreground = UIUtil.getLabelDisabledForeground()
