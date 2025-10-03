@@ -7,5 +7,6 @@ data class ProjectTemplateRequest(
     val enableKtlint: Boolean = false,
     val enableDetekt: Boolean = false,
     val enableKtor: Boolean = false,
-    val enableRetrofit: Boolean = false
+    val enableRetrofit: Boolean = false,
+    val enableGit: Boolean = false
 )

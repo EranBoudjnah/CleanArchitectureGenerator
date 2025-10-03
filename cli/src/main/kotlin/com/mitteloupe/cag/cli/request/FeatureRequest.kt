@@ -4,5 +4,6 @@ data class FeatureRequest(
     val featureName: String,
     val packageName: String?,
     val enableKtlint: Boolean,
-    val enableDetekt: Boolean
+    val enableDetekt: Boolean,
+    val enableGit: Boolean = false
 )

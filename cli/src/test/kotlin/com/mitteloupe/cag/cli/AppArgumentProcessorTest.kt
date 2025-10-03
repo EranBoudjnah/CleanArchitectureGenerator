@@ -6,6 +6,8 @@ import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 import com.mitteloupe.cag.cli.request.ViewModelRequest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -246,6 +248,26 @@ class AppArgumentProcessorTest {
                 assertEquals("Cannot mix short form (-nf) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
+
+        @Test
+        fun `Given --new-feature with --git when getNewFeatures then returns FeatureRequest with git enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=Quality", "--git")
+            val expectedRequest =
+                FeatureRequest(
+                    featureName = "Quality",
+                    packageName = null,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableGit = true
+                )
+
+            // When
+            val result = classUnderTest.getNewFeatures(givenArguments)
+
+            // Then
+            assertEquals(listOf(expectedRequest), result)
+        }
     }
 
     class AppArgumentProcessorArchitectureTest {
@@ -350,9 +372,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
-            assertEquals(true, result[0].enableKtlint)
-            assertEquals(false, result[0].enableDetekt)
+            assertTrue(result[0].enableCompose)
+            assertTrue(result[0].enableKtlint)
+            assertFalse(result[0].enableDetekt)
         }
 
         @Test
@@ -383,6 +405,19 @@ class AppArgumentProcessorTest {
             assertEquals(true, result[0].enableCompose)
             assertEquals(true, result[0].enableKtlint)
             assertEquals(false, result[0].enableDetekt)
+        }
+
+        @Test
+        fun `Given --new-architecture --git when getNewArchitecture then enableGit is true`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--git")
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertTrue(result[0].enableGit)
         }
     }
 
@@ -529,6 +564,19 @@ class AppArgumentProcessorTest {
                     exception.message
                 )
             }
+        }
+
+        @Test
+        fun `Given --git when getNewDataSources then enableGit is true`() {
+            // Given
+            val givenArguments = arrayOf("--new-datasource", "--name=My", "--git")
+            val expected = DataSourceRequest("MyDataSource", useKtor = false, useRetrofit = false, enableGit = true)
+
+            // When
+            val result = classUnderTest.getNewDataSources(givenArguments)
+
+            // Then
+            assertEquals(listOf(expected), result)
         }
     }
 
@@ -911,6 +959,29 @@ class AppArgumentProcessorTest {
                 assertEquals("Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
         }
+
+        @Test
+        fun `Given project template with --git when getNewProjectTemplate then enableGit is true`() {
+            // Given
+            val givenArguments = arrayOf("--new-project", "--name=GitApp", "--git")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = "GitApp",
+                    packageName = "",
+                    enableCompose = true,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false,
+                    enableGit = true
+                )
+
+            // When
+            val result = classUnderTest.getNewProjectTemplate(givenArguments)
+
+            // Then
+            assertEquals(listOf(expectedRequest), result)
+        }
     }
 
     class AppArgumentProcessorViewModelsTest {
@@ -991,6 +1062,19 @@ class AppArgumentProcessorTest {
                 // Then
                 assertEquals("Cannot mix short form (-nvm) with long form secondary flags (--name). Use -n instead.", exception.message)
             }
+        }
+
+        @Test
+        fun `Given view model with --git when getNewViewModels then enableGit is true`() {
+            // Given
+            val givenArguments = arrayOf("--new-view-model", "--name=MyViewModel", "--git")
+            val expected = ViewModelRequest("MyViewModel", null, enableGit = true)
+
+            // When
+            val result = classUnderTest.getNewViewModels(givenArguments)
+
+            // Then
+            assertEquals(listOf(expected), result)
         }
     }
 
