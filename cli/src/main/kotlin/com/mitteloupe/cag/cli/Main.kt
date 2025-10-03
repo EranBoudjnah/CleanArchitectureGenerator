@@ -84,7 +84,7 @@ fun main(arguments: Array<String>) {
     val destinationRootDirectory = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
-    val git = Git()
+    val git = Git(gitBinaryPath = configuration.git.path)
 
     projectTemplateRequests.forEach { request ->
         val projectTemplateDestinationDirectory =
@@ -111,6 +111,9 @@ fun main(arguments: Array<String>) {
 
         val shouldInitGit = request.enableGit || configuration.git.autoInitialize == true
         if (shouldInitGit) {
+            if (!git.isAvailable(projectTemplateDestinationDirectory)) {
+                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
+            }
             val didInit = git.initializeRepository(projectTemplateDestinationDirectory)
             if (!didInit || configuration.git.autoStage == true) {
                 runCatching { git.stageAll(projectTemplateDestinationDirectory) }
@@ -135,6 +138,9 @@ fun main(arguments: Array<String>) {
 
         if (request.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            if (!git.isAvailable(gitRoot)) {
+                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
+            }
             runCatching { git.stageAll(gitRoot) }
         }
     }
@@ -159,6 +165,9 @@ fun main(arguments: Array<String>) {
 
         if (requestFeature.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            if (!git.isAvailable(gitRoot)) {
+                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
+            }
             runCatching { git.stageAll(gitRoot) }
         }
     }
@@ -177,6 +186,9 @@ fun main(arguments: Array<String>) {
 
         if (request.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            if (!git.isAvailable(gitRoot)) {
+                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
+            }
             runCatching { git.stageAll(gitRoot) }
         }
     }

@@ -28,7 +28,7 @@ import java.lang.reflect.Field
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
-    private val git = Git()
+    private val git = Git(gitBinaryPath = AppSettingsService.getInstance().gitPath)
 
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
