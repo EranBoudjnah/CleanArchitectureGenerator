@@ -91,8 +91,9 @@ class VersionCatalogUpdater(
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
         val pluginRequirements = mutableListOf<PluginRequirement>()
         val pluginAliasToIdMutable = existingPluginAliasToId.toMutableMap()
+        val uniqueDesiredPlugins = dependencyConfiguration.plugins.distinctBy { it.id }
 
-        for (desired in dependencyConfiguration.plugins) {
+        for (desired in uniqueDesiredPlugins) {
             val existingAlias = existingPluginIdToAlias[desired.id]
             if (existingAlias != null) {
                 resolvedPluginIdToAliasMutable[desired.id] = existingAlias
@@ -131,8 +132,9 @@ class VersionCatalogUpdater(
         val resolvedLibraryModuleToAliasMutable = existingLibraryModuleToAlias.toMutableMap()
         val libraryRequirements = mutableListOf<LibraryRequirement>()
         val libraryAliasToModuleMutable = existingLibraryAliasToModule.toMutableMap()
+        val uniqueDesiredLibraries = dependencyConfiguration.libraries.distinctBy { it.module }
 
-        for (desired in dependencyConfiguration.libraries) {
+        for (desired in uniqueDesiredLibraries) {
             val existingAlias = existingLibraryModuleToAlias[desired.module]
             if (existingAlias != null) {
                 resolvedLibraryModuleToAliasMutable[desired.module] = existingAlias
@@ -201,7 +203,7 @@ class VersionCatalogUpdater(
         fileCreator.createFileIfNotExists(catalogFile) { "" }
 
         val pluginRequirements =
-            dependencyConfiguration.plugins.map { desired ->
+            dependencyConfiguration.plugins.distinctBy { it.id }.map { desired ->
                 PluginRequirement(
                     key = desired.key,
                     id = desired.id,
@@ -210,7 +212,7 @@ class VersionCatalogUpdater(
             }
 
         val libraryRequirements =
-            dependencyConfiguration.libraries.map { desired ->
+            dependencyConfiguration.libraries.distinctBy { it.module }.map { desired ->
                 LibraryRequirement(
                     key = desired.key,
                     module = desired.module,
