@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
@@ -62,7 +63,8 @@ class CreateViewModelDialog(
     override fun createCenterPanel(): JComponent =
         panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.name.label")) {
-                cell(viewModelNameTextField)
+                textField()
+                    .bindText(viewModelNameTextField::getText, viewModelNameTextField::setText)
                 label(VIEW_MODEL_SUFFIX)
                     .applyToComponent { foreground = UIUtil.getLabelDisabledForeground() }
             }
