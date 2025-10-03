@@ -460,7 +460,6 @@ dependencies {
     implementation(libs.test.kotlinx.coroutines)
     implementation(libs.test.mockito.core)
     implementation(libs.test.mockito.kotlin)
-    implementation(libs.test.mockito.android)
     implementation(projects.coroutine)
 }
 """
@@ -2847,7 +2846,6 @@ dependencies {
     implementation(libs.test.kotlinx.coroutines)
     implementation(libs.test.mockito.core)
     implementation(libs.test.mockito.kotlin)
-    implementation(libs.test.mockito.android)
     implementation(projects.coroutine)
 }
 """
