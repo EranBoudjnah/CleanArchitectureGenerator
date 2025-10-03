@@ -1,10 +1,10 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
@@ -23,7 +23,6 @@ class CreateCleanArchitectureFeatureDialog(
     private val featureNameTextField = JBTextField()
     private val featurePackageTextField = JBTextField()
     private var lastFeatureName: String = PLACEHOLDER
-    private val appModuleComboBox = ComboBox(appModuleDirectories.map { it.name }.toTypedArray())
 
     val featureName: String
         get() = featureNameTextField.text
@@ -31,14 +30,15 @@ class CreateCleanArchitectureFeatureDialog(
     val featurePackageName: String
         get() = featurePackageTextField.text.trim()
 
+    private var appModuleSelectedIndex: Int = 0
+
     val selectedAppModuleDirectory: File?
         get() =
             if (appModuleDirectories.isEmpty()) {
                 null
             } else {
-                val selectedIndex = appModuleComboBox.selectedIndex
-                if (selectedIndex in appModuleDirectories.indices) {
-                    appModuleDirectories[selectedIndex]
+                if (appModuleSelectedIndex in appModuleDirectories.indices) {
+                    appModuleDirectories[appModuleSelectedIndex]
                 } else {
                     null
                 }
@@ -101,7 +101,12 @@ class CreateCleanArchitectureFeatureDialog(
         panel {
             if (appModuleDirectories.size >= 2) {
                 row(CleanArchitectureGeneratorBundle.message("dialog.feature.app.module.label")) {
-                    cell(appModuleComboBox)
+                    val appModules = appModuleDirectories.map { it.name }
+                    comboBox(appModules, null)
+                        .bindItem(
+                            getter = { appModules[appModuleSelectedIndex] },
+                            setter = { appModuleSelectedIndex = it?.let(appModules::indexOf) ?: 0 }
+                        )
                 }
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.name.label")) {
