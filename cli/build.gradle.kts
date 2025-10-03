@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":git"))
     implementation(kotlin("stdlib"))
     testImplementation(libs.mockk)
     testImplementation(libs.junit4)

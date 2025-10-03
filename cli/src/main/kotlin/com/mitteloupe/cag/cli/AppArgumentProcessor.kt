@@ -70,7 +70,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 featureName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
                 packageName = secondaries[SecondaryFlagConstants.PACKAGE],
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
-                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT)
+                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
+                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
             )
         }
 
@@ -85,7 +86,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             DataSourceRequest(
                 dataSourceName = name,
                 useKtor = libraries.contains("ktor"),
-                useRetrofit = libraries.contains("retrofit")
+                useRetrofit = libraries.contains("retrofit"),
+                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
             )
         }
 
@@ -109,7 +111,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         ) { secondaries ->
             ViewModelRequest(
                 viewModelName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
-                targetPath = secondaries[SecondaryFlagConstants.PATH]
+                targetPath = secondaries[SecondaryFlagConstants.PATH],
+                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
             )
         }
 
@@ -121,7 +124,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             ArchitectureRequest(
                 enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
-                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT)
+                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
+                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
             )
         }
 
@@ -137,7 +141,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                 enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
                 enableKtor = secondaries.containsKey(SecondaryFlagConstants.KTOR),
-                enableRetrofit = secondaries.containsKey(SecondaryFlagConstants.RETROFIT)
+                enableRetrofit = secondaries.containsKey(SecondaryFlagConstants.RETROFIT),
+                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
             )
         }
 

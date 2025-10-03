@@ -18,17 +18,17 @@ import com.android.tools.idea.wizard.template.template
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
-import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitInitializer
-import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitStager
 import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
+import com.mitteloupe.cag.git.Git
 import java.io.File
 import java.lang.reflect.Field
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
+    private val git = Git()
 
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
@@ -153,13 +153,13 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
 
         val initializeGitRepository = initializeGitRepository.value
         if (initializeGitRepository) {
-            GitInitializer().initialize(projectRootDirectory)
+            git.initializeRepository(projectRootDirectory)
         }
 
         if (AppSettingsService.getInstance().autoAddGeneratedFilesToGit) {
             val gitDirectory = File(projectRootDirectory, ".git")
             if (gitDirectory.exists()) {
-                runCatching { GitStager().stageAll(projectRootDirectory) }
+                runCatching { git.stageAll(projectRootDirectory) }
             }
         }
     }

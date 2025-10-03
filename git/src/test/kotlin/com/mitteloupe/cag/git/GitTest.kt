@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.cleanarchitecturegenerator.git
+package com.mitteloupe.cag.git
 
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -10,8 +10,8 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
-class GitStagerTest {
-    private lateinit var classUnderTest: GitStager
+class GitTest {
+    private lateinit var classUnderTest: Git
 
     private lateinit var projectRoot: File
 
@@ -22,7 +22,7 @@ class GitStagerTest {
     fun setUp() {
         MockKAnnotations.init(this)
         projectRoot = createTempDirectory(prefix = "projRoot_").toFile()
-        classUnderTest = GitStager(executor)
+        classUnderTest = Git(executor)
     }
 
     @After
@@ -41,7 +41,7 @@ class GitStagerTest {
         val file2 = File(projectRoot, filename2).apply { writeText("b") }
         val givenFiles = listOf(file1, file2)
         val expectedArguments = listOf("git", "add", "--", "$relativePath/$filename1", filename2)
-        every { executor.run(projectRoot, expectedArguments) } returns Unit
+        every { executor.run(projectRoot, expectedArguments) } returns true
 
         // When
         classUnderTest.stage(projectRoot, givenFiles)
@@ -67,7 +67,7 @@ class GitStagerTest {
         val externalFile = File(externalDirectory, filename).apply { writeText("c") }
         val givenFiles = listOf(externalFile)
         val expectedArguments = listOf("git", "add", "--", "../${externalDirectory.name}/$filename")
-        every { executor.run(projectRoot, expectedArguments) } returns Unit
+        every { executor.run(projectRoot, expectedArguments) } returns true
 
         try {
             // When

@@ -33,6 +33,7 @@ import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
 import com.mitteloupe.cag.core.request.GenerateViewModelRequest
+import com.mitteloupe.cag.git.Git
 import java.io.File
 import java.nio.file.Paths
 import kotlin.system.exitProcess
@@ -83,6 +84,8 @@ fun main(arguments: Array<String>) {
     val destinationRootDirectory = projectModel.selectedModuleRootDir() ?: projectRoot
     val projectNamespace = basePackage ?: "com.unknown.app."
 
+    val git = Git()
+
     projectTemplateRequests.forEach { request ->
         val projectTemplateDestinationDirectory =
             if (projectModel.selectedModuleRootDir() != null) {
@@ -105,6 +108,14 @@ fun main(arguments: Array<String>) {
             setVersionProvider(configuration.newProjectVersions)
             generator.generateProjectTemplate(projectTemplateRequest)
         }
+
+        val shouldInitGit = request.enableGit || configuration.git.autoInitialize == true
+        if (shouldInitGit) {
+            val didInit = git.initializeRepository(projectTemplateDestinationDirectory)
+            if (!didInit || configuration.git.autoStage == true) {
+                runCatching { git.stageAll(projectTemplateDestinationDirectory) }
+            }
+        }
     }
 
     architectureRequests.forEach { request ->
@@ -120,6 +131,11 @@ fun main(arguments: Array<String>) {
         executeAndReport {
             setVersionProvider(configuration.existingProjectVersions)
             generator.generateArchitecture(architectureRequest)
+        }
+
+        if (request.enableGit || configuration.git.autoStage == true) {
+            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            runCatching { git.stageAll(gitRoot) }
         }
     }
 
@@ -140,6 +156,11 @@ fun main(arguments: Array<String>) {
             setVersionProvider(configuration.existingProjectVersions)
             generator.generateFeature(request)
         }
+
+        if (requestFeature.enableGit || configuration.git.autoStage == true) {
+            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            runCatching { git.stageAll(gitRoot) }
+        }
     }
 
     dataSourceRequests.forEach { request ->
@@ -152,6 +173,11 @@ fun main(arguments: Array<String>) {
                 useKtor = request.useKtor,
                 useRetrofit = request.useRetrofit
             )
+        }
+
+        if (request.enableGit || configuration.git.autoStage == true) {
+            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            runCatching { git.stageAll(gitRoot) }
         }
     }
 
@@ -190,6 +216,11 @@ fun main(arguments: Array<String>) {
         executeAndReport {
             setVersionProvider(configuration.existingProjectVersions)
             generator.generateViewModel(viewModelRequest)
+        }
+
+        if (request.enableGit || configuration.git.autoStage == true) {
+            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            runCatching { git.stageAll(gitRoot) }
         }
     }
 }

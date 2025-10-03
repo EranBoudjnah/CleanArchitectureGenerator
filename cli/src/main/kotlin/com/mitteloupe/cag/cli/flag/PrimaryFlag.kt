@@ -14,6 +14,19 @@ object SecondaryFlagConstants {
     const val OUTPUT_TYPE = "--output-type"
     const val HELP_TOPIC = "--topic"
     const val HELP_FORMAT = "--format"
+    const val GIT = "--git"
+}
+
+object SecondaryFlags {
+    val ktlint = SecondaryFlag(long = SecondaryFlagConstants.KTLINT, short = "-kl", isBoolean = true)
+    val detekt = SecondaryFlag(long = SecondaryFlagConstants.DETEKT, short = "-d", isBoolean = true)
+    val git =
+        SecondaryFlag(
+            long = SecondaryFlagConstants.GIT,
+            short = "-g",
+            isBoolean = true,
+            missingErrorMessage = "Git flag must be used without a value"
+        )
 }
 
 interface PrimaryFlag {
@@ -34,10 +47,11 @@ interface PrimaryFlag {
                 ),
                 SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p"),
                 SecondaryFlag(SecondaryFlagConstants.NO_COMPOSE, "-nc", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.KTLINT, "-kl", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.DETEKT, "-d", isBoolean = true),
+                SecondaryFlags.ktlint,
+                SecondaryFlags.detekt,
                 SecondaryFlag(SecondaryFlagConstants.KTOR, "-kt", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.RETROFIT, "-rt", isBoolean = true)
+                SecondaryFlag(SecondaryFlagConstants.RETROFIT, "-rt", isBoolean = true),
+                SecondaryFlags.git
             )
     }
 
@@ -47,8 +61,9 @@ interface PrimaryFlag {
         override val secondaryFlags =
             listOf(
                 SecondaryFlag(SecondaryFlagConstants.NO_COMPOSE, "-nc", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.KTLINT, "-kl", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.DETEKT, "-d", isBoolean = true)
+                SecondaryFlags.ktlint,
+                SecondaryFlags.detekt,
+                SecondaryFlags.git
             )
     }
 
@@ -64,8 +79,9 @@ interface PrimaryFlag {
                     missingErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName"
                 ),
                 SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p"),
-                SecondaryFlag(SecondaryFlagConstants.KTLINT, "-kl", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.DETEKT, "-d", isBoolean = true)
+                SecondaryFlags.ktlint,
+                SecondaryFlags.detekt,
+                SecondaryFlags.git
             )
     }
 
@@ -80,7 +96,8 @@ interface PrimaryFlag {
                     isMandatory = true,
                     missingErrorMessage = "Data source name is required. Use --name=DataSourceName or -n=DataSourceName"
                 ),
-                SecondaryFlag(SecondaryFlagConstants.WITH, "-w")
+                SecondaryFlag(SecondaryFlagConstants.WITH, "-w"),
+                SecondaryFlags.git
             )
     }
 
@@ -112,7 +129,8 @@ interface PrimaryFlag {
                     isMandatory = true,
                     missingErrorMessage = "ViewModel name is required. Use ${SecondaryFlagConstants.NAME}=ViewModelName or -n=ViewModelName"
                 ),
-                SecondaryFlag(SecondaryFlagConstants.PATH, "-p")
+                SecondaryFlag(SecondaryFlagConstants.PATH, "-p"),
+                SecondaryFlags.git
             )
     }
 

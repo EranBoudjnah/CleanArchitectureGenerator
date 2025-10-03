@@ -1,10 +1,13 @@
 rootProject.name = "Clean Architecture Generator"
 
 include(":core")
-project(":core").projectDir = File(rootDir, "core")
+project(":core")
 
 include(":plugin")
-project(":plugin").projectDir = File(rootDir, "plugin")
+project(":plugin")
 
 include(":cli")
-project(":cli").projectDir = File(rootDir, "cli")
+project(":cli")
+
+include(":git")
+project(":git")

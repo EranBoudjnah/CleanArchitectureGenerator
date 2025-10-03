@@ -15,13 +15,20 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 
+private const val NEW_PROJECT_SYNTAX =
+    "[--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git]]"
+private const val NEW_ARCHITECTURE_SYNTAX = "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git]]"
+private const val NEW_FEATURE_SYNTAX = "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
+private const val NEW_DATASOURCE_SYNTAX = "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
+private const val NEW_USE_CASE_SYNTAX = "[--new-use-case --name=UseCaseName [--path=TargetPath] [--git]]"
+private const val NEW_VIEW_MODEL_SYNTAX = "[--new-view-model --name=ViewModelName [--path=TargetPath] [--git]]"
 private const val SHORT_USAGE =
-    "usage: cag [--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit]]... " +
-        "[--new-architecture [--no-compose] [--ktlint] [--detekt]]... " +
-        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt]]... " +
-        "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit]]... " +
-        "[--new-use-case --name=UseCaseName [--path=TargetPath]]... " +
-        "[--new-view-model --name=ViewModelName [--path=TargetPath]]..."
+    "usage: cag $NEW_PROJECT_SYNTAX... " +
+        "$NEW_ARCHITECTURE_SYNTAX... " +
+        "$NEW_FEATURE_SYNTAX... " +
+        "$NEW_DATASOURCE_SYNTAX... " +
+        "$NEW_USE_CASE_SYNTAX... " +
+        "$NEW_VIEW_MODEL_SYNTAX..."
 
 @RunWith(Enclosed::class)
 @SuiteClasses(
