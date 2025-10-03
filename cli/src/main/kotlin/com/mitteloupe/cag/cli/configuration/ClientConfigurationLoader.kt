@@ -39,8 +39,8 @@ class ClientConfigurationLoader {
             existingProjectVersions = baseConfiguration.existingProjectVersions + override.existingProjectVersions,
             git =
                 GitConfiguration(
-                    autoInitialize = baseConfiguration.git.autoInitialize || override.git.autoInitialize,
-                    autoStage = baseConfiguration.git.autoStage || override.git.autoStage
+                    autoInitialize = override.git.autoInitialize ?: baseConfiguration.git.autoInitialize,
+                    autoStage = override.git.autoStage ?: baseConfiguration.git.autoStage
                 )
         )
 
@@ -83,8 +83,8 @@ class ClientConfigurationLoader {
     }
 
     private fun extractGitConfiguration(text: String): GitConfiguration {
-        var autoInitializeGit = false
-        var autoStageGit = false
+        var autoInitializeGit: Boolean? = null
+        var autoStageGit: Boolean? = null
         text.lineSequence().forEach { rawLine ->
             val line = rawLine.trim()
             if (

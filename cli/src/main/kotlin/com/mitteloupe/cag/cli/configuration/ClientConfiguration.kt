@@ -1,8 +1,8 @@
 package com.mitteloupe.cag.cli.configuration
 
 data class GitConfiguration(
-    val autoInitialize: Boolean = false,
-    val autoStage: Boolean = false
+    val autoInitialize: Boolean? = null,
+    val autoStage: Boolean? = null
 )
 
 data class ClientConfiguration(

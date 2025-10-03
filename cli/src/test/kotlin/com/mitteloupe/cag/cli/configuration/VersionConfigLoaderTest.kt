@@ -1,6 +1,8 @@
 package com.mitteloupe.cag.cli.configuration
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -50,6 +52,24 @@ class VersionConfigLoaderTest {
     }
 
     @Test
+    fun `Given INI with git section when parse then parses git booleans`() {
+        // Given
+        val text =
+            """
+            [git]
+            autoInitialize=true
+            autoStage=false
+            """.trimIndent()
+
+        // When
+        val actualConfiguration = classUnderTest.parse(text)
+
+        // Then
+        assertTrue(actualConfiguration.git.autoInitialize!!)
+        assertFalse(actualConfiguration.git.autoStage!!)
+    }
+
+    @Test
     fun `Given home, project configurations when loadFromFiles then project overrides home`() {
         // Given
         val temporaryDirectory = createTempDirectory(prefix = "cag-test-").toFile()
@@ -63,6 +83,9 @@ class VersionConfigLoaderTest {
                         ktor=1.0.0
                         [existing.versions]
                         retrofit=2.0.0
+                        [git]
+                        autoInitialize=true
+                        autoStage=false
                         """.trimIndent()
                     )
                 }
@@ -76,6 +99,9 @@ class VersionConfigLoaderTest {
                         [existing.versions]
                         retrofit=2.11.0
                         okhttp3=4.12.0
+                        [git]
+                        autoInitialize=false
+                        autoStage=true
                         """.trimIndent()
                     )
                 }
@@ -90,7 +116,8 @@ class VersionConfigLoaderTest {
                         mapOf(
                             "retrofit" to "2.11.0",
                             "okhttp3" to "4.12.0"
-                        )
+                        ),
+                    git = GitConfiguration(autoInitialize = false, autoStage = true)
                 )
 
             // When

@@ -109,10 +109,10 @@ fun main(arguments: Array<String>) {
             generator.generateProjectTemplate(projectTemplateRequest)
         }
 
-        val shouldInitGit = request.enableGit || configuration.git.autoInitialize
+        val shouldInitGit = request.enableGit || configuration.git.autoInitialize == true
         if (shouldInitGit) {
             val didInit = git.initializeRepository(projectTemplateDestinationDirectory)
-            if (!didInit || configuration.git.autoStage) {
+            if (!didInit || configuration.git.autoStage == true) {
                 runCatching { git.stageAll(projectTemplateDestinationDirectory) }
             }
         }
@@ -133,7 +133,7 @@ fun main(arguments: Array<String>) {
             generator.generateArchitecture(architectureRequest)
         }
 
-        if (request.enableGit || configuration.git.autoStage) {
+        if (request.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
             runCatching { git.stageAll(gitRoot) }
         }
@@ -157,7 +157,7 @@ fun main(arguments: Array<String>) {
             generator.generateFeature(request)
         }
 
-        if (requestFeature.enableGit || configuration.git.autoStage) {
+        if (requestFeature.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
             runCatching { git.stageAll(gitRoot) }
         }
@@ -175,7 +175,7 @@ fun main(arguments: Array<String>) {
             )
         }
 
-        if (request.enableGit || configuration.git.autoStage) {
+        if (request.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
             runCatching { git.stageAll(gitRoot) }
         }
@@ -218,7 +218,7 @@ fun main(arguments: Array<String>) {
             generator.generateViewModel(viewModelRequest)
         }
 
-        if (request.enableGit || configuration.git.autoStage) {
+        if (request.enableGit || configuration.git.autoStage == true) {
             val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
             runCatching { git.stageAll(gitRoot) }
         }
