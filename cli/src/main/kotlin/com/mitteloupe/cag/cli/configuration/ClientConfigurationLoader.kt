@@ -40,7 +40,8 @@ class ClientConfigurationLoader {
             git =
                 GitConfiguration(
                     autoInitialize = override.git.autoInitialize ?: baseConfiguration.git.autoInitialize,
-                    autoStage = override.git.autoStage ?: baseConfiguration.git.autoStage
+                    autoStage = override.git.autoStage ?: baseConfiguration.git.autoStage,
+                    path = override.git.path ?: baseConfiguration.git.path
                 )
         )
 
@@ -83,23 +84,30 @@ class ClientConfigurationLoader {
     }
 
     private fun extractGitConfiguration(text: String): GitConfiguration {
+        var isInGitSection = false
         var autoInitializeGit: Boolean? = null
         var autoStageGit: Boolean? = null
+        var gitPath: String? = null
+
         text.lineSequence().forEach { rawLine ->
             val line = rawLine.trim()
-            if (
-                line.startsWith("[") && line.endsWith("]") &&
-                line.substring(1, line.length - 1).equals("git", ignoreCase = true)
-            ) {
+            if (line.isEmpty() || line.startsWith("#") || line.startsWith(";")) return@forEach
+
+            if (line.startsWith("[") && line.endsWith("]")) {
+                isInGitSection = line.substring(1, line.length - 1).equals("git", ignoreCase = true)
                 return@forEach
             }
 
-            if (line.startsWith("autoInitialize")) {
+            if (!isInGitSection) return@forEach
+
+            if (line.startsWith("autoInitialize", ignoreCase = true)) {
                 autoInitializeGit = line.substringAfter('=', "false").trim().toBoolean()
-            } else if (line.startsWith("autoStage")) {
+            } else if (line.startsWith("autoStage", ignoreCase = true)) {
                 autoStageGit = line.substringAfter('=', "true").trim().toBoolean()
+            } else if (line.startsWith("path", ignoreCase = true)) {
+                gitPath = line.substringAfter('=', "").trim().ifEmpty { null }
             }
         }
-        return GitConfiguration(autoInitialize = autoInitializeGit, autoStage = autoStageGit)
+        return GitConfiguration(autoInitialize = autoInitializeGit, autoStage = autoStageGit, path = gitPath)
     }
 }

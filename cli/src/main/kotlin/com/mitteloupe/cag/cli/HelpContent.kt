@@ -186,7 +186,8 @@ object HelpContent {
 
                   Git Configuration:
                     - autoInitialize=true|false - Whether to automatically initialize a git repository for new projects (default: false)
-                    - autoStage=true|false - Whether to automatically stage changes after generation (default: true)
+                    - autoStage=true|false - Whether to automatically stage changes after generation (default: false)
+                    - path=/absolute/path/to/git - Optional path to the git executable (default: resolved via PATH)
 
                   Example ~/.cagrc:
                     [new.versions]
@@ -200,6 +201,7 @@ object HelpContent {
                     [git]
                     autoInitialize=true
                     autoStage=true
+                    path=/usr/bin/git
 
                   Example ./.cagrc (project overrides):
                     [new.versions]
@@ -210,6 +212,7 @@ object HelpContent {
                     
                     [git]
                     autoInitialize=false
+                    path=/opt/homebrew/bin/git
                 """.trimIndent()
             )
         }

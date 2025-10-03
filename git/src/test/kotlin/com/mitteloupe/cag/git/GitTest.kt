@@ -22,7 +22,7 @@ class GitTest {
     fun setUp() {
         MockKAnnotations.init(this)
         projectRoot = createTempDirectory(prefix = "projRoot_").toFile()
-        classUnderTest = Git(executor)
+        classUnderTest = Git(gitBinaryPath = null, processExecutor = executor)
     }
 
     @After

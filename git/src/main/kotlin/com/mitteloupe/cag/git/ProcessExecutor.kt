@@ -9,12 +9,16 @@ class ProcessExecutor {
     ): Boolean =
         try {
             val process =
-                ProcessBuilder(command)
-                    .directory(workingDirectory)
-                    .redirectErrorStream(true)
-                    .start()
-            val output = process.inputStream.bufferedReader().use { it.readText() }
-            val exitCode = process.waitFor()
+                try {
+                    ProcessBuilder(command)
+                        .directory(workingDirectory)
+                        .redirectErrorStream(true)
+                        .start()
+                } catch (_: Exception) {
+                    null
+                }
+            val output = process?.inputStream?.bufferedReader().use { it?.readText() }
+            val exitCode = process?.waitFor()
             if (exitCode == 0) {
                 true
             } else {

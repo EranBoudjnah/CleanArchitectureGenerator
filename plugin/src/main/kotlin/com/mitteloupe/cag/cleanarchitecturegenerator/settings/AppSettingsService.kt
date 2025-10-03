@@ -14,6 +14,7 @@ import com.intellij.openapi.components.service
 class AppSettingsService : PersistentStateComponent<AppSettingsService.State> {
     class State {
         var autoAddGeneratedFilesToGit: Boolean = false
+        var gitPath: String? = null
     }
 
     private var state: State = State()
@@ -28,6 +29,12 @@ class AppSettingsService : PersistentStateComponent<AppSettingsService.State> {
         get() = state.autoAddGeneratedFilesToGit
         set(value) {
             state.autoAddGeneratedFilesToGit = value
+        }
+
+    var gitPath: String?
+        get() = state.gitPath
+        set(value) {
+            state.gitPath = value
         }
 
     companion object {
