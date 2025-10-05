@@ -10,7 +10,9 @@ class SymbolValidator(
     private val fileSystemWrapper: FileSystemWrapper = IntelliJFileSystemWrapper()
 ) {
     fun isValidSymbolSyntax(type: String): Boolean {
-        if (type.isEmpty()) return false
+        if (type.isBlank()) {
+            return false
+        }
         val normalizedType = type.trim()
         val baseType = normalizedType.substringBefore('<')
         return isValidKotlinIdentifier(baseType) &&
@@ -22,7 +24,7 @@ class SymbolValidator(
         contextDirectory: File
     ): Boolean {
         if (!isValidSymbolSyntax(type)) {
-            return true
+            return false
         }
 
         val baseType = type.trim().substringBefore('<')
@@ -35,13 +37,30 @@ class SymbolValidator(
             return true
         }
 
-        return findTypeInModule(baseType, contextDirectory)
+        val entityName =
+            if (baseType.contains('.')) {
+                baseType.substringAfterLast('.')
+            } else {
+                baseType
+            }
+
+        return findTypeInModule(entityName, contextDirectory)
     }
 
     private fun isValidKotlinIdentifier(identifier: String): Boolean {
-        if (identifier.isEmpty()) return false
-        if (!identifier.first().isLetter() && identifier.first() != '_') return false
-        return identifier.all { it.isLetterOrDigit() || it == '_' }
+        val parts = identifier.split('.')
+        parts.forEach { part ->
+            if (part.isEmpty()) {
+                return false
+            }
+            if (!part.first().isLetter() && part.first() != '_') {
+                return false
+            }
+            if (!part.all { it.isLetterOrDigit() || it == '_' }) {
+                return false
+            }
+        }
+        return true
     }
 
     private fun hasValidGenericSyntax(type: String): Boolean {
@@ -114,15 +133,13 @@ class SymbolValidator(
         return null
     }
 
-    private fun findSourceDirectory(moduleRoot: File): File? {
-        val srcMain = File(moduleRoot, "src/main/kotlin")
-        if (srcMain.exists()) return srcMain
-
-        val src = File(moduleRoot, "src")
-        if (src.exists()) return src
-
-        return null
-    }
+    private fun findSourceDirectory(moduleRoot: File): File? =
+        listOf("src/main/kotlin", "src/main/java", "src")
+            .asSequence()
+            .map { path -> File(moduleRoot, path) }
+            .firstOrNull { file ->
+                file.exists() && file.isDirectory
+            }
 
     private fun searchForTypeInDirectory(
         typeName: String,
@@ -155,7 +172,7 @@ class SymbolValidator(
     ): Boolean {
         val patterns =
             listOf(
-                """(?:class|interface|object|enum class)\s+$typeName(?:\s|<|$)""".toRegex(),
+                """(?:class|interface|object|enum class)\s+$typeName(?:\s|<|\(|$)""".toRegex(),
                 """typealias\s+$typeName(?:\s|<|=)""".toRegex()
             )
 

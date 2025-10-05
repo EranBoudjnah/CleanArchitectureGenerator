@@ -14,16 +14,15 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.whenItemChangedFromUi
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import com.mitteloupe.cag.cleanarchitecturegenerator.validation.SymbolValidator
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
+import java.awt.EventQueue.invokeLater
 import java.io.File
 import javax.swing.DefaultComboBoxModel
-import javax.swing.JComponent
-import javax.swing.SwingUtilities
+import javax.swing.JTextField
 import javax.swing.text.AbstractDocument
 
 private const val USE_CASE_SUFFIX = "UseCase"
@@ -36,14 +35,14 @@ class CreateUseCaseDialog(
 ) : DialogWrapper(project) {
     private val useCaseNameTextField = JBTextField()
     private val directoryField = TextFieldWithBrowseButton()
-    private val inputDataTypeComboBox = ComboBox<String>()
+    private lateinit var inputDataTypeComboBox: ComboBox<String>
     private val inputWarningLabel = JBLabel()
-    private val outputDataTypeComboBox = ComboBox<String>()
+    private lateinit var outputDataTypeComboBox: ComboBox<String>
     private val outputWarningLabel = JBLabel()
     private val modelClassFinder = ModelClassFinder()
     private val symbolValidator = SymbolValidator()
-
-    private var documentListenersSetup = false
+    private val inputDataTypeModel = DefaultComboBoxModel<String>()
+    private val outputDataTypeModel = DefaultComboBoxModel<String>()
 
     val useCaseNameWithSuffix: String
         get() = useCaseName.removeSuffix(USE_CASE_SUFFIX) + USE_CASE_SUFFIX
@@ -51,11 +50,13 @@ class CreateUseCaseDialog(
     private val useCaseName: String
         get() = useCaseNameTextField.text.trim()
 
+    private var _inputDataType: String? = null
     val inputDataType: String?
-        get() = (inputDataTypeComboBox.selectedItem as? String)?.trim()?.takeIf { it.isNotEmpty() }
+        get() = _inputDataType
 
+    private var _outputDataType: String? = null
     val outputDataType: String?
-        get() = (outputDataTypeComboBox.selectedItem as? String)?.trim()?.takeIf { it.isNotEmpty() }
+        get() = _outputDataType
 
     val destinationDirectory: File?
         get() = directoryField.text.trim().takeIf { it.isNotEmpty() }?.let { File(it) }
@@ -86,17 +87,17 @@ class CreateUseCaseDialog(
         setupWarningLabels()
     }
 
-    override fun getPreferredFocusedComponent(): JComponent = useCaseNameTextField
+    override fun getPreferredFocusedComponent() = useCaseNameTextField
 
     override fun show() {
         super.show()
 
-        SwingUtilities.invokeLater {
+        invokeLater {
             validateFieldOnChange()
         }
     }
 
-    override fun createCenterPanel(): JComponent =
+    override fun createCenterPanel() =
         panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
                 textField()
@@ -108,11 +109,34 @@ class CreateUseCaseDialog(
                 )
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label")) {
-                cell(inputDataTypeComboBox)
+                @Suppress("UnstableApiUsage")
+                comboBox(inputDataTypeModel)
+                    .whenItemChangedFromUi { _inputDataType = it }
+                    .applyToComponent {
+                        isEditable = true
+                        (editor.editorComponent as JTextField).validateOnChange {
+                            _inputDataType = text
+                        }
+                        selectedItem = DEFAULT_DATA_TYPE
+                        inputDataTypeComboBox = this
+                    }
                 cell(inputWarningLabel)
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label")) {
-                cell(outputDataTypeComboBox)
+                @Suppress("UnstableApiUsage")
+                comboBox(outputDataTypeModel)
+                    .whenItemChangedFromUi { _outputDataType = it }
+                    .applyToComponent {
+                        isEditable = true
+                        (editor.editorComponent as JTextField).validateOnChange {
+                            _inputDataType = text
+                        }
+                        addActionListener {
+                            validateFieldOnChange()
+                        }
+                        selectedItem = DEFAULT_DATA_TYPE
+                        outputDataTypeComboBox = this
+                    }
                 cell(outputWarningLabel)
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label")) {
@@ -135,22 +159,6 @@ class CreateUseCaseDialog(
     private fun setupWarningLabels() {
         inputWarningLabel.clearWarning()
         outputWarningLabel.clearWarning()
-    }
-
-    private fun setupDocumentListenersIfNeeded() {
-        if (documentListenersSetup) {
-            return
-        }
-
-        val inputEditor = inputDataTypeComboBox.editor.editorComponent as? JBTextField
-        val outputEditor = outputDataTypeComboBox.editor.editorComponent as? JBTextField
-
-        if (inputEditor != null && outputEditor != null) {
-            inputEditor.validateOnChange()
-            outputEditor.validateOnChange()
-
-            documentListenersSetup = true
-        }
     }
 
     private fun validateFieldOnChange() {
@@ -228,33 +236,17 @@ class CreateUseCaseDialog(
             val modelClasses = modelClassFinder.findModelClasses(destinationDirectory)
             val allOptions = ModelClassFinder.PRIMITIVE_TYPES + modelClasses
 
-            inputDataTypeComboBox.enableAndPopulateComboBox(allOptions)
-            outputDataTypeComboBox.enableAndPopulateComboBox(allOptions)
+            inputDataTypeModel.addAll(allOptions)
+            outputDataTypeModel.addAll(allOptions)
         }
     }
 
-    private fun <T> ComboBox<T>.enableAndPopulateComboBox(options: List<T>) {
-        isEditable = true
-        addActionListener {
-            validateFieldOnChange()
-        }
-        model = DefaultComboBoxModel<T>().apply { addAll(options) }
-        selectedItem = DEFAULT_DATA_TYPE
-    }
-
-    private fun JBTextField.validateOnChange() {
-        document.addDocumentListener(OnChangeDocumentListener { validateFieldOnChange() })
-        addFocusListener(
-            object : FocusAdapter() {
-                override fun focusGained(event: FocusEvent) {
-                    setupDocumentListenersIfNeeded()
-                }
-
-                override fun focusLost(event: FocusEvent) {
-                    validateFieldOnChange()
-                }
+    private fun JTextField.validateOnChange(onChange: JTextField.() -> Unit) {
+        document.addDocumentListener(
+            OnChangeDocumentListener {
+                onChange()
+                validateFieldOnChange()
             }
         )
-        addActionListener { validateFieldOnChange() }
     }
 }
