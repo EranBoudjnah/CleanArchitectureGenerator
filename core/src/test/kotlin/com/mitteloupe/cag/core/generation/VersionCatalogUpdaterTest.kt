@@ -4,6 +4,7 @@ import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants.TEST_MOCKITO_ANDROID
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
@@ -22,6 +23,145 @@ class VersionCatalogUpdaterTest {
     @Before
     fun setUp() {
         classUnderTest = VersionCatalogUpdater(FileCreator(FakeFileSystemBridge()))
+    }
+
+    @Test
+    fun `Given libraries include library twice when createOrUpdateVersionCatalog then deduplicates`() {
+        // Given
+        val (projectRoot, catalogFile) =
+            createProjectWithCatalog(
+                initialContent =
+                    """
+                    [versions]
+                    kotlin = "2.2.10"
+                    compileSdk = "36"
+                    minSdk = "24"
+                    """.trimIndent()
+            )
+
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = emptyList(),
+                libraries = listOf(TEST_MOCKITO_ANDROID, TEST_MOCKITO_ANDROID),
+                plugins = emptyList()
+            )
+        val expectedCatalog =
+            """
+            [versions]
+            kotlin = "2.2.10"
+            compileSdk = "36"
+            minSdk = "24"
+            mockitoAndroid = "2.28.6"
+
+            [libraries]
+            test-mockito-android = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "mockitoAndroid" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        val actualCatalog = catalogFile.readText()
+
+        // Then
+        assertEquals(expectedCatalog, actualCatalog)
+    }
+
+    @Test
+    fun `Given plugins include plugin twice when createOrUpdateVersionCatalog then deduplicates`() {
+        // Given
+        val (projectRoot, catalogFile) =
+            createProjectWithCatalog(
+                initialContent =
+                    """
+                    [versions]
+                    kotlin = "2.2.10"
+                    compileSdk = "36"
+                    minSdk = "24"
+                    """.trimIndent()
+            )
+
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = emptyList(),
+                libraries = emptyList(),
+                plugins = listOf(PluginConstants.KOTLIN_JVM, PluginConstants.KOTLIN_JVM)
+            )
+        val expectedCatalog =
+            """
+            [versions]
+            kotlin = "2.2.10"
+            compileSdk = "36"
+            minSdk = "24"
+
+            [plugins]
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        val actualCatalog = catalogFile.readText()
+
+        // Then
+        assertEquals(expectedCatalog, actualCatalog)
+    }
+
+    @Test
+    fun `Given libraries include library twice when createOrReplaceVersionCatalog then deduplicates`() {
+        // Given
+        val projectRoot = createTempDirectory(prefix = "newCatalogDedupLib").toFile()
+
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = emptyList(),
+                libraries = listOf(TEST_MOCKITO_ANDROID, TEST_MOCKITO_ANDROID),
+                plugins = emptyList()
+            )
+        val expectedCatalog =
+            """
+            [versions]
+            mockitoAndroid = "2.28.6"
+
+            [libraries]
+            test-mockito-android = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "mockitoAndroid" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.createOrReplaceVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        val actualCatalog = File(projectRoot, "gradle/libs.versions.toml").readText()
+
+        // Then
+        assertEquals(expectedCatalog, actualCatalog)
+    }
+
+    @Test
+    fun `Given plugins include plugin twice when createOrReplaceVersionCatalog then deduplicates`() {
+        // Given
+        val projectRoot = createTempDirectory(prefix = "newCatalogDedupPlugin").toFile()
+
+        val dependencyConfiguration =
+            DependencyConfiguration(
+                versions = emptyList(),
+                libraries = emptyList(),
+                plugins = listOf(PluginConstants.KOTLIN_JVM, PluginConstants.KOTLIN_JVM)
+            )
+        val expectedCatalog =
+            """
+            [versions]
+            kotlin = "2.2.10"
+
+            [plugins]
+            kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+            """.trimIndent()
+
+        // When
+        classUnderTest.createOrReplaceVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        val actualCatalog = File(projectRoot, "gradle/libs.versions.toml").readText()
+
+        // Then
+        assertEquals(expectedCatalog, actualCatalog)
     }
 
     @Test
