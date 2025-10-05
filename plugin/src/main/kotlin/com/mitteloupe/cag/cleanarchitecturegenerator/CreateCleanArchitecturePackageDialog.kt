@@ -3,16 +3,16 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
-import javax.swing.JCheckBox
 import javax.swing.JComponent
 
 class CreateCleanArchitecturePackageDialog(
     project: Project
 ) : DialogWrapper(project) {
-    private val enableComposeCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.compose.label"), true)
-    private val enableKtlintCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.ktlint.label"), false)
-    private val enableDetektCheckBox = JCheckBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.detekt.label"), false)
+    private var enableCompose: Boolean = true
+    private var enableKtlint: Boolean = false
+    private var enableDetekt: Boolean = false
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
@@ -22,21 +22,24 @@ class CreateCleanArchitecturePackageDialog(
     override fun createCenterPanel(): JComponent =
         panel {
             row {
-                cell(enableComposeCheckBox)
+                checkBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.compose.label"))
+                    .bindSelected(::enableCompose)
             }
             row {
-                cell(enableKtlintCheckBox)
+                checkBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.ktlint.label"))
+                    .bindSelected(::enableKtlint)
             }
             row {
-                cell(enableDetektCheckBox)
+                checkBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.detekt.label"))
+                    .bindSelected(::enableDetekt)
             }
         }
 
     override fun doValidate(): ValidationInfo? = null
 
-    fun isComposeEnabled(): Boolean = enableComposeCheckBox.isSelected
+    fun isComposeEnabled(): Boolean = enableCompose
 
-    fun isKtlintEnabled(): Boolean = enableKtlintCheckBox.isSelected
+    fun isKtlintEnabled(): Boolean = enableKtlint
 
-    fun isDetektEnabled(): Boolean = enableDetektCheckBox.isSelected
+    fun isDetektEnabled(): Boolean = enableDetekt
 }
