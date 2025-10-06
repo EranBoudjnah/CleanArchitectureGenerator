@@ -32,16 +32,16 @@ Helps generate Android Clean Architecture code from the terminal.
 
 ```bash
 ./gradlew :cli:installDist
-"./cli/build/install/cli/bin/cli" --new-feature --name=MyFeature
-"./cli/build/install/cli/bin/cli" --new-view-model --name=MyViewModel
+"./cli/build/install/cag/bin/cag" --new-feature --name=MyFeature
+"./cli/build/install/cag/bin/cag" --new-view-model --name=MyViewModel
 ```
 
 - **Run the fat jar:**
 
 ```bash
 ./gradlew :cli:shadowJar
-java -jar "cli/build/libs/cli-all.jar" --new-feature --name=MyFeature
-java -jar "cli/build/libs/cli-all.jar" --new-view-model --name=MyViewModel
+java -jar "cli/build/libs/cag-[version]-all.jar" --new-feature --name=MyFeature
+java -jar "cli/build/libs/cag-[version]-all.jar" --new-view-model --name=MyViewModel
 ```
 
 #### Usage and help
