@@ -21,6 +21,13 @@ Key features:
 
 Helps generate Android Clean Architecture code from the terminal.
 
+- **Install via Homebrew:**
+
+```bash
+brew tap EranBoudjnah/cag
+brew install EranBoudjnah/cag/cag
+```
+
 - **Run via Gradle (no install):**
 
 ```bash
