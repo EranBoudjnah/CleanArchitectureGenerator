@@ -8,6 +8,7 @@ import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewFeaturePrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewProjectPrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewUseCasePrimary
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewViewModelPrimary
+import com.mitteloupe.cag.cli.flag.PrimaryFlag.VersionPrimary
 import com.mitteloupe.cag.cli.flag.SecondaryFlagConstants
 import com.mitteloupe.cag.cli.request.ArchitectureRequest
 import com.mitteloupe.cag.cli.request.DataSourceRequest
@@ -18,6 +19,7 @@ import com.mitteloupe.cag.cli.request.ViewModelRequest
 
 private val PRIMARY_FLAGS =
     setOf(
+        VersionPrimary,
         NewProjectPrimary,
         NewArchitecturePrimary,
         NewFeaturePrimary,
@@ -41,7 +43,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         return HelpOptions(topic = topic, format = format)
     }
 
-    private fun getAllPrimaryFlagStrings(): Set<String> = PRIMARY_FLAGS.flatMap { listOf(it.long, it.short) }.toSet()
+    fun isVersionRequested(arguments: Array<String>): Boolean =
+        argumentParser.parsePrimaryWithSecondaries(arguments, VersionPrimary).isNotEmpty()
 
     fun validateNoUnknownFlags(arguments: Array<String>) {
         val consumedArguments =
@@ -249,6 +252,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
             arguments[firstPrimaryIndex] == primaryFlag.long
         }
     }
+
+    private fun getAllPrimaryFlagStrings(): Set<String> = PRIMARY_FLAGS.flatMap { listOf(it.long, it.short) }.toSet()
 
     data class HelpOptions(val topic: String?, val format: String?)
 }

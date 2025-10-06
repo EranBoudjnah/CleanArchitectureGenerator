@@ -1,9 +1,14 @@
+import org.gradle.jvm.tasks.Jar
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     id("application")
     alias(libs.plugins.shadow)
     alias(libs.plugins.ktlint)
 }
+
+group = "com.mitteloupe.cag"
+version = "0.0.2"
 
 repositories {
     mavenCentral()
@@ -29,6 +34,15 @@ java {
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes(
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version
+        )
     }
 }
 

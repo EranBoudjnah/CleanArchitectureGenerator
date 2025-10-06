@@ -34,6 +34,12 @@ interface PrimaryFlag {
     val short: String
     val secondaryFlags: List<SecondaryFlag>
 
+    data object VersionPrimary : PrimaryFlag {
+        override val long = "--version"
+        override val short = "-v"
+        override val secondaryFlags = emptyList<SecondaryFlag>()
+    }
+
     data object NewProjectPrimary : PrimaryFlag {
         override val long = "--new-project"
         override val short = "-np"

@@ -40,8 +40,10 @@ abstract class GenerateManPage
         @TaskAction
         fun generate() {
             val manFile = outputFile.get().asFile
-            val manDir = manFile.parentFile
-            if (!manDir.exists()) manDir.mkdirs()
+            val manDirectory = manFile.parentFile
+            if (!manDirectory.exists()) {
+                manDirectory.mkdirs()
+            }
             manFile.writeText("")
 
             execOperations.exec {

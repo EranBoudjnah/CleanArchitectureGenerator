@@ -55,6 +55,12 @@ fun main(arguments: Array<String>) {
         return
     }
 
+    if (argumentProcessor.isVersionRequested(arguments)) {
+        val version = AppArgumentProcessor::class.java.`package`?.implementationVersion ?: "Unknown"
+        println(version)
+        return
+    }
+
     try {
         argumentProcessor.validateNoUnknownFlags(arguments)
     } catch (exception: IllegalArgumentException) {
