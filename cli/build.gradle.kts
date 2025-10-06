@@ -1,5 +1,3 @@
-import org.gradle.jvm.tasks.Jar
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     id("application")
@@ -22,7 +20,10 @@ dependencies {
     testImplementation(libs.junit4)
 }
 
+var terminalCommand = "cag"
+
 application {
+    applicationName = terminalCommand
     mainClass.set("com.mitteloupe.cag.cli.MainKt")
 }
 
@@ -37,18 +38,22 @@ kotlin {
     }
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes(
-            "Implementation-Title" to project.name,
-            "Implementation-Version" to project.version
-        )
+tasks {
+    jar {
+        manifest {
+            attributes(
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version
+            )
+        }
+        archiveBaseName.set(terminalCommand)
     }
-}
 
-tasks.shadowJar {
-    archiveClassifier.set("all")
-    mergeServiceFiles()
+    shadowJar {
+        archiveBaseName.set(terminalCommand)
+        archiveClassifier.set("all")
+        mergeServiceFiles()
+    }
 }
 
 ktlint {
