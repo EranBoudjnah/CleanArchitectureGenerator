@@ -26,7 +26,6 @@ import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGen
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
-import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.generation.withoutSpaces
@@ -392,12 +391,13 @@ class Generator(
             throw GenerationException("Package name is missing.")
         }
 
-        println("Comparing ${request.destinationRootDirectory.name} to ${projectName.withoutSpaces()}")
+        val sanitizedProjectName = projectName.withoutSpaces()
+        println("Comparing ${request.destinationRootDirectory.name} to $sanitizedProjectName")
         val projectRoot =
-            if (request.destinationRootDirectory.name == projectName.withoutSpaces()) {
+            if (request.destinationRootDirectory.name.matches("$sanitizedProjectName\\d*".toRegex())) {
                 request.destinationRootDirectory
             } else {
-                File(request.destinationRootDirectory, projectName.withoutSpaces())
+                File(request.destinationRootDirectory, sanitizedProjectName)
             }
 
         if (projectRoot != request.destinationRootDirectory && projectRoot.exists()) {
@@ -434,24 +434,21 @@ class Generator(
                     add(PluginConstants.DETEKT)
                 }
             }
-        val overrideVersions =
-            if (request.overrideMinimumAndroidSdk == null) {
-                VersionCatalogConstants.ANDROID_VERSIONS
-            } else {
-                VersionCatalogConstants.ANDROID_VERSIONS.map { androidVersion ->
-                    if (androidVersion.key == VersionCatalogConstants.MIN_SDK_VERSION.key) {
-                        SectionEntryRequirement.VersionRequirement(
-                            key = androidVersion.key,
-                            version = request.overrideMinimumAndroidSdk.toString()
-                        )
-                    } else {
-                        androidVersion
-                    }
-                }
+        val versionOverrides =
+            listOf(
+                VersionCatalogConstants.MIN_SDK_VERSION to request.overrideMinimumAndroidSdk?.toString(),
+                VersionCatalogConstants.ANDROID_GRADLE_PLUGIN_VERSION to request.overrideAndroidGradlePluginVersion
+            ).mapNotNull { override -> override.second?.let { override.first to it } }
+                .toMap()
+        val androidVersions =
+            VersionCatalogConstants.ANDROID_VERSIONS.map { version ->
+                versionOverrides[version]?.let { versionOverride ->
+                    version.copy(version = versionOverride)
+                } ?: version
             }
         val dependencyConfiguration =
             DependencyConfiguration(
-                versions = overrideVersions,
+                versions = androidVersions,
                 libraries = libraries,
                 plugins = plugins
             )

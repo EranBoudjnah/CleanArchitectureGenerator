@@ -162,8 +162,10 @@ class SettingsFileUpdater(private val fileCreator: FileCreator) {
         featureNames: List<String>
     ) {
         val settingsFile = File(projectRoot, "settings.gradle.kts")
-        val content = buildSettingsGradleScript(projectName, featureNames)
-        runCatching { fileCreator.createOrUpdateFile(settingsFile) { content } }
-            .onFailure { throw GenerationException("Failed to create settings.gradle.kts: ${it.message}") }
+        runCatching {
+            fileCreator.createOrUpdateFile(settingsFile) {
+                buildSettingsGradleScript(projectName.withoutSpaces(), featureNames)
+            }
+        }.onFailure { throw GenerationException("Failed to create settings.gradle.kts: ${it.message}") }
     }
 }

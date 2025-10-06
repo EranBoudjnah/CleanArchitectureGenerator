@@ -11,16 +11,13 @@ class GradleWrapperCreator(private val fileCreator: FileCreator) {
         fileCreator.createDirectoryIfNotExists(gradleWrapperDirectory)
 
         val gradleWrapperPropertiesFile = File(gradleWrapperDirectory, "gradle-wrapper.properties")
-        val gradleWrapperPropertiesContent = buildGradleWrapperPropertiesFile()
-
-        fileCreator.createFileIfNotExists(gradleWrapperPropertiesFile) { gradleWrapperPropertiesContent }
+        fileCreator.createOrUpdateFile(gradleWrapperPropertiesFile) { buildGradleWrapperPropertiesFile() }
 
         val gradleWrapperJarFile = File(gradleWrapperDirectory, "gradle-wrapper.jar")
         fileCreator.createBinaryFileIfNotExists(gradleWrapperJarFile) { getGradleWrapperResourceAsBytes() }
 
         val gradlewFile = File(projectRoot, "gradlew")
-        val gradlewContent = getResourceAsString("gradlew")
-        fileCreator.createFileIfNotExists(gradlewFile) { gradlewContent }
+        fileCreator.createFileIfNotExists(gradlewFile) { getResourceAsString("gradlew") }
         if (!gradlewFile.setExecutable(true)) {
             throw GenerationException("Failed to make gradlew executable")
         }

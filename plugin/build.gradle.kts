@@ -18,6 +18,9 @@ repositories {
 intellijPlatform {
     pluginVerification {
         ides {
+            ide(IntelliJPlatformType.AndroidStudio, "2024.3.1.13")
+            ide(IntelliJPlatformType.AndroidStudio, "2025.1.2.11")
+            ide(IntelliJPlatformType.AndroidStudio, "2025.1.3.7")
             ide(IntelliJPlatformType.AndroidStudio, libs.versions.androidStudio.get())
         }
     }

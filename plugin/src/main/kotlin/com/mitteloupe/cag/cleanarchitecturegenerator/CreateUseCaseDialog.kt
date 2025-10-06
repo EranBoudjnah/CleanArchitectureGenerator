@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.whenItemChangedFromUi
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.intellij.util.ui.UIUtil
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
 import com.mitteloupe.cag.cleanarchitecturegenerator.validation.SymbolValidator
@@ -91,7 +91,7 @@ class CreateUseCaseDialog(
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.input.type.label")) {
                 @Suppress("UnstableApiUsage")
                 comboBox(inputDataTypeModel)
-                    .whenItemChangedFromUi { _inputDataType = it }
+                    .whenItemSelectedFromUi { _inputDataType = it }
                     .applyToComponent {
                         inputDataTypeComboBox = this
                         isEditable = true
@@ -108,7 +108,7 @@ class CreateUseCaseDialog(
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.output.type.label")) {
                 @Suppress("UnstableApiUsage")
                 comboBox(outputDataTypeModel)
-                    .whenItemChangedFromUi { _outputDataType = it }
+                    .whenItemSelectedFromUi { _outputDataType = it }
                     .applyToComponent {
                         outputDataTypeComboBox = this
                         isEditable = true

@@ -99,6 +99,7 @@ fun main(arguments: Array<String>) {
                 projectName = request.projectName,
                 packageName = request.packageName,
                 overrideMinimumAndroidSdk = null,
+                overrideAndroidGradlePluginVersion = null,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt,
