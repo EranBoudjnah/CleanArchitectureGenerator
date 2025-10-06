@@ -1,16 +1,30 @@
 ## Clean Architecture Generator
 
-A CLI and Android Studio plugin for generating Clean Architecture boilerplate including features, data sources, use cases, ViewModels, and architecture packages.
+A CLI and Android Studio plugin for generating Clean Architecture boilerplate including whole projects, features, data sources, use cases, ViewModels, and architecture packages.
 
 ### Android Studio plugin
 
 Adds multiple time-saving code generation shortcuts to Android Studio. 
 
+For a working project example, visit [Clean Architecture For Android](https://github.com/EranBoudjnah/CleanArchitectureForAndroid).
+
 Key features:
 
-- New Clean Architecture project template
+- **Android Studio Plugin**
+    - Available on the IDE Plugins Marketplace 
+    - New Clean Architecture project template
+    - New menu items:
+        - New architecture package
+        - New feature
+        - New use case in domain modules
+        - New ViewModel in presentation modules
+        - New data source
 
-- New menu items:
+
+- **Terminal command**
+  - Available via Homebrew
+  - Generate:
+    - New Clean Architecture project
     - New architecture package
     - New feature
     - New use case in domain modules
