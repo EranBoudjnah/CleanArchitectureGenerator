@@ -152,11 +152,14 @@ object HelpContent {
                 "general",
                 """
                 General
+                  --version | -v
+                      Show the current version.
                   --help | -h [--topic=<topic>] [--format=man]
                       Show help. When a topic is provided, prints only that section. With --format=man outputs a roff man page to stdout.
                       Topics: new-project, new-architecture, new-feature, new-datasource, new-use-case, new-view-model, configuration
 
                 Examples:
+                  cag --version
                   cag --help
                   cag --help --topic=new-feature
                   cag --help --format=man | col -b

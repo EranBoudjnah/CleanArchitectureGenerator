@@ -34,6 +34,7 @@ private const val SHORT_USAGE =
 @SuiteClasses(
     MainTest.NoArguments::class,
     MainTest.Help::class,
+    MainTest.Version::class,
     MainTest.InvalidFlags::class,
     MainTest.GenerationException::class,
     MainTest.SuccessfulGeneration::class
@@ -169,6 +170,20 @@ Options:
   --help, -h
       Show this help message and exit
 """
+        }
+    }
+
+    class Version : BaseMainTest() {
+        @Test
+        fun `Given --version when main then prints version`() {
+            // Give
+            val expected = "Unknown\n"
+
+            // When
+            main(arrayOf("--version"))
+
+            // Then
+            assertEquals(expected, output.toString())
         }
     }
 
