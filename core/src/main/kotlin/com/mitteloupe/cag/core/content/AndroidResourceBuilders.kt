@@ -30,11 +30,11 @@ fun buildAndroidManifest(appName: String): String =
     </manifest>
     """.trimIndent()
 
-fun buildStringsXml(packageName: String): String =
+fun buildStringsXml(appName: String): String =
     """
     <?xml version="1.0" encoding="utf-8"?>
     <resources>
-        <string name="app_name">${packageName.split('.').last().capitalized}</string>
+        <string name="app_name">$appName</string>
     </resources>
     """.trimIndent()
 

@@ -64,14 +64,15 @@ class AppModuleContentGenerator(
 
         fileCreator.createDirectoryIfNotExists(basePackageDir)
 
+        val sanitizedAppName = appName.withoutSpaces()
         val mainActivityFile = File(basePackageDir, "MainActivity.kt")
-        val mainActivityContent =
+        fileCreator.createFileIfNotExists(mainActivityFile) {
             buildMainActivityKotlinFile(
-                appName = appName,
+                appName = sanitizedAppName,
                 projectNamespace = projectNamespace,
                 enableCompose = enableCompose
             )
-        fileCreator.createFileIfNotExists(mainActivityFile) { mainActivityContent }
+        }
 
         val applicationFile = File(basePackageDir, "Application.kt")
         val applicationContent = buildApplicationKotlinFile(projectNamespace)
@@ -91,24 +92,25 @@ class AppModuleContentGenerator(
         packageName: String,
         enableCompose: Boolean
     ) {
+        val sanitizedAppName = appName.withoutSpaces()
         val manifestFile = File(appModuleDirectory, "src/main/AndroidManifest.xml")
-        fileCreator.createOrUpdateFile(manifestFile) { buildAndroidManifest(appName) }
+        fileCreator.createOrUpdateFile(manifestFile) { buildAndroidManifest(sanitizedAppName) }
 
         val valuesDirectory = File(appModuleDirectory, "src/main/res/values")
         fileCreator.createDirectoryIfNotExists(valuesDirectory)
         val stringsFile = File(valuesDirectory, "strings.xml")
-        fileCreator.createFileIfNotExists(stringsFile) { buildStringsXml(packageName) }
+        fileCreator.createFileIfNotExists(stringsFile) { buildStringsXml(appName) }
         val xmlDirectory = File(appModuleDirectory, "src/main/res/xml")
         fileCreator.createDirectoryIfNotExists(xmlDirectory)
 
         if (enableCompose) {
             val themeFile = File(valuesDirectory, "themes.xml")
-            fileCreator.createFileIfNotExists(themeFile) { buildThemesXml(appName) }
+            fileCreator.createFileIfNotExists(themeFile) { buildThemesXml(sanitizedAppName) }
 
             val uiDirectory = File(appModuleDirectory, "src/main/java/${packageName.replace('.', '/')}/ui/theme")
             fileCreator.createDirectoryIfNotExists(uiDirectory)
             val themeKtFile = File(uiDirectory, "Theme.kt")
-            fileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(appName = appName, packageName = packageName) }
+            fileCreator.createFileIfNotExists(themeKtFile) { buildThemeKt(appName = sanitizedAppName, packageName = packageName) }
 
             val colorsKtFile = File(uiDirectory, "Color.kt")
             fileCreator.createFileIfNotExists(colorsKtFile) { buildColorsKt(packageName) }

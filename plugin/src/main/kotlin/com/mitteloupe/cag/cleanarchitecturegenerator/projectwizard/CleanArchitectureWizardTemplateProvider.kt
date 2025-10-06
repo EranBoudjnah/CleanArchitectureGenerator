@@ -15,6 +15,7 @@ import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.template
+import com.intellij.openapi.application.ApplicationInfo
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
@@ -23,7 +24,8 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.git.Git
 import java.io.File
-import java.lang.reflect.Field
+
+private val MEERKAT_PREFIX = "^(?:.* )?2024\\.3\\..*$".toRegex()
 
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
@@ -105,7 +107,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                         val projectRootDirectory = moduleData.rootDir.parentFile
                         createProject(
                             projectRootDirectory,
-                            data,
+                            moduleData,
                             enableCompose,
                             enableKtlint,
                             enableDetekt,
@@ -139,17 +141,29 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     ) {
         val selectedMinSdk: Int? =
             try {
-                data.apis.minApi.apiLevel
+                val apis = data.apis
+                val getMinApi = apis.javaClass.methods.first { it.name == "getMinApi" }
+                val minApi = getMinApi(apis)
+                minApi.apiLevelCompat
             } catch (_: Exception) {
+                null
+            }
+
+        val applicationInfo = ApplicationInfo.getInstance()
+        val overrideAndroidGradlePluginVersion =
+            if (applicationInfo.fullVersion.matches(MEERKAT_PREFIX)) {
+                "8.9.0"
+            } else {
                 null
             }
 
         val request =
             GenerateProjectTemplateRequest(
                 destinationRootDirectory = projectRootDirectory,
-                projectName = readProjectName(projectRootDirectory.name),
+                projectName = readProjectName(projectRootDirectory) ?: projectRootDirectory.name,
                 packageName = data.packageName,
                 overrideMinimumAndroidSdk = selectedMinSdk,
+                overrideAndroidGradlePluginVersion = overrideAndroidGradlePluginVersion,
                 enableCompose = enableCompose.value,
                 enableKtlint = enableKtlint.value,
                 enableDetekt = enableDetekt.value,
@@ -172,28 +186,30 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
         }
     }
 
-    private fun RecipeExecutor.readProjectName(fallbackProjectName: String): String {
-        val projectNameFromContext =
-            try {
-                val findReferencesExecutor = this as? FindReferencesRecipeExecutor
-                if (findReferencesExecutor != null) {
-                    val contextField: Field = FindReferencesRecipeExecutor::class.java.getDeclaredField("context")
-                    contextField.isAccessible = true
-                    val context = contextField.get(findReferencesExecutor)
-                    val projectField = context?.javaClass?.getDeclaredField("project")
-                    projectField?.isAccessible = true
-                    val project = projectField?.get(context)
-                    val nameField = project?.javaClass?.getDeclaredField("name")
-                    nameField?.isAccessible = true
-                    nameField?.get(project) as? String
-                } else {
-                    null
-                }
-            } catch (_: Exception) {
-                null
-            }
+    private fun readProjectName(rootDir: File): String? {
+        val gradleFile =
+            File(rootDir, "settings.gradle.kts").takeIf { it.exists() }
+                ?: File(rootDir, "settings.gradle").takeIf { it.exists() }
 
-        return projectNameFromContext?.takeIf { it.isNotEmpty() }
-            ?: fallbackProjectName
+        if (gradleFile?.exists() == true) {
+            val gradleContents = gradleFile.readText()
+            val projectNameRegex = Regex("""rootProject\.name\s*=\s*["'](.+?)["']""")
+            val match = projectNameRegex.find(gradleContents)
+            return match?.groups?.get(1)?.value
+        }
+
+        return null
     }
+
+    private val Any.apiLevelCompat: Int
+        get() =
+            runCatching {
+                val field = this::class.java.getDeclaredField("apiLevel")
+                field.isAccessible = true
+                field.getInt(this)
+            }.getOrElse {
+                val fallback = this::class.java.getDeclaredField("api")
+                fallback.isAccessible = true
+                fallback.getInt(this)
+            }
 }

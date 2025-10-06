@@ -89,7 +89,7 @@ class GradleWrapperCreatorTest {
     }
 
     @Test
-    fun `Given existing gradle-wrapper-properties when writeGradleWrapperFiles then does not overwrite existing file`() {
+    fun `Given existing gradle-wrapper-properties when writeGradleWrapperFiles then overwrites existing file`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "projectRoot").toFile()
         val gradleWrapperDirectory = File(projectRoot, "gradle/wrapper")
@@ -98,12 +98,21 @@ class GradleWrapperCreatorTest {
         val gradleWrapperPropertiesFile = File(gradleWrapperDirectory, "gradle-wrapper.properties")
         val initialContent = "initial content"
         gradleWrapperPropertiesFile.writeText(initialContent)
+        val expectedContent =
+            """
+            distributionBase=GRADLE_USER_HOME
+            distributionPath=wrapper/dists
+            distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+            zipStoreBase=GRADLE_USER_HOME
+            zipStorePath=wrapper/dists
+            """.trimIndent()
 
         // When
         classUnderTest.writeGradleWrapperFiles(projectRoot)
+        val actualContent = gradleWrapperPropertiesFile.readText()
 
         // Then
-        assertEquals("Existing gradle wrapper properties should not be overwritten", initialContent, gradleWrapperPropertiesFile.readText())
+        assertEquals("Existing gradle wrapper properties should be overwritten", expectedContent, actualContent)
     }
 
     @Test

@@ -109,4 +109,6 @@
             <add-to-group group-id="NewGroup" anchor="first"/>
         </group>
     </actions>
+
+    <idea-version since-build="AI-243.*" until-build="AI-251.*" />
 </idea-plugin>

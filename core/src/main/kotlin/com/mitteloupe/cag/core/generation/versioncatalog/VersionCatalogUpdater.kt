@@ -169,7 +169,9 @@ class VersionCatalogUpdater(
                         insertPositionIfMissing = CatalogInsertPosition.Start,
                         requirements =
                             (dependencyConfiguration.versions + pluginRequirements.versions + libraryRequirements.versions)
-                                .distinct()
+                                .associateBy { it.key }
+                                .values
+                                .toList()
                     ),
                     SectionTransaction(
                         insertPositionIfMissing = CatalogInsertPosition.End,
@@ -221,8 +223,10 @@ class VersionCatalogUpdater(
             }
 
         val versionRequirements =
-            (dependencyConfiguration.versions + pluginRequirements.versions + libraryRequirements.versions)
-                .distinct()
+            (pluginRequirements.versions + libraryRequirements.versions + dependencyConfiguration.versions)
+                .associateBy { it.key }
+                .values
+                .toList()
 
         updateVersionCatalogIfPresent(
             projectRootDir = projectRootDir,

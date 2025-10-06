@@ -527,12 +527,12 @@ class GeneratorTest {
         val expectedContent =
             """
             [versions]
+            kotlin = "2.2.10"
+            ksp = "2.2.10-2.0.2"
+            androidGradlePlugin = "8.12.2"
             compileSdk = "36"
             minSdk = "24"
             targetSdk = "36"
-            androidGradlePlugin = "8.12.2"
-            kotlin = "2.2.10"
-            ksp = "2.2.10-2.0.2"
             
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
