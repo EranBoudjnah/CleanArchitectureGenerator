@@ -1,0 +1,23 @@
+<html lang="en">
+<body>
+
+<p>Detects public functions in ViewModel classes that do not follow the naming convention of starting with <code>on</code>.</p>
+
+<p>
+    This inspection encourages a clear communication pattern between the View (UI) and the ViewModel in MVVM architecture.
+    By enforcing that public ViewModel methods start with <code>on</code>, such as <code>onLoginAction()</code> or <code>onSearchSubmitted()</code>,
+    it helps reinforce the principle that the ViewModel should respond to UI events without being tightly coupled to UI logic.
+</p>
+
+<pre><code>
+// Correct
+fun onItemSelected(item: Item)
+
+// Incorrect
+fun selectItem(item: Item)
+</code></pre>
+
+<p>This helps maintain consistency and improves the readability and maintainability of your codebase.</p>
+
+</body>
+</html>

@@ -11,3 +11,6 @@ project(":cli")
 
 include(":git")
 project(":git")
+
+include(":lint")
+project(":lint")

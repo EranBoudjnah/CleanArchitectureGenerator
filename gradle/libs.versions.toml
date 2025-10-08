@@ -7,11 +7,14 @@ mockk = "1.13.11"
 junit4 = "4.13.2"
 androidStudio = "2025.1.4.7"
 hamcrest = "3.0"
+lint = "31.13.0"
 
 [libraries]
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
+lint-checks = { module = "com.android.tools.lint:lint-checks", version.ref = "lint" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

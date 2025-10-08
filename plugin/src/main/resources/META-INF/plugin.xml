@@ -73,6 +73,20 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="kotlin"
+                         implementationClass="com.mitteloupe.cag.cleanarchitecturegenerator.inspection.ViewModelPublicFunctionShouldStartWithOnInspection"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         groupKey="inspection.clean.architecture.group.name"
+                         key="inspection.viewmodel.function.name.starts.with.on.display.name"/>
+
+        <localInspection language="kotlin"
+                         implementationClass="com.mitteloupe.cag.cleanarchitecturegenerator.inspection.ViewModelFunctionShouldNotContainUiTermsInspection"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         groupKey="inspection.clean.architecture.group.name"
+                         key="inspection.viewmodel.function.name.ui.agnostic.display.name"/>
+
         <applicationConfigurable
                 id="com.mitteloupe.cag.settings.Settings"
                 key="settings.display.name"
