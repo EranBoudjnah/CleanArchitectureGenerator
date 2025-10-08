@@ -7,36 +7,33 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
     <name>Clean Architecture Generator (CAG)</name>
 
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 
     <change-notes><![CDATA[
-        <h2>0.2.0</h2>
+        <h2>0.3.0</h2>
         <h3>Added</h3>
         <ul>
-            <li>Added optional git initialization for new projects (#16)</li>
-            <li>Added automatic git staging option (#14)</li>
-            <li>Added man page support and improved help documentation (#13)</li>
-            <li>Implemented configuration file support (#12)</li>
-            <li>Added settings panel for better user configuration (#11)</li>
-            <li>Added ktlint and detekt options for new features (#8)</li>
-            <li>Added app module selector for new features (#6)</li>
-            <li>Added Gradle check task validation (#5)</li>
+            <li>Added inspections to the plugin</li>
+            <li>Added a reference project to README for easier onboarding (#29)</li>
+            <li>Added Homebrew installation instructions to README (#28)</li>
+            <li>Added backwards compatibility for Android Studio Meerkat (#25)</li>
+            <li>Added settings for custom git path (#20)</li>
+            <li>Added version output to the CLI (#26)</li>
+            <li>Added git automation to the CLI for staging and commits (#19)</li>
         </ul>
-        
+
         <h3>Changed</h3>
         <ul>
-            <li>Improved version catalog logic and fixed related bugs</li>
-            <li>Simplified version catalog implementation (#9)</li>
-            <li>Moved all requests to a dedicated request package</li>
-            <li>Updated plugin name and template thumbnail</li>
-            <li>Improved README documentation</li>
+            <li>Renamed generated binary from cli to cag (#27)</li>
+            <li>Migrated UI to use JetBrains UI DSL v2 (#24)</li>
+            <li>Deduplicated version catalog entries (#23)</li>
+            <li>Refreshed and updated the README content (#30)</li>
         </ul>
-        
+
         <h3>Fixed</h3>
         <ul>
-            <li>Fixed multiple generation glitches</li>
-            <li>Fixed issue where new architecture module option was shown for existing modules (#7)</li>
-            <li>Various bug fixes in version catalog logic</li>
+            <li>Removed dexmaker from presentation-test module (#22)</li>
+            <li>Ensured new project minimum SDK version respects IDE-specified value (#21)</li>
         </ul>
     ]]></change-notes>
 
@@ -50,12 +47,14 @@
     <description><![CDATA[
         Provides quick actions to create:
         <ul>
+            <li><b>New Clean Architecture project</b> - A template for creating new projects</li>
             <li><b>Architecture Package</b> - A Clean Architecture architecture package</li>
             <li><b>Features</b> - Complete feature modules with presentation, domain, and data layers</li>
             <li><b>Data Sources</b> - Repository implementations and data source classes</li>
             <li><b>Use Cases</b> - Domain use cases following Clean Architecture principles</li>
             <li><b>ViewModels</b> - Presentation ViewModels following Clean Architecture principles</li>
         </ul>
+        In addition, provides some inline inspections to help maintain conventions.
         <br>
         Designed for Android and Kotlin projects following Clean Architecture patterns.
     ]]></description>
