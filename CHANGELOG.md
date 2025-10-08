@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.3.0]
+
+### Added
+- Added inspections to the plugin
+- Added a reference project to README for easier onboarding (#29)
+- Added Homebrew installation instructions to README (#28)
+- Added backwards compatibility for Android Studio Meerkat (#25)
+- Added settings for custom git path (#20)
+- Added version output to the CLI (#26)
+- Added git automation to the CLI for staging and commits (#19)
+
+### Changed
+- Renamed generated binary from cli to cag (#27)
+- Migrated UI to use JetBrains UI DSL v2 (#24)
+- Deduplicated version catalog entries (#23)
+- Refreshed and updated the README content (#30)
+
+### Fixed
+- Removed dexmaker from presentation-test module (#22)
+- Ensured new project minimum SDK version respects IDE-specified value (#21)
+
 ## [0.2.0]
 
 ### Added

@@ -31,6 +31,7 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 | Generate a data source         |          ✔️           | ✔️  |
 | Automatic git staging          |          ✔️           | ✔️  |
 | Configurable                   |          ✔️           | ✔️  |
+| Inline inspections             |          ✔️           | ❌️  |
 
 **Android Studio Plugin** is available on the IDE Plugins Marketplace.
 
@@ -38,7 +39,7 @@ A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 
 ## Android Studio plugin
 
-Adds multiple time-saving code generation shortcuts to Android Studio. 
+Adds multiple time-saving code generation shortcuts to Android Studio.
 
 ### Usage
 
@@ -52,6 +53,9 @@ Right-click on relevant directories and expand the `New` menu item.
 Settings are available under `Tools` > `Clean Architecture`.
 
 For a working project example, visit [Clean Architecture For Android](https://github.com/EranBoudjnah/CleanArchitectureForAndroid).
+
+#### Inspections
+Work out of the box. You can disable any or all inspections via Android Studio's settings.
 
 ## CLI
 

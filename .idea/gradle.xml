@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/cli" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/git" />
+            <option value="$PROJECT_DIR$/lint" />
             <option value="$PROJECT_DIR$/plugin" />
           </set>
         </option>

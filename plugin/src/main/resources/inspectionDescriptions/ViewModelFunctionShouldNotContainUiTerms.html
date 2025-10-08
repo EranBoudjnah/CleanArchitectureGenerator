@@ -1,0 +1,24 @@
+<html lang="en">
+<body>
+
+<p>Highlights public function names in ViewModel classes that contain UI-specific terms like "Click", "Scroll", or "Swipe".</p>
+
+<p>
+    This inspection helps ensure ViewModel functions are named in a UI-agnostic way by detecting naming patterns that leak UI layer concerns into the presentation layer.
+    It encourages replacing UI interaction verbs with more generic alternatives such as <code>Action</code> to promote cleaner architecture and separation of concerns.
+</p>
+
+<pre><code>
+class LoginViewModel {
+    // Correct
+    fun onLoginAction()
+
+    // Incorrect
+    fun onLoginClicked()
+}
+</code></pre>
+
+<p>This inspection supports an auto-fix that renames the function by replacing the UI-related term with <code>Action</code>, e.g., <code>onLoginClicked</code> becomes <code>onLoginAction</code>.</p>
+
+</body>
+</html>

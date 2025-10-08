@@ -29,6 +29,7 @@ intellijPlatform {
 dependencies {
     implementation(project(":core"))
     implementation(project(":git"))
+    implementation(project(":lint"))
 
     intellijPlatform {
         androidStudio(libs.versions.androidStudio.get())
