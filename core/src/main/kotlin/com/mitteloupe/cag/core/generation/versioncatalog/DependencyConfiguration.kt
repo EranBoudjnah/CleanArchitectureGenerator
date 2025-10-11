@@ -9,12 +9,12 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROIDX_CORE_KTX_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROIDX_FRAGMENT_KTX_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROIDX_LIFECYCLE_RUNTIME_KTX_VERSION
-import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROIDX_RECYCLER_VIEW_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROID_GRADLE_PLUGIN_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.ANDROID_NAVIGATION_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.COMPOSE_BOM_VERSION
-import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.COMPOSE_NAVIGATION_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.DETEKT_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.HILT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.JUNIT4_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLINX_COROUTINES_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLIN_VERSION
@@ -24,10 +24,9 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.MATERIAL_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.OKHTTP3_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.RETROFIT_VERSION
-import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROIDX_ESPRESSO_CORE_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROIDX_ESPRESSO_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROIDX_JUNIT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROIDX_RULES_VERSION
-import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROID_HILT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_ANDROID_UI_AUTOMATOR_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_MOCKITO_ANDROID_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.TEST_MOCKITO_CORE_VERSION
@@ -41,80 +40,72 @@ data class DependencyConfiguration(
 )
 
 object VersionCatalogConstants {
-    internal val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.10")
+    internal val KOTLIN_VERSION = VersionRequirement(key = "kotlin", version = "2.2.20")
     internal val COMPILE_SDK_VERSION = VersionRequirement(key = "compileSdk", version = "36")
     internal val MIN_SDK_VERSION = VersionRequirement(key = "minSdk", version = "24")
     internal val TARGET_SDK_VERSION = VersionRequirement(key = "targetSdk", version = "36")
 
-    internal val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.12.2")
+    internal val ANDROID_GRADLE_PLUGIN_VERSION = VersionRequirement(key = "androidGradlePlugin", version = "8.13.0")
 
     internal val COMPOSE_BOM_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "composeBom", version = getVersionForKey("composeBom", "2025.08.01"))
-    internal val COMPOSE_NAVIGATION_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "composeNavigation", version = getVersionForKey("composeNavigation", "2.9.3"))
+        get() = versionRequirement(key = "composeBom", defaultValue = "2025.10.00")
 
     internal val JUNIT4_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "junit4", version = getVersionForKey("junit4", "4.13.2"))
+        get() = versionRequirement(key = "junit4", defaultValue = "4.13.2")
     internal val KSP_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "ksp", version = getVersionForKey("ksp", "2.2.10-2.0.2"))
+        get() = versionRequirement(key = "ksp", defaultValue = "2.2.20-2.0.4")
 
     internal val KTLINT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "ktlint", version = getVersionForKey("ktlint", "13.1.0"))
+        get() = versionRequirement(key = "ktlint", defaultValue = "13.1.0")
     internal val DETEKT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "detekt", version = getVersionForKey("detekt", "1.23.6"))
+        get() = versionRequirement(key = "detekt", defaultValue = "1.23.8")
 
     internal val ANDROIDX_CORE_KTX_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxCoreKtx", version = getVersionForKey("androidxCoreKtx", "1.12.0"))
+        get() = versionRequirement(key = "androidxCoreKtx", defaultValue = "1.17.0")
     internal val ANDROIDX_LIFECYCLE_RUNTIME_KTX_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxLifecycleRuntimeKtx", version = getVersionForKey("androidxLifecycleRuntimeKtx", "2.7.0"))
+        get() = versionRequirement(key = "androidxLifecycleRuntimeKtx", defaultValue = "2.9.4")
     internal val KOTLINX_COROUTINES_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "kotlinxCoroutines", version = getVersionForKey("kotlinxCoroutines", "1.7.3"))
+        get() = versionRequirement(key = "kotlinxCoroutines", defaultValue = "1.10.2")
     internal val MATERIAL_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "material", version = getVersionForKey("material", "1.11.0"))
+        get() = versionRequirement(key = "material", defaultValue = "1.13.0")
     internal val OKHTTP3_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "okhttp3", version = getVersionForKey("okhttp3", "4.12.0"))
+        get() = versionRequirement(key = "okhttp3", defaultValue = "5.2.1")
     internal val ANDROIDX_APPCOMPAT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxAppcompat", version = getVersionForKey("androidxAppcompat", "1.6.1"))
+        get() = versionRequirement(key = "androidxAppcompat", defaultValue = "1.7.1")
     internal val HILT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "hilt", version = getVersionForKey("hilt", "2.57.2"))
+        get() = versionRequirement(key = "hilt", defaultValue = "2.57.2")
     internal val ANDROIDX_RECYCLER_VIEW_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxRecyclerView", version = getVersionForKey("androidxRecyclerView", "1.3.2"))
+        get() = versionRequirement(key = "androidxRecyclerView", defaultValue = "1.4.0")
     internal val ANDROIDX_FRAGMENT_KTX_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxFragmentKtx", version = getVersionForKey("androidxFragmentKtx", "1.6.2"))
-    internal val ANDROIDX_NAVIGATION_FRAGMENT_KTX_VERSION: VersionRequirement
-        get() =
-            VersionRequirement(
-                key = "androidxNavigationFragmentKtx",
-                version = getVersionForKey("androidxNavigationFragmentKtx", "2.7.6")
-            )
+        get() = versionRequirement(key = "androidxFragmentKtx", defaultValue = "1.8.9")
+    internal val ANDROID_NAVIGATION_VERSION: VersionRequirement
+        get() = versionRequirement(key = "androidNavigation", defaultValue = "2.9.5")
     internal val ANDROIDX_CONSTRAINT_LAYOUT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxConstraintLayout", version = getVersionForKey("androidxConstraintLayout", "2.1.4"))
+        get() = versionRequirement(key = "androidxConstraintLayout", defaultValue = "2.2.1")
 
     internal val ANDROIDX_ACTIVITY_COMPOSE_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxActivityCompose", version = getVersionForKey("androidxActivityCompose", "1.8.2"))
+        get() = versionRequirement(key = "androidxActivityCompose", defaultValue = "1.11.0")
 
     internal val KTOR_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "ktor", version = getVersionForKey("ktor", "3.0.3"))
+        get() = versionRequirement(key = "ktor", defaultValue = "3.3.1")
     internal val RETROFIT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "retrofit", version = getVersionForKey("retrofit", "2.11.0"))
+        get() = versionRequirement(key = "retrofit", defaultValue = "3.0.0")
 
     internal val TEST_MOCKITO_CORE_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "mockitoCore", version = getVersionForKey("mockitoCore", "5.20.0"))
+        get() = versionRequirement(key = "mockitoCore", defaultValue = "5.20.0")
     internal val TEST_MOCKITO_KOTLIN_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "mockitoKotlin", version = getVersionForKey("mockitoKotlin", "6.0.0"))
+        get() = versionRequirement(key = "mockitoKotlin", defaultValue = "6.1.0")
     internal val TEST_MOCKITO_ANDROID_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "mockitoAndroid", version = getVersionForKey("mockitoAndroid", "2.28.6"))
+        get() = versionRequirement(key = "mockitoAndroid", defaultValue = "2.28.6")
 
     internal val TEST_ANDROIDX_JUNIT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxJunit", version = getVersionForKey("androidxJunit", "1.1.5"))
-    internal val TEST_ANDROIDX_ESPRESSO_CORE_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxEspressoCore", version = getVersionForKey("androidxEspressoCore", "3.5.1"))
-    internal val TEST_ANDROID_HILT_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidHilt", version = getVersionForKey("androidHilt", "2.48"))
+        get() = versionRequirement(key = "androidxJunit", defaultValue = "1.3.0")
+    internal val TEST_ANDROIDX_ESPRESSO_VERSION: VersionRequirement
+        get() = versionRequirement(key = "androidxEspresso", defaultValue = "3.7.0")
     internal val TEST_ANDROID_UI_AUTOMATOR_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxUiautomator", version = getVersionForKey("androidxUiautomator", "2.2.0"))
+        get() = versionRequirement(key = "androidxUiautomator", defaultValue = "2.3.0")
     internal val TEST_ANDROIDX_RULES_VERSION: VersionRequirement
-        get() = VersionRequirement(key = "androidxTestRules", version = getVersionForKey("androidxTestRules", "1.5.0"))
+        get() = versionRequirement(key = "androidxTestRules", defaultValue = "1.7.0")
 
     val ANDROID_VERSIONS =
         listOf(
@@ -123,6 +114,11 @@ object VersionCatalogConstants {
             TARGET_SDK_VERSION,
             ANDROID_GRADLE_PLUGIN_VERSION
         )
+
+    private fun versionRequirement(
+        key: String,
+        defaultValue: String
+    ) = VersionRequirement(key = key, version = getVersionForKey(key, defaultValue))
 }
 
 object LibraryConstants {
@@ -199,7 +195,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "compose-navigation",
                 module = "androidx.navigation:navigation-compose",
-                version = COMPOSE_NAVIGATION_VERSION
+                version = ANDROID_NAVIGATION_VERSION
             )
 
     val TEST_JUNIT: LibraryRequirement
@@ -223,7 +219,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "test-androidx-espresso-core",
                 module = "androidx.test.espresso:espresso-core",
-                version = TEST_ANDROIDX_ESPRESSO_CORE_VERSION
+                version = TEST_ANDROIDX_ESPRESSO_VERSION
             )
 
     val TEST_ANDROID_HILT: LibraryRequirement
@@ -231,7 +227,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "test-android-hilt",
                 module = "com.google.dagger:hilt-android-testing",
-                version = TEST_ANDROID_HILT_VERSION
+                version = HILT_VERSION
             )
 
     val TEST_ANDROID_UI_AUTOMATOR: LibraryRequirement
@@ -286,7 +282,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "hilt-android",
                 module = "com.google.dagger:hilt-android",
-                version = VersionCatalogConstants.HILT_VERSION
+                version = HILT_VERSION
             )
 
     val HILT_ANDROID_COMPILER: LibraryRequirement
@@ -294,7 +290,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "hilt-android-compiler",
                 module = "com.google.dagger:hilt-android-compiler",
-                version = VersionCatalogConstants.HILT_VERSION
+                version = HILT_VERSION
             )
 
     val ANDROIDX_APPCOMPAT: LibraryRequirement
@@ -326,7 +322,7 @@ object LibraryConstants {
             LibraryRequirement(
                 key = "androidx-navigation-fragment-ktx",
                 module = "androidx.navigation:navigation-fragment-ktx",
-                version = ANDROIDX_NAVIGATION_FRAGMENT_KTX_VERSION
+                version = ANDROID_NAVIGATION_VERSION
             )
 
     val ANDROIDX_UI_TOOLING: LibraryRequirement
@@ -521,7 +517,7 @@ object PluginConstants {
             PluginRequirement(
                 key = "hilt",
                 id = "com.google.dagger.hilt.android",
-                version = VersionCatalogConstants.HILT_VERSION
+                version = HILT_VERSION
             )
 
     val COMPOSE_COMPILER: PluginRequirement

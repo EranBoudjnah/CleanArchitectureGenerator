@@ -17,6 +17,10 @@ import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
 
+private const val KOTLIN_VERSION = "kotlin = \"2.2.20\""
+private const val ANDROID_GRADLE_PLUGIN_VERSION = "androidGradlePlugin = \"8.13.0\""
+private const val KSP_VERSION = "ksp = \"2.2.20-2.0.4\""
+
 class VersionCatalogUpdaterTest {
     private lateinit var classUnderTest: VersionCatalogUpdater
 
@@ -149,7 +153,7 @@ class VersionCatalogUpdaterTest {
         val expectedCatalog =
             """
             [versions]
-            kotlin = "2.2.10"
+            $KOTLIN_VERSION
 
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -195,9 +199,9 @@ class VersionCatalogUpdaterTest {
         val expected =
             """
             [versions]
-            kotlin = "2.2.10"
-            ksp = "2.2.10-2.0.2"
-            androidGradlePlugin = "8.12.2"
+            $KOTLIN_VERSION
+            $KSP_VERSION
+            $ANDROID_GRADLE_PLUGIN_VERSION
 
             [plugins]
             android-application = { id = "com.android.application", version = "1.0.0" }
@@ -246,8 +250,8 @@ class VersionCatalogUpdaterTest {
             compileSdk = "34"
             minSdk = "23"
             targetSdk = "36"
-            androidGradlePlugin = "8.12.2"
-            ksp = "2.2.10-2.0.2"
+            $ANDROID_GRADLE_PLUGIN_VERSION
+            $KSP_VERSION
 
             [plugins]
             android-application = { id = "com.android.application", version = "1.0.0" }
@@ -291,8 +295,8 @@ class VersionCatalogUpdaterTest {
             compileSdk = "36"
             minSdk = "24"
             targetSdk = "36"
-            androidGradlePlugin = "8.12.2"
-            ksp = "2.2.10-2.0.2"
+            $ANDROID_GRADLE_PLUGIN_VERSION
+            $KSP_VERSION
 
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -336,8 +340,8 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "36"
             minSdk = "24"
-            ksp = "2.2.10-2.0.2"
-            androidGradlePlugin = "8.12.2"
+            $KSP_VERSION
+            $ANDROID_GRADLE_PLUGIN_VERSION
 
             [plugins]
             kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -379,7 +383,7 @@ class VersionCatalogUpdaterTest {
             """
             [versions]
             agp = "35"
-            androidGradlePlugin = "8.12.2"
+            $ANDROID_GRADLE_PLUGIN_VERSION
 
             [plugins]
             android-library = { id = "com.android.library", version.ref = "agp" }
@@ -419,9 +423,9 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "36"
             minSdk = "24"
-            composeBom = "2025.08.01"
-            composeNavigation = "2.9.3"
-            androidxActivityCompose = "1.8.2"
+            composeBom = "2025.10.00"
+            androidNavigation = "2.9.5"
+            androidxActivityCompose = "1.11.0"
 
             [plugins]
             compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -432,7 +436,7 @@ class VersionCatalogUpdaterTest {
             compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
             compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
             compose-material3 = { module = "androidx.compose.material3:material3" }
-            compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+            compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "androidNavigation" }
             compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
             compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
             androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
@@ -471,7 +475,7 @@ class VersionCatalogUpdaterTest {
             kotlin = "2.2.10"
             compileSdk = "36"
             minSdk = "24"
-            kotlinxCoroutines = "1.7.3"
+            kotlinxCoroutines = "1.10.2"
 
             [libraries]
             kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }

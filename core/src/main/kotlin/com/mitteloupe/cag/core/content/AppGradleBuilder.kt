@@ -65,11 +65,19 @@ fun buildAppGradleScript(
     val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
     val result =
         """
+        import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+        
         plugins {
             alias(libs.plugins.$aliasAndroidApplication)
             alias(libs.plugins.$aliasKotlinAndroid)
             alias(libs.plugins.$aliasKsp)
             alias(libs.plugins.$aliasPluginHilt)$composePlugins
+        }
+        
+        kotlin {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_17)
+            }
         }
         
         android {
@@ -98,9 +106,6 @@ fun buildAppGradleScript(
             compileOptions {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
-            }
-            kotlinOptions {
-                jvmTarget = "17"
             }${
             if (enableCompose) {
                 """
@@ -111,6 +116,9 @@ fun buildAppGradleScript(
                 ""
             }
         }
+            packaging {
+                resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            }
         }
             
         dependencies {
