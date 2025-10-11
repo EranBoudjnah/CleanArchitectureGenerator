@@ -468,10 +468,10 @@ class GeneratorTest {
             [versions]
             $existingVersions
             targetSdk = "36"
-            androidGradlePlugin = "8.12.2"
-            composeBom = "2025.08.01"
-            composeNavigation = "2.9.3"
-            androidxActivityCompose = "1.8.2"
+            androidGradlePlugin = "8.13.0"
+            composeBom = "2025.10.00"
+            androidNavigation = "2.9.5"
+            androidxActivityCompose = "1.11.0"
 
             [libraries]
             $existingLibraries
@@ -480,7 +480,7 @@ class GeneratorTest {
             compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
             compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
             compose-material3 = { module = "androidx.compose.material3:material3" }
-            compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+            compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "androidNavigation" }
             compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
             compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
             androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
@@ -527,9 +527,9 @@ class GeneratorTest {
         val expectedContent =
             """
             [versions]
-            kotlin = "2.2.10"
-            ksp = "2.2.10-2.0.2"
-            androidGradlePlugin = "8.12.2"
+            kotlin = "2.2.20"
+            ksp = "2.2.20-2.0.4"
+            androidGradlePlugin = "8.13.0"
             compileSdk = "36"
             minSdk = "24"
             targetSdk = "36"
@@ -589,7 +589,7 @@ class GeneratorTest {
             [versions]
             $existingVersions
             targetSdk = "36"
-            androidGradlePlugin = "8.12.2"
+            androidGradlePlugin = "8.13.0"
 
             [libraries]
             $existingLibraries

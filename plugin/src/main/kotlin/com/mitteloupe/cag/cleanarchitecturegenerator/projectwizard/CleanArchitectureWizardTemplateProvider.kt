@@ -152,7 +152,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
         val applicationInfo = ApplicationInfo.getInstance()
         val overrideAndroidGradlePluginVersion =
             if (applicationInfo.fullVersion.matches(MEERKAT_PREFIX)) {
-                "8.9.0"
+                "8.9.1"
             } else {
                 null
             }
