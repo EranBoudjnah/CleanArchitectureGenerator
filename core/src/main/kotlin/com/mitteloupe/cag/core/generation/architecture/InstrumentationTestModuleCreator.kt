@@ -208,9 +208,9 @@ import org.hamcrest.Matcher
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.assertion
+            $$"""package $$architecturePackageName.test.assertion
 
-$imports
+$$imports
 fun matchesItemAtPosition(matcher: Matcher<View?>?, position: Int) =
     ViewAssertion { view, noViewFoundException ->
         if (noViewFoundException != null) {
@@ -218,7 +218,7 @@ fun matchesItemAtPosition(matcher: Matcher<View?>?, position: Int) =
         }
         val recyclerView = view as RecyclerView
         val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
-            ?: throw AssertionFailedError("No view holder at position: ${'$'}position")
+            ?: throw AssertionFailedError("No view holder at position: $position")
         assertThat(viewHolder.itemView, matcher)
     }
 """
@@ -277,9 +277,9 @@ import androidx.test.uiautomator.UiSelector
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.idlingresource
+            $$"""package $$architecturePackageName.test.idlingresource
 
-$imports
+$$imports
 private const val APP_NOT_RESPONDING_TEXT = " isn't responding"
 private const val APP_NOT_RESPONDING_TAG = "AppNotResponding"
 fun UiDevice.registerAppNotRespondingWatcher() {
@@ -316,7 +316,7 @@ private fun UiDevice.closeAnrWithWait(appNotRespondingDialog: UiObject) {
         ).click()
         val dialogText = appNotRespondingDialog.text
         val appName = dialogText.take(dialogText.length - APP_NOT_RESPONDING_TEXT.length)
-        Log.i(APP_NOT_RESPONDING_TAG, "App \"${'$'}appName\" is not responding. Pressed on wait.")
+        Log.i(APP_NOT_RESPONDING_TAG, "App \"$appName\" is not responding. Pressed on wait.")
     } catch (uiObjectNotFoundException: UiObjectNotFoundException) {
         Log.i(APP_NOT_RESPONDING_TAG, "Detected app not responding dialog, but window disappeared.")
     }
@@ -427,14 +427,14 @@ annotation class LocalStore(val localStoreDataIds: Array<String>)
             packageDirectory = packageDirectory,
             relativePath = "test/DoesNot.kt",
             content =
-                """package $architecturePackageName.test.test
+                $$"""package $$architecturePackageName.test.test
 
 import junit.framework.AssertionFailedError
 
 fun doesNot(description: String, block: () -> Unit) {
     try {
         block()
-        error("Unexpected: ${'$'}description")
+        error("Unexpected: $description")
     } catch (_: AssertionFailedError) {
     }
 }
@@ -676,9 +676,9 @@ import org.hamcrest.TypeSafeMatcher
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.matcher
+            $$"""package $$architecturePackageName.test.matcher
 
-$imports
+$$imports
 fun withBackgroundColorMatcher(
     @ColorInt color: Int,
     matchCardViewBackgrounds: Boolean
@@ -690,7 +690,7 @@ class WithBackgroundColorMatcher(
 ) : TypeSafeMatcher<View>() {
     override fun describeTo(description: Description?) {
         @OptIn(ExperimentalStdlibApi::class)
-        description?.appendText("has background color: #${'$'}{expectedColor.toHexString()}")
+        description?.appendText("has background color: #${expectedColor.toHexString()}")
     }
 
     override fun matchesSafely(item: View): Boolean {
@@ -698,7 +698,7 @@ class WithBackgroundColorMatcher(
             (item as? CardView)?.cardBackgroundColor?.getColorForState(item.drawableState, -1)
                 .also {
                     @OptIn(ExperimentalStdlibApi::class)
-                    println("Background color: #${'$'}{it?.toHexString()}")
+                    println("Background color: #${it?.toHexString()}")
                 }
         } else {
             (item.background as? ColorDrawable)?.color
@@ -746,9 +746,9 @@ import org.hamcrest.TypeSafeMatcher
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.matcher
+            $$"""package $$architecturePackageName.test.matcher
 
-$imports
+$$imports
 fun withDrawableId(@DrawableRes id: Int): Matcher<View> = WithDrawableIdMatcher(id)
 
 class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
@@ -806,10 +806,10 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
         }
 
     override fun describeTo(description: Description) {
-        description.appendText("with drawable from resource id: ${'$'}expectedId")
+        description.appendText("with drawable from resource id: $expectedId")
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         targetContext.resources.getResourceEntryName(expectedId)
-            ?.let { description.appendText("[${'$'}it]") }
+            ?.let { description.appendText("[$it]") }
     }
 
     private fun Drawable.extractStateIfStateful(currentState: IntArray): Drawable? {
@@ -820,7 +820,7 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
                 stateListDrawable.findStateDrawableIndex(currentState)
             )
         } else {
-            Log.w("DrawableMatcher", "Android version ${'$'}{Build.VERSION.SDK_INT} unsupported.")
+            Log.w("DrawableMatcher", "Android version ${Build.VERSION.SDK_INT} unsupported.")
             null
         }
     }
@@ -894,9 +894,9 @@ import org.junit.runners.model.Statement
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.rule
+            $$"""package $$architecturePackageName.test.rule
 
-$imports
+$$imports
 class LocalStoreRule(
     private val lazySharedPreferences: Lazy<SharedPreferences>,
     private val lazyKeyValueStore: Lazy<KeyValueStore>
@@ -925,7 +925,7 @@ class LocalStoreRule(
                 description.localStoreDataIds()
                     .map { localStoreDataId ->
                         requireNotNull(keyValueStore.keyValues[localStoreDataId]) {
-                            "Request/Response ID ${'$'}localStoreDataId not found."
+                            "Request/Response ID $localStoreDataId not found."
                         }
                     }.forEach { keyValuePair ->
                         val (key, value) = keyValuePair
@@ -954,7 +954,7 @@ class LocalStoreRule(
                 putStringSet(key, value as Set<String>)
             }
 
-            else -> throw IllegalArgumentException("${'$'}value is of an unsupported type.")
+            else -> throw IllegalArgumentException("$value is of an unsupported type.")
         }
     }
 }
@@ -995,9 +995,9 @@ import org.junit.runner.Description
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.rule
+            $$"""package $$architecturePackageName.test.rule
 
-$imports
+$$imports
 private const val TAG = "Test"
 
 private val deviceLanguage by lazy { Locale.getDefault().language }
@@ -1016,7 +1016,7 @@ private val contentValues = ContentValues().apply {
 
 class ScreenshotFailureRule : TestWatcher() {
     override fun failed(e: Throwable?, description: Description) {
-        val screenShotName = "${'$'}deviceLanguage-${'$'}{description.methodName}-${'$'}{getDate()}"
+        val screenShotName = "$deviceLanguage-${description.methodName}-${getDate()}"
         val bitmap = getInstrumentation().uiAutomation.takeScreenshot()
         storeFailureScreenshot(bitmap, screenShotName)
     }
@@ -1054,7 +1054,7 @@ private fun useMediaStoreScreenshotStorage(
 
     contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         ?.let { uri ->
-            Log.d(TAG, "Saving screenshot to ${'$'}uri")
+            Log.d(TAG, "Saving screenshot to $uri")
             contentResolver.openOutputStream(uri)?.let { saveScreenshotToStream(bitmap, it) }
             contentResolver.update(uri, contentValues, null, null)
         }
@@ -1076,7 +1076,7 @@ private fun usePublicExternalScreenshotStorage(
     }
 
     val file = File(directory, screenshotName.jpg)
-    Log.d(TAG, "Saving screenshot to ${'$'}{file.absolutePath}")
+    Log.d(TAG, "Saving screenshot to ${file.absolutePath}")
     saveScreenshotToStream(bitmap, FileOutputStream(file))
 
     contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
@@ -1088,13 +1088,13 @@ private fun saveScreenshotToStream(bitmap: Bitmap, outputStream: OutputStream) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 80, openStream)
             Log.d(TAG, "Screenshot saved.")
         } catch (ioException: IOException) {
-            Log.e(TAG, "Screenshot was not stored at this time: ${'$'}{ioException.message}")
+            Log.e(TAG, "Screenshot was not stored at this time: ${ioException.message}")
         }
     }
 }
 
 private val String.jpg
-    get() = "${'$'}{this.replace(":", "_")}.jpg"
+    get() = "${this.replace(":", "_")}.jpg"
 """
 
         generateFileIfMissing(
@@ -1201,9 +1201,9 @@ import org.junit.runners.model.Statement
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.rule
+            $$"""package $$architecturePackageName.test.rule
 
-$imports
+$$imports
 class WebServerRule(
     private val lazyMockDispatcher: Lazy<ResponseBinder>,
     private val lazyResponseStore: Lazy<ResponseStore>
@@ -1234,7 +1234,7 @@ private class WebServerStatement(
             .map { requestResponseId ->
                 requireNotNull(
                     responseStore.responseFactories[requestResponseId]
-                ) { "Request/Response ID ${'$'}requestResponseId not found." }
+                ) { "Request/Response ID $requestResponseId not found." }
             }
 
         requestResponses.forEach { requestResponse ->
@@ -1251,7 +1251,7 @@ private class WebServerStatement(
 
         val unusedResponseKeys = stubbedResponseKeys - usedResponseKeys
         check(unusedResponseKeys.isEmpty()) {
-            "${'$'}{unusedResponseKeys.size} unused stubbed URLs:\n[" +
+            "${unusedResponseKeys.size} unused stubbed URLs:\n[" +
                 unusedResponseKeys.joinToString("]\n[") + "]"
         }
     }
@@ -1284,9 +1284,9 @@ import javax.net.ssl.SSLSocketFactory
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.server
+            $$"""package $$architecturePackageName.test.server
 
-$imports
+$$imports
 class LoggingSslSocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFactory() {
     override fun getDefaultCipherSuites(): Array<String> = delegate.defaultCipherSuites
 
@@ -1322,7 +1322,7 @@ class LoggingSslSocketFactory(private val delegate: SSLSocketFactory) : SSLSocke
             socket.addHandshakeCompletedListener { event ->
                 Log.d(
                     "SSL",
-                    "Handshake completed with peerHost=${'$'}{event.socket.inetAddress.hostName}"
+                    "Handshake completed with peerHost=${event.socket.inetAddress.hostName}"
                 )
             }
         }
@@ -1356,9 +1356,9 @@ import okhttp3.mockwebserver.RecordedRequest
 """.optimizeImports()
 
         val content =
-            """package $architecturePackageName.test.server
+            $$"""package $$architecturePackageName.test.server
 
-$imports
+$$imports
 class MockDispatcher :
     Dispatcher(),
     ResponseBinder {
@@ -1390,7 +1390,7 @@ class MockDispatcher :
             usedEndpoints.add(requestResponse.key)
         }
         val response = matchingRequest?.value?.mockResponse() ?: MockResponse(code = 404).also {
-            Log.w(TAG, "${'$'}testName: ${'$'}{request.path} not stubbed!")
+            Log.w(TAG, "$testName: ${request.path} not stubbed!")
         }
         return if (response.upgradeToWebSocket) {
             MockResponse().withWebSocketUpgrade(

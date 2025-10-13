@@ -10,8 +10,7 @@ fun buildMainActivityKotlinFile(
     val result =
         if (enableCompose) {
             val optimizedImports =
-                """
-import android.os.Bundle
+                """import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,64 +22,60 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import $projectNamespace.ui.theme.${appName}Theme
 """.optimizeImports()
-            """
-            package $projectNamespace
+            $$"""package $$projectNamespace
 
-            $optimizedImports
-            class MainActivity : ComponentActivity() {
-                override fun onCreate(savedInstanceState: Bundle?) {
-                    super.onCreate(savedInstanceState)
-                    setContent {
-                        ${appName}Theme {
-                            Surface(
-                                modifier = Modifier.fillMaxSize(),
-                                color = MaterialTheme.colorScheme.background
-                            ) {
-                                Greeting("Android")
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Composable
-            fun Greeting(name: String, modifier: Modifier = Modifier) {
-                Text(
-                    text = "Hello ${'$'}name!",
-                    modifier = modifier
-                )
-            }
-
-            @Preview(showBackground = true)
-            @Composable
-            fun GreetingPreview() {
-                ${appName}Theme {
+$$optimizedImports
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            $${appName}Theme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     Greeting("Android")
                 }
             }
-            """.trimIndent()
+        }
+    }
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    $${appName}Theme {
+        Greeting("Android")
+    }
+}
+"""
         } else {
             val optimizedImports =
-                """
-import android.os.Bundle
+                """import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import $projectNamespace.databinding.ActivityMainBinding
 """.optimizeImports()
-            """
-            package $projectNamespace
+            """package $projectNamespace
 
-            $optimizedImports
+$optimizedImports
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
 
-            class MainActivity : AppCompatActivity() {
-                private lateinit var binding: ActivityMainBinding
-
-                override fun onCreate(savedInstanceState: Bundle?) {
-                    super.onCreate(savedInstanceState)
-                    binding = ActivityMainBinding.inflate(layoutInflater)
-                    setContentView(binding.root)
-                }
-            }
-            """.trimIndent()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+}
+"""
         }
 
     return result

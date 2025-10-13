@@ -54,13 +54,13 @@ interface ViewStateBinder<in VIEW_STATE : Any, in VIEWS_PROVIDER : ViewsProvider
             packageDirectory = packageDirectory,
             relativePath = "navigation/exception/UnhandledNavigationException.kt",
             content =
-                """package $moduleNamespace.ui.navigation.exception
+                $$"""package $$moduleNamespace.ui.navigation.exception
 
-import $moduleNamespace.presentation.navigation.PresentationNavigationEvent
+import $$moduleNamespace.presentation.navigation.PresentationNavigationEvent
 
 class UnhandledNavigationException(event: PresentationNavigationEvent) :
     IllegalArgumentException(
-        "Navigation event ${'$'}{event::class.simpleName} was not handled."
+        "Navigation event ${event::class.simpleName} was not handled."
     )
 """,
             errorMessage = "unhandled navigation exception"

@@ -38,14 +38,14 @@ class SettingsFileUpdaterTest {
             )
         val givenFeatureNameLowerCase = "feature"
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "ui",
                 "presentation",
                 "domain",
                 "data"
             ).forEach { module ->
-                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+                include(":features:$$givenFeatureNameLowerCase:$module")
             }
             """.trimIndent()
 
@@ -69,14 +69,14 @@ class SettingsFileUpdaterTest {
             )
         val givenFeatureNameLowerCase = "feat"
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "ui",
                 "presentation",
                 "domain",
                 "data"
             ).forEach { module ->
-                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+                include(":features:$$givenFeatureNameLowerCase:$module")
             }
             """.trimIndent()
         val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
@@ -97,7 +97,7 @@ class SettingsFileUpdaterTest {
         // Given
         val givenFeatureNameLowerCase = "ready"
         val initial =
-            """
+            $$"""
             rootProject.name = "app"
             setOf(
                 "ui",
@@ -105,7 +105,7 @@ class SettingsFileUpdaterTest {
                 "domain",
                 "data"
             ).forEach { module ->
-                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+                include(":features:$$givenFeatureNameLowerCase:$module")
             }
             
             """.trimIndent()
@@ -131,14 +131,14 @@ class SettingsFileUpdaterTest {
             )
         val givenFeatureNameLowerCase = "testfeature"
         val expectedTail =
-            """
+            $$"""
             [
                 'ui',
                 'presentation',
                 'domain',
                 'data'
             ].each { module ->
-                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+                include ":features:$$givenFeatureNameLowerCase:$module"
             }
             """.trimIndent()
 
@@ -167,14 +167,14 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "ui",
                 "presentation",
                 "domain",
                 "data"
             ).forEach { module ->
-                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+                include(":features:$$givenFeatureNameLowerCase:$module")
             }
             """.trimIndent()
 
@@ -202,14 +202,14 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
 
         val expectedTail =
-            """
+            $$"""
             [
                 'ui',
                 'presentation',
                 'domain',
                 'data'
             ].each { module ->
-                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+                include ":features:$$givenFeatureNameLowerCase:$module"
             }
             """.trimIndent()
 
@@ -229,7 +229,7 @@ class SettingsFileUpdaterTest {
         // Given
         val givenFeatureNameLowerCase = "feat"
         val initial =
-            """
+            $$"""
             rootProject.name = "app"
             setOf(
                 "ui",
@@ -237,7 +237,7 @@ class SettingsFileUpdaterTest {
                 "domain",
                 "data"
             ).forEach { module ->
-                include(":features:$givenFeatureNameLowerCase:${'$'}module")
+                include(":features:$$givenFeatureNameLowerCase:$module")
             }
             """.trimIndent() + "\n"
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
@@ -258,7 +258,7 @@ class SettingsFileUpdaterTest {
         // Given
         val givenFeatureNameLowerCase = "feat"
         val initial =
-            """
+            $$"""
             rootProject.name = 'app'
             [
                 'ui',
@@ -266,7 +266,7 @@ class SettingsFileUpdaterTest {
                 'domain',
                 'data'
             ].each { module ->
-                include ":features:$givenFeatureNameLowerCase:${'$'}module"
+                include ":features:$$givenFeatureNameLowerCase:$module"
             }
             """.trimIndent() + "\n"
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
@@ -323,12 +323,12 @@ class SettingsFileUpdaterTest {
                 initialContent = "rootProject.name = \"app\"\n"
             )
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "source",
                 "implementation"
             ).forEach { module ->
-                include(":datasource:${'$'}module")
+                include(":datasource:$module")
             }
             """.trimIndent()
 
@@ -348,12 +348,12 @@ class SettingsFileUpdaterTest {
                 initialContent = "rootProject.name = \"app\""
             )
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "source",
                 "implementation"
             ).forEach { module ->
-                include(":datasource:${'$'}module")
+                include(":datasource:$module")
             }
             """.trimIndent()
         val expectedNewlineBeforeIncludes = "rootProject.name = \"app\"\n$expectedTail"
@@ -379,12 +379,12 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "source",
                 "implementation"
             ).forEach { module ->
-                include(":datasource:${'$'}module")
+                include(":datasource:$module")
             }
             """.trimIndent()
 
@@ -408,12 +408,12 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
 
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "source",
                 "implementation"
             ).forEach { module ->
-                include(":datasource:${'$'}module")
+                include(":datasource:$module")
             }
             """.trimIndent()
 
@@ -433,12 +433,12 @@ class SettingsFileUpdaterTest {
                 initialContent = "rootProject.name = 'app'\n"
             )
         val expectedTail =
-            """
+            $$"""
             [
                 'source',
                 'implementation'
             ].each { module ->
-                include ":datasource:${'$'}module"
+                include ":datasource:$module"
             }
             """.trimIndent()
 
@@ -461,12 +461,12 @@ class SettingsFileUpdaterTest {
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
 
         val expectedTail =
-            """
+            $$"""
             [
                 'source',
                 'implementation'
             ].each { module ->
-                include ":datasource:${'$'}module"
+                include ":datasource:$module"
             }
             """.trimIndent()
 
@@ -482,13 +482,13 @@ class SettingsFileUpdaterTest {
     fun `Given grouped includes already present in Kotlin when updateDataSourceSettingsIfPresent then does nothing`() {
         // Given
         val initial =
-            """
+            $$"""
             rootProject.name = "app"
             setOf(
                 "source",
                 "implementation"
             ).forEach { module ->
-                include(":datasource:${'$'}module")
+                include(":datasource:$module")
             }
             """.trimIndent() + "\n"
         val (projectRoot, startDirectory) = createProjectWithKotlinSettings(initialContent = initial)
@@ -505,13 +505,13 @@ class SettingsFileUpdaterTest {
     fun `Given grouped includes already present in Groovy when updateDataSourceSettingsIfPresent then does nothing`() {
         // Given
         val initial =
-            """
+            $$"""
             rootProject.name = 'app'
             [
                 'source',
                 'implementation'
             ].each { module ->
-                include ":datasource:${'$'}module"
+                include ":datasource:$module"
             }
             """.trimIndent() + "\n"
         val (projectRoot, startDirectory) = createProjectWithGroovySettings(initialContent = initial)
@@ -534,7 +534,7 @@ class SettingsFileUpdaterTest {
                 initialContent = "rootProject.name = \"app\"\n"
             )
         val expectedTail =
-            """
+            $$"""
             setOf(
                 "ui",
                 "instrumentation-test",
@@ -542,7 +542,7 @@ class SettingsFileUpdaterTest {
                 "presentation-test",
                 "domain"
             ).forEach { module ->
-                include(":architecture:${'$'}module")
+                include(":architecture:$module")
             }
             """.trimIndent()
 
@@ -562,7 +562,7 @@ class SettingsFileUpdaterTest {
                 initialContent = "rootProject.name = 'app'\n"
             )
         val expectedTail =
-            """
+            $$"""
             [
                 'ui',
                 'instrumentation-test',
@@ -570,7 +570,7 @@ class SettingsFileUpdaterTest {
                 'presentation-test',
                 'domain'
             ].each { module ->
-                include ":architecture:${'$'}module"
+                include ":architecture:$module"
             }
             """.trimIndent()
 
