@@ -4,6 +4,7 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import io.mockk.every
@@ -473,24 +474,23 @@ subprojects {
         assertEquals(expectedContent, targetFile.readText())
     }
 
-    private fun givenVersionCatalog(): VersionCatalogReader {
-        val catalog = mockk<VersionCatalogUpdater>()
-        every { catalog.isPluginAvailable(PluginConstants.ANDROID_APPLICATION) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_APPLICATION) } returns "android.application"
-        every { catalog.isPluginAvailable(PluginConstants.ANDROID_LIBRARY) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY) } returns "android.library"
-        every { catalog.isPluginAvailable(PluginConstants.KOTLIN_ANDROID) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID) } returns "kotlin.android"
-        every { catalog.isPluginAvailable(PluginConstants.KOTLIN_JVM) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM) } returns "kotlin.jvm"
-        every { catalog.isPluginAvailable(PluginConstants.KTLINT) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KTLINT) } returns "ktlint"
-        every { catalog.isPluginAvailable(PluginConstants.DETEKT) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.DETEKT) } returns "detekt"
-        every { catalog.isPluginAvailable(PluginConstants.HILT_ANDROID) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID) } returns "hilt"
-        every { catalog.isPluginAvailable(PluginConstants.KSP) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KSP) } returns "ksp"
-        return catalog
+    private fun givenVersionCatalog(): VersionCatalogReader =
+        mockk<VersionCatalogUpdater>().apply {
+            givenVersionCatalogPlugin(PluginConstants.ANDROID_APPLICATION, "android.application")
+            givenVersionCatalogPlugin(PluginConstants.ANDROID_LIBRARY, "android.library")
+            givenVersionCatalogPlugin(PluginConstants.KOTLIN_ANDROID, "kotlin.android")
+            givenVersionCatalogPlugin(PluginConstants.KOTLIN_JVM, "kotlin.jvm")
+            givenVersionCatalogPlugin(PluginConstants.KTLINT, "ktlint")
+            givenVersionCatalogPlugin(PluginConstants.DETEKT, "detekt")
+            givenVersionCatalogPlugin(PluginConstants.HILT_ANDROID, "hilt")
+            givenVersionCatalogPlugin(PluginConstants.KSP, "ksp")
+        }
+
+    private fun VersionCatalogUpdater.givenVersionCatalogPlugin(
+        pluginRequirement: PluginRequirement,
+        alias: String
+    ) {
+        every { isPluginAvailable(pluginRequirement) } returns true
+        every { getResolvedPluginAliasFor(pluginRequirement) } returns alias
     }
 }
