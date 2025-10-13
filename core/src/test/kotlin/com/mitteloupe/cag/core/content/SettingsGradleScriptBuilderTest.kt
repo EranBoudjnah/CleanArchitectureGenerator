@@ -9,7 +9,7 @@ class SettingsGradleScriptBuilderTest {
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
-        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+        val expectedContent = $$"""enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -38,18 +38,18 @@ setOf(
     "presentation-test",
     "domain"
 ).forEach { module ->
-    include(":architecture:${'$'}module")
+    include(":architecture:$module")
 }
 
 setOf("ui", "presentation", "domain", "data").forEach { layer ->
-   include("features:samplefeature:${'$'}layer")
+   include("features:samplefeature:$layer")
 }
 
 setOf(
     "source",
     "implementation"
 ).forEach { module ->
-    include(":datasource:${'$'}module")
+    include(":datasource:$module")
 }"""
 
         // When
@@ -64,7 +64,7 @@ setOf(
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
-        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+        val expectedContent = $$"""enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -93,18 +93,18 @@ setOf(
     "presentation-test",
     "domain"
 ).forEach { module ->
-    include(":architecture:${'$'}module")
+    include(":architecture:$module")
 }
 
 setOf("ui", "presentation", "domain", "data").forEach { layer ->
-   include("features:samplefeature:${'$'}layer")
+   include("features:samplefeature:$layer")
 }
 
 setOf(
     "source",
     "implementation"
 ).forEach { module ->
-    include(":datasource:${'$'}module")
+    include(":datasource:$module")
 }"""
 
         // When
@@ -119,7 +119,7 @@ setOf(
         // Given
         val projectName = "TestProject"
         val featureNames = listOf("SampleFeature")
-        val expectedContent = """enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+        val expectedContent = $$"""enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -148,18 +148,18 @@ setOf(
     "presentation-test",
     "domain"
 ).forEach { module ->
-    include(":architecture:${'$'}module")
+    include(":architecture:$module")
 }
 
 setOf("ui", "presentation", "domain", "data").forEach { layer ->
-   include("features:samplefeature:${'$'}layer")
+   include("features:samplefeature:$layer")
 }
 
 setOf(
     "source",
     "implementation"
 ).forEach { module ->
-    include(":datasource:${'$'}module")
+    include(":datasource:$module")
 }"""
 
         // When

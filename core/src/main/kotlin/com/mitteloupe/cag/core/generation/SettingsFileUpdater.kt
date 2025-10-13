@@ -75,9 +75,9 @@ class SettingsFileUpdater(
                     throw GenerationException("Failed to read ${settingsFile.name}: ${it.message}")
                 }
 
-        val groupedIncludeKts = "include(\"$groupPrefix:${'$'}module\")"
-        val groupedIncludeGroovyDouble = "include \"$groupPrefix:${'$'}module\""
-        val groupedIncludeGroovySingle = "include '$groupPrefix:${'$'}module'"
+        val groupedIncludeKts = $$"include(\"$$groupPrefix:$module\")"
+        val groupedIncludeGroovyDouble = $$"include \"$$groupPrefix:$module\""
+        val groupedIncludeGroovySingle = $$"include '$$groupPrefix:$module'"
 
         val hasGroupedInclude =
             originalFileContent.contains(groupedIncludeKts) ||
@@ -134,7 +134,7 @@ class SettingsFileUpdater(
                         "setOf(\n" +
                             modulesKtsBlock +
                             "\n).forEach { module ->\n" +
-                            "    include(\"$groupPrefix:${'$'}module\")\n" +
+                            $$"    include(\"$$groupPrefix:$module\")\n" +
                             "}"
                     )
                 } else {
@@ -142,7 +142,7 @@ class SettingsFileUpdater(
                         "[\n" +
                             modulesGroovyBlock +
                             "\n].each { module ->\n" +
-                            "    include \"$groupPrefix:${'$'}module\"\n" +
+                            $$"    include \"$$groupPrefix:$module\"\n" +
                             "}"
                     )
                 }

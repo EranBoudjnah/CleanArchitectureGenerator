@@ -60,12 +60,12 @@ class AppModuleContentGenerator(
     ) {
         val appModuleDirectory = File(startDirectory, "app")
         val sourceRoot = File(appModuleDirectory, "src/main/java")
-        val basePackageDir = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
+        val basePackageDirectory = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
 
-        fileCreator.createDirectoryIfNotExists(basePackageDir)
+        fileCreator.createDirectoryIfNotExists(basePackageDirectory)
 
         val sanitizedAppName = appName.withoutSpaces()
-        val mainActivityFile = File(basePackageDir, "MainActivity.kt")
+        val mainActivityFile = File(basePackageDirectory, "MainActivity.kt")
         fileCreator.createFileIfNotExists(mainActivityFile) {
             buildMainActivityKotlinFile(
                 appName = sanitizedAppName,
@@ -74,9 +74,10 @@ class AppModuleContentGenerator(
             )
         }
 
-        val applicationFile = File(basePackageDir, "Application.kt")
-        val applicationContent = buildApplicationKotlinFile(projectNamespace)
-        fileCreator.createFileIfNotExists(applicationFile) { applicationContent }
+        val applicationFile = File(basePackageDirectory, "${sanitizedAppName}Application.kt")
+        fileCreator.createFileIfNotExists(applicationFile) {
+            buildApplicationKotlinFile(projectNamespace = projectNamespace, appName = sanitizedAppName)
+        }
 
         generateAndroidResources(
             appModuleDirectory = appModuleDirectory,

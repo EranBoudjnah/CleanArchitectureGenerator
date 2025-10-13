@@ -947,13 +947,13 @@ interface ViewStateBinder<in VIEW_STATE : Any, in VIEWS_PROVIDER : ViewsProvider
             // Then
             val unhandledNavigationExceptionFile =
                 File(uiRoot, "src/main/java/com/example/architecture/ui/navigation/exception/UnhandledNavigationException.kt")
-            val expectedContent = """package com.example.architecture.ui.navigation.exception
+            val expectedContent = $$"""package com.example.architecture.ui.navigation.exception
 
 import com.example.architecture.presentation.navigation.PresentationNavigationEvent
 
 class UnhandledNavigationException(event: PresentationNavigationEvent) :
     IllegalArgumentException(
-        "Navigation event ${'$'}{event::class.simpleName} was not handled."
+        "Navigation event ${event::class.simpleName} was not handled."
     )
 """
             assertEquals(
@@ -1751,7 +1751,7 @@ annotation class LocalStore(val localStoreDataIds: Array<String>)
             // Then
             val itemAtPositionMatcherFile =
                 File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/assertion/ItemAtPositionMatcher.kt")
-            val expectedContent = """package com.example.architecture.test.assertion
+            val expectedContent = $$"""package com.example.architecture.test.assertion
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -1767,7 +1767,7 @@ fun matchesItemAtPosition(matcher: Matcher<View?>?, position: Int) =
         }
         val recyclerView = view as RecyclerView
         val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
-            ?: throw AssertionFailedError("No view holder at position: ${'$'}position")
+            ?: throw AssertionFailedError("No view holder at position: $position")
         assertThat(viewHolder.itemView, matcher)
     }
 """
@@ -1818,7 +1818,7 @@ fun <OUTPUT> processAssetStream(
             // Then
             val appNotRespondingHandlerFile =
                 File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/idlingresource/AppNotRespondingHandler.kt")
-            val expectedContent = """package com.example.architecture.test.idlingresource
+            val expectedContent = $$"""package com.example.architecture.test.idlingresource
 
 import android.util.Log
 import androidx.test.uiautomator.UiDevice
@@ -1862,7 +1862,7 @@ private fun UiDevice.closeAnrWithWait(appNotRespondingDialog: UiObject) {
         ).click()
         val dialogText = appNotRespondingDialog.text
         val appName = dialogText.take(dialogText.length - APP_NOT_RESPONDING_TEXT.length)
-        Log.i(APP_NOT_RESPONDING_TAG, "App \"${'$'}appName\" is not responding. Pressed on wait.")
+        Log.i(APP_NOT_RESPONDING_TAG, "App \"$appName\" is not responding. Pressed on wait.")
     } catch (uiObjectNotFoundException: UiObjectNotFoundException) {
         Log.i(APP_NOT_RESPONDING_TAG, "Detected app not responding dialog, but window disappeared.")
     }
@@ -1884,14 +1884,14 @@ private fun UiDevice.closeAnrWithWait(appNotRespondingDialog: UiObject) {
 
             // Then
             val doesNotFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/test/DoesNot.kt")
-            val expectedContent = """package com.example.architecture.test.test
+            val expectedContent = $$"""package com.example.architecture.test.test
 
 import junit.framework.AssertionFailedError
 
 fun doesNot(description: String, block: () -> Unit) {
     try {
         block()
-        error("Unexpected: ${'$'}description")
+        error("Unexpected: $description")
     } catch (_: AssertionFailedError) {
     }
 }
@@ -2136,7 +2136,7 @@ abstract class KeyValueStore {
             // Then
             val withBackgroundColorMatcherFile =
                 File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/matcher/WithBackgroundColorMatcher.kt")
-            val expectedContent = """package com.example.architecture.test.matcher
+            val expectedContent = $$"""package com.example.architecture.test.matcher
 
 import android.graphics.drawable.ColorDrawable
 import android.view.View
@@ -2157,7 +2157,7 @@ class WithBackgroundColorMatcher(
 ) : TypeSafeMatcher<View>() {
     override fun describeTo(description: Description?) {
         @OptIn(ExperimentalStdlibApi::class)
-        description?.appendText("has background color: #${'$'}{expectedColor.toHexString()}")
+        description?.appendText("has background color: #${expectedColor.toHexString()}")
     }
 
     override fun matchesSafely(item: View): Boolean {
@@ -2165,7 +2165,7 @@ class WithBackgroundColorMatcher(
             (item as? CardView)?.cardBackgroundColor?.getColorForState(item.drawableState, -1)
                 .also {
                     @OptIn(ExperimentalStdlibApi::class)
-                    println("Background color: #${'$'}{it?.toHexString()}")
+                    println("Background color: #${it?.toHexString()}")
                 }
         } else {
             (item.background as? ColorDrawable)?.color
@@ -2196,7 +2196,7 @@ class WithBackgroundColorMatcher(
             // Then
             val withDrawableIdMatcherFile =
                 File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/matcher/WithDrawableIdMatcher.kt")
-            val expectedContent = """package com.example.architecture.test.matcher
+            val expectedContent = $$"""package com.example.architecture.test.matcher
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -2276,10 +2276,10 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
         }
 
     override fun describeTo(description: Description) {
-        description.appendText("with drawable from resource id: ${'$'}expectedId")
+        description.appendText("with drawable from resource id: $expectedId")
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         targetContext.resources.getResourceEntryName(expectedId)
-            ?.let { description.appendText("[${'$'}it]") }
+            ?.let { description.appendText("[$it]") }
     }
 
     private fun Drawable.extractStateIfStateful(currentState: IntArray): Drawable? {
@@ -2290,7 +2290,7 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
                 stateListDrawable.findStateDrawableIndex(currentState)
             )
         } else {
-            Log.w("DrawableMatcher", "Android version ${'$'}{Build.VERSION.SDK_INT} unsupported.")
+            Log.w("DrawableMatcher", "Android version ${Build.VERSION.SDK_INT} unsupported.")
             null
         }
     }
@@ -2638,7 +2638,7 @@ abstract class ResponseStore {
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -2651,7 +2651,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {
@@ -2703,7 +2703,7 @@ dependencies {
 
             // Then
             val buildGradleFile = File(architectureRoot, "presentation/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -2722,7 +2722,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {
@@ -2748,7 +2748,7 @@ dependencies {
 
             // Then
             val buildGradleFile = File(architectureRoot, "ui/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
@@ -2788,7 +2788,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {
@@ -2820,7 +2820,7 @@ dependencies {
 
             // Then
             val buildGradleFile = File(architectureRoot, "presentation-test/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -2833,7 +2833,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {
@@ -2866,7 +2866,7 @@ dependencies {
 
             // Then
             val buildGradleFile = File(architectureRoot, "instrumentation-test/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint)
@@ -2911,7 +2911,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {
@@ -2988,14 +2988,14 @@ dependencies {
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
-            val expectedContent = """plugins {
+            val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.detekt)
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../detekt.yml")
+    config.setFrom("$projectDir/../../detekt.yml")
 }
 
 dependencies {

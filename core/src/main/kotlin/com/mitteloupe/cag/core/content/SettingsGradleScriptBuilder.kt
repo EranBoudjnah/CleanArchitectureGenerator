@@ -8,13 +8,13 @@ fun buildSettingsGradleScript(
         featureNames.joinToString(
             separator = "\n        "
         ) { featureName ->
-            """
+            $$"""
         setOf("ui", "presentation", "domain", "data").forEach { layer ->
-           include("features:${featureName.lowercase()}:${'$'}layer")
+           include("features:$${featureName.lowercase()}:$layer")
         }
         """
         }
-    return """
+    return $$"""
         enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
         
         pluginManagement {
@@ -33,7 +33,7 @@ fun buildSettingsGradleScript(
             }
         }
 
-        rootProject.name = "$projectName"
+        rootProject.name = "$$projectName"
         include(":app")
         include(":coroutine")
 
@@ -44,14 +44,14 @@ fun buildSettingsGradleScript(
             "presentation-test",
             "domain"
         ).forEach { module ->
-            include(":architecture:${'$'}module")
+            include(":architecture:$module")
         }
-        $featuresBlock
+        $$featuresBlock
         setOf(
             "source",
             "implementation"
         ).forEach { module ->
-            include(":datasource:${'$'}module")
+            include(":datasource:$module")
         }
         """.trimIndent()
 }

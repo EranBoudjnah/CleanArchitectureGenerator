@@ -22,12 +22,6 @@ class BuildSrcContentCreatorTest {
         val projectRoot = createTempDirectory(prefix = "projectRoot").toFile()
         val buildSrcDir = File(projectRoot, "buildSrc")
         buildSrcDir.mkdirs()
-
-        // When
-        classUnderTest.writeGradleFile(projectRoot)
-
-        // Then
-        val buildSrcGradleFile = File(buildSrcDir, "build.gradle.kts")
         val expectedContent = """plugins {
     `kotlin-dsl`
 }
@@ -36,6 +30,12 @@ repositories {
     mavenCentral()
 }
 """
+
+        // When
+        classUnderTest.writeGradleFile(projectRoot)
+        val buildSrcGradleFile = File(buildSrcDir, "build.gradle.kts")
+
+        // Then
         assertEquals(expectedContent, buildSrcGradleFile.readText())
     }
 
@@ -62,12 +62,6 @@ repositories {
         val projectRoot = createTempDirectory(prefix = "projectRoot3").toFile()
         val buildSrcDir = File(projectRoot, "buildSrc")
         buildSrcDir.mkdirs()
-
-        // When
-        classUnderTest.writeSettingsGradleFile(projectRoot)
-
-        // Then
-        val buildSrcSettingsFile = File(buildSrcDir, "settings.gradle.kts")
         val expectedContent = """rootProject.name = "buildSrc"
 
 pluginManagement {
@@ -78,6 +72,12 @@ pluginManagement {
     }
 }
 """
+
+        // When
+        classUnderTest.writeSettingsGradleFile(projectRoot)
+        val buildSrcSettingsFile = File(buildSrcDir, "settings.gradle.kts")
+
+        // Then
         assertEquals(expectedContent, buildSrcSettingsFile.readText())
     }
 

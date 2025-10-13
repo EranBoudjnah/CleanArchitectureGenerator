@@ -52,9 +52,9 @@ class GradleFileExtender internal constructor() {
         configRelativePathFromModule: String = "../../detekt.yml"
     ): String =
         if (catalog.isPluginAvailable(PluginConstants.DETEKT)) {
-            """
+            $$"""
     detekt {
-        config.setFrom("${'$'}projectDir/$configRelativePathFromModule")
+        config.setFrom("$projectDir/$$configRelativePathFromModule")
     }
     """
         } else {

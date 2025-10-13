@@ -659,7 +659,7 @@ class GeneratorTest {
                 appModuleDirectory = null
             )
         val featureRoot = File(temporaryDirectory, "features/sample")
-        val expectedContent = """plugins {
+        val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -672,7 +672,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+    config.setFrom("$projectDir/../../../detekt.yml")
 }
 
 dependencies {
@@ -703,7 +703,7 @@ dependencies {
                 appModuleDirectory = null
             )
         val featureRoot = File(temporaryDirectory, "features/sample")
-        val expectedContent = """plugins {
+        val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -716,7 +716,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+    config.setFrom("$projectDir/../../../detekt.yml")
 }
 
 dependencies {
@@ -749,7 +749,7 @@ dependencies {
                 appModuleDirectory = null
             )
         val featureRoot = File(temporaryDirectory, "features/sample")
-        val expectedContent = """plugins {
+        val expectedContent = $$"""plugins {
     id("project-java-library")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktlint)
@@ -762,7 +762,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+    config.setFrom("$projectDir/../../../detekt.yml")
 }
 
 dependencies {
@@ -796,7 +796,7 @@ dependencies {
                 appModuleDirectory = null
             )
         val featureRoot = File(temporaryDirectory, "features/sample")
-        val expectedContent = """plugins {
+        val expectedContent = $$"""plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
@@ -844,7 +844,7 @@ ktlint {
 }
 
 detekt {
-    config.setFrom("${'$'}projectDir/../../../detekt.yml")
+    config.setFrom("$projectDir/../../../detekt.yml")
 }
 
 dependencies {
