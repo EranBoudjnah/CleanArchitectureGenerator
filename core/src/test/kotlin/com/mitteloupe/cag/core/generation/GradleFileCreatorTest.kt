@@ -4,6 +4,7 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
+import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import io.mockk.every
@@ -13,6 +14,13 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
+
+private const val DEFAULT_PLUGINS = """alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false"""
 
 class GradleFileCreatorTest {
     private lateinit var classUnderTest: GradleFileCreator
@@ -293,34 +301,30 @@ class GradleFileCreatorTest {
         val targetFile = File(projectRoot, "build.gradle.kts")
         val catalog = VersionCatalogUpdater(fileCreator)
         val expectedContent =
-            """
-            // Top-level build file where you can add configuration options common to all sub-projects/modules.
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-            import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+            """// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-            plugins {
-                alias(libs.plugins.android.application) apply false
-                alias(libs.plugins.android.library) apply false
-                alias(libs.plugins.kotlin.android) apply false
-                alias(libs.plugins.kotlin.jvm) apply false
-            }
+plugins {
+    $DEFAULT_PLUGINS
+}
 
-            tasks {
-                withType<JavaCompile> {
-                    sourceCompatibility = JavaVersion.VERSION_17.toString()
-                    targetCompatibility = JavaVersion.VERSION_17.toString()
-                }
-            }
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+}
 
-            subprojects {
-                tasks.withType<KotlinCompile> {
-                    compilerOptions {
-                        jvmTarget.set(JvmTarget.JVM_17)
-                        freeCompilerArgs.add("-Xskip-prerelease-check")
-                    }
-                }
-            }
-            """.trimIndent()
+subprojects {
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
+        }
+    }
+}
+"""
 
         // When
         classUnderTest.writeProjectGradleFile(
@@ -341,35 +345,31 @@ class GradleFileCreatorTest {
         val targetFile = File(projectRoot, "build.gradle.kts")
         val catalog = givenVersionCatalog()
         val expectedContent =
-            """
-            // Top-level build file where you can add configuration options common to all sub-projects/modules.
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-            import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+            """// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-            plugins {
-                alias(libs.plugins.android.application) apply false
-                alias(libs.plugins.android.library) apply false
-                alias(libs.plugins.kotlin.android) apply false
-                alias(libs.plugins.kotlin.jvm) apply false
-                alias(libs.plugins.ktlint) apply false
-            }
+plugins {
+    $DEFAULT_PLUGINS
+    alias(libs.plugins.ktlint) apply false
+}
 
-            tasks {
-                withType<JavaCompile> {
-                    sourceCompatibility = JavaVersion.VERSION_17.toString()
-                    targetCompatibility = JavaVersion.VERSION_17.toString()
-                }
-            }
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+}
 
-            subprojects {
-                tasks.withType<KotlinCompile> {
-                    compilerOptions {
-                        jvmTarget.set(JvmTarget.JVM_17)
-                        freeCompilerArgs.add("-Xskip-prerelease-check")
-                    }
-                }
-            }
-            """.trimIndent()
+subprojects {
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
+        }
+    }
+}
+"""
 
         // When
         classUnderTest.writeProjectGradleFile(
@@ -390,35 +390,31 @@ class GradleFileCreatorTest {
         val targetFile = File(projectRoot, "build.gradle.kts")
         val catalog = givenVersionCatalog()
         val expectedContent =
-            """
-            // Top-level build file where you can add configuration options common to all sub-projects/modules.
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-            import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+            """// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-            plugins {
-                alias(libs.plugins.android.application) apply false
-                alias(libs.plugins.android.library) apply false
-                alias(libs.plugins.kotlin.android) apply false
-                alias(libs.plugins.kotlin.jvm) apply false
-                alias(libs.plugins.detekt) apply false
-            }
+plugins {
+    $DEFAULT_PLUGINS
+    alias(libs.plugins.detekt) apply false
+}
 
-            tasks {
-                withType<JavaCompile> {
-                    sourceCompatibility = JavaVersion.VERSION_17.toString()
-                    targetCompatibility = JavaVersion.VERSION_17.toString()
-                }
-            }
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+}
 
-            subprojects {
-                tasks.withType<KotlinCompile> {
-                    compilerOptions {
-                        jvmTarget.set(JvmTarget.JVM_17)
-                        freeCompilerArgs.add("-Xskip-prerelease-check")
-                    }
-                }
-            }
-            """.trimIndent()
+subprojects {
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
+        }
+    }
+}
+"""
 
         // When
         classUnderTest.writeProjectGradleFile(
@@ -439,36 +435,32 @@ class GradleFileCreatorTest {
         val targetFile = File(projectRoot, "build.gradle.kts")
         val catalog = givenVersionCatalog()
         val expectedContent =
-            """
-            // Top-level build file where you can add configuration options common to all sub-projects/modules.
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-            import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+            """// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-            plugins {
-                alias(libs.plugins.android.application) apply false
-                alias(libs.plugins.android.library) apply false
-                alias(libs.plugins.kotlin.android) apply false
-                alias(libs.plugins.kotlin.jvm) apply false
-                alias(libs.plugins.ktlint) apply false
-                alias(libs.plugins.detekt) apply false
-            }
+plugins {
+    $DEFAULT_PLUGINS
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.detekt) apply false
+}
 
-            tasks {
-                withType<JavaCompile> {
-                    sourceCompatibility = JavaVersion.VERSION_17.toString()
-                    targetCompatibility = JavaVersion.VERSION_17.toString()
-                }
-            }
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+}
 
-            subprojects {
-                tasks.withType<KotlinCompile> {
-                    compilerOptions {
-                        jvmTarget.set(JvmTarget.JVM_17)
-                        freeCompilerArgs.add("-Xskip-prerelease-check")
-                    }
-                }
-            }
-            """.trimIndent()
+subprojects {
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
+        }
+    }
+}
+"""
 
         // When
         classUnderTest.writeProjectGradleFile(
@@ -482,20 +474,23 @@ class GradleFileCreatorTest {
         assertEquals(expectedContent, targetFile.readText())
     }
 
-    private fun givenVersionCatalog(): VersionCatalogReader {
-        val catalog = mockk<VersionCatalogUpdater>()
-        every { catalog.isPluginAvailable(PluginConstants.ANDROID_APPLICATION) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_APPLICATION) } returns "android.application"
-        every { catalog.isPluginAvailable(PluginConstants.ANDROID_LIBRARY) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY) } returns "android.library"
-        every { catalog.isPluginAvailable(PluginConstants.KOTLIN_ANDROID) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID) } returns "kotlin.android"
-        every { catalog.isPluginAvailable(PluginConstants.KOTLIN_JVM) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM) } returns "kotlin.jvm"
-        every { catalog.isPluginAvailable(PluginConstants.KTLINT) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.KTLINT) } returns "ktlint"
-        every { catalog.isPluginAvailable(PluginConstants.DETEKT) } returns true
-        every { catalog.getResolvedPluginAliasFor(PluginConstants.DETEKT) } returns "detekt"
-        return catalog
+    private fun givenVersionCatalog(): VersionCatalogReader =
+        mockk<VersionCatalogUpdater>().apply {
+            givenVersionCatalogPlugin(PluginConstants.ANDROID_APPLICATION, "android.application")
+            givenVersionCatalogPlugin(PluginConstants.ANDROID_LIBRARY, "android.library")
+            givenVersionCatalogPlugin(PluginConstants.KOTLIN_ANDROID, "kotlin.android")
+            givenVersionCatalogPlugin(PluginConstants.KOTLIN_JVM, "kotlin.jvm")
+            givenVersionCatalogPlugin(PluginConstants.KTLINT, "ktlint")
+            givenVersionCatalogPlugin(PluginConstants.DETEKT, "detekt")
+            givenVersionCatalogPlugin(PluginConstants.HILT_ANDROID, "hilt")
+            givenVersionCatalogPlugin(PluginConstants.KSP, "ksp")
+        }
+
+    private fun VersionCatalogUpdater.givenVersionCatalogPlugin(
+        pluginRequirement: PluginRequirement,
+        alias: String
+    ) {
+        every { isPluginAvailable(pluginRequirement) } returns true
+        every { getResolvedPluginAliasFor(pluginRequirement) } returns alias
     }
 }

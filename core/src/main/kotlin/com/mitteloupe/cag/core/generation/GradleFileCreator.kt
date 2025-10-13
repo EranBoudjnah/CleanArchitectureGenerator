@@ -26,8 +26,9 @@ class GradleFileCreator(
         catalog: VersionCatalogReader
     ) {
         val buildGradleFile = File(projectRoot, "build.gradle.kts")
-        val content = buildProjectGradleScript(enableKtlint, enableDetekt, catalog)
-        fileCreator.createOrUpdateFile(buildGradleFile) { content }
+        fileCreator.createOrUpdateFile(buildGradleFile) {
+            buildProjectGradleScript(enableKtlint, enableDetekt, catalog)
+        }
     }
 
     fun writeAppGradleFile(
