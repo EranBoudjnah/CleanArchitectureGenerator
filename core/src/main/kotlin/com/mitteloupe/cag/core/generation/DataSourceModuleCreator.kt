@@ -9,7 +9,9 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class DataSourceModuleCreator(private val fileCreator: FileCreator) {
+class DataSourceModuleCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeDataSourceModule(
         destinationRootDirectory: File,
         projectNamespace: String,

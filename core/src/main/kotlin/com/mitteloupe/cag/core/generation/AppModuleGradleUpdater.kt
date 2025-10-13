@@ -8,7 +8,9 @@ import java.io.File
 
 private val FEATURE_LAYERS = listOf("ui", "presentation", "domain", "data")
 
-class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = DirectoryFinder()) {
+class AppModuleGradleUpdater(
+    private val directoryFinder: DirectoryFinder = DirectoryFinder()
+) {
     fun updateAppModuleDependenciesIfPresent(
         startDirectory: File,
         featureNameLowerCase: String,
@@ -303,5 +305,8 @@ class AppModuleGradleUpdater(private val directoryFinder: DirectoryFinder = Dire
         throwable: Throwable
     ): GenerationException = GenerationException("Failed to read $fileName: ${throwable.message}")
 
-    private data class BlockRange(val openBraceIndex: Int, val endIndex: Int)
+    private data class BlockRange(
+        val openBraceIndex: Int,
+        val endIndex: Int
+    )
 }

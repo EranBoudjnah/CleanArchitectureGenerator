@@ -21,10 +21,11 @@ class RootConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable = RootConfigurable()
 }
 
-private class RootConfigurable : BoundSearchableConfigurable(
-    CleanArchitectureGeneratorBundle.message("settings.display.name"),
-    "com.mitteloupe.cag.settings.Settings"
-) {
+private class RootConfigurable :
+    BoundSearchableConfigurable(
+        CleanArchitectureGeneratorBundle.message("settings.display.name"),
+        "com.mitteloupe.cag.settings.Settings"
+    ) {
     private val serviceAutoAddToGit: Boolean
         get() = AppSettingsService.getInstance().autoAddGeneratedFilesToGit
     private val serviceGitPath: String?
@@ -53,37 +54,33 @@ private class RootConfigurable : BoundSearchableConfigurable(
                     .applyToComponent {
                         toolTipText = CleanArchitectureGeneratorBundle.message("settings.auto.add.to.git.tooltip")
                         addChangeListener { updateWarning(gitPath) }
-                    }
-                    .bindSelected(::autoAddToGit)
+                    }.bindSelected(::autoAddToGit)
             }
 
             row(CleanArchitectureGeneratorBundle.message("settings.git.path.label")) {
                 val descriptor = FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor()
-                @Suppress("UnstableApiUsage")
                 textFieldWithBrowseButton(
                     project = null,
                     fileChooserDescriptor = descriptor,
                     fileChosen = { it.path }
-                )
-                    .applyToComponent {
-                        toolTipText = CleanArchitectureGeneratorBundle.message("settings.git.path.tooltip")
-                        textField.document.addDocumentListener(
-                            object : DocumentListener {
-                                override fun insertUpdate(event: DocumentEvent) {
-                                    updateWarning(text)
-                                }
-
-                                override fun removeUpdate(event: DocumentEvent) {
-                                    updateWarning(text)
-                                }
-
-                                override fun changedUpdate(evenet: DocumentEvent) {
-                                    updateWarning(text)
-                                }
+                ).applyToComponent {
+                    toolTipText = CleanArchitectureGeneratorBundle.message("settings.git.path.tooltip")
+                    textField.document.addDocumentListener(
+                        object : DocumentListener {
+                            override fun insertUpdate(event: DocumentEvent) {
+                                updateWarning(text)
                             }
-                        )
-                    }
-                    .bindText(::gitPath)
+
+                            override fun removeUpdate(event: DocumentEvent) {
+                                updateWarning(text)
+                            }
+
+                            override fun changedUpdate(evenet: DocumentEvent) {
+                                updateWarning(text)
+                            }
+                        }
+                    )
+                }.bindText(::gitPath)
             }
 
             row {

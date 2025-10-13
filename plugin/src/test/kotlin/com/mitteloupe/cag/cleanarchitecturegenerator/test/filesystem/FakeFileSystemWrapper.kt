@@ -68,7 +68,9 @@ class FakeFileSystemWrapper(
     override fun getFileExtension(file: VirtualFile): String? = (file as? TemporaryVirtualFile)?.extension
 }
 
-private class TemporaryVirtualFile(val file: File) : VirtualFile() {
+private class TemporaryVirtualFile(
+    val file: File
+) : VirtualFile() {
     override fun getName(): String = file.name
 
     override fun getPath(): String = file.absolutePath
@@ -83,7 +85,11 @@ private class TemporaryVirtualFile(val file: File) : VirtualFile() {
 
     override fun getChildren(): Array<out VirtualFile> =
         if (file.isDirectory) {
-            file.listFiles()?.map { TemporaryVirtualFile(it) }?.toTypedArray().orEmpty()
+            file
+                .listFiles()
+                ?.map { TemporaryVirtualFile(it) }
+                ?.toTypedArray()
+                .orEmpty()
         } else {
             emptyArray()
         }

@@ -205,11 +205,11 @@ fun main(arguments: Array<String>) {
         val targetDirectory = request.targetPath.toDirectory(destinationRootDirectory)
 
         val useCaseRequest =
-            GenerateUseCaseRequest.Builder(
-                destinationDirectory = targetDirectory,
-                useCaseName = request.useCaseName
-            )
-                .inputDataType(request.inputDataType)
+            GenerateUseCaseRequest
+                .Builder(
+                    destinationDirectory = targetDirectory,
+                    useCaseName = request.useCaseName
+                ).inputDataType(request.inputDataType)
                 .outputDataType(request.outputDataType)
                 .build()
 
@@ -225,13 +225,14 @@ fun main(arguments: Array<String>) {
         val featurePackageName = basePackage ?: "com.example"
 
         val viewModelRequest =
-            GenerateViewModelRequest.Builder(
-                destinationDirectory = targetDirectory,
-                viewModelName = request.viewModelName,
-                viewModelPackageName = "$featurePackageName.presentation.viewmodel",
-                featurePackageName = featurePackageName,
-                projectNamespace = projectNamespace
-            ).build()
+            GenerateViewModelRequest
+                .Builder(
+                    destinationDirectory = targetDirectory,
+                    viewModelName = request.viewModelName,
+                    viewModelPackageName = "$featurePackageName.presentation.viewmodel",
+                    featurePackageName = featurePackageName,
+                    projectNamespace = projectNamespace
+                ).build()
 
         executeAndReport {
             setVersionProvider(configuration.existingProjectVersions)

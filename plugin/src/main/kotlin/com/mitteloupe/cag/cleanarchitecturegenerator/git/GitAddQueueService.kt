@@ -8,7 +8,9 @@ import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 
 @Service(Service.Level.PROJECT)
-class GitAddQueueService(private val project: Project) {
+class GitAddQueueService(
+    private val project: Project
+) {
     private val queue = ConcurrentSkipListSet<String>()
     private val git: Git by lazy {
         Git(gitBinaryPath = AppSettingsService.getInstance().gitPath)

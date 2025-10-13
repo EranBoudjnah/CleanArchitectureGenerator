@@ -14,10 +14,9 @@ fun String.preferredIndentation(): String =
         }
     } ?: DEFAULT_INDENTATION
 
-fun String.preferredEndOfLine(): String {
-    return if (this.contains(CURSOR_RETURN_LINE_FEED)) {
+fun String.preferredEndOfLine(): String =
+    if (this.contains(CURSOR_RETURN_LINE_FEED)) {
         CURSOR_RETURN_LINE_FEED
     } else {
         "\n"
     }
-}

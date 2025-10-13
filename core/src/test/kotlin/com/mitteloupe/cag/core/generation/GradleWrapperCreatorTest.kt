@@ -166,6 +166,9 @@ class GradleWrapperCreatorTest {
     }
 
     private fun getResourceAsString(resourceName: String): String =
-        javaClass.classLoader.getResourceAsStream(resourceName)?.bufferedReader()?.readText()
+        javaClass.classLoader
+            .getResourceAsStream(resourceName)
+            ?.bufferedReader()
+            ?.readText()
             ?: throw RuntimeException("Resource $resourceName not found in classpath")
 }

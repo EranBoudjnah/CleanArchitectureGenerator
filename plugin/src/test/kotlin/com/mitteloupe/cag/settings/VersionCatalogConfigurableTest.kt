@@ -265,7 +265,9 @@ class VersionCatalogConfigurableTest {
         throw AssertionError("Expected to find a JTable in the configurable panel")
     }
 
-    private class InMemorySettingsService(initial: Map<String, String>) : VersionCatalogSettingsService() {
+    private class InMemorySettingsService(
+        initial: Map<String, String>
+    ) : VersionCatalogSettingsService() {
         init {
             replaceAll(initial)
         }

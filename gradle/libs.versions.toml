@@ -1,9 +1,9 @@
 [versions]
-kotlin = "2.1.0"
-intellijPlatform = "2.5.0"
-ktlint = "12.1.1"
+kotlin = "2.2.20"
+intellijPlatform = "2.9.0"
+ktlint = "13.1.0"
 shadow = "8.1.1"
-mockk = "1.13.11"
+mockk = "1.14.6"
 junit4 = "4.13.2"
 androidStudio = "2024.3.1.13"
 hamcrest = "3.0"

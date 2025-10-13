@@ -6,7 +6,9 @@ import com.mitteloupe.cag.core.content.buildSettingsGradleScript
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class SettingsFileUpdater(private val fileCreator: FileCreator) {
+class SettingsFileUpdater(
+    private val fileCreator: FileCreator
+) {
     fun updateProjectSettingsIfPresent(
         startDirectory: File,
         featureNameLowerCase: String
@@ -120,8 +122,7 @@ class SettingsFileUpdater(private val fileCreator: FileCreator) {
                             line.contains("include '$pathWithoutRoot'") ||
                             line.contains("include \"$pathWithoutRoot\"")
                     }
-                }
-                .joinToString(separator = "\n", postfix = if (originalFileContent.endsWith("\n")) "\n" else "")
+                }.joinToString(separator = "\n", postfix = if (originalFileContent.endsWith("\n")) "\n" else "")
 
         val contentToAppend =
             buildString {

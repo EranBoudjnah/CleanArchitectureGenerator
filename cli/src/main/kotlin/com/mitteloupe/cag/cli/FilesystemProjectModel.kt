@@ -32,7 +32,9 @@ class FilesystemProjectModel(
                 result.add(directory)
             }
             if (!hasGradle || directory == root) {
-                directory.listFiles()?.filter { it.isDirectory && !it.name.startsWith('.') && it.name != "build" }
+                directory
+                    .listFiles()
+                    ?.filter { it.isDirectory && !it.name.startsWith('.') && it.name != "build" }
                     ?.forEach(queue::add)
             }
         }

@@ -6,7 +6,9 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class KotlinFileCreator(private val fileCreator: FileCreator) {
+class KotlinFileCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeKotlinFileInLayer(
         featureRoot: File,
         layer: String,
@@ -19,7 +21,8 @@ class KotlinFileCreator(private val fileCreator: FileCreator) {
         val packageSegments = featurePackageName.toSegments()
         val basePackageDirectory = buildPackageDirectory(sourceRoot, packageSegments + layer)
         val targetDirectory =
-            relativePackageSubPath.toSegments()
+            relativePackageSubPath
+                .toSegments()
                 .fold(basePackageDirectory) { parent, segment -> File(parent, segment) }
 
         if (!targetDirectory.exists()) {

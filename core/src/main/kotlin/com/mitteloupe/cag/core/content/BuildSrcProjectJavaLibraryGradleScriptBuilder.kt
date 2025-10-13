@@ -1,7 +1,7 @@
 package com.mitteloupe.cag.core.content
 
-fun buildBuildSrcProjectJavaLibraryGradleScript(): String {
-    return """plugins {
+fun buildBuildSrcProjectJavaLibraryGradleScript(): String =
+    """plugins {
     id("java-library")
 }
 
@@ -15,4 +15,3 @@ java {
 }
 
 """
-}

@@ -6,7 +6,9 @@ import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import java.io.File
 
-class GradleFileCreator(private val fileCreator: FileCreator) {
+class GradleFileCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeGradleFileIfMissing(
         featureRoot: File,
         layer: String,

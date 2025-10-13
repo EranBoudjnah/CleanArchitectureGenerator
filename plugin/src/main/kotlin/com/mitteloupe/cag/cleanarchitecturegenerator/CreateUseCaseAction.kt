@@ -66,11 +66,11 @@ class CreateUseCaseAction : AnAction() {
         val useCaseName = dialog.useCaseNameWithSuffix
 
         val request =
-            GenerateUseCaseRequest.Builder(
-                destinationDirectory = destination ?: File(projectRootDir, ""),
-                useCaseName = useCaseName
-            )
-                .inputDataType(dialog.inputDataType)
+            GenerateUseCaseRequest
+                .Builder(
+                    destinationDirectory = destination ?: File(projectRootDir, ""),
+                    useCaseName = useCaseName
+                ).inputDataType(dialog.inputDataType)
                 .outputDataType(dialog.outputDataType)
                 .build()
 
@@ -136,8 +136,8 @@ private fun findUseCaseDirectoryIn(directory: VirtualFile?): VirtualFile? {
     VfsUtilCore.visitChildrenRecursively(
         directory,
         object : VirtualFileVisitor<Any>() {
-            override fun visitFile(file: VirtualFile): Boolean {
-                return when {
+            override fun visitFile(file: VirtualFile): Boolean =
+                when {
                     file.isDirectory && file.name.equals("usecase", ignoreCase = true) -> {
                         result = file
                         false
@@ -148,7 +148,6 @@ private fun findUseCaseDirectoryIn(directory: VirtualFile?): VirtualFile? {
                     }
                     else -> true
                 }
-            }
         }
     )
 

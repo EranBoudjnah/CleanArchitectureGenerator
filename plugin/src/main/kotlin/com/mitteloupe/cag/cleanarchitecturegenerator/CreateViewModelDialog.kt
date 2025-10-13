@@ -64,12 +64,10 @@ class CreateViewModelDialog(
             }
 
             row(CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.field.label")) {
-                @Suppress("UnstableApiUsage")
                 textFieldWithBrowseButton(
                     project = project,
                     fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                )
-                    .bindText(::directoryPath)
+                ).bindText(::directoryPath)
                     .applyToComponent {
                         invokeLater { text = suggestedDirectory?.absolutePath.orEmpty() }
                         toolTipText = CleanArchitectureGeneratorBundle.message("dialog.viewmodel.directory.tooltip")

@@ -73,13 +73,14 @@ class CreateViewModelAction : AnAction() {
         val viewModelPackageName = PackageNameDeriver.derivePackageNameForDirectory(destination).orEmpty()
         val featurePackageName = viewModelPackageName.substringBeforeLast(".presentation")
         val request =
-            GenerateViewModelRequest.Builder(
-                destinationDirectory = destination,
-                viewModelName = viewModelName,
-                featurePackageName = featurePackageName,
-                viewModelPackageName = viewModelPackageName,
-                projectNamespace = projectNamespace ?: "com.unknown.app"
-            ).build()
+            GenerateViewModelRequest
+                .Builder(
+                    destinationDirectory = destination,
+                    viewModelName = viewModelName,
+                    featurePackageName = featurePackageName,
+                    viewModelPackageName = viewModelPackageName,
+                    projectNamespace = projectNamespace ?: "com.unknown.app"
+                ).build()
 
         try {
             generatorProvider.prepare(project).generate().generateViewModel(request)
@@ -149,8 +150,8 @@ private fun findViewModelDirectoryIn(directory: VirtualFile?): VirtualFile? {
     VfsUtilCore.visitChildrenRecursively(
         directory,
         object : VirtualFileVisitor<Any>() {
-            override fun visitFile(file: VirtualFile): Boolean {
-                return when {
+            override fun visitFile(file: VirtualFile): Boolean =
+                when {
                     file.isDirectory && file.name.equals("viewmodel", ignoreCase = true) -> {
                         result = file
                         false
@@ -161,7 +162,6 @@ private fun findViewModelDirectoryIn(directory: VirtualFile?): VirtualFile? {
                     }
                     else -> true
                 }
-            }
         }
     )
 

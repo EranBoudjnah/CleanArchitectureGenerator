@@ -217,9 +217,10 @@ private fun parseInlineArgument(
         if (isLongForm) {
             token.substringAfter("=").trim()
         } else {
-            token.removePrefix(matchingKey).let {
-                if (it.startsWith("=")) it.removePrefix("=") else it
-            }.trim()
+            token
+                .removePrefix(matchingKey)
+                .let { if (it.startsWith("=")) it.removePrefix("=") else it }
+                .trim()
         }
 
     return if (value.isNotEmpty()) {

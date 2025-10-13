@@ -8,7 +8,9 @@ import com.mitteloupe.cag.core.content.buildDomainUseCaseKotlinFile
 import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
 
-class DomainLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreator) {
+class DomainLayerContentGenerator(
+    private val kotlinFileCreator: KotlinFileCreator
+) {
     fun generateDomainLayer(
         featureRoot: File,
         projectNamespace: String,
@@ -27,7 +29,8 @@ class DomainLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreat
     ) {
         val packageSuffixRegex = USE_CASE_PACKAGE_SUFFIX.replace(".", "\\.") + "$"
         val packageName =
-            PackageNameDeriver.derivePackageNameForDirectory(destinationDirectory)
+            PackageNameDeriver
+                .derivePackageNameForDirectory(destinationDirectory)
                 ?.replace(packageSuffixRegex.toRegex(), "")
                 ?: throw GenerationException(
                     "Could not determine package name from directory: " +

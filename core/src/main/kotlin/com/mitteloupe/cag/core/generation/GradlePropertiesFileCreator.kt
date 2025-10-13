@@ -4,7 +4,9 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class GradlePropertiesFileCreator(private val fileCreator: FileCreator) {
+class GradlePropertiesFileCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeGradlePropertiesFile(projectRoot: File) {
         val gradlePropertiesFile = File(projectRoot, "gradle.properties")
         runCatching {
@@ -35,7 +37,6 @@ class GradlePropertiesFileCreator(private val fileCreator: FileCreator) {
                 android.nonTransitiveRClass=true
                 """.trimIndent()
             }
-        }
-            .onFailure { throw GenerationException("Failed to create gradle.properties: ${it.message}") }
+        }.onFailure { throw GenerationException("Failed to create gradle.properties: ${it.message}") }
     }
 }

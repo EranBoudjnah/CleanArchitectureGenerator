@@ -7,7 +7,9 @@ import com.mitteloupe.cag.core.content.buildUiScreenKotlinFile
 import com.mitteloupe.cag.core.content.capitalized
 import java.io.File
 
-class UiLayerContentGenerator(private val kotlinFileCreator: KotlinFileCreator) {
+class UiLayerContentGenerator(
+    private val kotlinFileCreator: KotlinFileCreator
+) {
     fun generate(
         featureRoot: File,
         projectNamespace: String,

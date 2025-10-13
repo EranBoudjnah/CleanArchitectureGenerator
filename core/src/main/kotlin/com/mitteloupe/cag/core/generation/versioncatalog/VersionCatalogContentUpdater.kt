@@ -13,9 +13,10 @@ class VersionCatalogContentUpdater {
     ): String {
         val contentLines = catalogText.split('\n')
         val result =
-            sectionTransactions.fold(contentLines) { currentLines, sectionTransaction ->
-                ensureSectionEntries(currentLines, sectionTransaction)
-            }.joinToString("\n")
+            sectionTransactions
+                .fold(contentLines) { currentLines, sectionTransaction ->
+                    ensureSectionEntries(currentLines, sectionTransaction)
+                }.joinToString("\n")
         return if (result.endsWith("\n")) result else "$result\n"
     }
 
