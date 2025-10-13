@@ -41,9 +41,10 @@ fun buildDataSourceImplementationGradleScript(
         if (useRetrofit) {
             val aliasRetrofit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.RETROFIT).asAccessor
             val aliasOkhttp3LoggingInterceptor =
-                catalog.getResolvedLibraryAliasForModule(
-                    LibraryConstants.OKHTTP3_LOGGING_INTERCEPTOR
-                ).asAccessor
+                catalog
+                    .getResolvedLibraryAliasForModule(
+                        LibraryConstants.OKHTTP3_LOGGING_INTERCEPTOR
+                    ).asAccessor
             """
             implementation(libs.$aliasRetrofit)
             implementation(libs.$aliasOkhttp3LoggingInterceptor)

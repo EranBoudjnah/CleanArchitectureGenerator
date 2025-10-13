@@ -104,6 +104,7 @@ class SymbolValidator(
                     }
                     lastCharacter = character
                 }
+
                 else -> lastCharacter = character
             }
         }
@@ -181,16 +182,29 @@ class SymbolValidator(
 
     companion object {
         private val PRIMITIVE_TYPES =
-            setOf(
-                "Unit", "Boolean", "Byte", "Char", "Double", "Float", "Int", "Long", "Short", "String"
-            )
+            setOf("Unit", "Boolean", "Byte", "Char", "Double", "Float", "Int", "Long", "Short", "String")
 
         private val COMMON_COLLECTION_TYPES =
             setOf(
-                "List", "MutableList", "Set", "MutableSet", "Map", "MutableMap",
-                "Collection", "MutableCollection", "Iterable", "MutableIterable",
-                "Array", "IntArray", "LongArray", "FloatArray", "DoubleArray", "BooleanArray",
-                "ByteArray", "CharArray", "ShortArray"
+                "List",
+                "MutableList",
+                "Set",
+                "MutableSet",
+                "Map",
+                "MutableMap",
+                "Collection",
+                "MutableCollection",
+                "Iterable",
+                "MutableIterable",
+                "Array",
+                "IntArray",
+                "LongArray",
+                "FloatArray",
+                "DoubleArray",
+                "BooleanArray",
+                "ByteArray",
+                "CharArray",
+                "ShortArray"
             )
     }
 }

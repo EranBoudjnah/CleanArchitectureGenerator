@@ -4,7 +4,9 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.filesystem.FileSystemBridge
 import java.io.File
 
-class FileCreator(val fileSystemBridge: FileSystemBridge) {
+class FileCreator(
+    val fileSystemBridge: FileSystemBridge
+) {
     fun createDirectoryIfNotExists(directory: File) {
         if (!directory.exists()) {
             runCatching { fileSystemBridge.createDirectoryIfNotExists(directory) }

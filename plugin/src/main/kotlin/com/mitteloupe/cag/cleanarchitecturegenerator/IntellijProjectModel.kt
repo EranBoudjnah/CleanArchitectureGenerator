@@ -9,7 +9,9 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.mitteloupe.cag.core.ProjectModel
 import java.io.File
 
-class IntellijProjectModel(private val event: AnActionEvent) : ProjectModel {
+class IntellijProjectModel(
+    private val event: AnActionEvent
+) : ProjectModel {
     override fun selectedModuleRootDir(): File? {
         val project = event.project ?: return null
         val virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return null

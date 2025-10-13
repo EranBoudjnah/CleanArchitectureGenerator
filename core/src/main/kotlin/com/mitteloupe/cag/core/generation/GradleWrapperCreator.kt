@@ -5,7 +5,9 @@ import com.mitteloupe.cag.core.content.buildGradleWrapperPropertiesFile
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class GradleWrapperCreator(private val fileCreator: FileCreator) {
+class GradleWrapperCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeGradleWrapperFiles(projectRoot: File) {
         val gradleWrapperDirectory = File(projectRoot, "gradle/wrapper")
         fileCreator.createDirectoryIfNotExists(gradleWrapperDirectory)
@@ -34,6 +36,9 @@ class GradleWrapperCreator(private val fileCreator: FileCreator) {
     }
 
     private fun getResourceAsString(resourceName: String): String =
-        javaClass.classLoader.getResourceAsStream(resourceName)?.bufferedReader()?.readText()
+        javaClass.classLoader
+            .getResourceAsStream(resourceName)
+            ?.bufferedReader()
+            ?.readText()
             ?: throw GenerationException("Resource $resourceName not found in classpath")
 }

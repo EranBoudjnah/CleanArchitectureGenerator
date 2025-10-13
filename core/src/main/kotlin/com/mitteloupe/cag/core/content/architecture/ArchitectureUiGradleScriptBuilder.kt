@@ -19,9 +19,10 @@ fun buildArchitectureUiGradleScript(
     val libAliasComposeUi = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI).asAccessor
     val libAliasAndroidxFragmentKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_FRAGMENT_KTX).asAccessor
     val libAliasAndroidxNavigationFragmentKtx =
-        catalog.getResolvedLibraryAliasForModule(
-            LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
-        ).asAccessor
+        catalog
+            .getResolvedLibraryAliasForModule(
+                LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
+            ).asAccessor
 
     val composePluginLine =
         if (catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {

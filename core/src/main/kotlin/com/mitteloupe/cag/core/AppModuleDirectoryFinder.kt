@@ -15,7 +15,9 @@ private val versionCatalogEntryRegex =
     """(?m)^\s*([A-Za-z0-9_.\-]+)\s*=\s*\{[^}]*?\bid\s*=\s*['"]([^'"]+)['"][^}]*}.*$""".toRegex()
 private const val PLUGINS_SECTION_MARKER = "[plugins]"
 
-class AppModuleDirectoryFinder(private val directoryFinder: DirectoryFinder = DirectoryFinder()) {
+class AppModuleDirectoryFinder(
+    private val directoryFinder: DirectoryFinder = DirectoryFinder()
+) {
     fun findAndroidAppModuleDirectories(projectRoot: File): List<File> {
         val moduleDirectories = findGradleModuleDirectories(projectRoot)
         return moduleDirectories.filter { moduleDirectory ->
@@ -55,10 +57,12 @@ class AppModuleDirectoryFinder(private val directoryFinder: DirectoryFinder = Di
         buildFileContents: String
     ): Boolean {
         val aliasMatches =
-            pluginsBlockRegex.findAll(buildFileContents).flatMap { blockMatch ->
-                val block = blockMatch.groupValues[1]
-                aliasPluginLineRegex.findAll(block)
-            }.toList()
+            pluginsBlockRegex
+                .findAll(buildFileContents)
+                .flatMap { blockMatch ->
+                    val block = blockMatch.groupValues[1]
+                    aliasPluginLineRegex.findAll(block)
+                }.toList()
         if (aliasMatches.isEmpty()) {
             return false
         }
@@ -89,10 +93,11 @@ class AppModuleDirectoryFinder(private val directoryFinder: DirectoryFinder = Di
     }
 
     private fun findNearestVersionCatalog(startDirectory: File): File? =
-        directoryFinder.findDirectory(startDirectory) { currentDirectory ->
-            val catalog = currentDirectory.versionCatalogFile()
-            catalog.exists()
-        }?.versionCatalogFile()
+        directoryFinder
+            .findDirectory(startDirectory) { currentDirectory ->
+                val catalog = currentDirectory.versionCatalogFile()
+                catalog.exists()
+            }?.versionCatalogFile()
 
     private fun extractPluginsSection(toml: String): String? {
         val startIndex = toml.indexOf(PLUGINS_SECTION_MARKER)
@@ -141,7 +146,9 @@ class AppModuleDirectoryFinder(private val directoryFinder: DirectoryFinder = Di
                 result.add(directory)
             }
             if (!hasGradle || directory == root) {
-                directory.listFiles()?.filter { it.isDirectory && !it.name.startsWith('.') && it.name != "build" }
+                directory
+                    .listFiles()
+                    ?.filter { it.isDirectory && !it.name.startsWith('.') && it.name != "build" }
                     ?.forEach(queue::add)
             }
         }

@@ -68,8 +68,7 @@ tasks.register("generateManPage", GenerateManPage::class.java) {
 
 abstract class InstallManPage
     @Inject
-    constructor() :
-    DefaultTask() {
+    constructor() : DefaultTask() {
         @get:Inject
         protected abstract val layout: ProjectLayout
 

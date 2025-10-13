@@ -6,7 +6,9 @@ import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import java.io.File
 
-class DataSourceInterfaceCreator(private val fileCreator: FileCreator) {
+class DataSourceInterfaceCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeDataSourceInterface(
         destinationRootDirectory: File,
         projectNamespace: String,

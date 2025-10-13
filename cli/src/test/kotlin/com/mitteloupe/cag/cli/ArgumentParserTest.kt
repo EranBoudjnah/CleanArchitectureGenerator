@@ -261,7 +261,8 @@ class ArgumentParserTest {
     fun `Given long primary with short secondaries when parsePrimaryWithSecondaries then throws informative exception`() {
         // Given
         val givenArguments = arrayOf("--alpha", "-b", "value")
-        val expectedErrorMessage = "Cannot mix long form (--alpha) with short form secondary flags (-b). Use --beta instead."
+        val expectedErrorMessage =
+            "Cannot mix long form (--alpha) with short form secondary flags (-b). Use --beta instead."
 
         // When
         try {
@@ -656,8 +657,18 @@ class ArgumentParserTest {
                         short = "-a",
                         secondaryFlags =
                             listOf(
-                                SecondaryFlag("--beta", "-b", isMandatory = true, missingErrorMessage = "Beta required"),
-                                SecondaryFlag("--gamma", "-g", isMandatory = true, missingErrorMessage = "Gamma required")
+                                SecondaryFlag(
+                                    "--beta",
+                                    "-b",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Beta required"
+                                ),
+                                SecondaryFlag(
+                                    "--gamma",
+                                    "-g",
+                                    isMandatory = true,
+                                    missingErrorMessage = "Gamma required"
+                                )
                             )
                     )
             )
@@ -787,8 +798,15 @@ class ArgumentParserTest {
         // Given
         val givenArguments =
             arrayOf(
-                "--alpha", "--beta=inline", "--gamma", "separate", "--delta",
-                "--alpha", "--beta", "separate", "--gamma=inline"
+                "--alpha",
+                "--beta=inline",
+                "--gamma",
+                "separate",
+                "--delta",
+                "--alpha",
+                "--beta",
+                "separate",
+                "--gamma=inline"
             )
         val expectedParsedArguments =
             listOf(
@@ -822,7 +840,8 @@ class ArgumentParserTest {
     fun `Given long primary with short secondary and missing mandatory name when parsePrimaryWithSecondaries then throws mixed form exception`() {
         // Given
         val givenArguments = arrayOf("--alpha", "-b", "value")
-        val expectedErrorMessage = "Cannot mix long form (--alpha) with short form secondary flags (-b). Use --beta instead."
+        val expectedErrorMessage =
+            "Cannot mix long form (--alpha) with short form secondary flags (-b). Use --beta instead."
 
         // When
         try {

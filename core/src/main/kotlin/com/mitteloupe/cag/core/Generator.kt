@@ -111,15 +111,16 @@ class Generator(
         val layers = listOf("ui", "presentation", "domain", "data")
 
         val allCreated =
-            layers.map { layerName ->
-                val layerSourceRoot = File(featureRoot, "$layerName/src/main/java")
-                val destinationDirectory = buildPackageDirectory(layerSourceRoot, pathSegments)
-                if (destinationDirectory.exists()) {
-                    destinationDirectory.isDirectory
-                } else {
-                    destinationDirectory.mkdirs()
-                }
-            }.all { it }
+            layers
+                .map { layerName ->
+                    val layerSourceRoot = File(featureRoot, "$layerName/src/main/java")
+                    val destinationDirectory = buildPackageDirectory(layerSourceRoot, pathSegments)
+                    if (destinationDirectory.exists()) {
+                        destinationDirectory.isDirectory
+                    } else {
+                        destinationDirectory.mkdirs()
+                    }
+                }.all { it }
 
         if (allCreated) {
             gradleFileCreator.writeGradleFileIfMissing(

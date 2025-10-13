@@ -14,7 +14,9 @@ import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.filesystem.FileSystemBridge
 import java.io.File
 
-class IntelliJFileSystemBridge(private val project: Project?) : FileSystemBridge {
+class IntelliJFileSystemBridge(
+    private val project: Project?
+) : FileSystemBridge {
     override fun createDirectoryIfNotExists(directory: File) {
         directory.mkdirs()
         updateAsync(directory)

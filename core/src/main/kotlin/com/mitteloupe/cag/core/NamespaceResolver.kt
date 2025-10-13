@@ -4,7 +4,7 @@ import java.io.File
 
 private val namespaceRegex = """(?s)android\s*\{[\n\r\s\S]*?namespace(?:\s*=\s*|\s+)['"]([^'"]+)['"]""".toRegex()
 
-class NamespaceResolver() {
+class NamespaceResolver {
     fun determineBasePackage(projectModel: ProjectModel): String? {
         val selectedModule = projectModel.selectedModuleRootDir()
         val namespace = readAndroidNamespace(selectedModule)
@@ -34,12 +34,17 @@ class NamespaceResolver() {
             }
         val projectRoot = findGradleProjectRoot(moduleDirectory) ?: moduleDirectory
         val isAppModule =
-            AppModuleDirectoryFinder().findAndroidAppModuleDirectories(projectRoot)
+            AppModuleDirectoryFinder()
+                .findAndroidAppModuleDirectories(projectRoot)
                 .any { it == moduleDirectory }
         if (!isAppModule) {
             return null
         }
 
-        return namespaceRegex.find(fileContents)?.groupValues?.get(1)?.trim()
+        return namespaceRegex
+            .find(fileContents)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
     }
 }

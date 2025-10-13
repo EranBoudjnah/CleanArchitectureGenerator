@@ -24,9 +24,10 @@ fun buildAppGradleScript(
             val aliasComposeBom = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_BOM).asAccessor
             val aliasComposeUi = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_UI).asAccessor
             val aliasComposeUiToolingPreview =
-                catalog.getResolvedLibraryAliasForModule(
-                    LibraryConstants.COMPOSE_UI_TOOLING_PREVIEW
-                ).asAccessor
+                catalog
+                    .getResolvedLibraryAliasForModule(
+                        LibraryConstants.COMPOSE_UI_TOOLING_PREVIEW
+                    ).asAccessor
             val aliasComposeMaterial3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_MATERIAL3).asAccessor
             val aliasComposeUiTooling = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_UI_TOOLING).asAccessor
 

@@ -12,7 +12,9 @@ data class SectionTransaction<SECTION_TYPE : SectionEntryRequirement>(
     val requirements: List<SECTION_TYPE>
 )
 
-sealed class SectionEntryRequirement(val header: String) {
+sealed class SectionEntryRequirement(
+    val header: String
+) {
     abstract val key: String
 
     data class VersionRequirement(

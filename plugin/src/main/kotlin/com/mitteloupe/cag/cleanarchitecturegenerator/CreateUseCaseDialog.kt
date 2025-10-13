@@ -69,8 +69,8 @@ class CreateUseCaseDialog(
         setupWarningLabels()
     }
 
-    override fun createCenterPanel(): DialogPanel {
-        return panel {
+    override fun createCenterPanel(): DialogPanel =
+        panel {
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.name.label")) {
                 textField()
                     .bindText(::useCaseNameText)
@@ -123,7 +123,6 @@ class CreateUseCaseDialog(
                 label("").applyToComponent { outputWarningLabel = this }
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.usecase.directory.field.label")) {
-                @Suppress("UnstableApiUsage")
                 textFieldWithBrowseButton(
                     project = project,
                     fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor(),
@@ -133,8 +132,7 @@ class CreateUseCaseDialog(
                             setupDataTypeComboBoxes()
                         }
                     }
-                )
-                    .bindText(::directoryPath)
+                ).bindText(::directoryPath)
                     .applyToComponent {
                         invokeLater {
                             text = initialDirectory
@@ -143,7 +141,6 @@ class CreateUseCaseDialog(
                     }
             }
         }
-    }
 
     override fun doValidate(): ValidationInfo? =
         if (useCaseName.isEmpty()) {

@@ -3,7 +3,9 @@ package com.mitteloupe.cag.cleanarchitecturegenerator.form
 import javax.swing.text.AttributeSet
 import javax.swing.text.DocumentFilter
 
-class PredicateDocumentFilter(private val predicate: (character: Char) -> Boolean) : DocumentFilter() {
+class PredicateDocumentFilter(
+    private val predicate: (character: Char) -> Boolean
+) : DocumentFilter() {
     override fun insertString(
         fb: FilterBypass,
         offset: Int,

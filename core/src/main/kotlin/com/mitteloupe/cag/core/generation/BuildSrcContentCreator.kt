@@ -6,7 +6,9 @@ import com.mitteloupe.cag.core.content.buildBuildSrcSettingsGradleScript
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import java.io.File
 
-class BuildSrcContentCreator(private val fileCreator: FileCreator) {
+class BuildSrcContentCreator(
+    private val fileCreator: FileCreator
+) {
     fun writeGradleFile(projectRoot: File) {
         val buildSrcDirectory = File(projectRoot, "buildSrc")
         if (!buildSrcDirectory.exists()) {

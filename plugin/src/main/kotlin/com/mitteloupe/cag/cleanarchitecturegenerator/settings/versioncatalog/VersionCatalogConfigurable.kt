@@ -125,22 +125,18 @@ open class VersionCatalogConfigurable(
                     if (selectedRows.isNotEmpty()) {
                         versionsModel.resetRowsToDefaults(selectedRows, defaultValues)
                     }
-                }
-                    .applyToComponent {
-                        toolTipText =
-                            CleanArchitectureGeneratorBundle.message("settings.versions.reset.selected.tooltip")
-                    }
-                    .enabledIf(hasModifiedSelectionPredicate)
+                }.applyToComponent {
+                    toolTipText =
+                        CleanArchitectureGeneratorBundle.message("settings.versions.reset.selected.tooltip")
+                }.enabledIf(hasModifiedSelectionPredicate)
 
                 button(
                     CleanArchitectureGeneratorBundle.message("settings.versions.reset.all")
                 ) {
                     versionsModel.resetAllToDefaults(defaultValues)
-                }
-                    .applyToComponent {
-                        toolTipText = CleanArchitectureGeneratorBundle.message("settings.versions.reset.all.tooltip")
-                    }
-                    .enabledIf(deviatesFromDefaultsPredicate)
+                }.applyToComponent {
+                    toolTipText = CleanArchitectureGeneratorBundle.message("settings.versions.reset.all.tooltip")
+                }.enabledIf(deviatesFromDefaultsPredicate)
             }.layout(RowLayout.PARENT_GRID)
 
             onApply {
@@ -167,7 +163,9 @@ open class VersionCatalogConfigurable(
         }
 }
 
-private class VersionsTableModel(values: Map<String, String>) : AbstractTableModel() {
+private class VersionsTableModel(
+    values: Map<String, String>
+) : AbstractTableModel() {
     private data class Row(
         val versionKey: String,
         val libraries: String,
@@ -191,8 +189,7 @@ private class VersionsTableModel(values: Map<String, String>) : AbstractTableMod
                     .groupBy(
                         keySelector = { it.version!!.key },
                         valueTransform = { it.module }
-                    )
-                    .forEach { (versionKey, modules) ->
+                    ).forEach { (versionKey, modules) ->
                         put(versionKey, (get(versionKey).orEmpty() + modules).distinct())
                     }
 
@@ -200,8 +197,7 @@ private class VersionsTableModel(values: Map<String, String>) : AbstractTableMod
                     .groupBy(
                         keySelector = { it.version.key },
                         valueTransform = { it.id }
-                    )
-                    .forEach { (versionKey, pluginIds) ->
+                    ).forEach { (versionKey, pluginIds) ->
                         put(versionKey, (get(versionKey).orEmpty() + pluginIds).distinct())
                     }
             }

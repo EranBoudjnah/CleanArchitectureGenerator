@@ -29,7 +29,9 @@ private val PRIMARY_FLAGS =
         HelpPrimary
     )
 
-class AppArgumentProcessor(private val argumentParser: ArgumentParser = ArgumentParser()) {
+class AppArgumentProcessor(
+    private val argumentParser: ArgumentParser = ArgumentParser()
+) {
     fun isHelpRequested(arguments: Array<String>): Boolean = argumentParser.parsePrimaryWithSecondaries(arguments, HelpPrimary).isNotEmpty()
 
     fun getHelpOptions(arguments: Array<String>): HelpOptions? {
@@ -120,17 +122,16 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         }
 
     fun getNewArchitecture(arguments: Array<String>): List<ArchitectureRequest> =
-        argumentParser.parsePrimaryWithSecondaries(
-            arguments = arguments,
-            primaryFlag = NewArchitecturePrimary
-        ).map { secondaries ->
-            ArchitectureRequest(
-                enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
-                enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
-                enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
-                enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
-            )
-        }
+        argumentParser
+            .parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewArchitecturePrimary)
+            .map { secondaries ->
+                ArchitectureRequest(
+                    enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
+                    enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
+                    enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
+                    enableGit = secondaries.containsKey(SecondaryFlagConstants.GIT)
+                )
+            }
 
     fun getNewProjectTemplate(arguments: Array<String>): List<ProjectTemplateRequest> =
         parseWithNameFlag(
@@ -153,12 +154,11 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         arguments: Array<String>,
         primaryFlag: PrimaryFlag,
         transform: (Map<String, String>) -> T
-    ): List<T> {
-        return argumentParser.parsePrimaryWithSecondaries(
-            arguments = arguments,
-            primaryFlag = primaryFlag
-        ).map(transform).filter { isValidRequest(it) }
-    }
+    ): List<T> =
+        argumentParser
+            .parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = primaryFlag)
+            .map(transform)
+            .filter(::isValidRequest)
 
     private fun <T> isValidRequest(request: T): Boolean =
         when (request) {
@@ -169,7 +169,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
         }
 
     private fun parseLibraries(withValue: String?): Set<String> =
-        (withValue.orEmpty()).lowercase()
+        (withValue.orEmpty())
+            .lowercase()
             .split(",")
             .map { it.trim() }
             .filter { it.isNotEmpty() }
@@ -255,5 +256,8 @@ class AppArgumentProcessor(private val argumentParser: ArgumentParser = Argument
 
     private fun getAllPrimaryFlagStrings(): Set<String> = PRIMARY_FLAGS.flatMap { listOf(it.long, it.short) }.toSet()
 
-    data class HelpOptions(val topic: String?, val format: String?)
+    data class HelpOptions(
+        val topic: String?,
+        val format: String?
+    )
 }
