@@ -15,6 +15,7 @@ fun buildAndroidManifest(appName: String): String =
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.$appName"
+            android:name=".${appName}Application"
             tools:targetApi="31">
             <activity
                 android:name=".MainActivity"
