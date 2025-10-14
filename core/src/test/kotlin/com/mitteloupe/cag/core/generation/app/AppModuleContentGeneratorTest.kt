@@ -3,6 +3,7 @@ package com.mitteloupe.cag.core.generation.app
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.option.DependencyInjection
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             startDirectory = startDirectory,
             appName = appName,
             projectNamespace = namespace,
+            dependencyInjection = DependencyInjection.Hilt,
             enableCompose = enableCompose
         )
         val mainActivityFile = File(startDirectory, "app/src/main/java/com/company/testapp/MainActivity.kt")
@@ -113,6 +115,7 @@ fun GreetingPreview() {
             startDirectory = startDirectory,
             appName = appName,
             projectNamespace = namespace,
+            dependencyInjection = DependencyInjection.Hilt,
             enableCompose = enableCompose
         )
         val mainActivityFile = File(startDirectory, "app/src/main/java/com/company/testapp/MainActivity.kt")
@@ -141,6 +144,59 @@ class HappinessTrackerApplication : Application()
             startDirectory = startDirectory,
             appName = appName,
             projectNamespace = namespace,
+            dependencyInjection = DependencyInjection.Hilt,
+            enableCompose = enableCompose
+        )
+        val mainActivityFile =
+            File(startDirectory, "app/src/main/java/com/happycorp/happinesstracker/HappinessTrackerApplication.kt")
+
+        // Then
+        assertEquals(expectedContent, mainActivityFile.readText())
+    }
+
+    @Test
+    fun `Given Koin when writeAppModule then generates HappinessTrackerApplication file with Koin`() {
+        val startDirectory = createTempDirectory(prefix = "appModule").toFile()
+        val appName = "HappinessTracker"
+        val namespace = "com.happycorp.happinesstracker"
+        val dependencyInjection = DependencyInjection.Koin
+        val enableCompose = false
+        val expectedContent = """
+package com.happycorp.happinesstracker
+
+import android.app.Application
+import com.happycorp.happinesstracker.di.architectureModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.dsl.KoinAppDeclaration
+import org.koin.dsl.includes
+
+class HappinessTrackerApplication : Application() {
+    private fun initKoin(config : KoinAppDeclaration? = null){
+        startKoin {
+            includes(config)
+            modules(architectureModule)
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        initKoin {
+            androidContext(this@HappinessTrackerApplication)
+            androidLogger()
+        }
+    }
+}
+"""
+
+        // When
+        classUnderTest.writeAppModule(
+            startDirectory = startDirectory,
+            appName = appName,
+            projectNamespace = namespace,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose
         )
         val mainActivityFile =

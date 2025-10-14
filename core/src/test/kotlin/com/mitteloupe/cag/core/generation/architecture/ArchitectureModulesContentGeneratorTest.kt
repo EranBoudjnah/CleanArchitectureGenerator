@@ -5,6 +5,7 @@ import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.gradle.GradleFileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
+import com.mitteloupe.cag.core.option.DependencyInjection
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
@@ -79,7 +80,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -99,7 +100,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -119,7 +120,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -139,7 +140,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -166,7 +167,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -193,7 +194,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -220,7 +221,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -247,7 +248,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -258,7 +259,7 @@ class ArchitectureModulesContentGeneratorTest {
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
                     architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
-                    enableHilt = true
+                    dependencyInjection = DependencyInjection.Hilt
                 )
             }
         }
@@ -275,7 +276,7 @@ class ArchitectureModulesContentGeneratorTest {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -314,7 +315,7 @@ class ArchitectureModulesContentGeneratorTest {
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
                     architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
-                    enableHilt = true
+                    dependencyInjection = DependencyInjection.Hilt
                 )
             }
         }
@@ -332,7 +333,7 @@ class ArchitectureModulesContentGeneratorTest {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -372,7 +373,7 @@ class ArchitectureModulesContentGeneratorTest {
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
                     architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
-                    enableHilt = true
+                    dependencyInjection = DependencyInjection.Hilt
                 )
             }
         }
@@ -417,7 +418,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -456,7 +457,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -524,7 +525,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -564,7 +565,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -648,7 +649,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = enableCompose,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -662,7 +663,7 @@ dependencies {
             // Given
             val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
             val architecturePackageName = "com.example.architecture"
-            val enableHilt = false
+            val dependencyInjection = DependencyInjection.None
             val expectedInstrumentationTest = """plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -730,7 +731,7 @@ dependencies {
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
                 enableCompose = false,
-                enableHilt = enableHilt,
+                dependencyInjection = dependencyInjection,
                 enableKtlint = false,
                 enableDetekt = false
             )
@@ -1701,7 +1702,7 @@ interface CoroutineContextProvider {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -1848,7 +1849,7 @@ abstract class BaseTest {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -1907,7 +1908,7 @@ class ClickChildView(private val matcher: Matcher<View>) : ViewAction {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -1934,7 +1935,7 @@ annotation class ServerRequestResponse(val requestResponseIds: Array<String>)
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -1960,7 +1961,7 @@ annotation class LocalStore(val localStoreDataIds: Array<String>)
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2002,7 +2003,7 @@ fun matchesItemAtPosition(matcher: Matcher<View?>?, position: Int) =
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2037,7 +2038,7 @@ fun <OUTPUT> processAssetStream(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2109,7 +2110,7 @@ private fun UiDevice.closeAnrWithWait(appNotRespondingDialog: UiObject) {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2142,7 +2143,7 @@ fun doesNot(description: String, block: () -> Unit) {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2181,7 +2182,7 @@ fun retry(waitMilliseconds: Long = 200L, repeat: Int = 5, block: () -> Unit) {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2222,7 +2223,7 @@ class ComposeOkHttp3IdlingResource private constructor(dispatcher: Dispatcher) :
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2283,7 +2284,7 @@ class EspressoOkHttp3IdlingResource private constructor(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2310,7 +2311,7 @@ fun interface AppLauncher {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2353,7 +2354,7 @@ fun <ACTIVITY : ComponentActivity> fromComposable(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2395,7 +2396,7 @@ abstract class KeyValueStore {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2460,7 +2461,7 @@ class WithBackgroundColorMatcher(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2590,7 +2591,7 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2628,7 +2629,7 @@ class HiltInjectorRule(private val hiltAndroidRule: HiltAndroidRule) : TestRule 
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2653,7 +2654,7 @@ data class MockRequest(val url: String)
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2683,7 +2684,7 @@ data class MockResponse(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2718,7 +2719,7 @@ data class MockRequestResponseFactory(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2748,7 +2749,7 @@ interface MockResponseFactory {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2780,7 +2781,7 @@ sealed class ErrorResponseFactory {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2823,7 +2824,7 @@ data class SimpleResponseFactory(
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2862,7 +2863,7 @@ class SequenceResponseFactory(private vararg val responses: MockResponseFactory)
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2897,7 +2898,7 @@ interface ResponseBinder {
                 architectureRoot = instrumentationTestRoot,
                 architecturePackageName = architecturePackageName,
                 architecturePackageNameSegments = packageSegments,
-                enableHilt = true
+                dependencyInjection = DependencyInjection.Hilt
             )
 
             // Then
@@ -2957,7 +2958,7 @@ abstract class ResponseStore {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3002,7 +3003,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3036,7 +3037,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3088,7 +3089,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3167,7 +3168,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3220,7 +3221,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3316,7 +3317,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
@@ -3356,7 +3357,7 @@ dependencies {
             classUnderTest.generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt

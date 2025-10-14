@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.generation.SettingsFileUpdater
 import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class ArchitectureFilesGenerator(
@@ -19,7 +20,7 @@ class ArchitectureFilesGenerator(
     fun generateArchitecture(
         destinationRootDirectory: File,
         architecturePackageName: String,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
@@ -60,7 +61,7 @@ class ArchitectureFilesGenerator(
             .generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
-                enableHilt = enableHilt,
+                dependencyInjection = dependencyInjection,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt

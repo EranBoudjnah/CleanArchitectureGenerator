@@ -88,7 +88,7 @@ fun main(arguments: Array<String>) {
                 packageName = request.packageName,
                 overrideMinimumAndroidSdk = null,
                 overrideAndroidGradlePluginVersion = null,
-                enableHilt = request.enableHilt,
+                dependencyInjection = request.dependencyInjection,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt,
@@ -118,7 +118,7 @@ fun main(arguments: Array<String>) {
             GenerateArchitectureRequest(
                 destinationRootDirectory = destinationRootDirectory,
                 architecturePackageName = architecturePackageName,
-                enableHilt = request.enableHilt,
+                dependencyInjection = request.dependencyInjection,
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt

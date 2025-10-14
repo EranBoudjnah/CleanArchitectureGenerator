@@ -83,7 +83,7 @@ class Generator(
         architectureFilesGenerator.generateArchitecture(
             destinationRootDirectory = request.destinationRootDirectory,
             architecturePackageName = request.architecturePackageName,
-            enableHilt = request.enableHilt,
+            dependencyInjection = request.dependencyInjection,
             enableCompose = request.enableCompose,
             enableKtlint = request.enableKtlint,
             enableDetekt = request.enableDetekt
@@ -97,7 +97,7 @@ class Generator(
             packageName = request.packageName,
             overrideMinimumAndroidSdk = request.overrideMinimumAndroidSdk,
             overrideAndroidGradlePluginVersion = request.overrideAndroidGradlePluginVersion,
-            enableHilt = request.enableHilt,
+            dependencyInjection = request.dependencyInjection,
             enableCompose = request.enableCompose,
             enableKtlint = request.enableKtlint,
             enableDetekt = request.enableDetekt,

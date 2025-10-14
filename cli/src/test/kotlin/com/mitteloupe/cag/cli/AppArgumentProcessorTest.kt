@@ -5,6 +5,7 @@ import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 import com.mitteloupe.cag.cli.request.ViewModelRequest
+import com.mitteloupe.cag.core.option.DependencyInjection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -750,7 +751,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MyApp",
                     packageName = "com.example",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = true,
                     enableKtlint = true,
                     enableDetekt = true,
@@ -774,7 +775,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "TestApp",
                     packageName = "com.test",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = false,
                     enableKtlint = true,
                     enableDetekt = true,
@@ -798,7 +799,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MinimalApp",
                     packageName = "",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -822,7 +823,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "NoComposeApp",
                     packageName = "",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = false,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -846,7 +847,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "First",
                     packageName = "com.first",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -858,7 +859,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "Second",
                     packageName = "",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -980,7 +981,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "GitApp",
                     packageName = "",
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,

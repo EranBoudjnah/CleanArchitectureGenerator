@@ -1,7 +1,9 @@
 package com.mitteloupe.cag.cli.request
 
+import com.mitteloupe.cag.core.option.DependencyInjection
+
 data class ArchitectureRequest(
-    val enableHilt: Boolean,
+    val dependencyInjection: DependencyInjection,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,

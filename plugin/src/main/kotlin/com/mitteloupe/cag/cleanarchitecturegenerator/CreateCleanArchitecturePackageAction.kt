@@ -9,6 +9,7 @@ import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvide
 import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
+import com.mitteloupe.cag.core.option.DependencyInjection
 import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
 import java.io.File
 
@@ -35,7 +36,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                     destinationRootDirectory = projectRootDir,
                     architecturePackageName = architecturePackageName,
                     enableCompose = dialog.isComposeEnabled(),
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableKtlint = dialog.isKtlintEnabled(),
                     enableDetekt = dialog.isDetektEnabled()
                 )

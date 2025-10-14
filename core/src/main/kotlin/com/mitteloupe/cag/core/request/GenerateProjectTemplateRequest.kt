@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core.request
 
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 data class GenerateProjectTemplateRequest(
@@ -8,7 +9,7 @@ data class GenerateProjectTemplateRequest(
     val packageName: String,
     val overrideMinimumAndroidSdk: Int?,
     val overrideAndroidGradlePluginVersion: String?,
-    val enableHilt: Boolean,
+    val dependencyInjection: DependencyInjection,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,

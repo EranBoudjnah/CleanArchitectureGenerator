@@ -16,6 +16,7 @@ import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 import com.mitteloupe.cag.cli.request.ViewModelRequest
+import com.mitteloupe.cag.core.option.DependencyInjection
 
 private val PRIMARY_FLAGS =
     setOf(
@@ -126,7 +127,7 @@ class AppArgumentProcessor(
             .parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewArchitecturePrimary)
             .map { secondaries ->
                 ArchitectureRequest(
-                    enableHilt = true,
+                    dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                     enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                     enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
@@ -142,7 +143,7 @@ class AppArgumentProcessor(
             ProjectTemplateRequest(
                 projectName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
                 packageName = secondaries[SecondaryFlagConstants.PACKAGE].orEmpty(),
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                 enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),

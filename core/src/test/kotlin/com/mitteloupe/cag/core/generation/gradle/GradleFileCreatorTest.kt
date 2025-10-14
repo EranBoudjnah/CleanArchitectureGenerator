@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
+import com.mitteloupe.cag.core.option.DependencyInjection
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
@@ -93,85 +94,84 @@ class GradleFileCreatorTest {
         val targetFile = File(moduleDirectory, "build.gradle.kts")
         val catalog = VersionCatalogUpdater(fileCreator)
         val expectedContent =
-            """
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+            """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-            plugins {
-                alias(libs.plugins.android.application)
-                alias(libs.plugins.kotlin.android)
-                alias(libs.plugins.ksp)
-                $ALIAS_HILT
-            }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    $ALIAS_HILT
+}
 
-            kotlin {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_17)
-                }
-            }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
 
-            android {
-                namespace = "com.brand.app"
-                compileSdk = libs.versions.compileSdk.get().toInt()
+android {
+    namespace = "com.brand.app"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
-                defaultConfig {
-                    applicationId = "com.brand.app"
-                    minSdk = libs.versions.minSdk.get().toInt()
-                    targetSdk = libs.versions.targetSdk.get().toInt()
-                    versionCode = 1
-                    versionName = "1.0"
+    defaultConfig {
+        applicationId = "com.brand.app"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
 
-                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-                buildTypes {
-                    release {
-                        isMinifyEnabled = false
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-                packaging {
-                    resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
-                }
-            }
-                
-            dependencies {
-                implementation(libs.material)
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-                implementation(libs.hilt.android)
-                ksp(libs.hilt.android.compiler)
-                implementation(libs.androidx.appcompat)
-                implementation(libs.androidx.constraintlayout)
-                implementation(libs.material)
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    packaging {
+        resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+    }
+}
+    
+dependencies {
+    implementation(libs.material)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
 
-                implementation(projects.architecture.ui)
-                implementation(projects.architecture.presentation)
-                implementation(projects.architecture.domain)
-                implementation(projects.features.samplefeature.ui)
-                implementation(projects.features.samplefeature.presentation)
-                implementation(projects.features.samplefeature.domain)
-                implementation(projects.features.samplefeature.data)
-                implementation(projects.datasource.source)
-                implementation(projects.datasource.implementation)
-                    
-                testImplementation(libs.test.junit)
-                androidTestImplementation(libs.test.androidx.junit)
-                androidTestImplementation(libs.test.androidx.espresso.core)
-            }
-            """.trimIndent()
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+    implementation(projects.features.samplefeature.ui)
+    implementation(projects.features.samplefeature.presentation)
+    implementation(projects.features.samplefeature.domain)
+    implementation(projects.features.samplefeature.data)
+    implementation(projects.datasource.source)
+    implementation(projects.datasource.implementation)
+        
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.junit)
+    androidTestImplementation(libs.test.androidx.espresso.core)
+}
+"""
 
         // When
         classUnderTest.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableCompose = false,
             catalog = catalog
         )
@@ -181,93 +181,186 @@ class GradleFileCreatorTest {
     }
 
     @Test
-    fun `Given no hilt when writeAppGradleFile then generates app gradle file without hilt`() {
+    fun `Given no DI when writeAppGradleFile then generates app gradle file without DI`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "featureRoot3").toFile()
         val packageName = "com.brand.app"
+        val dependencyInjection = DependencyInjection.None
         val moduleDirectory = File(projectRoot, "app")
         moduleDirectory.mkdirs()
         val targetFile = File(moduleDirectory, "build.gradle.kts")
         val catalog = VersionCatalogUpdater(fileCreator)
         val expectedContent =
-            """
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+            """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-            plugins {
-                alias(libs.plugins.android.application)
-                alias(libs.plugins.kotlin.android)
-                alias(libs.plugins.ksp)
-            }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+}
 
-            kotlin {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_17)
-                }
-            }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
 
-            android {
-                namespace = "com.brand.app"
-                compileSdk = libs.versions.compileSdk.get().toInt()
+android {
+    namespace = "com.brand.app"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
-                defaultConfig {
-                    applicationId = "com.brand.app"
-                    minSdk = libs.versions.minSdk.get().toInt()
-                    targetSdk = libs.versions.targetSdk.get().toInt()
-                    versionCode = 1
-                    versionName = "1.0"
+    defaultConfig {
+        applicationId = "com.brand.app"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
 
-                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-                buildTypes {
-                    release {
-                        isMinifyEnabled = false
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-                packaging {
-                    resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
-                }
-            }
-                
-            dependencies {
-                implementation(libs.material)
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-                implementation(libs.hilt.android)
-                ksp(libs.hilt.android.compiler)
-                implementation(libs.androidx.appcompat)
-                implementation(libs.androidx.constraintlayout)
-                implementation(libs.material)
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    packaging {
+        resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+    }
+}
+    
+dependencies {
+    implementation(libs.material)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
 
-                implementation(projects.architecture.ui)
-                implementation(projects.architecture.presentation)
-                implementation(projects.architecture.domain)
-                implementation(projects.features.samplefeature.ui)
-                implementation(projects.features.samplefeature.presentation)
-                implementation(projects.features.samplefeature.domain)
-                implementation(projects.features.samplefeature.data)
-                implementation(projects.datasource.source)
-                implementation(projects.datasource.implementation)
-                    
-                testImplementation(libs.test.junit)
-                androidTestImplementation(libs.test.androidx.junit)
-                androidTestImplementation(libs.test.androidx.espresso.core)
-            }
-            """.trimIndent()
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+    implementation(projects.features.samplefeature.ui)
+    implementation(projects.features.samplefeature.presentation)
+    implementation(projects.features.samplefeature.domain)
+    implementation(projects.features.samplefeature.data)
+    implementation(projects.datasource.source)
+    implementation(projects.datasource.implementation)
+        
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.junit)
+    androidTestImplementation(libs.test.androidx.espresso.core)
+}
+"""
 
         // When
         classUnderTest.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableHilt = false,
+            dependencyInjection = dependencyInjection,
+            enableCompose = false,
+            catalog = catalog
+        )
+
+        // Then
+        assertEquals(expectedContent, targetFile.readText())
+    }
+
+    @Test
+    fun `Given Koin when writeAppGradleFile then generates app gradle file with Koin`() {
+        // Given
+        val projectRoot = createTempDirectory(prefix = "featureRoot3").toFile()
+        val packageName = "com.brand.app"
+        val dependencyInjection = DependencyInjection.Koin
+        val moduleDirectory = File(projectRoot, "app")
+        moduleDirectory.mkdirs()
+        val targetFile = File(moduleDirectory, "build.gradle.kts")
+        val catalog = VersionCatalogUpdater(fileCreator)
+        val expectedContent =
+            """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
+android {
+    namespace = "com.brand.app"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        applicationId = "com.brand.app"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    packaging {
+        resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+    }
+}
+    
+dependencies {
+    implementation(libs.material)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.koin.android)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
+
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+    implementation(projects.features.samplefeature.ui)
+    implementation(projects.features.samplefeature.presentation)
+    implementation(projects.features.samplefeature.domain)
+    implementation(projects.features.samplefeature.data)
+    implementation(projects.datasource.source)
+    implementation(projects.datasource.implementation)
+        
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.junit)
+    androidTestImplementation(libs.test.androidx.espresso.core)
+}
+"""
+
+        // When
+        classUnderTest.writeAppGradleFile(
+            projectRoot = projectRoot,
+            packageName = packageName,
+            dependencyInjection = dependencyInjection,
             enableCompose = false,
             catalog = catalog
         )
@@ -286,93 +379,92 @@ class GradleFileCreatorTest {
         val targetFile = File(moduleDirectory, "build.gradle.kts")
         val catalog = VersionCatalogUpdater(fileCreator)
         val expectedContent =
-            """
-            import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+            """import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-            plugins {
-                alias(libs.plugins.android.application)
-                alias(libs.plugins.kotlin.android)
-                alias(libs.plugins.ksp)
-                $ALIAS_HILT
-                alias(libs.plugins.compose.compiler)
-            }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    $ALIAS_HILT
+    alias(libs.plugins.compose.compiler)
+}
 
-            kotlin {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_17)
-                }
-            }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
 
-            android {
-                namespace = "com.awesome.app"
-                compileSdk = libs.versions.compileSdk.get().toInt()
+android {
+    namespace = "com.awesome.app"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
-                defaultConfig {
-                    applicationId = "com.awesome.app"
-                    minSdk = libs.versions.minSdk.get().toInt()
-                    targetSdk = libs.versions.targetSdk.get().toInt()
-                    versionCode = 1
-                    versionName = "1.0"
+    defaultConfig {
+        applicationId = "com.awesome.app"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
 
-                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-                buildTypes {
-                    release {
-                        isMinifyEnabled = false
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
-                    }
-                }
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-                buildFeatures {
-                    compose = true
-                }
-                packaging {
-                    resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
-                }
-            }
-                
-            dependencies {
-                implementation(libs.material)
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-                implementation(libs.hilt.android)
-                ksp(libs.hilt.android.compiler)
-                implementation(libs.androidx.activity.compose)
-                implementation(platform(libs.compose.bom))
-                implementation(libs.compose.ui)
-                implementation(libs.compose.ui.tooling.preview)
-                implementation(libs.compose.material3)
-                debugImplementation(libs.compose.ui.tooling)
-                debugImplementation(libs.compose.ui.test.manifest)
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+    packaging {
+        resources.pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+    }
+}
+    
+dependencies {
+    implementation(libs.material)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 
-                implementation(projects.architecture.ui)
-                implementation(projects.architecture.presentation)
-                implementation(projects.architecture.domain)
-                implementation(projects.features.samplefeature.ui)
-                implementation(projects.features.samplefeature.presentation)
-                implementation(projects.features.samplefeature.domain)
-                implementation(projects.features.samplefeature.data)
-                implementation(projects.datasource.source)
-                implementation(projects.datasource.implementation)
-                    
-                testImplementation(libs.test.junit)
-                androidTestImplementation(libs.test.androidx.junit)
-                androidTestImplementation(libs.test.androidx.espresso.core)
-            }
-            """.trimIndent()
+    implementation(projects.architecture.ui)
+    implementation(projects.architecture.presentation)
+    implementation(projects.architecture.domain)
+    implementation(projects.features.samplefeature.ui)
+    implementation(projects.features.samplefeature.presentation)
+    implementation(projects.features.samplefeature.domain)
+    implementation(projects.features.samplefeature.data)
+    implementation(projects.datasource.source)
+    implementation(projects.datasource.implementation)
+        
+    testImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.androidx.junit)
+    androidTestImplementation(libs.test.androidx.espresso.core)
+}
+"""
 
         // When
         classUnderTest.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableCompose = true,
             catalog = catalog
         )
@@ -416,7 +508,7 @@ subprojects {
         // When
         classUnderTest.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableKtlint = false,
             enableDetekt = false,
             catalog = catalog
@@ -465,7 +557,7 @@ subprojects {
         // When
         classUnderTest.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = false,
+            dependencyInjection = DependencyInjection.None,
             enableKtlint = false,
             enableDetekt = false,
             catalog = catalog
@@ -511,7 +603,7 @@ subprojects {
         // When
         classUnderTest.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableKtlint = true,
             enableDetekt = false,
             catalog = catalog
@@ -557,7 +649,7 @@ subprojects {
         // When
         classUnderTest.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableKtlint = false,
             enableDetekt = true,
             catalog = catalog
@@ -604,7 +696,7 @@ subprojects {
         // When
         classUnderTest.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = true,
+            dependencyInjection = DependencyInjection.Hilt,
             enableKtlint = true,
             enableDetekt = true,
             catalog = catalog

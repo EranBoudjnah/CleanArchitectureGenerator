@@ -19,6 +19,7 @@ import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.withoutSpaces
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class AppModuleContentGenerator(
@@ -55,6 +56,7 @@ class AppModuleContentGenerator(
         startDirectory: File,
         appName: String,
         projectNamespace: String,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean
     ) {
         val appModuleDirectory = File(startDirectory, "app")
@@ -73,7 +75,11 @@ class AppModuleContentGenerator(
         }
 
         createFileIfNotExists(basePackageDirectory, "${sanitizedAppName}Application.kt") {
-            buildApplicationKotlinFile(projectNamespace = projectNamespace, appName = sanitizedAppName)
+            buildApplicationKotlinFile(
+                projectNamespace = projectNamespace,
+                appName = sanitizedAppName,
+                dependencyInjection = dependencyInjection
+            )
         }
 
         generateAndroidResources(

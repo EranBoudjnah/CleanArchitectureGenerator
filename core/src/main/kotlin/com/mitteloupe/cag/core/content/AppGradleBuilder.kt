@@ -4,10 +4,11 @@ import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+import com.mitteloupe.cag.core.option.DependencyInjection
 
 fun buildAppGradleScript(
     packageName: String,
-    enableHilt: Boolean,
+    dependencyInjection: DependencyInjection,
     enableCompose: Boolean,
     catalog: VersionCatalogReader
 ): String {
@@ -57,7 +58,7 @@ fun buildAppGradleScript(
     val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
     val aliasKsp = catalog.getResolvedPluginAliasFor(PluginConstants.KSP).asAccessor
     val hiltPlugin =
-        if (enableHilt) {
+        if (dependencyInjection == DependencyInjection.Hilt) {
             val aliasPluginHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
             """
             alias(libs.plugins.$aliasPluginHilt)"""
@@ -67,11 +68,25 @@ fun buildAppGradleScript(
     val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
     val aliasCoreKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CORE_KTX).asAccessor
     val aliasLifecycleRuntimeKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_LIFECYCLE_RUNTIME_KTX).asAccessor
-    val aliasHiltAndroid = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID).asAccessor
-    val aliasHiltAndroidCompiler = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID_COMPILER).asAccessor
     val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
     val aliasTestAndroidxJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_JUNIT).asAccessor
     val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
+    val dependencyInjectionDependencies =
+        when (dependencyInjection) {
+            DependencyInjection.Hilt -> {
+                val aliasHiltAndroid = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID).asAccessor
+                val aliasHiltAndroidCompiler = catalog.getResolvedLibraryAliasForModule(LibraryConstants.HILT_ANDROID_COMPILER).asAccessor
+                """
+            implementation(libs.$aliasHiltAndroid)
+            ksp(libs.$aliasHiltAndroidCompiler)"""
+            }
+            DependencyInjection.Koin -> {
+                val aliasKoinAndroid = catalog.getResolvedLibraryAliasForModule(LibraryConstants.KOIN_ANDROID).asAccessor
+                """
+            implementation(libs.$aliasKoinAndroid)"""
+            }
+            DependencyInjection.None -> ""
+        }
     val result =
         """
         import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -132,9 +147,7 @@ fun buildAppGradleScript(
         dependencies {
             implementation(libs.$aliasMaterial)
             implementation(libs.$aliasCoreKtx)
-            implementation(libs.$aliasLifecycleRuntimeKtx)
-            implementation(libs.$aliasHiltAndroid)
-            ksp(libs.$aliasHiltAndroidCompiler)$viewDependencies
+            implementation(libs.$aliasLifecycleRuntimeKtx)$dependencyInjectionDependencies$viewDependencies
             implementation(projects.architecture.ui)
             implementation(projects.architecture.presentation)
             implementation(projects.architecture.domain)
@@ -149,6 +162,7 @@ fun buildAppGradleScript(
             androidTestImplementation(libs.$aliasTestAndroidxJunit)
             androidTestImplementation(libs.$aliasTestAndroidxEspressoCore)
         }
+
         """.trimIndent()
     return result
 }

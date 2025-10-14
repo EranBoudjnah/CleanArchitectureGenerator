@@ -14,6 +14,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.generation.withoutSpaces
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class ProjectTemplateFilesGenerator(
@@ -35,7 +36,7 @@ class ProjectTemplateFilesGenerator(
         packageName: String,
         overrideMinimumAndroidSdk: Int?,
         overrideAndroidGradlePluginVersion: String?,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean,
@@ -85,7 +86,10 @@ class ProjectTemplateFilesGenerator(
                 }
         val plugins =
             buildList {
-                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS + PluginConstants.HILT_ANDROID)
+                addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
+                if (dependencyInjection is DependencyInjection.Hilt) {
+                    add(PluginConstants.HILT_ANDROID)
+                }
                 if (enableCompose) {
                     add(PluginConstants.COMPOSE_COMPILER)
                 }
@@ -123,7 +127,7 @@ class ProjectTemplateFilesGenerator(
         architectureFilesGenerator.generateArchitecture(
             destinationRootDirectory = projectRoot,
             architecturePackageName = "$packageName.architecture",
-            enableHilt = enableHilt,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt
@@ -148,12 +152,13 @@ class ProjectTemplateFilesGenerator(
             startDirectory = projectRoot,
             appName = projectName,
             projectNamespace = packageName,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose
         )
         generateTemplateProjectGradleFiles(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableHilt = enableHilt,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt
@@ -194,14 +199,14 @@ class ProjectTemplateFilesGenerator(
     private fun generateTemplateProjectGradleFiles(
         projectRoot: File,
         packageName: String,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
     ) {
         gradleFileCreator.writeProjectGradleFile(
             projectRoot = projectRoot,
-            enableHilt = enableHilt,
+            dependencyInjection = dependencyInjection,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt,
             catalog = catalogUpdater
@@ -210,7 +215,7 @@ class ProjectTemplateFilesGenerator(
         gradleFileCreator.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
-            enableHilt = enableHilt,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose,
             catalog = catalogUpdater
         )
