@@ -21,6 +21,7 @@ import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.GenerationException
+import com.mitteloupe.cag.core.option.DependencyInjection
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.git.Git
 import java.io.File
@@ -164,7 +165,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                 packageName = data.packageName,
                 overrideMinimumAndroidSdk = selectedMinSdk,
                 overrideAndroidGradlePluginVersion = overrideAndroidGradlePluginVersion,
-                enableHilt = true,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = enableCompose.value,
                 enableKtlint = enableKtlint.value,
                 enableDetekt = enableDetekt.value,

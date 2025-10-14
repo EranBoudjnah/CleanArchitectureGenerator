@@ -5,10 +5,11 @@ import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+import com.mitteloupe.cag.core.option.DependencyInjection
 
 fun buildArchitectureInstrumentationTestGradleScript(
     architecturePackageName: String,
-    enableHilt: Boolean,
+    dependencyInjection: DependencyInjection,
     catalog: VersionCatalogReader
 ): String {
     val aliasAndroidLibrary = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY).asAccessor
@@ -40,7 +41,7 @@ fun buildArchitectureInstrumentationTestGradleScript(
 
     val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
     val hiltDependency =
-        if (enableHilt) {
+        if (dependencyInjection == DependencyInjection.Hilt) {
             val aliasTestAndroidHilt = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_HILT).asAccessor
             """
     implementation(libs.$aliasTestAndroidHilt)"""

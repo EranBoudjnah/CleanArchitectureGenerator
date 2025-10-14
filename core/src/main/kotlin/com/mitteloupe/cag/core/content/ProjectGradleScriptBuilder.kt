@@ -4,9 +4,10 @@ import com.mitteloupe.cag.core.content.gradle.GradleFileExtender
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
+import com.mitteloupe.cag.core.option.DependencyInjection
 
 fun buildProjectGradleScript(
-    enableHilt: Boolean,
+    dependencyInjection: DependencyInjection,
     enableKtlint: Boolean,
     enableDetekt: Boolean,
     catalog: VersionCatalogReader
@@ -46,7 +47,7 @@ fun buildProjectGradleScript(
     val aliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
     val aliasKsp = catalog.getResolvedPluginAliasFor(PluginConstants.KSP).asAccessor
     val hiltPlugin =
-        if (enableHilt) {
+        if (dependencyInjection == DependencyInjection.Hilt) {
             val aliasHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
             """
             alias(libs.plugins.$aliasHilt) apply false"""

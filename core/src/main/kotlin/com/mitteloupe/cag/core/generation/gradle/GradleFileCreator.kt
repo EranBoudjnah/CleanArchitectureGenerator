@@ -4,6 +4,7 @@ import com.mitteloupe.cag.core.content.buildAppGradleScript
 import com.mitteloupe.cag.core.content.buildProjectGradleScript
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class GradleFileCreator(
@@ -21,7 +22,7 @@ class GradleFileCreator(
 
     fun writeProjectGradleFile(
         projectRoot: File,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableKtlint: Boolean,
         enableDetekt: Boolean,
         catalog: VersionCatalogReader
@@ -29,7 +30,7 @@ class GradleFileCreator(
         val buildGradleFile = File(projectRoot, "build.gradle.kts")
         fileCreator.createOrUpdateFile(buildGradleFile) {
             buildProjectGradleScript(
-                enableHilt = enableHilt,
+                dependencyInjection = dependencyInjection,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt,
                 catalog = catalog
@@ -40,13 +41,13 @@ class GradleFileCreator(
     fun writeAppGradleFile(
         projectRoot: File,
         packageName: String,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         catalog: VersionCatalogReader
     ) {
         val appGradleFile = File(projectRoot, "app/build.gradle.kts")
         fileCreator.createOrUpdateFile(appGradleFile) {
-            buildAppGradleScript(packageName, enableHilt, enableCompose, catalog)
+            buildAppGradleScript(packageName, dependencyInjection, enableCompose, catalog)
         }
     }
 }

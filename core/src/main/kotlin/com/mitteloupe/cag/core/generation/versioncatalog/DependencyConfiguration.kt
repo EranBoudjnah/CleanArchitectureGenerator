@@ -16,6 +16,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.DETEKT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.HILT_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.JUNIT4_VERSION
+import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOIN_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLINX_COROUTINES_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KOTLIN_VERSION
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants.KSP_VERSION
@@ -74,6 +75,8 @@ object VersionCatalogConstants {
         get() = versionRequirement(key = "androidxAppcompat", defaultValue = "1.7.1")
     internal val HILT_VERSION: VersionRequirement
         get() = versionRequirement(key = "hilt", defaultValue = "2.57.2")
+    internal val KOIN_VERSION: VersionRequirement
+        get() = versionRequirement(key = "koinAndroid", defaultValue = "4.1.1")
     internal val ANDROIDX_RECYCLER_VIEW_VERSION: VersionRequirement
         get() = versionRequirement(key = "androidxRecyclerView", defaultValue = "1.4.0")
     internal val ANDROIDX_FRAGMENT_KTX_VERSION: VersionRequirement
@@ -220,6 +223,14 @@ object LibraryConstants {
                 key = "test-androidx-espresso-core",
                 module = "androidx.test.espresso:espresso-core",
                 version = TEST_ANDROIDX_ESPRESSO_VERSION
+            )
+
+    val KOIN_ANDROID: LibraryRequirement
+        get() =
+            LibraryRequirement(
+                key = "koin-android",
+                module = "io.insert-koin:koin-android",
+                version = KOIN_VERSION
             )
 
     val TEST_ANDROID_HILT: LibraryRequirement

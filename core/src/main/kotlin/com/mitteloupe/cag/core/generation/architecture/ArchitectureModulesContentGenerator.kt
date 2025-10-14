@@ -14,6 +14,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class ArchitectureModulesContentGenerator(
@@ -28,7 +29,7 @@ class ArchitectureModulesContentGenerator(
     fun generate(
         architectureRoot: File,
         architecturePackageName: String,
-        enableHilt: Boolean,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
@@ -64,7 +65,7 @@ class ArchitectureModulesContentGenerator(
                         LibraryConstants.TEST_MOCKITO_LIBRARIES +
                         LibraryConstants.TEST_MOCKITO_ANDROID
                 )
-                if (enableHilt) {
+                if (dependencyInjection == DependencyInjection.Hilt) {
                     addAll(LibraryConstants.HILT_LIBRARIES)
                 }
                 addAll(
@@ -128,7 +129,7 @@ class ArchitectureModulesContentGenerator(
         ) {
             buildArchitectureInstrumentationTestGradleScript(
                 architecturePackageName = architecturePackageName,
-                enableHilt = enableHilt,
+                dependencyInjection = dependencyInjection,
                 catalog = catalogUpdater
             )
         }
@@ -160,7 +161,7 @@ class ArchitectureModulesContentGenerator(
             architectureRoot = instrumentationTestRoot,
             architecturePackageName = architecturePackageName.substringBeforeLast('.'),
             architecturePackageNameSegments = architecturePackageName.substringBeforeLast('.').toSegments() + "test",
-            enableHilt = enableHilt
+            dependencyInjection = dependencyInjection
         )
     }
 }

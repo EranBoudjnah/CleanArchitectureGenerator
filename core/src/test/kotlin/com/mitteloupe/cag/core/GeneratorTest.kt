@@ -1,6 +1,7 @@
 package com.mitteloupe.cag.core
 
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
+import com.mitteloupe.cag.core.option.DependencyInjection
 import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.request.GenerateFeatureRequest
 import com.mitteloupe.cag.core.request.GenerateUseCaseRequest
@@ -291,7 +292,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "",
                 destinationRootDirectory = temporaryDirectory,
-                enableHilt = false,
+                dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false
@@ -310,7 +311,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "...",
                 destinationRootDirectory = temporaryDirectory,
-                enableHilt = false,
+                dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false
@@ -331,7 +332,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
-                enableHilt = false,
+                dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false
@@ -350,7 +351,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
-                enableHilt = false,
+                dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false
@@ -377,7 +378,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
-                enableHilt = false,
+                dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true

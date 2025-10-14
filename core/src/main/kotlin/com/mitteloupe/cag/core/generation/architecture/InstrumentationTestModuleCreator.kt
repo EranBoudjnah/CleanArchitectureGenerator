@@ -3,6 +3,7 @@ package com.mitteloupe.cag.core.generation.architecture
 import com.mitteloupe.cag.core.generation.format.optimizeImports
 import com.mitteloupe.cag.core.generation.generateFileIfMissing
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class InstrumentationTestModuleCreator internal constructor() {
@@ -10,7 +11,7 @@ class InstrumentationTestModuleCreator internal constructor() {
         architectureRoot: File,
         architecturePackageName: String,
         architecturePackageNameSegments: List<String>,
-        enableHilt: Boolean
+        dependencyInjection: DependencyInjection
     ) {
         val codeRoot = File(architectureRoot, "src/main/java")
         val packageDirectory = buildPackageDirectory(codeRoot, architecturePackageNameSegments)
@@ -29,7 +30,7 @@ class InstrumentationTestModuleCreator internal constructor() {
         generateKeyValueStore(packageDirectory, architecturePackageName)
         generateWithBackgroundColorMatcher(packageDirectory, architecturePackageName)
         generateWithDrawableIdMatcher(packageDirectory, architecturePackageName)
-        if (enableHilt) {
+        if (dependencyInjection == DependencyInjection.Hilt) {
             generateHiltInjectorRule(packageDirectory, architecturePackageName)
         }
         generateLocalStoreRule(packageDirectory, architecturePackageName)
