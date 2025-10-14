@@ -34,6 +34,7 @@ class GeneratorTest {
                 featurePackageName = "",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -55,6 +56,7 @@ class GeneratorTest {
                 featurePackageName = null,
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -76,6 +78,7 @@ class GeneratorTest {
                 featurePackageName = "...",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -99,6 +102,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -124,6 +128,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -145,6 +150,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -238,6 +244,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.app.testfeature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -266,6 +273,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.app.testfeature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -290,8 +298,10 @@ class GeneratorTest {
         // Given
         val request =
             GenerateArchitectureRequest(
+                projectNamespace = "",
                 architecturePackageName = "",
                 destinationRootDirectory = temporaryDirectory,
+                appModuleDirectory = File(temporaryDirectory, "app"),
                 dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
@@ -309,8 +319,10 @@ class GeneratorTest {
         // Given
         val request =
             GenerateArchitectureRequest(
+                projectNamespace = "",
                 architecturePackageName = "...",
                 destinationRootDirectory = temporaryDirectory,
+                appModuleDirectory = File(temporaryDirectory, "app"),
                 dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
@@ -330,8 +342,10 @@ class GeneratorTest {
         existingArchitectureDir.mkdirs()
         val request =
             GenerateArchitectureRequest(
+                projectNamespace = "",
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
+                appModuleDirectory = File(temporaryDirectory, "app"),
                 dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
@@ -349,8 +363,10 @@ class GeneratorTest {
         // Given
         val request =
             GenerateArchitectureRequest(
+                projectNamespace = "com.example",
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
+                appModuleDirectory = File(temporaryDirectory, "app"),
                 dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = false,
@@ -376,8 +392,10 @@ class GeneratorTest {
         // Given
         val request =
             GenerateArchitectureRequest(
+                projectNamespace = "com.example",
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
+                appModuleDirectory = File(temporaryDirectory, "app"),
                 dependencyInjection = DependencyInjection.None,
                 enableCompose = true,
                 enableKtlint = true,
@@ -453,6 +471,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -507,6 +526,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = false,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -574,6 +594,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.feature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = false,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -620,6 +641,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.app.testfeature",
                 destinationRootDirectory = temporaryDirectory,
                 projectNamespace = "com.example.app",
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = false,
                 enableDetekt = false,
@@ -648,6 +670,7 @@ class GeneratorTest {
                 featurePackageName = "com.example.sample",
                 projectNamespace = "com.example",
                 destinationRootDirectory = temporaryDirectory,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true,
@@ -692,6 +715,7 @@ dependencies {
                 featurePackageName = "com.example.sample",
                 projectNamespace = "com.example",
                 destinationRootDirectory = temporaryDirectory,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true,
@@ -738,6 +762,7 @@ dependencies {
                 featurePackageName = "com.example.sample",
                 projectNamespace = "com.example",
                 destinationRootDirectory = temporaryDirectory,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true,
@@ -785,6 +810,7 @@ dependencies {
                 featurePackageName = "com.example.sample",
                 projectNamespace = "com.example",
                 destinationRootDirectory = temporaryDirectory,
+                dependencyInjection = DependencyInjection.Hilt,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true,

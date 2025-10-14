@@ -7,6 +7,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
+import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.option.DependencyInjection
@@ -16,6 +17,7 @@ import java.io.File
 class CreateCleanArchitecturePackageAction : AnAction() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
+    private val appModuleDirectoryFinder = AppModuleDirectoryFinder()
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -23,17 +25,20 @@ class CreateCleanArchitecturePackageAction : AnAction() {
         val project = event.project ?: return
         val projectModel = IntellijProjectModel(event)
         val basePackage = NamespaceResolver().determineBasePackage(projectModel)
-        val dialog = CreateCleanArchitecturePackageDialog(project)
+        val projectRootDirectory = project.basePath?.let { File(it) } ?: File(".")
+        val appModuleDirectories = appModuleDirectoryFinder.findAndroidAppModuleDirectories(projectRootDirectory)
+        val dialog = CreateCleanArchitecturePackageDialog(project, appModuleDirectories)
         if (dialog.showAndGet()) {
+            val defaultBasePackage = "com.example"
             val architecturePackageName =
-                basePackage?.let {
-                    "$it.architecture"
-                } ?: "com.example.architecture"
+                (basePackage ?: defaultBasePackage) + ".architecture"
             val generator = generatorProvider.prepare(project).generate()
-            val projectRootDir = event.project?.basePath?.let { File(it) } ?: File(".")
+            val projectRootDirectory = event.project?.basePath?.let { File(it) } ?: File(".")
             val request =
                 GenerateArchitectureRequest(
-                    destinationRootDirectory = projectRootDir,
+                    projectNamespace = basePackage ?: defaultBasePackage,
+                    destinationRootDirectory = projectRootDirectory,
+                    appModuleDirectory = dialog.selectedAppModuleDirectory,
                     architecturePackageName = architecturePackageName,
                     enableCompose = dialog.isComposeEnabled(),
                     dependencyInjection = DependencyInjection.Hilt,
@@ -43,8 +48,8 @@ class CreateCleanArchitecturePackageAction : AnAction() {
             try {
                 generator.generateArchitecture(request)
                 project.service<GitAddQueueService>().flush()
-                ideBridge.refreshIde(projectRootDir)
-                ideBridge.synchronizeGradle(project, projectRootDir)
+                ideBridge.refreshIde(projectRootDirectory)
+                ideBridge.synchronizeGradle(project, projectRootDirectory)
                 Messages.showInfoMessage(
                     project,
                     CleanArchitectureGeneratorBundle.message(

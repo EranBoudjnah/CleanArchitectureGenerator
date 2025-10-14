@@ -30,6 +30,7 @@ class Generator(
             projectNamespace = request.projectNamespace,
             destinationRootDirectory = request.destinationRootDirectory,
             appModuleDirectory = request.appModuleDirectory,
+            dependencyInjection = request.dependencyInjection,
             enableCompose = request.enableCompose,
             enableKtlint = request.enableKtlint,
             enableDetekt = request.enableDetekt
@@ -81,7 +82,9 @@ class Generator(
 
     fun generateArchitecture(request: GenerateArchitectureRequest) {
         architectureFilesGenerator.generateArchitecture(
+            projectNamespace = request.projectNamespace,
             destinationRootDirectory = request.destinationRootDirectory,
+            appModuleDirectory = request.appModuleDirectory,
             architecturePackageName = request.architecturePackageName,
             dependencyInjection = request.dependencyInjection,
             enableCompose = request.enableCompose,

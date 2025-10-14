@@ -76,14 +76,25 @@ class ProjectTemplateFilesGenerator(
         }
 
         val libraries =
-            LibraryConstants.CORE_ANDROID_LIBRARIES +
-                LibraryConstants.HILT_LIBRARIES +
-                LibraryConstants.TESTING_LIBRARIES +
-                if (enableCompose) {
-                    LibraryConstants.COMPOSE_LIBRARIES
-                } else {
-                    LibraryConstants.VIEW_LIBRARIES
+            buildList {
+                addAll(LibraryConstants.CORE_ANDROID_LIBRARIES)
+                addAll(LibraryConstants.TESTING_LIBRARIES)
+                when (dependencyInjection) {
+                    DependencyInjection.Hilt -> {
+                        addAll(LibraryConstants.HILT_LIBRARIES)
+                        add(LibraryConstants.TEST_ANDROID_HILT)
+                    }
+                    DependencyInjection.Koin -> add(LibraryConstants.KOIN_ANDROID)
+                    DependencyInjection.None -> Unit
                 }
+                addAll(
+                    if (enableCompose) {
+                        LibraryConstants.COMPOSE_LIBRARIES
+                    } else {
+                        LibraryConstants.VIEW_LIBRARIES
+                    }
+                )
+            }
         val plugins =
             buildList {
                 addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
@@ -119,13 +130,16 @@ class ProjectTemplateFilesGenerator(
                 plugins = plugins
             )
         catalogUpdater.createOrReplaceVersionCatalog(
-            projectRootDir = projectRoot,
+            projectRootDirectory = projectRoot,
             dependencyConfiguration = dependencyConfiguration
         )
 
         generateProjectStructure(projectRoot)
+        val appModuleDirectory = File(projectRoot, "app")
         architectureFilesGenerator.generateArchitecture(
+            projectNamespace = packageName,
             destinationRootDirectory = projectRoot,
+            appModuleDirectory = appModuleDirectory,
             architecturePackageName = "$packageName.architecture",
             dependencyInjection = dependencyInjection,
             enableCompose = enableCompose,
@@ -139,14 +153,15 @@ class ProjectTemplateFilesGenerator(
         )
         val featureName = "SampleFeature"
         featureFilesGenerator.generateFeature(
-            "$packageName.${featureName.lowercase()}",
-            featureName,
-            packageName,
-            projectRoot,
-            null,
-            enableCompose,
-            enableKtlint,
-            enableDetekt
+            featurePackageName = "$packageName.${featureName.lowercase()}",
+            featureName = featureName,
+            projectNamespace = packageName,
+            destinationRootDirectory = projectRoot,
+            appModuleDirectory = appModuleDirectory,
+            dependencyInjection = dependencyInjection,
+            enableCompose = enableCompose,
+            enableKtlint = enableKtlint,
+            enableDetekt = enableDetekt
         )
         appModuleContentGenerator.writeAppModule(
             startDirectory = projectRoot,

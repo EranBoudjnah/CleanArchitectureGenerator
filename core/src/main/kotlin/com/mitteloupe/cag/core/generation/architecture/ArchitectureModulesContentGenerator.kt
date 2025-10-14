@@ -67,6 +67,7 @@ class ArchitectureModulesContentGenerator(
                 )
                 if (dependencyInjection == DependencyInjection.Hilt) {
                     addAll(LibraryConstants.HILT_LIBRARIES)
+                    add(LibraryConstants.TEST_ANDROID_HILT)
                 }
                 addAll(
                     if (enableCompose) {

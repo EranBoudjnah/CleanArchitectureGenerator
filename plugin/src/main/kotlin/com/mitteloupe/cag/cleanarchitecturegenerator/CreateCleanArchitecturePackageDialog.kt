@@ -3,16 +3,33 @@ package com.mitteloupe.cag.cleanarchitecturegenerator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
+import java.io.File
 import javax.swing.JComponent
 
 class CreateCleanArchitecturePackageDialog(
-    project: Project
+    project: Project,
+    private val appModuleDirectories: List<File>
 ) : DialogWrapper(project) {
     private var enableCompose: Boolean = true
     private var enableKtlint: Boolean = false
     private var enableDetekt: Boolean = false
+
+    private var appModuleSelectedIndex: Int = 0
+
+    val selectedAppModuleDirectory: File?
+        get() =
+            if (appModuleDirectories.isEmpty()) {
+                null
+            } else {
+                if (appModuleSelectedIndex in appModuleDirectories.indices) {
+                    appModuleDirectories[appModuleSelectedIndex]
+                } else {
+                    null
+                }
+            }
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
@@ -21,6 +38,16 @@ class CreateCleanArchitecturePackageDialog(
 
     override fun createCenterPanel(): JComponent =
         panel {
+            if (appModuleDirectories.size >= 2) {
+                row(CleanArchitectureGeneratorBundle.message("dialog.feature.app.module.label")) {
+                    val appModules = appModuleDirectories.map { it.name }
+                    comboBox(appModules, null)
+                        .bindItem(
+                            getter = { appModules[appModuleSelectedIndex] },
+                            setter = { appModuleSelectedIndex = it?.let(appModules::indexOf) ?: 0 }
+                        )
+                }
+            }
             row {
                 checkBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.compose.label"))
                     .bindSelected(::enableCompose)

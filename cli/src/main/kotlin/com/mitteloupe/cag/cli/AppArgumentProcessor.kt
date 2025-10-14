@@ -127,6 +127,7 @@ class AppArgumentProcessor(
             .parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewArchitecturePrimary)
             .map { secondaries ->
                 ArchitectureRequest(
+                    appModuleDirectory = null,
                     dependencyInjection = DependencyInjection.Hilt,
                     enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                     enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),

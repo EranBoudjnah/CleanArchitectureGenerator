@@ -24,6 +24,7 @@ fun buildApplicationKotlinFile(
         DependencyInjection.Koin -> {
             val optimizedImports =
                 """import $projectNamespace.di.architectureModule
+import $projectNamespace.di.sampleFeatureModule
 import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -40,7 +41,7 @@ class ${appName}Application : Application() {
     private fun initKoin(config : KoinAppDeclaration? = null){
         startKoin {
             includes(config)
-            modules(architectureModule)
+            modules(architectureModule, sampleFeatureModule)
         }
     }
 

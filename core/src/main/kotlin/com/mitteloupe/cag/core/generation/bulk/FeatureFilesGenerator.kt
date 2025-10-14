@@ -21,6 +21,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 class FeatureFilesGenerator(
@@ -40,6 +41,7 @@ class FeatureFilesGenerator(
         projectNamespace: String,
         destinationRootDirectory: File,
         appModuleDirectory: File?,
+        dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
@@ -54,7 +56,7 @@ class FeatureFilesGenerator(
             throw GenerationException("Feature package name is invalid.")
         }
 
-        val featureNameLowerCase = featureName.lowercase()
+        val featureNameLowercase = featureName.lowercase()
         val dependencyConfiguration =
             DependencyConfiguration(
                 versions = VersionCatalogConstants.ANDROID_VERSIONS,
@@ -82,7 +84,7 @@ class FeatureFilesGenerator(
             projectRootDirectory = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
-        val featureRoot = File(destinationRootDirectory, "features/$featureNameLowerCase")
+        val featureRoot = File(destinationRootDirectory, "features/$featureNameLowercase")
 
         if (featureRoot.exists()) {
             throw GenerationException(
@@ -122,7 +124,7 @@ class FeatureFilesGenerator(
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "presentation"
-            ) { buildPresentationGradleScript(featureNameLowerCase, catalogUpdater) }
+            ) { buildPresentationGradleScript(featureNameLowercase, catalogUpdater) }
             presentationLayerContentGenerator
                 .generatePresentationLayer(
                     featureRoot = featureRoot,
@@ -133,7 +135,7 @@ class FeatureFilesGenerator(
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
                 layer = "data"
-            ) { buildDataGradleScript(featureNameLowerCase, catalogUpdater) }
+            ) { buildDataGradleScript(featureNameLowercase, catalogUpdater) }
             dataLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
@@ -146,7 +148,7 @@ class FeatureFilesGenerator(
             ) {
                 buildUiGradleScript(
                     featurePackageName = featurePackageName,
-                    featureNameLowerCase = featureNameLowerCase,
+                    featureNameLowerCase = featureNameLowercase,
                     enableCompose = enableCompose,
                     catalog = catalogUpdater
                 )
@@ -164,17 +166,18 @@ class FeatureFilesGenerator(
             if (enableKtlint) {
                 configurationFileCreator.writeEditorConfigFile(destinationRootDirectory)
             }
-            settingsFileUpdater.updateProjectSettingsIfPresent(destinationRootDirectory, featureNameLowerCase)
-            appModuleContentGenerator.writeFeatureModuleIfPossible(
+            settingsFileUpdater.updateProjectSettingsIfPresent(destinationRootDirectory, featureNameLowercase)
+            appModuleContentGenerator.writeFeatureDependencyInjectionModuleIfPossible(
                 startDirectory = destinationRootDirectory,
                 projectNamespace = projectNamespace,
                 featureName = featureName,
                 featurePackageName = featurePackageName,
-                appModuleDirectory = appModuleDirectory
+                appModuleDirectory = appModuleDirectory,
+                dependencyInjection = dependencyInjection
             )
             AppModuleGradleUpdater().updateAppModuleDependenciesIfPresent(
                 startDirectory = destinationRootDirectory,
-                featureNameLowerCase = featureNameLowerCase,
+                featureNameLowerCase = featureNameLowercase,
                 appModuleDirectory = appModuleDirectory
             )
         }
