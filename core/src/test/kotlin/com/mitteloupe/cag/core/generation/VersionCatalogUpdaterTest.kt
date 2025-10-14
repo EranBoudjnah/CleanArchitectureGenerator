@@ -63,7 +63,7 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
         val actualCatalog = catalogFile.readText()
 
         // Then
@@ -103,7 +103,7 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
         val actualCatalog = catalogFile.readText()
 
         // Then
@@ -180,7 +180,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then does nothing
     }
@@ -219,7 +219,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -269,7 +269,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -314,7 +314,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -359,7 +359,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -398,7 +398,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -450,7 +450,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -489,7 +489,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(expected, catalogFile.readText())
@@ -507,7 +507,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals("kotlin-jvm", classUnderTest.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM))
@@ -544,7 +544,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals(
@@ -575,7 +575,7 @@ class VersionCatalogUpdaterTest {
             )
 
         // When
-        classUnderTest.createOrUpdateVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrUpdateVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
 
         // Then
         assertEquals("kotlin-jvm", classUnderTest.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM))

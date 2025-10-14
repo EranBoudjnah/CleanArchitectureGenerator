@@ -2,8 +2,8 @@ package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
-import com.mitteloupe.cag.core.generation.GradleFileCreator
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
+import com.mitteloupe.cag.core.generation.gradle.GradleFileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogUpdater
 import org.junit.Assert.assertEquals
 import org.junit.Before

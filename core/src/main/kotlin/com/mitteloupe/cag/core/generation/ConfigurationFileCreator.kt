@@ -8,14 +8,12 @@ class ConfigurationFileCreator(
 ) {
     fun writeDetektConfigurationFile(projectRoot: File) {
         val detektFile = File(projectRoot, "detekt.yml")
-        val content = buildDetektConfiguration()
-        fileCreator.createFileIfNotExists(detektFile) { content }
+        fileCreator.createFileIfNotExists(detektFile) { buildDetektConfiguration() }
     }
 
     fun writeEditorConfigFile(projectRoot: File) {
         val editorConfigFile = File(projectRoot, ".editorconfig")
-        val content = buildEditorConfig()
-        fileCreator.createFileIfNotExists(editorConfigFile) { content }
+        fileCreator.createFileIfNotExists(editorConfigFile) { buildEditorConfig() }
     }
 
     private fun buildDetektConfiguration(): String =

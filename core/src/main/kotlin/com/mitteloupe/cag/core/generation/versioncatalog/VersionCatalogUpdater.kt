@@ -1,7 +1,6 @@
 package com.mitteloupe.cag.core.generation.versioncatalog
 
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement
@@ -68,16 +67,16 @@ class VersionCatalogUpdater(
     }
 
     fun createOrUpdateVersionCatalog(
-        projectRootDir: File,
+        projectRootDirectory: File,
         dependencyConfiguration: DependencyConfiguration
     ) {
-        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        val catalogFile = File(projectRootDirectory, "gradle/libs.versions.toml")
         if (catalogFile.exists()) {
-            updateExistingVersionCatalog(projectRootDir, dependencyConfiguration)
+            updateExistingVersionCatalog(projectRootDirectory, dependencyConfiguration)
             return
         }
 
-        createNewVersionCatalog(projectRootDir, dependencyConfiguration)
+        createNewVersionCatalog(projectRootDirectory, dependencyConfiguration)
     }
 
     private fun updateExistingVersionCatalog(
@@ -86,9 +85,9 @@ class VersionCatalogUpdater(
     ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
         val existingPluginIdToAlias: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
+            catalogTextBefore?.let(contentUpdater::parseExistingPluginIdToAlias) ?: emptyMap()
         val existingPluginAliasToId: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
+            catalogTextBefore?.let(contentUpdater::parseExistingPluginAliasToId) ?: emptyMap()
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
         val pluginRequirements = mutableListOf<PluginRequirement>()
@@ -124,7 +123,7 @@ class VersionCatalogUpdater(
 
         val catalogTextBeforeLibraries = readCatalogFile(projectRootDir)
         val existingLibraryAliasToModule: Map<String, String> =
-            catalogTextBeforeLibraries?.let { contentUpdater.parseExistingLibraryAliasToModule(it) } ?: emptyMap()
+            catalogTextBeforeLibraries?.let(contentUpdater::parseExistingLibraryAliasToModule) ?: emptyMap()
 
         val existingLibraryModuleToAlias: Map<String, String> =
             existingLibraryAliasToModule.entries.associate { (alias, module) ->

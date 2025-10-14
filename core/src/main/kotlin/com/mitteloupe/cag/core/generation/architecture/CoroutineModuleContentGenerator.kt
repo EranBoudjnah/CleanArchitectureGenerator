@@ -2,7 +2,7 @@ package com.mitteloupe.cag.core.generation.architecture
 
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.content.architecture.buildCoroutineGradleScript
-import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.gradle.GradleFileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants
@@ -41,15 +41,14 @@ class CoroutineModuleContentGenerator(
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
         catalogUpdater.createOrUpdateVersionCatalog(
-            projectRootDir = projectRoot,
+            projectRootDirectory = projectRoot,
             dependencyConfiguration = dependencyConfiguration
         )
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = coroutineRoot,
-            layer = "",
-            content = buildCoroutineGradleScript(catalogUpdater)
-        )
+            layer = ""
+        ) { buildCoroutineGradleScript(catalogUpdater) }
         CoroutineModuleCreator().generateCoroutineContent(coroutineRoot, coroutinePackageName, packageSegments)
     }
 }
