@@ -9,7 +9,8 @@ class InstrumentationTestModuleCreator internal constructor() {
     fun generateInstrumentationTestContent(
         architectureRoot: File,
         architecturePackageName: String,
-        architecturePackageNameSegments: List<String>
+        architecturePackageNameSegments: List<String>,
+        enableHilt: Boolean
     ) {
         val codeRoot = File(architectureRoot, "src/main/java")
         val packageDirectory = buildPackageDirectory(codeRoot, architecturePackageNameSegments)
@@ -28,7 +29,9 @@ class InstrumentationTestModuleCreator internal constructor() {
         generateKeyValueStore(packageDirectory, architecturePackageName)
         generateWithBackgroundColorMatcher(packageDirectory, architecturePackageName)
         generateWithDrawableIdMatcher(packageDirectory, architecturePackageName)
-        generateHiltInjectorRule(packageDirectory, architecturePackageName)
+        if (enableHilt) {
+            generateHiltInjectorRule(packageDirectory, architecturePackageName)
+        }
         generateLocalStoreRule(packageDirectory, architecturePackageName)
         generateScreenshotFailureRule(packageDirectory, architecturePackageName)
         generateSdkAwareGrantPermissionRule(packageDirectory, architecturePackageName)

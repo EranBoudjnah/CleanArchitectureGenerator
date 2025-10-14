@@ -75,7 +75,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then throws GenerationException
         }
@@ -88,7 +95,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then throws GenerationException
         }
@@ -101,7 +115,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then throws GenerationException
         }
@@ -114,7 +135,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
@@ -134,7 +162,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
@@ -154,7 +189,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
@@ -174,7 +216,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
@@ -194,14 +243,22 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
                 instrumentationTestModuleCreator.generateInstrumentationTestContent(
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
-                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test")
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
+                    enableHilt = true
                 )
             }
         }
@@ -214,7 +271,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableCompose = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             verify {
@@ -249,7 +313,8 @@ class ArchitectureModulesContentGeneratorTest {
                 instrumentationTestModuleCreator.generateInstrumentationTestContent(
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
-                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test")
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
+                    enableHilt = true
                 )
             }
         }
@@ -264,7 +329,14 @@ class ArchitectureModulesContentGeneratorTest {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             verify {
@@ -299,7 +371,8 @@ class ArchitectureModulesContentGeneratorTest {
                 instrumentationTestModuleCreator.generateInstrumentationTestContent(
                     architectureRoot = File(architectureRoot, "instrumentation-test"),
                     architecturePackageName = "com.example.architecture",
-                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test")
+                    architecturePackageNameSegments = listOf("com", "example", "architecture", "test"),
+                    enableHilt = true
                 )
             }
         }
@@ -340,7 +413,14 @@ dependencies {
             val domainGradle = File(architectureRoot, "domain/build.gradle.kts")
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             assertEquals(expectedDomain, domainGradle.readText())
@@ -372,7 +452,14 @@ dependencies {
             val presentationGradle = File(architectureRoot, "presentation/build.gradle.kts")
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             assertEquals(expectedPresentation, presentationGradle.readText())
@@ -433,7 +520,14 @@ dependencies {
             val uiGradle = File(architectureRoot, "ui/build.gradle.kts")
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             assertEquals(expectedUi, uiGradle.readText())
@@ -466,7 +560,14 @@ dependencies {
             val presentationTestGradle = File(architectureRoot, "presentation-test/build.gradle.kts")
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             assertEquals(expectedPresentationTest, presentationTestGradle.readText())
@@ -543,7 +644,96 @@ dependencies {
             val instrumentationTestGradle = File(architectureRoot, "instrumentation-test/build.gradle.kts")
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = enableCompose,
+                enableHilt = true,
+                enableKtlint = false,
+                enableDetekt = false
+            )
+
+            // Then
+            assertEquals(expectedInstrumentationTest, instrumentationTestGradle.readText())
+        }
+
+        @Test
+        fun `Given no hilt when generate then writes instrumentation test gradle file without hilt`() {
+            // Given
+            val architectureRoot = File(temporaryDirectory, "architecture").apply { mkdirs() }
+            val architecturePackageName = "com.example.architecture"
+            val enableHilt = false
+            val expectedInstrumentationTest = """plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.example.test"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+}
+
+dependencies {
+    implementation(libs.material)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+
+    implementation(libs.test.junit)
+    implementation(libs.test.androidx.junit)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.test.compose.ui.junit4)
+    implementation(libs.test.android.uiautomator)
+    implementation(libs.test.androidx.espresso.core)
+    implementation(libs.okhttp3)
+    implementation(libs.test.android.mockwebserver)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.test.androidx.rules)
+    implementation(libs.androidx.recyclerview)
+    implementation(kotlin("reflect"))
+}
+"""
+            val instrumentationTestGradle = File(architectureRoot, "instrumentation-test/build.gradle.kts")
+
+            // When
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableCompose = false,
+                enableHilt = enableHilt,
+                enableKtlint = false,
+                enableDetekt = false
+            )
 
             // Then
             assertEquals(expectedInstrumentationTest, instrumentationTestGradle.readText())
@@ -1507,7 +1697,12 @@ interface CoroutineContextProvider {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val baseTestFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/test/BaseTest.kt")
@@ -1649,7 +1844,12 @@ abstract class BaseTest {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val clickChildViewFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/action/ClickChildView.kt")
@@ -1703,7 +1903,12 @@ class ClickChildView(private val matcher: Matcher<View>) : ViewAction {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val serverRequestResponseFile =
@@ -1725,7 +1930,12 @@ annotation class ServerRequestResponse(val requestResponseIds: Array<String>)
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val localStoreFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/annotation/LocalStore.kt")
@@ -1746,7 +1956,12 @@ annotation class LocalStore(val localStoreDataIds: Array<String>)
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val itemAtPositionMatcherFile =
@@ -1783,7 +1998,12 @@ fun matchesItemAtPosition(matcher: Matcher<View?>?, position: Int) =
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val assetReaderFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/asset/AssetReader.kt")
@@ -1813,7 +2033,12 @@ fun <OUTPUT> processAssetStream(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val appNotRespondingHandlerFile =
@@ -1880,7 +2105,12 @@ private fun UiDevice.closeAnrWithWait(appNotRespondingDialog: UiObject) {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val doesNotFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/test/DoesNot.kt")
@@ -1908,7 +2138,12 @@ fun doesNot(description: String, block: () -> Unit) {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val retryFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/test/Retry.kt")
@@ -1942,7 +2177,12 @@ fun retry(waitMilliseconds: Long = 200L, repeat: Int = 5, block: () -> Unit) {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val composeOkHttp3IdlingResourceFile =
@@ -1978,7 +2218,12 @@ class ComposeOkHttp3IdlingResource private constructor(dispatcher: Dispatcher) :
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val espressoOkHttp3IdlingResourceFile =
@@ -2034,7 +2279,12 @@ class EspressoOkHttp3IdlingResource private constructor(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val appLauncherFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/launcher/AppLauncher.kt")
@@ -2056,7 +2306,12 @@ fun interface AppLauncher {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val fromComposableFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/launcher/FromComposable.kt")
@@ -2094,7 +2349,12 @@ fun <ACTIVITY : ComponentActivity> fromComposable(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val keyValueStoreFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/localstore/KeyValueStore.kt")
@@ -2131,7 +2391,12 @@ abstract class KeyValueStore {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val withBackgroundColorMatcherFile =
@@ -2191,7 +2456,12 @@ class WithBackgroundColorMatcher(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val withDrawableIdMatcherFile =
@@ -2316,7 +2586,12 @@ class WithDrawableIdMatcher(@param:DrawableRes private val expectedId: Int) :
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val hiltInjectorRuleFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/rule/HiltInjectorRule.kt")
@@ -2349,7 +2624,12 @@ class HiltInjectorRule(private val hiltAndroidRule: HiltAndroidRule) : TestRule 
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val mockRequestFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/MockRequest.kt")
@@ -2369,7 +2649,12 @@ data class MockRequest(val url: String)
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val mockResponseFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/MockResponse.kt")
@@ -2394,7 +2679,12 @@ data class MockResponse(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val mockRequestResponseFactoryFile =
@@ -2424,7 +2714,12 @@ data class MockRequestResponseFactory(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val mockResponseFactoryFile =
@@ -2449,7 +2744,12 @@ interface MockResponseFactory {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val errorResponseFactoryFile =
@@ -2476,7 +2776,12 @@ sealed class ErrorResponseFactory {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val simpleResponseFactoryFile =
@@ -2514,7 +2819,12 @@ data class SimpleResponseFactory(
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val sequenceResponseFactoryFile =
@@ -2548,7 +2858,12 @@ class SequenceResponseFactory(private vararg val responses: MockResponseFactory)
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val responseBinderFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/ResponseBinder.kt")
@@ -2578,7 +2893,12 @@ interface ResponseBinder {
             val packageSegments = listOf("com", "example", "architecture", "test")
 
             // When
-            classUnderTest.generateInstrumentationTestContent(instrumentationTestRoot, architecturePackageName, packageSegments)
+            classUnderTest.generateInstrumentationTestContent(
+                architectureRoot = instrumentationTestRoot,
+                architecturePackageName = architecturePackageName,
+                architecturePackageNameSegments = packageSegments,
+                enableHilt = true
+            )
 
             // Then
             val responseStoreFile = File(instrumentationTestRoot, "src/main/java/com/example/architecture/test/server/ResponseStore.kt")
@@ -2634,7 +2954,14 @@ abstract class ResponseStore {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
@@ -2672,7 +2999,14 @@ dependencies {
             val enableDetekt = false
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
@@ -2699,7 +3033,14 @@ dependencies {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "presentation/build.gradle.kts")
@@ -2744,7 +3085,14 @@ dependencies {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "ui/build.gradle.kts")
@@ -2816,7 +3164,14 @@ dependencies {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "presentation-test/build.gradle.kts")
@@ -2862,7 +3217,14 @@ dependencies {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "instrumentation-test/build.gradle.kts")
@@ -2951,7 +3313,14 @@ dependencies {
             val enableDetekt = false
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")
@@ -2984,7 +3353,14 @@ dependencies {
             val enableDetekt = true
 
             // When
-            classUnderTest.generate(architectureRoot, architecturePackageName, enableCompose, enableKtlint, enableDetekt)
+            classUnderTest.generate(
+                architectureRoot = architectureRoot,
+                architecturePackageName = architecturePackageName,
+                enableHilt = true,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt
+            )
 
             // Then
             val buildGradleFile = File(architectureRoot, "domain/build.gradle.kts")

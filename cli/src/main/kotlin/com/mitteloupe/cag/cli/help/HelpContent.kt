@@ -1,4 +1,4 @@
-package com.mitteloupe.cag.cli
+package com.mitteloupe.cag.cli.help
 
 object HelpContent {
     private const val NEW_PROJECT_SYNTAX =

@@ -8,6 +8,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitectureInstrumentationTestGradleScript(
     architecturePackageName: String,
+    enableHilt: Boolean,
     catalog: VersionCatalogReader
 ): String {
     val aliasAndroidLibrary = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY).asAccessor
@@ -23,7 +24,6 @@ fun buildArchitectureInstrumentationTestGradleScript(
     val aliasTestAndroidxJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_JUNIT).asAccessor
     val aliasTestAndroidxEspressoCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROIDX_ESPRESSO_CORE).asAccessor
     val aliasTestComposeUiJunit4 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_COMPOSE_UI_JUNIT4).asAccessor
-    val aliasTestAndroidHilt = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_HILT).asAccessor
     val aliasTestAndroidUiAutomator = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_UI_AUTOMATOR).asAccessor
     val aliasOkhttp3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.OKHTTP3).asAccessor
     val aliasTestAndroidMockWebServer = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_MOCKWEBSERVER).asAccessor
@@ -39,6 +39,14 @@ fun buildArchitectureInstrumentationTestGradleScript(
     val detektConfiguration = gradleFileExtender.buildDetektConfiguration(catalog)
 
     val configurations = "$ktlintConfiguration$detektConfiguration".trimIndent()
+    val hiltDependency =
+        if (enableHilt) {
+            val aliasTestAndroidHilt = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_ANDROID_HILT).asAccessor
+            """
+    implementation(libs.$aliasTestAndroidHilt)"""
+        } else {
+            ""
+        }
     return """plugins {
     alias(libs.plugins.$aliasAndroidLibrary)
     alias(libs.plugins.$aliasKotlinAndroid)$composePluginLine$ktlintPluginLine$detektPluginLine
@@ -93,8 +101,7 @@ dependencies {
     implementation(libs.$aliasTestJunit)
     implementation(libs.$aliasTestAndroidxJunit)
     implementation(libs.$aliasTestAndroidxEspressoCore)
-    implementation(libs.$aliasTestComposeUiJunit4)
-    implementation(libs.$aliasTestAndroidHilt)
+    implementation(libs.$aliasTestComposeUiJunit4)$hiltDependency
     implementation(libs.$aliasTestAndroidUiAutomator)
     implementation(libs.$aliasTestAndroidxEspressoCore)
     implementation(libs.$aliasOkhttp3)

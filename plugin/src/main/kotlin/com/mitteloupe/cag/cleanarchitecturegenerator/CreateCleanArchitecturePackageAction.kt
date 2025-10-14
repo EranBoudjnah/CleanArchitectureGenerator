@@ -35,6 +35,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
                     destinationRootDirectory = projectRootDir,
                     architecturePackageName = architecturePackageName,
                     enableCompose = dialog.isComposeEnabled(),
+                    enableHilt = true,
                     enableKtlint = dialog.isKtlintEnabled(),
                     enableDetekt = dialog.isDetektEnabled()
                 )

@@ -126,6 +126,7 @@ class AppArgumentProcessor(
             .parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewArchitecturePrimary)
             .map { secondaries ->
                 ArchitectureRequest(
+                    enableHilt = true,
                     enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                     enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                     enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),
@@ -141,6 +142,7 @@ class AppArgumentProcessor(
             ProjectTemplateRequest(
                 projectName = secondaries[SecondaryFlagConstants.NAME].orEmpty(),
                 packageName = secondaries[SecondaryFlagConstants.PACKAGE].orEmpty(),
+                enableHilt = true,
                 enableCompose = !secondaries.containsKey(SecondaryFlagConstants.NO_COMPOSE),
                 enableKtlint = secondaries.containsKey(SecondaryFlagConstants.KTLINT),
                 enableDetekt = secondaries.containsKey(SecondaryFlagConstants.DETEKT),

@@ -750,11 +750,13 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MyApp",
                     packageName = "com.example",
+                    enableHilt = true,
                     enableCompose = true,
                     enableKtlint = true,
                     enableDetekt = true,
                     enableKtor = true,
-                    enableRetrofit = true
+                    enableRetrofit = true,
+                    enableGit = false
                 )
 
             // When
@@ -772,11 +774,13 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "TestApp",
                     packageName = "com.test",
+                    enableHilt = true,
                     enableCompose = false,
                     enableKtlint = true,
                     enableDetekt = true,
                     enableKtor = true,
-                    enableRetrofit = true
+                    enableRetrofit = true,
+                    enableGit = false
                 )
 
             // When
@@ -794,11 +798,13 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MinimalApp",
                     packageName = "",
+                    enableHilt = true,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
                     enableKtor = false,
-                    enableRetrofit = false
+                    enableRetrofit = false,
+                    enableGit = false
                 )
 
             // When
@@ -816,11 +822,13 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "NoComposeApp",
                     packageName = "",
+                    enableHilt = true,
                     enableCompose = false,
                     enableKtlint = false,
                     enableDetekt = false,
                     enableKtor = false,
-                    enableRetrofit = false
+                    enableRetrofit = false,
+                    enableGit = false
                 )
 
             // When
@@ -838,21 +846,25 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "First",
                     packageName = "com.first",
+                    enableHilt = true,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
                     enableKtor = false,
-                    enableRetrofit = false
+                    enableRetrofit = false,
+                    enableGit = false
                 )
             val expectedRequest2 =
                 ProjectTemplateRequest(
                     projectName = "Second",
                     packageName = "",
+                    enableHilt = true,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
                     enableKtor = false,
-                    enableRetrofit = false
+                    enableRetrofit = false,
+                    enableGit = false
                 )
 
             // When
@@ -968,6 +980,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "GitApp",
                     packageName = "",
+                    enableHilt = true,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,

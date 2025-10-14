@@ -8,6 +8,7 @@ data class GenerateProjectTemplateRequest(
     val packageName: String,
     val overrideMinimumAndroidSdk: Int?,
     val overrideAndroidGradlePluginVersion: String?,
+    val enableHilt: Boolean,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,
