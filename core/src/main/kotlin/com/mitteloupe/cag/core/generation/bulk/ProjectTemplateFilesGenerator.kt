@@ -74,7 +74,9 @@ class ProjectTemplateFilesGenerator(
         }
 
         val libraries =
-            LibraryConstants.CORE_ANDROID_LIBRARIES + LibraryConstants.TESTING_LIBRARIES +
+            LibraryConstants.CORE_ANDROID_LIBRARIES +
+                LibraryConstants.HILT_LIBRARIES +
+                LibraryConstants.TESTING_LIBRARIES +
                 if (enableCompose) {
                     LibraryConstants.COMPOSE_LIBRARIES
                 } else {

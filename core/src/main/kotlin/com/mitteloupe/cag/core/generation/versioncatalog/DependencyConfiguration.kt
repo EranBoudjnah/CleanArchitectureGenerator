@@ -419,10 +419,11 @@ object LibraryConstants {
                 ANDROIDX_APPCOMPAT,
                 KOTLINX_COROUTINES_CORE,
                 MATERIAL,
-                OKHTTP3,
-                HILT_ANDROID,
-                HILT_ANDROID_COMPILER
+                OKHTTP3
             )
+
+    val HILT_LIBRARIES: List<LibraryRequirement>
+        get() = listOf(HILT_ANDROID, HILT_ANDROID_COMPILER)
 
     val VIEW_LIBRARIES: List<LibraryRequirement>
         get() =
@@ -483,7 +484,7 @@ object LibraryConstants {
             )
 
     val ALL_LIBRARIES =
-        CORE_ANDROID_LIBRARIES + VIEW_LIBRARIES + COMPOSE_LIBRARIES + TESTING_LIBRARIES + COMPOSE_TESTING_LIBRARIES +
+        CORE_ANDROID_LIBRARIES + HILT_LIBRARIES + VIEW_LIBRARIES + COMPOSE_LIBRARIES + TESTING_LIBRARIES + COMPOSE_TESTING_LIBRARIES +
             NETWORK_LIBRARIES + TEST_MOCKITO_LIBRARIES + TEST_KOTLINX_COROUTINES
 }
 
