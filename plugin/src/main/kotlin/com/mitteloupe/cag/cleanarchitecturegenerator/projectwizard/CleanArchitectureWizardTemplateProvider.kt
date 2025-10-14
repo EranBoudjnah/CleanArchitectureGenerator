@@ -1,9 +1,9 @@
 package com.mitteloupe.cag.cleanarchitecturegenerator.projectwizard
 
 import com.android.tools.idea.templates.recipe.FindReferencesRecipeExecutor
-import com.android.tools.idea.wizard.template.BooleanParameter
 import com.android.tools.idea.wizard.template.Category
 import com.android.tools.idea.wizard.template.CheckBoxWidget
+import com.android.tools.idea.wizard.template.EnumWidget
 import com.android.tools.idea.wizard.template.FormFactor
 import com.android.tools.idea.wizard.template.ModuleTemplateData
 import com.android.tools.idea.wizard.template.RecipeExecutor
@@ -13,6 +13,7 @@ import com.android.tools.idea.wizard.template.TemplateData
 import com.android.tools.idea.wizard.template.WizardTemplateProvider
 import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
+import com.android.tools.idea.wizard.template.enumParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
 import com.android.tools.idea.wizard.template.template
 import com.intellij.openapi.application.ApplicationInfo
@@ -25,6 +26,7 @@ import com.mitteloupe.cag.core.option.DependencyInjection
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
 import com.mitteloupe.cag.git.Git
 import java.io.File
+import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection as WizardDependencyInjection
 
 private val MEERKAT_PREFIX = "^(?:.* )?2024\\.3\\..*$".toRegex()
 
@@ -44,6 +46,13 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             minApi = MIN_API
             constraints = listOf(TemplateConstraint.AndroidX, TemplateConstraint.Kotlin)
             screens = listOf(WizardUiContext.NewProject, WizardUiContext.NewProjectExtraDetail)
+
+            val dependencyInjectionOption =
+                enumParameter<WizardDependencyInjection> {
+                    name = "Dependency Injection"
+                    default = WizardDependencyInjection.Hilt
+                    help = "Select the dependency injection library to use in the generated project"
+                }
 
             val enableKtlint =
                 booleanParameter {
@@ -88,6 +97,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                 }
 
             widgets(
+                EnumWidget(dependencyInjectionOption),
                 CheckBoxWidget(enableKtlint),
                 CheckBoxWidget(enableDetekt),
                 CheckBoxWidget(enableCompose),
@@ -107,14 +117,15 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                     try {
                         val projectRootDirectory = moduleData.rootDir.parentFile
                         createProject(
-                            projectRootDirectory,
-                            moduleData,
-                            enableCompose,
-                            enableKtlint,
-                            enableDetekt,
-                            enableKtor,
-                            enableRetrofit,
-                            initializeGitRepository
+                            projectRootDirectory = projectRootDirectory,
+                            data = moduleData,
+                            dependencyInjection = dependencyInjectionOption.value.coreValue,
+                            enableCompose = enableCompose.value,
+                            enableKtlint = enableKtlint.value,
+                            enableDetekt = enableDetekt.value,
+                            enableKtor = enableKtor.value,
+                            enableRetrofit = enableRetrofit.value,
+                            initializeGitRepository = initializeGitRepository.value
                         )
                         ideBridge.refreshIde(projectRootDirectory)
                     } catch (exception: GenerationException) {
@@ -133,12 +144,13 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private fun RecipeExecutor.createProject(
         projectRootDirectory: File,
         data: ModuleTemplateData,
-        enableCompose: BooleanParameter,
-        enableKtlint: BooleanParameter,
-        enableDetekt: BooleanParameter,
-        enableKtor: BooleanParameter,
-        enableRetrofit: BooleanParameter,
-        initializeGitRepository: BooleanParameter
+        dependencyInjection: DependencyInjection,
+        enableCompose: Boolean,
+        enableKtlint: Boolean,
+        enableDetekt: Boolean,
+        enableKtor: Boolean,
+        enableRetrofit: Boolean,
+        initializeGitRepository: Boolean
     ) {
         val selectedMinSdk: Int? =
             try {
@@ -165,17 +177,17 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                 packageName = data.packageName,
                 overrideMinimumAndroidSdk = selectedMinSdk,
                 overrideAndroidGradlePluginVersion = overrideAndroidGradlePluginVersion,
-                dependencyInjection = DependencyInjection.Hilt,
-                enableCompose = enableCompose.value,
-                enableKtlint = enableKtlint.value,
-                enableDetekt = enableDetekt.value,
-                enableKtor = enableKtor.value,
-                enableRetrofit = enableRetrofit.value
+                dependencyInjection = dependencyInjection,
+                enableCompose = enableCompose,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt,
+                enableKtor = enableKtor,
+                enableRetrofit = enableRetrofit
             )
 
         generatorProvider.prepare(project = null).generate().generateProjectTemplate(request)
 
-        val initializeGitRepository = initializeGitRepository.value
+        val initializeGitRepository = initializeGitRepository
         if (initializeGitRepository) {
             git.initializeRepository(projectRootDirectory)
         }

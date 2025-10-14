@@ -116,7 +116,9 @@ fun main(arguments: Array<String>) {
         val architecturePackageName = basePackage?.let { "$it.architecture" } ?: "com.unknown.app.architecture"
         val architectureRequest =
             GenerateArchitectureRequest(
+                projectNamespace = projectNamespace,
                 destinationRootDirectory = destinationRootDirectory,
+                appModuleDirectory = request.appModuleDirectory,
                 architecturePackageName = architecturePackageName,
                 dependencyInjection = request.dependencyInjection,
                 enableCompose = request.enableCompose,

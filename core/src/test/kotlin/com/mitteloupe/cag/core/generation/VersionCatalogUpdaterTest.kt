@@ -132,7 +132,7 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.createOrReplaceVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrReplaceVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
         val actualCatalog = File(projectRoot, "gradle/libs.versions.toml").readText()
 
         // Then
@@ -161,7 +161,7 @@ class VersionCatalogUpdaterTest {
             """.trimIndent()
 
         // When
-        classUnderTest.createOrReplaceVersionCatalog(projectRootDir = projectRoot, dependencyConfiguration = dependencyConfiguration)
+        classUnderTest.createOrReplaceVersionCatalog(projectRootDirectory = projectRoot, dependencyConfiguration = dependencyConfiguration)
         val actualCatalog = File(projectRoot, "gradle/libs.versions.toml").readText()
 
         // Then

@@ -64,7 +64,8 @@ class GeneratorFactory(
                 architectureModulesContentGenerator,
                 settingsFileUpdater,
                 buildSrcContentCreator,
-                configurationFileCreator
+                configurationFileCreator,
+                appModuleContentGenerator
             )
         val featureFilesGenerator =
             FeatureFilesGenerator(

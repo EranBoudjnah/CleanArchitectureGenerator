@@ -9,6 +9,7 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.OnChangeDocumentListener
 import com.mitteloupe.cag.cleanarchitecturegenerator.form.PredicateDocumentFilter
+import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
 import java.io.File
 import javax.swing.JComponent
 import javax.swing.text.AbstractDocument
@@ -43,6 +44,10 @@ class CreateCleanArchitectureFeatureDialog(
                     null
                 }
             }
+
+    val dependencyInjection: DependencyInjection = DependencyInjection.None
+
+    val enableCompose: Boolean = true
 
     private var enableKtlintInternal: Boolean = false
     val enableKtlint: Boolean

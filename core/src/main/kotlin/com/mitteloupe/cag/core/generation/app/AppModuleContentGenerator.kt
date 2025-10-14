@@ -3,8 +3,9 @@ package com.mitteloupe.cag.core.generation.app
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.DirectoryFinder
 import com.mitteloupe.cag.core.content.buildAndroidManifest
-import com.mitteloupe.cag.core.content.buildAppFeatureModuleKotlinFile
+import com.mitteloupe.cag.core.content.buildAppFeatureDependencyInjectionModuleKotlinFile
 import com.mitteloupe.cag.core.content.buildApplicationKotlinFile
+import com.mitteloupe.cag.core.content.buildArchitectureDependencyInjectionModuleKotlinFile
 import com.mitteloupe.cag.core.content.buildBackupRulesXml
 import com.mitteloupe.cag.core.content.buildColorsKt
 import com.mitteloupe.cag.core.content.buildDataExtractionRulesXml
@@ -26,13 +27,50 @@ class AppModuleContentGenerator(
     private val fileCreator: FileCreator,
     private val directoryFinder: DirectoryFinder
 ) {
-    fun writeFeatureModuleIfPossible(
+    fun writeArchitectureDependencyInjectionModuleIfPossible(
+        startDirectory: File,
+        projectNamespace: String,
+        appModuleDirectory: File?,
+        dependencyInjection: DependencyInjection
+    ) {
+        if (dependencyInjection is DependencyInjection.None) {
+            return
+        }
+
+        val rootDirectory =
+            appModuleDirectory ?: run {
+                val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
+                val appModuleDirectories =
+                    AppModuleDirectoryFinder(directoryFinder).findAndroidAppModuleDirectories(projectRoot)
+                if (appModuleDirectories.isEmpty()) {
+                    return
+                } else {
+                    appModuleDirectories.first()
+                }
+            }
+        val sourceRoot = File(rootDirectory, "src/main/java")
+        val basePackageDirectory = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
+        val dependencyInjectionDirectory = createDirectoryIfNotExists(basePackageDirectory, "di")
+        createFileIfNotExists(dependencyInjectionDirectory, "ArchitectureModule.kt") {
+            buildArchitectureDependencyInjectionModuleKotlinFile(
+                projectNamespace = projectNamespace,
+                dependencyInjection = dependencyInjection
+            )
+        }
+    }
+
+    fun writeFeatureDependencyInjectionModuleIfPossible(
         startDirectory: File,
         projectNamespace: String,
         featureName: String,
         featurePackageName: String,
-        appModuleDirectory: File?
+        appModuleDirectory: File?,
+        dependencyInjection: DependencyInjection
     ) {
+        if (dependencyInjection is DependencyInjection.None) {
+            return
+        }
+
         val rootDirectory =
             appModuleDirectory ?: run {
                 val projectRoot = findGradleProjectRoot(startDirectory, directoryFinder) ?: startDirectory
@@ -48,7 +86,12 @@ class AppModuleContentGenerator(
         val basePackageDirectory = buildPackageDirectory(sourceRoot, projectNamespace.toSegments())
         val dependencyInjectionDirectory = createDirectoryIfNotExists(basePackageDirectory, "di")
         createFileIfNotExists(dependencyInjectionDirectory, "${featureName.capitalized}Module.kt") {
-            buildAppFeatureModuleKotlinFile(projectNamespace, featurePackageName, featureName)
+            buildAppFeatureDependencyInjectionModuleKotlinFile(
+                projectNamespace = projectNamespace,
+                featurePackageName = featurePackageName,
+                featureName = featureName,
+                dependencyInjection = dependencyInjection
+            )
         }
     }
 

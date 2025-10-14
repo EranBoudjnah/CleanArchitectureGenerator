@@ -37,7 +37,8 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
                     projectNamespace = defaultNamespace ?: "com.unknown.app",
                     featureName = featureName
                 ).featurePackageName(featurePackageName)
-                    .enableCompose(true)
+                    .setDependencyInjection(dialog.dependencyInjection.coreValue)
+                    .enableCompose(dialog.enableCompose)
                     .appModuleDirectory(selectedAppModule)
                     .enableKtlint(enableKtlint)
                     .enableDetekt(enableDetekt)

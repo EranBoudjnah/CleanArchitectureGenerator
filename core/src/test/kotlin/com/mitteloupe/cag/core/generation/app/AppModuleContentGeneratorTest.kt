@@ -166,6 +166,7 @@ package com.happycorp.happinesstracker
 
 import android.app.Application
 import com.happycorp.happinesstracker.di.architectureModule
+import com.happycorp.happinesstracker.di.sampleFeatureModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
@@ -176,7 +177,7 @@ class HappinessTrackerApplication : Application() {
     private fun initKoin(config : KoinAppDeclaration? = null){
         startKoin {
             includes(config)
-            modules(architectureModule)
+            modules(architectureModule, sampleFeatureModule)
         }
     }
 

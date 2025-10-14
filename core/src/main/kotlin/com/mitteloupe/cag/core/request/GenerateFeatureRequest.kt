@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.core.request
 
+import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
 data class GenerateFeatureRequest(
@@ -7,6 +8,7 @@ data class GenerateFeatureRequest(
     val featurePackageName: String?,
     val projectNamespace: String,
     val destinationRootDirectory: File,
+    val dependencyInjection: DependencyInjection,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,
@@ -19,6 +21,7 @@ class GenerateFeatureRequestBuilder(
     private val featureName: String
 ) {
     private var featurePackageName: String? = null
+    private var dependencyInjection: DependencyInjection = DependencyInjection.None
     private var enableCompose: Boolean = false
     private var appModuleDirectory: File? = null
     private var enableKtlint: Boolean = false
@@ -27,6 +30,11 @@ class GenerateFeatureRequestBuilder(
     fun featurePackageName(featurePackageName: String?) =
         apply {
             this.featurePackageName = featurePackageName
+        }
+
+    fun setDependencyInjection(dependencyInjection: DependencyInjection) =
+        apply {
+            this.dependencyInjection = dependencyInjection
         }
 
     fun enableCompose(enable: Boolean) =
@@ -55,6 +63,7 @@ class GenerateFeatureRequestBuilder(
             featurePackageName = featurePackageName,
             projectNamespace = projectNamespace,
             destinationRootDirectory = destinationRootDir,
+            dependencyInjection = dependencyInjection,
             enableCompose = enableCompose,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt,

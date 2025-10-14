@@ -4,6 +4,7 @@ import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.generation.BuildSrcContentCreator
 import com.mitteloupe.cag.core.generation.ConfigurationFileCreator
 import com.mitteloupe.cag.core.generation.SettingsFileUpdater
+import com.mitteloupe.cag.core.generation.app.AppModuleContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.ArchitectureModulesContentGenerator
 import com.mitteloupe.cag.core.generation.architecture.CoroutineModuleContentGenerator
 import com.mitteloupe.cag.core.kotlinpackage.toSegments
@@ -15,10 +16,13 @@ class ArchitectureFilesGenerator(
     private val architectureModulesContentGenerator: ArchitectureModulesContentGenerator,
     private val settingsFileUpdater: SettingsFileUpdater,
     private val buildSrcContentCreator: BuildSrcContentCreator,
-    private val configurationFileCreator: ConfigurationFileCreator
+    private val configurationFileCreator: ConfigurationFileCreator,
+    private val appModuleContentGenerator: AppModuleContentGenerator
 ) {
     fun generateArchitecture(
+        projectNamespace: String,
         destinationRootDirectory: File,
+        appModuleDirectory: File?,
         architecturePackageName: String,
         dependencyInjection: DependencyInjection,
         enableCompose: Boolean,
@@ -79,5 +83,12 @@ class ArchitectureFilesGenerator(
         if (enableKtlint) {
             configurationFileCreator.writeEditorConfigFile(destinationRootDirectory)
         }
+
+        appModuleContentGenerator.writeArchitectureDependencyInjectionModuleIfPossible(
+            startDirectory = destinationRootDirectory,
+            projectNamespace = projectNamespace,
+            appModuleDirectory = appModuleDirectory,
+            dependencyInjection = dependencyInjection
+        )
     }
 }
