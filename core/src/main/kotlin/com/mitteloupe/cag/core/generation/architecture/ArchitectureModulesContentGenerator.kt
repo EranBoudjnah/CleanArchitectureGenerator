@@ -55,6 +55,7 @@ class ArchitectureModulesContentGenerator(
 
         val libraries =
             LibraryConstants.CORE_ANDROID_LIBRARIES +
+                LibraryConstants.HILT_LIBRARIES +
                 LibraryConstants.TESTING_LIBRARIES +
                 LibraryConstants.TEST_KOTLINX_COROUTINES +
                 LibraryConstants.NETWORK_LIBRARIES +
