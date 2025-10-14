@@ -1,6 +1,6 @@
 package com.mitteloupe.cag.core.content
 
-import com.mitteloupe.cag.core.generation.optimizeImports
+import com.mitteloupe.cag.core.generation.format.optimizeImports
 
 fun buildPresentationViewModelKotlinFile(
     projectNamespace: String,

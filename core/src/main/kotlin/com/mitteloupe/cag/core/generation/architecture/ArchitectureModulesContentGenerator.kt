@@ -6,7 +6,7 @@ import com.mitteloupe.cag.core.content.architecture.buildArchitectureInstrumenta
 import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentationGradleScript
 import com.mitteloupe.cag.core.content.architecture.buildArchitecturePresentationTestGradleScript
 import com.mitteloupe.cag.core.content.architecture.buildArchitectureUiGradleScript
-import com.mitteloupe.cag.core.generation.GradleFileCreator
+import com.mitteloupe.cag.core.generation.gradle.GradleFileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.DependencyConfiguration
 import com.mitteloupe.cag.core.generation.versioncatalog.LibraryConstants
 import com.mitteloupe.cag.core.generation.versioncatalog.PluginConstants

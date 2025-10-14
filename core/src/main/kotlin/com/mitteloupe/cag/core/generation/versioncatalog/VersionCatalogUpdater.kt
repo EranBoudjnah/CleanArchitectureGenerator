@@ -1,7 +1,6 @@
 package com.mitteloupe.cag.core.generation.versioncatalog
 
 import com.mitteloupe.cag.core.GenerationException
-import com.mitteloupe.cag.core.generation.CatalogInsertPosition
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.LibraryRequirement
 import com.mitteloupe.cag.core.generation.versioncatalog.SectionEntryRequirement.PluginRequirement

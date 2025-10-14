@@ -1,7 +1,7 @@
 package com.mitteloupe.cag.core.generation.architecture
 
+import com.mitteloupe.cag.core.generation.format.optimizeImports
 import com.mitteloupe.cag.core.generation.generateFileIfMissing
-import com.mitteloupe.cag.core.generation.optimizeImports
 import com.mitteloupe.cag.core.kotlinpackage.buildPackageDirectory
 import java.io.File
 
