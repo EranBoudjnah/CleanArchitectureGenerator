@@ -51,20 +51,19 @@ class DataSourceModulesGenerator(
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
-            layer = "source",
-            content = buildDataSourceSourceGradleScript(catalogUpdater)
-        )
+            layer = "source"
+        ) { buildDataSourceSourceGradleScript(catalogUpdater) }
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = datasourceRoot,
-            layer = "implementation",
-            content =
-                buildDataSourceImplementationGradleScript(
-                    catalog = catalogUpdater,
-                    useKtor = useKtor,
-                    useRetrofit = useRetrofit
-                )
-        )
+            layer = "implementation"
+        ) {
+            buildDataSourceImplementationGradleScript(
+                catalog = catalogUpdater,
+                useKtor = useKtor,
+                useRetrofit = useRetrofit
+            )
+        }
 
         settingsFileUpdater.updateDataSourceSettingsIfPresent(destinationRootDirectory)
     }

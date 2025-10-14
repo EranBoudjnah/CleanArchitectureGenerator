@@ -43,11 +43,7 @@ class GradleFileCreatorTest {
         val givenContent = "plugins { kotlin(\"jvm\") }\n"
 
         // When
-        classUnderTest.writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = givenLayer,
-            content = givenContent
-        )
+        classUnderTest.writeGradleFileIfMissing(featureRoot = featureRoot, layer = givenLayer) { givenContent }
 
         // Then
         val targetFile = File(moduleDirectory, "build.gradle.kts")
@@ -62,11 +58,7 @@ class GradleFileCreatorTest {
         val givenContent = "// gradle script\n"
 
         // When
-        classUnderTest.writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = givenLayer,
-            content = givenContent
-        )
+        classUnderTest.writeGradleFileIfMissing(featureRoot = featureRoot, layer = givenLayer) { givenContent }
 
         // Then throws GenerationException
     }
@@ -84,11 +76,7 @@ class GradleFileCreatorTest {
         val newContent = "// new content that should be ignored\n"
 
         // When
-        classUnderTest.writeGradleFileIfMissing(
-            featureRoot = featureRoot,
-            layer = givenLayer,
-            content = newContent
-        )
+        classUnderTest.writeGradleFileIfMissing(featureRoot = featureRoot, layer = givenLayer) { newContent }
 
         // Then
         assertEquals(initialContent, targetFile.readText())

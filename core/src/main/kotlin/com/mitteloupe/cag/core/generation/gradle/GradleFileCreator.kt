@@ -12,11 +12,11 @@ class GradleFileCreator(
     fun writeGradleFileIfMissing(
         featureRoot: File,
         layer: String,
-        content: String
+        content: () -> String
     ) {
         val moduleDirectory = File(featureRoot, layer)
         val buildGradleFile = File(moduleDirectory, "build.gradle.kts")
-        fileCreator.createFileIfNotExists(buildGradleFile) { content }
+        fileCreator.createFileIfNotExists(buildGradleFile, content)
     }
 
     fun writeProjectGradleFile(

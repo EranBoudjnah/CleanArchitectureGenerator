@@ -95,29 +95,27 @@ class ArchitectureModulesContentGenerator(
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
-            layer = "domain",
-            content = buildArchitectureDomainGradleScript(catalogUpdater)
-        )
+            layer = "domain"
+        ) { buildArchitectureDomainGradleScript(catalogUpdater) }
+
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
-            layer = "presentation",
-            content = buildArchitecturePresentationGradleScript(catalogUpdater)
-        )
+            layer = "presentation"
+        ) { buildArchitecturePresentationGradleScript(catalogUpdater) }
+
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
-            layer = "ui",
-            content = buildArchitectureUiGradleScript(architecturePackageName, catalogUpdater)
-        )
+            layer = "ui"
+        ) { buildArchitectureUiGradleScript(architecturePackageName, catalogUpdater) }
+
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
-            layer = "presentation-test",
-            content = buildArchitecturePresentationTestGradleScript(catalogUpdater)
-        )
+            layer = "presentation-test"
+        ) { buildArchitecturePresentationTestGradleScript(catalogUpdater) }
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
-            layer = "instrumentation-test",
-            content = buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater)
-        )
+            layer = "instrumentation-test"
+        ) { buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater) }
 
         val domainRoot = File(architectureRoot, "domain")
         domainModuleCreator.generateDomainContent(

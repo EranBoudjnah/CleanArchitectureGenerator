@@ -47,9 +47,8 @@ class CoroutineModuleContentGenerator(
 
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = coroutineRoot,
-            layer = "",
-            content = buildCoroutineGradleScript(catalogUpdater)
-        )
+            layer = ""
+        ) { buildCoroutineGradleScript(catalogUpdater) }
         CoroutineModuleCreator().generateCoroutineContent(coroutineRoot, coroutinePackageName, packageSegments)
     }
 }

@@ -103,10 +103,7 @@ class AppModuleContentGenerator(
 
             val uiDirectory = createDirectoryIfNotExists(appModuleDirectory, "src/main/java/${packageName.replace('.', '/')}/ui/theme")
             createFileIfNotExists(uiDirectory, "Theme.kt") {
-                buildThemeKt(
-                    appName = sanitizedAppName,
-                    packageName = packageName
-                )
+                buildThemeKt(appName = sanitizedAppName, packageName = packageName)
             }
 
             createFileIfNotExists(uiDirectory, "Color.kt") { buildColorsKt(packageName) }

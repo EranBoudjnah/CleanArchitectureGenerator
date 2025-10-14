@@ -19,9 +19,9 @@ class ArchitectureFilesGenerator(
     fun generateArchitecture(
         destinationRootDirectory: File,
         architecturePackageName: String,
-        enableCompose: Boolean = true,
-        enableKtlint: Boolean = false,
-        enableDetekt: Boolean = false
+        enableCompose: Boolean,
+        enableKtlint: Boolean,
+        enableDetekt: Boolean
     ) {
         val architecturePackageName = architecturePackageName.trim()
         if (architecturePackageName.isEmpty()) {

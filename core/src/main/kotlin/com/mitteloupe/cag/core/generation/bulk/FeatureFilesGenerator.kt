@@ -111,9 +111,8 @@ class FeatureFilesGenerator(
         if (allCreated) {
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
-                layer = "domain",
-                content = buildDomainGradleScript(catalogUpdater)
-            )
+                layer = "domain"
+            ) { buildDomainGradleScript(catalogUpdater) }
             domainLayerContentGenerator
                 .generateDomainLayer(
                     featureRoot = featureRoot,
@@ -122,9 +121,8 @@ class FeatureFilesGenerator(
                 )
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
-                layer = "presentation",
-                content = buildPresentationGradleScript(featureNameLowerCase, catalogUpdater)
-            )
+                layer = "presentation"
+            ) { buildPresentationGradleScript(featureNameLowerCase, catalogUpdater) }
             presentationLayerContentGenerator
                 .generatePresentationLayer(
                     featureRoot = featureRoot,
@@ -134,9 +132,8 @@ class FeatureFilesGenerator(
                 )
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
-                layer = "data",
-                content = buildDataGradleScript(featureNameLowerCase, catalogUpdater)
-            )
+                layer = "data"
+            ) { buildDataGradleScript(featureNameLowerCase, catalogUpdater) }
             dataLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,
@@ -145,15 +142,15 @@ class FeatureFilesGenerator(
                 )
             gradleFileCreator.writeGradleFileIfMissing(
                 featureRoot = featureRoot,
-                layer = "ui",
-                content =
-                    buildUiGradleScript(
-                        featurePackageName = featurePackageName,
-                        featureNameLowerCase = featureNameLowerCase,
-                        enableCompose = enableCompose,
-                        catalog = catalogUpdater
-                    )
-            )
+                layer = "ui"
+            ) {
+                buildUiGradleScript(
+                    featurePackageName = featurePackageName,
+                    featureNameLowerCase = featureNameLowerCase,
+                    enableCompose = enableCompose,
+                    catalog = catalogUpdater
+                )
+            }
             uiLayerContentGenerator
                 .generate(
                     featureRoot = featureRoot,

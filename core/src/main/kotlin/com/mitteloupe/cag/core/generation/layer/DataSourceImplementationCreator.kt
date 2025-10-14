@@ -32,7 +32,7 @@ class DataSourceImplementationCreator(
         val targetFile = File(targetDirectory, fileName)
         fileCreator.createFileIfNotExists(targetFile) {
             val packageName =
-                (listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource"))
+                listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource")
                     .joinToString(".")
 
             buildDataSourceImplementationKotlinFile(

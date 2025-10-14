@@ -33,7 +33,7 @@ class DataSourceDependencyInjectionModuleCreator(
         fileCreator.createFileIfNotExists(targetFile) {
             val dataSourceBaseName = dataSourceName.removeSuffix("DataSource")
             val dataSourcePackageName =
-                (listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource"))
+                listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource")
                     .joinToString(".")
 
             buildDataSourceModuleKotlinFile(

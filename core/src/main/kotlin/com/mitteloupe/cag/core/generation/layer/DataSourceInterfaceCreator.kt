@@ -31,7 +31,7 @@ class DataSourceInterfaceCreator(
         val targetFile = File(targetDirectory, "$dataSourceName.kt")
         fileCreator.createFileIfNotExists(targetFile) {
             val packageName =
-                (listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource"))
+                listOf(projectNamespace, "datasource", dataSourceBaseName.lowercase(), "datasource")
                     .joinToString(".")
 
             buildDataSourceInterfaceKotlinFile(
