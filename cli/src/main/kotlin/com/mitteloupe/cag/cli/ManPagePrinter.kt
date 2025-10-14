@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.help.HelpContent
+
 object ManPagePrinter {
     fun printManPage(topic: String?) {
         val name = "cag"

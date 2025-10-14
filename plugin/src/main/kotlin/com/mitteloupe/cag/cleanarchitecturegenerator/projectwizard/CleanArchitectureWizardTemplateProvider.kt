@@ -164,6 +164,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
                 packageName = data.packageName,
                 overrideMinimumAndroidSdk = selectedMinSdk,
                 overrideAndroidGradlePluginVersion = overrideAndroidGradlePluginVersion,
+                enableHilt = true,
                 enableCompose = enableCompose.value,
                 enableKtlint = enableKtlint.value,
                 enableDetekt = enableDetekt.value,

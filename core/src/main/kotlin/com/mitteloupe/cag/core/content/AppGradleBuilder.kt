@@ -7,6 +7,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildAppGradleScript(
     packageName: String,
+    enableHilt: Boolean,
     enableCompose: Boolean,
     catalog: VersionCatalogReader
 ): String {
@@ -55,7 +56,14 @@ fun buildAppGradleScript(
     val aliasAndroidApplication = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_APPLICATION).asAccessor
     val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
     val aliasKsp = catalog.getResolvedPluginAliasFor(PluginConstants.KSP).asAccessor
-    val aliasPluginHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
+    val hiltPlugin =
+        if (enableHilt) {
+            val aliasPluginHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
+            """
+            alias(libs.plugins.$aliasPluginHilt)"""
+        } else {
+            ""
+        }
     val aliasMaterial = catalog.getResolvedLibraryAliasForModule(LibraryConstants.MATERIAL).asAccessor
     val aliasCoreKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_CORE_KTX).asAccessor
     val aliasLifecycleRuntimeKtx = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_LIFECYCLE_RUNTIME_KTX).asAccessor
@@ -71,8 +79,7 @@ fun buildAppGradleScript(
         plugins {
             alias(libs.plugins.$aliasAndroidApplication)
             alias(libs.plugins.$aliasKotlinAndroid)
-            alias(libs.plugins.$aliasKsp)
-            alias(libs.plugins.$aliasPluginHilt)$composePlugins
+            alias(libs.plugins.$aliasKsp)$hiltPlugin$composePlugins
         }
         
         kotlin {

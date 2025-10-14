@@ -6,6 +6,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogReader
 import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildProjectGradleScript(
+    enableHilt: Boolean,
     enableKtlint: Boolean,
     enableDetekt: Boolean,
     catalog: VersionCatalogReader
@@ -43,9 +44,15 @@ fun buildProjectGradleScript(
     val aliasAndroidLibrary = catalog.getResolvedPluginAliasFor(PluginConstants.ANDROID_LIBRARY).asAccessor
     val aliasKotlinAndroid = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_ANDROID).asAccessor
     val aliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
-    val aliasHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
     val aliasKsp = catalog.getResolvedPluginAliasFor(PluginConstants.KSP).asAccessor
-
+    val hiltPlugin =
+        if (enableHilt) {
+            val aliasHilt = catalog.getResolvedPluginAliasFor(PluginConstants.HILT_ANDROID).asAccessor
+            """
+            alias(libs.plugins.$aliasHilt) apply false"""
+        } else {
+            ""
+        }
     return """
         // Top-level build file where you can add configuration options common to all sub-projects/modules.
         import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -55,8 +62,7 @@ fun buildProjectGradleScript(
             alias(libs.plugins.$aliasAndroidApplication) apply false
             alias(libs.plugins.$aliasAndroidLibrary) apply false
             alias(libs.plugins.$aliasKotlinAndroid) apply false
-            alias(libs.plugins.$aliasKotlinJvm) apply false
-            alias(libs.plugins.$aliasHilt) apply false
+            alias(libs.plugins.$aliasKotlinJvm) apply false$hiltPlugin
             alias(libs.plugins.$aliasKsp) apply false$ktlintPlugins$detektPlugins
         }
 

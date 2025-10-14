@@ -21,23 +21,32 @@ class GradleFileCreator(
 
     fun writeProjectGradleFile(
         projectRoot: File,
+        enableHilt: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean,
         catalog: VersionCatalogReader
     ) {
         val buildGradleFile = File(projectRoot, "build.gradle.kts")
         fileCreator.createOrUpdateFile(buildGradleFile) {
-            buildProjectGradleScript(enableKtlint, enableDetekt, catalog)
+            buildProjectGradleScript(
+                enableHilt = enableHilt,
+                enableKtlint = enableKtlint,
+                enableDetekt = enableDetekt,
+                catalog = catalog
+            )
         }
     }
 
     fun writeAppGradleFile(
         projectRoot: File,
         packageName: String,
+        enableHilt: Boolean,
         enableCompose: Boolean,
         catalog: VersionCatalogReader
     ) {
         val appGradleFile = File(projectRoot, "app/build.gradle.kts")
-        fileCreator.createOrUpdateFile(appGradleFile) { buildAppGradleScript(packageName, enableCompose, catalog) }
+        fileCreator.createOrUpdateFile(appGradleFile) {
+            buildAppGradleScript(packageName, enableHilt, enableCompose, catalog)
+        }
     }
 }

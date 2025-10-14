@@ -291,7 +291,10 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "",
                 destinationRootDirectory = temporaryDirectory,
-                enableCompose = true
+                enableHilt = false,
+                enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false
             )
 
         // When
@@ -307,7 +310,10 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "...",
                 destinationRootDirectory = temporaryDirectory,
-                enableCompose = true
+                enableHilt = false,
+                enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false
             )
 
         // When
@@ -325,7 +331,10 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
-                enableCompose = true
+                enableHilt = false,
+                enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false
             )
 
         // When
@@ -341,7 +350,10 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
-                enableCompose = true
+                enableHilt = false,
+                enableCompose = true,
+                enableKtlint = false,
+                enableDetekt = false
             )
 
         // When
@@ -365,6 +377,7 @@ class GeneratorTest {
             GenerateArchitectureRequest(
                 architecturePackageName = "com.example.architecture",
                 destinationRootDirectory = temporaryDirectory,
+                enableHilt = false,
                 enableCompose = true,
                 enableKtlint = true,
                 enableDetekt = true

@@ -28,9 +28,10 @@ class ArchitectureModulesContentGenerator(
     fun generate(
         architectureRoot: File,
         architecturePackageName: String,
+        enableHilt: Boolean,
         enableCompose: Boolean,
-        enableKtlint: Boolean = false,
-        enableDetekt: Boolean = false
+        enableKtlint: Boolean,
+        enableDetekt: Boolean
     ) {
         val packageSegments = architecturePackageName.toSegments()
         if (packageSegments.isEmpty()) {
@@ -54,22 +55,30 @@ class ArchitectureModulesContentGenerator(
         }
 
         val libraries =
-            LibraryConstants.CORE_ANDROID_LIBRARIES +
-                LibraryConstants.HILT_LIBRARIES +
-                LibraryConstants.TESTING_LIBRARIES +
-                LibraryConstants.TEST_KOTLINX_COROUTINES +
-                LibraryConstants.NETWORK_LIBRARIES +
-                LibraryConstants.TEST_MOCKITO_LIBRARIES +
-                LibraryConstants.TEST_MOCKITO_ANDROID +
-                if (enableCompose) {
-                    LibraryConstants.COMPOSE_LIBRARIES +
-                        LibraryConstants.COMPOSE_TESTING_LIBRARIES +
-                        LibraryConstants.ANDROIDX_RECYCLERVIEW +
-                        LibraryConstants.ANDROIDX_FRAGMENT_KTX +
-                        LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
-                } else {
-                    LibraryConstants.VIEW_LIBRARIES
+            buildList {
+                addAll(
+                    LibraryConstants.CORE_ANDROID_LIBRARIES +
+                        LibraryConstants.TESTING_LIBRARIES +
+                        LibraryConstants.TEST_KOTLINX_COROUTINES +
+                        LibraryConstants.NETWORK_LIBRARIES +
+                        LibraryConstants.TEST_MOCKITO_LIBRARIES +
+                        LibraryConstants.TEST_MOCKITO_ANDROID
+                )
+                if (enableHilt) {
+                    addAll(LibraryConstants.HILT_LIBRARIES)
                 }
+                addAll(
+                    if (enableCompose) {
+                        LibraryConstants.COMPOSE_LIBRARIES +
+                            LibraryConstants.COMPOSE_TESTING_LIBRARIES +
+                            LibraryConstants.ANDROIDX_RECYCLERVIEW +
+                            LibraryConstants.ANDROIDX_FRAGMENT_KTX +
+                            LibraryConstants.ANDROIDX_NAVIGATION_FRAGMENT_KTX
+                    } else {
+                        LibraryConstants.VIEW_LIBRARIES
+                    }
+                )
+            }
         val plugins =
             buildList {
                 addAll(PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS)
@@ -116,7 +125,13 @@ class ArchitectureModulesContentGenerator(
         gradleFileCreator.writeGradleFileIfMissing(
             featureRoot = architectureRoot,
             layer = "instrumentation-test"
-        ) { buildArchitectureInstrumentationTestGradleScript(architecturePackageName, catalogUpdater) }
+        ) {
+            buildArchitectureInstrumentationTestGradleScript(
+                architecturePackageName = architecturePackageName,
+                enableHilt = enableHilt,
+                catalog = catalogUpdater
+            )
+        }
 
         val domainRoot = File(architectureRoot, "domain")
         domainModuleCreator.generateDomainContent(
@@ -142,9 +157,10 @@ class ArchitectureModulesContentGenerator(
         uiModuleCreator.generateUiContent(uiRoot, architecturePackageName, packageSegments + "ui")
         val instrumentationTestRoot = File(architectureRoot, "instrumentation-test")
         instrumentationTestModuleCreator.generateInstrumentationTestContent(
-            instrumentationTestRoot,
-            architecturePackageName.substringBeforeLast('.'),
-            architecturePackageName.substringBeforeLast('.').toSegments() + "test"
+            architectureRoot = instrumentationTestRoot,
+            architecturePackageName = architecturePackageName.substringBeforeLast('.'),
+            architecturePackageNameSegments = architecturePackageName.substringBeforeLast('.').toSegments() + "test",
+            enableHilt = enableHilt
         )
     }
 }

@@ -3,10 +3,11 @@ package com.mitteloupe.cag.cli.request
 data class ProjectTemplateRequest(
     val projectName: String,
     val packageName: String,
-    val enableCompose: Boolean = true,
-    val enableKtlint: Boolean = false,
-    val enableDetekt: Boolean = false,
-    val enableKtor: Boolean = false,
-    val enableRetrofit: Boolean = false,
-    val enableGit: Boolean = false
+    val enableHilt: Boolean,
+    val enableCompose: Boolean,
+    val enableKtlint: Boolean,
+    val enableDetekt: Boolean,
+    val enableKtor: Boolean,
+    val enableRetrofit: Boolean,
+    val enableGit: Boolean
 )

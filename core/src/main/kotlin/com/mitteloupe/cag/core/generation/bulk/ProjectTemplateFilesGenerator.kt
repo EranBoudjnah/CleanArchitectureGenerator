@@ -35,6 +35,7 @@ class ProjectTemplateFilesGenerator(
         packageName: String,
         overrideMinimumAndroidSdk: Int?,
         overrideAndroidGradlePluginVersion: String?,
+        enableHilt: Boolean,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean,
@@ -122,6 +123,7 @@ class ProjectTemplateFilesGenerator(
         architectureFilesGenerator.generateArchitecture(
             destinationRootDirectory = projectRoot,
             architecturePackageName = "$packageName.architecture",
+            enableHilt = enableHilt,
             enableCompose = enableCompose,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt
@@ -151,6 +153,7 @@ class ProjectTemplateFilesGenerator(
         generateTemplateProjectGradleFiles(
             projectRoot = projectRoot,
             packageName = packageName,
+            enableHilt = enableHilt,
             enableCompose = enableCompose,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt
@@ -191,12 +194,14 @@ class ProjectTemplateFilesGenerator(
     private fun generateTemplateProjectGradleFiles(
         projectRoot: File,
         packageName: String,
+        enableHilt: Boolean,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
     ) {
         gradleFileCreator.writeProjectGradleFile(
             projectRoot = projectRoot,
+            enableHilt = enableHilt,
             enableKtlint = enableKtlint,
             enableDetekt = enableDetekt,
             catalog = catalogUpdater
@@ -205,6 +210,7 @@ class ProjectTemplateFilesGenerator(
         gradleFileCreator.writeAppGradleFile(
             projectRoot = projectRoot,
             packageName = packageName,
+            enableHilt = enableHilt,
             enableCompose = enableCompose,
             catalog = catalogUpdater
         )

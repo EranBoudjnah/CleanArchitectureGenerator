@@ -19,6 +19,7 @@ class ArchitectureFilesGenerator(
     fun generateArchitecture(
         destinationRootDirectory: File,
         architecturePackageName: String,
+        enableHilt: Boolean,
         enableCompose: Boolean,
         enableKtlint: Boolean,
         enableDetekt: Boolean
@@ -59,6 +60,7 @@ class ArchitectureFilesGenerator(
             .generate(
                 architectureRoot = architectureRoot,
                 architecturePackageName = architecturePackageName,
+                enableHilt = enableHilt,
                 enableCompose = enableCompose,
                 enableKtlint = enableKtlint,
                 enableDetekt = enableDetekt
