@@ -32,9 +32,8 @@ class UiLayerContentGenerator(
             layer = "ui",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "model",
-            fileName = "StubUiModel.kt",
-            content = buildUiModelKotlinFile(featurePackageName)
-        )
+            fileName = "StubUiModel.kt"
+        ) { buildUiModelKotlinFile(featurePackageName) }
     }
 
     private fun writePresentationToUiMapperFile(
@@ -46,9 +45,8 @@ class UiLayerContentGenerator(
             layer = "ui",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
-            fileName = "StubUiMapper.kt",
-            content = buildPresentationToUiMapperKotlinFile(featurePackageName)
-        )
+            fileName = "StubUiMapper.kt"
+        ) { buildPresentationToUiMapperKotlinFile(featurePackageName) }
     }
 
     private fun writeUiDiFile(
@@ -62,9 +60,8 @@ class UiLayerContentGenerator(
             layer = "ui",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "di",
-            fileName = "${featureName.capitalized}Dependencies.kt",
-            content = buildUiDiKotlinFile(projectNamespace, featurePackageName, featureName)
-        )
+            fileName = "${featureName.capitalized}Dependencies.kt"
+        ) { buildUiDiKotlinFile(projectNamespace, featurePackageName, featureName) }
     }
 
     private fun writeUiScreenFile(
@@ -78,8 +75,7 @@ class UiLayerContentGenerator(
             layer = "ui",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "view",
-            fileName = "${featureName.capitalized}Screen.kt",
-            content = buildUiScreenKotlinFile(projectNamespace, featurePackageName, featureName)
-        )
+            fileName = "${featureName.capitalized}Screen.kt"
+        ) { buildUiScreenKotlinFile(projectNamespace, featurePackageName, featureName) }
     }
 }

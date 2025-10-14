@@ -37,13 +37,13 @@ class PresentationLayerContentGenerator(
         fileCreator.createDirectoryIfNotExists(destinationDirectory)
         kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = destinationDirectory,
-            fileName = "${featureName.capitalized}ViewState.kt",
-            content =
-                buildPresentationViewStateKotlinFile(
-                    featurePackageName = featurePackageName,
-                    featureName = featureName.capitalized
-                )
-        )
+            fileName = "${featureName.capitalized}ViewState.kt"
+        ) {
+            buildPresentationViewStateKotlinFile(
+                featurePackageName = featurePackageName,
+                featureName = featureName.capitalized
+            )
+        }
     }
 
     private fun writePresentationViewStateForFeature(
@@ -57,13 +57,13 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "model",
-            fileName = "${capitalizedFeatureName}ViewState.kt",
-            content =
-                buildPresentationViewStateKotlinFile(
-                    featurePackageName = featurePackageName,
-                    featureName = capitalizedFeatureName
-                )
-        )
+            fileName = "${capitalizedFeatureName}ViewState.kt"
+        ) {
+            buildPresentationViewStateKotlinFile(
+                featurePackageName = featurePackageName,
+                featureName = capitalizedFeatureName
+            )
+        }
     }
 
     private fun writePresentationModelFile(
@@ -75,10 +75,8 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "model",
-            fileName = "StubPresentationModel.kt",
-            content =
-                buildPresentationModelKotlinFile(featurePackageName)
-        )
+            fileName = "StubPresentationModel.kt"
+        ) { buildPresentationModelKotlinFile(featurePackageName) }
     }
 
     private fun writeDomainToPresentationMapperFile(
@@ -90,9 +88,8 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
-            fileName = "StubPresentationMapper.kt",
-            content = buildDomainToPresentationMapperKotlinFile(featurePackageName)
-        )
+            fileName = "StubPresentationMapper.kt"
+        ) { buildDomainToPresentationMapperKotlinFile(featurePackageName) }
     }
 
     private fun writePresentationToDomainMapperFile(
@@ -104,9 +101,8 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "mapper",
-            fileName = "StubDomainMapper.kt",
-            content = buildPresentationToDomainMapperKotlinFile(featurePackageName)
-        )
+            fileName = "StubDomainMapper.kt"
+        ) { buildPresentationToDomainMapperKotlinFile(featurePackageName) }
     }
 
     private fun writePresentationViewModelFileToDirectory(
@@ -119,15 +115,15 @@ class PresentationLayerContentGenerator(
         fileCreator.createDirectoryIfNotExists(destinationDirectory)
         kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = destinationDirectory,
-            fileName = "${featureName.capitalized}ViewModel.kt",
-            content =
-                buildPresentationViewModelKotlinFile(
-                    projectNamespace = projectNamespace,
-                    viewModelPackageName = viewModelPackageName,
-                    featurePackageName = featurePackageName,
-                    featureName = featureName.capitalized
-                )
-        )
+            fileName = "${featureName.capitalized}ViewModel.kt"
+        ) {
+            buildPresentationViewModelKotlinFile(
+                projectNamespace = projectNamespace,
+                viewModelPackageName = viewModelPackageName,
+                featurePackageName = featurePackageName,
+                featureName = featureName.capitalized
+            )
+        }
     }
 
     private fun writePresentationViewModelFileForFeature(
@@ -141,15 +137,15 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "viewmodel",
-            fileName = "${featureName.capitalized}ViewModel.kt",
-            content =
-                buildPresentationViewModelKotlinFile(
-                    projectNamespace = projectNamespace,
-                    viewModelPackageName = "$featurePackageName.presentation.viewmodel",
-                    featurePackageName = featurePackageName,
-                    featureName = featureName.capitalized
-                )
-        )
+            fileName = "${featureName.capitalized}ViewModel.kt"
+        ) {
+            buildPresentationViewModelKotlinFile(
+                projectNamespace = projectNamespace,
+                viewModelPackageName = "$featurePackageName.presentation.viewmodel",
+                featurePackageName = featurePackageName,
+                featureName = featureName.capitalized
+            )
+        }
     }
 
     private fun writePresentationNavigationEvent(
@@ -163,14 +159,14 @@ class PresentationLayerContentGenerator(
             layer = "presentation",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "navigation",
-            fileName = "${featureName.capitalized}PresentationNavigationEvent.kt",
-            content =
-                buildPresentationNavigationEventKotlinFile(
-                    projectNamespace = projectNamespace,
-                    featurePackageName = featurePackageName,
-                    featureName = featureName.capitalized
-                )
-        )
+            fileName = "${featureName.capitalized}PresentationNavigationEvent.kt"
+        ) {
+            buildPresentationNavigationEventKotlinFile(
+                projectNamespace = projectNamespace,
+                featurePackageName = featurePackageName,
+                featureName = featureName.capitalized
+            )
+        }
     }
 
     fun generateViewState(

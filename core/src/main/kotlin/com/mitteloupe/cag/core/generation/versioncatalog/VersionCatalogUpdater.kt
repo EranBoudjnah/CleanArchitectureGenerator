@@ -85,9 +85,9 @@ class VersionCatalogUpdater(
     ) {
         val catalogTextBefore = readCatalogFile(projectRootDir)
         val existingPluginIdToAlias: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginIdToAlias(it) } ?: emptyMap()
+            catalogTextBefore?.let(contentUpdater::parseExistingPluginIdToAlias) ?: emptyMap()
         val existingPluginAliasToId: Map<String, String> =
-            catalogTextBefore?.let { contentUpdater.parseExistingPluginAliasToId(it) } ?: emptyMap()
+            catalogTextBefore?.let(contentUpdater::parseExistingPluginAliasToId) ?: emptyMap()
 
         val resolvedPluginIdToAliasMutable = existingPluginIdToAlias.toMutableMap()
         val pluginRequirements = mutableListOf<PluginRequirement>()
@@ -123,7 +123,7 @@ class VersionCatalogUpdater(
 
         val catalogTextBeforeLibraries = readCatalogFile(projectRootDir)
         val existingLibraryAliasToModule: Map<String, String> =
-            catalogTextBeforeLibraries?.let { contentUpdater.parseExistingLibraryAliasToModule(it) } ?: emptyMap()
+            catalogTextBeforeLibraries?.let(contentUpdater::parseExistingLibraryAliasToModule) ?: emptyMap()
 
         val existingLibraryModuleToAlias: Map<String, String> =
             existingLibraryAliasToModule.entries.associate { (alias, module) ->

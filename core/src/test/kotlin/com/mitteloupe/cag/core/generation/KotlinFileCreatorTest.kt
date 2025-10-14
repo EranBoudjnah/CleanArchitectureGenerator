@@ -38,9 +38,8 @@ class KotlinFileCreatorTest {
             layer = layer,
             featurePackageName = featurePackageName,
             relativePackageSubPath = relativePackageSubPath,
-            fileName = fileName,
-            content = content
-        )
+            fileName = fileName
+        ) { content }
 
         // Then
         assertEquals(content, expectedFile.readText())
@@ -69,9 +68,8 @@ class KotlinFileCreatorTest {
             layer = layer,
             featurePackageName = featurePackageName,
             relativePackageSubPath = relativePackageSubPath,
-            fileName = fileName,
-            content = newContent
-        )
+            fileName = fileName
+        ) { newContent }
 
         // Then
         assertEquals(originalContent, targetFile.readText())
@@ -98,9 +96,8 @@ class KotlinFileCreatorTest {
             layer = layer,
             featurePackageName = featurePackageName,
             relativePackageSubPath = relativePackageSubPath,
-            fileName = fileName,
-            content = content
-        )
+            fileName = fileName
+        ) { content }
 
         // Then throws GenerationException
     }
@@ -127,9 +124,8 @@ class KotlinFileCreatorTest {
             layer = layer,
             featurePackageName = featurePackageName,
             relativePackageSubPath = relativePackageSubPath,
-            fileName = fileName,
-            content = content
-        )
+            fileName = fileName
+        ) { content }
 
         // Then throws GenerationException
     }
@@ -146,9 +142,8 @@ class KotlinFileCreatorTest {
         // When
         classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
-            fileName = fileName,
-            content = content
-        )
+            fileName = fileName
+        ) { content }
 
         // Then
         assertTrue(expectedFile.exists())
@@ -169,9 +164,8 @@ class KotlinFileCreatorTest {
         // When
         classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
-            fileName = fileName,
-            content = newContent
-        )
+            fileName = fileName
+        ) { newContent }
 
         // Then
         assertEquals(originalContent, targetFile.readText())
@@ -191,9 +185,8 @@ class KotlinFileCreatorTest {
         // When
         classUnderTest.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
-            fileName = fileName,
-            content = content
-        )
+            fileName = fileName
+        ) { content }
 
         // Then throws GenerationException
     }

@@ -9,6 +9,10 @@ import com.mitteloupe.cag.core.generation.KotlinFileCreator
 import com.mitteloupe.cag.core.generation.structure.PackageNameDeriver
 import java.io.File
 
+private const val USE_CASE_BASE_NAME = "PerformAction"
+private const val USE_CASE_NAME = "${USE_CASE_BASE_NAME}UseCase"
+private const val REPOSITORY_NAME = "${USE_CASE_BASE_NAME}Repository"
+
 class DomainLayerContentGenerator(
     private val kotlinFileCreator: KotlinFileCreator
 ) {
@@ -57,17 +61,17 @@ class DomainLayerContentGenerator(
     ) {
         kotlinFileCreator.writeKotlinFileInDirectory(
             targetDirectory = targetDirectory,
-            fileName = "$useCaseName.kt",
-            content =
-                buildDomainUseCaseKotlinFile(
-                    projectNamespace = projectNamespace,
-                    featurePackageName = featurePackageName,
-                    useCaseName = useCaseName,
-                    repositoryName = null,
-                    inputDataType = inputDataType,
-                    outputDataType = outputDataType
-                )
-        )
+            fileName = "$useCaseName.kt"
+        ) {
+            buildDomainUseCaseKotlinFile(
+                projectNamespace = projectNamespace,
+                featurePackageName = featurePackageName,
+                useCaseName = useCaseName,
+                repositoryName = null,
+                inputDataType = inputDataType,
+                outputDataType = outputDataType
+            )
+        }
     }
 
     private fun writeDomainUseCaseFile(
@@ -75,40 +79,33 @@ class DomainLayerContentGenerator(
         projectNamespace: String,
         featurePackageName: String
     ) {
-        val useCaseName = "PerformActionUseCase"
-        val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
-
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "usecase",
-            fileName = "$useCaseName.kt",
-            content =
-                buildDomainUseCaseKotlinFile(
-                    projectNamespace = projectNamespace,
-                    featurePackageName = featurePackageName,
-                    useCaseName = useCaseName,
-                    repositoryName = repositoryName
-                )
-        )
+            fileName = "$USE_CASE_NAME.kt"
+        ) {
+            buildDomainUseCaseKotlinFile(
+                projectNamespace = projectNamespace,
+                featurePackageName = featurePackageName,
+                useCaseName = USE_CASE_NAME,
+                repositoryName = REPOSITORY_NAME
+            )
+        }
     }
 
     private fun writeDomainRepositoryInterface(
         featureRoot: File,
         featurePackageName: String
     ) {
-        val useCaseName = "PerformActionUseCase"
-        val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "domain",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "repository",
-            fileName = "$repositoryName.kt",
-            content =
-                buildDomainRepositoryKotlinFile(featurePackageName, repositoryName)
-        )
+            fileName = "$REPOSITORY_NAME.kt"
+        ) { buildDomainRepositoryKotlinFile(featurePackageName, REPOSITORY_NAME) }
     }
 
     private fun writeDomainModelFile(
@@ -120,13 +117,9 @@ class DomainLayerContentGenerator(
             layer = "domain",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "model",
-            fileName = "StubDomainModel.kt",
-            content =
-                buildDomainModelKotlinFile(featurePackageName)
-        )
+            fileName = "StubDomainModel.kt"
+        ) { buildDomainModelKotlinFile(featurePackageName) }
     }
-
-    private fun deriveRepositoryNameFromUseCaseName(useCaseName: String): String = useCaseName.removeSuffix("UseCase") + "Repository"
 
     private fun extractProjectNamespace(packageName: String): String {
         val segments = packageName.split(".")

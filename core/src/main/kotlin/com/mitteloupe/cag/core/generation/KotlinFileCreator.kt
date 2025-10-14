@@ -15,7 +15,7 @@ class KotlinFileCreator(
         featurePackageName: String,
         relativePackageSubPath: String,
         fileName: String,
-        content: String
+        content: () -> String
     ) {
         val sourceRoot = File(featureRoot, "$layer/src/main/java")
         val packageSegments = featurePackageName.toSegments()
@@ -37,12 +37,12 @@ class KotlinFileCreator(
     fun writeKotlinFileInDirectory(
         targetDirectory: File,
         fileName: String,
-        content: String
+        content: () -> String
     ) {
         val targetFile = File(targetDirectory, fileName)
         if (targetFile.exists() && !targetFile.isFile) {
             throw GenerationException("Failed to create file: ${targetFile.absolutePath} (it's a directory)")
         }
-        fileCreator.createFileIfNotExists(targetFile) { content }
+        fileCreator.createFileIfNotExists(targetFile, content)
     }
 }

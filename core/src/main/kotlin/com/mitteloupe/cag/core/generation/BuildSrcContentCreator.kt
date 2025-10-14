@@ -15,8 +15,7 @@ class BuildSrcContentCreator(
             buildSrcDirectory.mkdirs()
         }
         val buildSrcGradleFile = File(buildSrcDirectory, "build.gradle.kts")
-        val content = buildBuildSrcGradleScript()
-        fileCreator.createFileIfNotExists(buildSrcGradleFile) { content }
+        fileCreator.createFileIfNotExists(buildSrcGradleFile) { buildBuildSrcGradleScript() }
     }
 
     fun writeSettingsGradleFile(projectRoot: File) {
@@ -25,8 +24,7 @@ class BuildSrcContentCreator(
             buildSrcDirectory.mkdirs()
         }
         val buildSrcSettingsFile = File(buildSrcDirectory, "settings.gradle.kts")
-        val content = buildBuildSrcSettingsGradleScript()
-        fileCreator.createFileIfNotExists(buildSrcSettingsFile) { content }
+        fileCreator.createFileIfNotExists(buildSrcSettingsFile) { buildBuildSrcSettingsGradleScript() }
     }
 
     fun writeProjectJavaLibraryFile(projectRoot: File) {
@@ -35,7 +33,8 @@ class BuildSrcContentCreator(
             projectJavaLibrarySrcDirectory.mkdirs()
         }
         val projectJavaLibraryGradleFile = File(projectJavaLibrarySrcDirectory, "project-java-library.gradle.kts")
-        val content = buildBuildSrcProjectJavaLibraryGradleScript()
-        fileCreator.createFileIfNotExists(projectJavaLibraryGradleFile) { content }
+        fileCreator.createFileIfNotExists(projectJavaLibraryGradleFile) {
+            buildBuildSrcProjectJavaLibraryGradleScript()
+        }
     }
 }

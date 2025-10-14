@@ -22,15 +22,16 @@ class DataLayerContentGenerator(
         featureName: String,
         useCaseName: String = "PerformActionUseCase"
     ) {
-        val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
         kotlinFileCreator.writeKotlinFileInLayer(
             featureRoot = featureRoot,
             layer = "data",
             featurePackageName = featurePackageName,
             relativePackageSubPath = "repository",
-            fileName = "${featureName.capitalized}Repository.kt",
-            content = buildDataRepositoryKotlinFile(featurePackageName, featureName, repositoryName)
-        )
+            fileName = "${featureName.capitalized}Repository.kt"
+        ) {
+            val repositoryName = deriveRepositoryNameFromUseCaseName(useCaseName)
+            buildDataRepositoryKotlinFile(featurePackageName, featureName, repositoryName)
+        }
     }
 
     private fun deriveRepositoryNameFromUseCaseName(useCaseName: String): String = useCaseName.removeSuffix("UseCase") + "Repository"
