@@ -47,11 +47,7 @@ class DataSourceImplementationCreatorTest {
 class TestDataSourceImpl : TestDataSource {
 }
 """
-        assertEquals(
-            "Implementation file should have exact content",
-            expectedContent,
-            implementationFile.readText()
-        )
+        assertEquals(expectedContent, implementationFile.readText())
     }
 
     @Test

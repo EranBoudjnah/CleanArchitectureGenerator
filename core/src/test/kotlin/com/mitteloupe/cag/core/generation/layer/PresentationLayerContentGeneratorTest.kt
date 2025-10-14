@@ -69,11 +69,7 @@ sealed interface TestViewState {
         classUnderTest.generatePresentationLayer(featureRoot, projectNamespace, featurePackageName, featureName)
 
         // Then
-        assertEquals(
-            "View state file should have exact content",
-            expectedViewStateContent,
-            viewStateFile.readText()
-        )
+        assertEquals("View state file should have exact content", expectedViewStateContent, viewStateFile.readText())
     }
 
     @Test
@@ -95,10 +91,7 @@ class StubPresentationMapper {
 }
 """
         val domainToPresentationMapperFile =
-            File(
-                featureRoot,
-                "presentation/src/main/java/com/example/feature/presentation/mapper/StubPresentationMapper.kt"
-            )
+            File(featureRoot, "presentation/src/main/java/com/example/feature/presentation/mapper/StubPresentationMapper.kt")
 
         // When
         classUnderTest.generatePresentationLayer(featureRoot, projectNamespace, featurePackageName, featureName)
@@ -199,8 +192,7 @@ class TestViewModel(
     }
 }
 """
-        val viewModelFile =
-            File(featureRoot, "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModel.kt")
+        val viewModelFile = File(featureRoot, "presentation/src/main/java/com/example/feature/presentation/viewmodel/TestViewModel.kt")
 
         // When
         classUnderTest.generatePresentationLayer(
@@ -211,11 +203,7 @@ class TestViewModel(
         )
 
         // Then
-        assertEquals(
-            "View model file should have exact content",
-            expectedViewModelContent,
-            viewModelFile.readText()
-        )
+        assertEquals("View model file should have exact content", expectedViewModelContent, viewModelFile.readText())
     }
 
     @Test
@@ -235,20 +223,13 @@ sealed interface TestPresentationNavigationEvent : PresentationNavigationEvent {
 }
 """
         val navigationEventFile =
-            File(
-                featureRoot,
-                "presentation/src/main/java/com/example/feature/presentation/navigation/TestPresentationNavigationEvent.kt"
-            )
+            File(featureRoot, "presentation/src/main/java/com/example/feature/presentation/navigation/TestPresentationNavigationEvent.kt")
 
         // When
         classUnderTest.generatePresentationLayer(featureRoot, projectNamespace, featurePackageName, featureName)
 
         // Then
-        assertEquals(
-            "Navigation event file should have exact content",
-            expectedNavigationEventContent,
-            navigationEventFile.readText()
-        )
+        assertEquals("Navigation event file should have exact content", expectedNavigationEventContent, navigationEventFile.readText())
     }
 
     @Test
@@ -343,11 +324,7 @@ class UserProfileViewModel(
         classUnderTest.generatePresentationLayer(featureRoot, projectNamespace, featurePackageName, featureName)
 
         // Then
-        assertEquals(
-            "Existing model file should not be overwritten",
-            originalContent,
-            existingModelFile.readText()
-        )
+        assertEquals("Existing model file should not be overwritten", originalContent, existingModelFile.readText())
     }
 
     @Test
@@ -373,10 +350,6 @@ class UserProfileViewModel(
         )
 
         // Then
-        assertEquals(
-            "Existing view model file should not be overwritten",
-            originalContent,
-            existingFile.readText()
-        )
+        assertEquals("Existing view model file should not be overwritten", originalContent, existingFile.readText())
     }
 }

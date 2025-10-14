@@ -3,7 +3,7 @@ package com.mitteloupe.cag.core.generation.app
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.fake.FakeFileSystemBridge
 import com.mitteloupe.cag.core.generation.filesystem.FileCreator
-import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -46,14 +46,14 @@ class DataSourceDependencyInjectionModuleCreatorTest {
         val file = File(targetDirectory, "ExampleDataSourceModule.kt")
         assertTrue(file.exists())
         val content = file.readText()
-        assertThat(content, CoreMatchers.containsString("package com.example.app.di"))
+        assertThat(content, containsString("package com.example.app.di"))
         assertThat(
             content,
-            CoreMatchers.containsString("object ExampleDataSourceModule")
+            containsString("object ExampleDataSourceModule")
         )
         assertThat(
             content,
-            CoreMatchers.containsString(
+            containsString(
                 "fun providesExampleDataSource(): ExampleDataSource = ExampleDataSourceImpl()"
             )
         )

@@ -71,11 +71,7 @@ interface PerformActionRepository {
         classUnderTest.generateDomainLayer(featureRoot, projectNamespace, featurePackageName)
 
         // Then
-        assertEquals(
-            "Repository file should have exact content",
-            expectedRepositoryContent,
-            repositoryFile.readText()
-        )
+        assertEquals("Repository file should have exact content", expectedRepositoryContent, repositoryFile.readText())
     }
 
     @Test
@@ -172,11 +168,7 @@ class PerformActionUseCase() : UseCase<StubDomainModel, StubDomainModel> {
         classUnderTest.generateDomainLayer(featureRoot, projectNamespace, featurePackageName)
 
         // Then
-        assertEquals(
-            "Existing use case file should not be overwritten",
-            originalContent,
-            existingUseCaseFile.readText()
-        )
+        assertEquals("Existing use case file should not be overwritten", originalContent, existingUseCaseFile.readText())
     }
 
     @Test
@@ -193,10 +185,6 @@ class PerformActionUseCase() : UseCase<StubDomainModel, StubDomainModel> {
         classUnderTest.generateUseCase(destinationDirectory, useCaseName)
 
         // Then
-        assertEquals(
-            "Existing use case file should not be overwritten",
-            originalContent,
-            existingFile.readText()
-        )
+        assertEquals("Existing use case file should not be overwritten", originalContent, existingFile.readText())
     }
 }

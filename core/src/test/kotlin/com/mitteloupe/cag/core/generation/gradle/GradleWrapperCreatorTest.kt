@@ -144,11 +144,7 @@ class GradleWrapperCreatorTest {
         classUnderTest.writeGradleWrapperFiles(projectRoot)
 
         // Then
-        assertEquals(
-            "Existing gradlew.bat should not be overwritten",
-            initialGradlewBatContent,
-            gradlewBatFile.readText()
-        )
+        assertEquals("Existing gradlew.bat should not be overwritten", initialGradlewBatContent, gradlewBatFile.readText())
     }
 
     @Test
@@ -166,11 +162,7 @@ class GradleWrapperCreatorTest {
         classUnderTest.writeGradleWrapperFiles(projectRoot)
 
         // Then
-        assertEquals(
-            "Existing gradle wrapper jar should not be overwritten",
-            initialJarContent,
-            gradleWrapperJarFile.readText()
-        )
+        assertEquals("Existing gradle wrapper jar should not be overwritten", initialJarContent, gradleWrapperJarFile.readText())
     }
 
     private fun getResourceAsString(resourceName: String): String =

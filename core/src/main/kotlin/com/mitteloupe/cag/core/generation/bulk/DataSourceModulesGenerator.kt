@@ -45,7 +45,7 @@ class DataSourceModulesGenerator(
                 plugins = PluginConstants.KOTLIN_PLUGINS + PluginConstants.ANDROID_PLUGINS
             )
         catalogUpdater.createOrUpdateVersionCatalog(
-            projectRootDir = destinationRootDirectory,
+            projectRootDirectory = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
 

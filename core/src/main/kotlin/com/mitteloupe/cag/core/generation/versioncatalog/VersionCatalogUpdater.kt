@@ -67,16 +67,16 @@ class VersionCatalogUpdater(
     }
 
     fun createOrUpdateVersionCatalog(
-        projectRootDir: File,
+        projectRootDirectory: File,
         dependencyConfiguration: DependencyConfiguration
     ) {
-        val catalogFile = File(projectRootDir, "gradle/libs.versions.toml")
+        val catalogFile = File(projectRootDirectory, "gradle/libs.versions.toml")
         if (catalogFile.exists()) {
-            updateExistingVersionCatalog(projectRootDir, dependencyConfiguration)
+            updateExistingVersionCatalog(projectRootDirectory, dependencyConfiguration)
             return
         }
 
-        createNewVersionCatalog(projectRootDir, dependencyConfiguration)
+        createNewVersionCatalog(projectRootDirectory, dependencyConfiguration)
     }
 
     private fun updateExistingVersionCatalog(

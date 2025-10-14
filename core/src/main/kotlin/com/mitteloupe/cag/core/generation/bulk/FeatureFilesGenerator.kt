@@ -79,7 +79,7 @@ class FeatureFilesGenerator(
                     }
             )
         catalogUpdater.createOrUpdateVersionCatalog(
-            projectRootDir = destinationRootDirectory,
+            projectRootDirectory = destinationRootDirectory,
             dependencyConfiguration = dependencyConfiguration
         )
         val featureRoot = File(destinationRootDirectory, "features/$featureNameLowerCase")
