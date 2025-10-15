@@ -1,5 +1,6 @@
-package com.mitteloupe.cag.cli
+package com.mitteloupe.cag.cli.argument
 
+import com.mitteloupe.cag.cli.flag.FlagOption
 import com.mitteloupe.cag.cli.flag.PrimaryFlag
 import com.mitteloupe.cag.cli.flag.SecondaryFlag
 
@@ -7,7 +8,7 @@ class ArgumentParser {
     fun parsePrimaryWithSecondaries(
         arguments: Array<String>,
         primaryFlag: PrimaryFlag
-    ): List<Map<String, String>> {
+    ): List<Map<FlagOption, String>> {
         if (arguments.isEmpty()) {
             return emptyList()
         }
@@ -15,10 +16,22 @@ class ArgumentParser {
         val isLongForm = determineForm(arguments, primaryFlag.long, primaryFlag.short) ?: return emptyList()
 
         val primary = if (isLongForm) primaryFlag.long else primaryFlag.short
-        val secondaryMap = primaryFlag.secondaryFlags.associateBy { if (isLongForm) it.long else it.short }
 
-        return parseArguments(arguments, primary, secondaryMap, isLongForm)
+        return parseArguments(
+            arguments = arguments,
+            primary = primary,
+            secondaryFlags = primaryFlag.secondaryFlags,
+            isLongForm = isLongForm
+        )
     }
+
+    inline fun <T> ArgumentParser.parsePrimaryWithSecondaries(
+        arguments: Array<String>,
+        primaryFlag: PrimaryFlag,
+        transform: (Map<FlagOption, String>) -> T
+    ): List<T> =
+        parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = primaryFlag)
+            .map(transform)
 
     private fun determineForm(
         arguments: Array<String>,
@@ -36,17 +49,17 @@ class ArgumentParser {
     private fun parseArguments(
         arguments: Array<String>,
         primary: String,
-        secondaryMap: Map<String, SecondaryFlag>,
+        secondaryFlags: Set<SecondaryFlag>,
         isLongForm: Boolean
-    ): List<Map<String, String>> {
-        val results = mutableListOf<Map<String, String>>()
-        var currentSecondaries = mutableMapOf<String, String>()
+    ): List<Map<FlagOption, String>> {
+        val results = mutableListOf<Map<FlagOption, String>>()
+        var currentSecondaries = mutableMapOf<FlagOption, String>()
         var hasPrimary = false
         var hasEncounteredSecondaries = false
 
         fun finalizeCurrent() {
             if (hasPrimary || currentSecondaries.isNotEmpty()) {
-                validateMandatoryFlags(currentSecondaries, secondaryMap.values)
+                validateMandatoryFlags(currentSecondaries, secondaryFlags)
                 if (currentSecondaries.isNotEmpty()) {
                     results.add(currentSecondaries.toMap())
                 } else if (hasPrimary && !hasEncounteredSecondaries) {
@@ -69,27 +82,27 @@ class ArgumentParser {
                     hasPrimary = true
                     index++
                 }
-                secondaryMap.containsKey(token) -> {
-                    val secondary = secondaryMap.getValue(token)
+                secondaryFlags.any { token == if (isLongForm) it.long else it.short } -> {
+                    val secondary = secondaryFlags.first { token == if (isLongForm) it.long else it.short }
                     hasEncounteredSecondaries = true
                     if (secondary.isBoolean) {
-                        currentSecondaries[secondary.long] = ""
+                        currentSecondaries[secondary.option] = ""
                         index++
                     } else {
                         index =
                             consumeValue(arguments, index) { value ->
-                                currentSecondaries[secondary.long] = value
+                                currentSecondaries[secondary.option] = value
                             }
                     }
                 }
                 else -> {
-                    val inlineResult = parseInlineArgument(token, secondaryMap, isLongForm)
+                    val inlineResult = parseInlineArgument(token, secondaryFlags, isLongForm)
                     if (inlineResult != null) {
                         hasEncounteredSecondaries = true
                         currentSecondaries[inlineResult.first] = inlineResult.second
                     } else if (token.startsWith("-") && !token.startsWith(primary)) {
                         hasEncounteredSecondaries = true
-                        validateMixedForm(token, primary, isLongForm, secondaryMap)
+                        validateMixedForm(token, primary, isLongForm, secondaryFlags)
                     }
                     index++
                 }
@@ -101,16 +114,16 @@ class ArgumentParser {
     }
 
     private fun validateMandatoryFlags(
-        currentSecondaries: Map<String, String>,
+        currentSecondaries: Map<FlagOption, String>,
         secondaryFlags: Collection<SecondaryFlag>
     ) {
         val missingFlags =
             secondaryFlags.filter { flag ->
                 flag.isMandatory &&
                     if (flag.isBoolean) {
-                        !currentSecondaries.containsKey(flag.long)
+                        !currentSecondaries.containsKey(flag.option)
                     } else {
-                        currentSecondaries[flag.long]?.isNotEmpty() != true
+                        currentSecondaries[flag.option]?.isNotEmpty() != true
                     }
             }
 
@@ -127,18 +140,13 @@ class ArgumentParser {
         token: String,
         primary: String,
         isLongForm: Boolean,
-        secondaryMap: Map<String, SecondaryFlag>
+        secondaryFlags: Set<SecondaryFlag>
     ) {
-        val matchingSecondary =
-            secondaryMap.values.find { flag ->
-                if (isLongForm) {
-                    token == flag.short
-                } else {
-                    token == flag.long
-                }
-            }
-
-        if (matchingSecondary != null) {
+        fun mixedFormError(
+            isLongForm: Boolean,
+            primary: String,
+            matchingSecondary: SecondaryFlag
+        ): Nothing {
             val errorMessage =
                 if (isLongForm) {
                     "Cannot mix long form ($primary) with short form secondary flags " +
@@ -150,8 +158,12 @@ class ArgumentParser {
             throw IllegalArgumentException(errorMessage)
         }
 
+        secondaryFlags
+            .firstOrNull { flag -> token == if (isLongForm) flag.short else flag.long }
+            ?.let { matchingSecondary -> mixedFormError(isLongForm, primary, matchingSecondary) }
+
         val inlineMatchingSecondary =
-            secondaryMap.values.find { flag ->
+            secondaryFlags.firstOrNull { flag ->
                 if (isLongForm) {
                     token.startsWith(flag.short) && (token == flag.short || token.startsWith("${flag.short}="))
                 } else {
@@ -160,15 +172,7 @@ class ArgumentParser {
             }
 
         if (inlineMatchingSecondary != null) {
-            val errorMessage =
-                if (isLongForm) {
-                    "Cannot mix long form ($primary) with short form secondary flags " +
-                        "(${inlineMatchingSecondary.short}). Use ${inlineMatchingSecondary.long} instead."
-                } else {
-                    "Cannot mix short form ($primary) with long form secondary flags " +
-                        "(${inlineMatchingSecondary.long}). Use ${inlineMatchingSecondary.short} instead."
-                }
-            throw IllegalArgumentException(errorMessage)
+            mixedFormError(isLongForm, primary, inlineMatchingSecondary)
         }
     }
 }
@@ -190,41 +194,30 @@ private inline fun consumeValue(
 
 private fun parseInlineArgument(
     token: String,
-    secondaryMap: Map<String, SecondaryFlag>,
+    secondaryFlags: Set<SecondaryFlag>,
     isLongForm: Boolean
-): Pair<String, String>? {
-    val matchingKey =
+): Pair<FlagOption, String>? {
+    val matchingSecondaryFlag =
         if (isLongForm) {
-            secondaryMap.keys.find { token.startsWith("$it=") }
+            secondaryFlags.firstOrNull { token.startsWith("${it.long}=") }
         } else {
-            secondaryMap.keys.find { token.startsWith(it) }
+            secondaryFlags.firstOrNull { token.startsWith(it.short) }
         } ?: return null
 
-    val secondary = secondaryMap.getValue(matchingKey)
-
-    val isMixedForm =
-        if (isLongForm) {
-            matchingKey.startsWith("-") && !matchingKey.startsWith("--")
-        } else {
-            matchingKey.startsWith("--")
-        }
-
-    if (isMixedForm) {
-        return null
-    }
+    val secondaryFlagToken = matchingSecondaryFlag.value(isLongForm)
 
     val value =
         if (isLongForm) {
             token.substringAfter("=").trim()
         } else {
             token
-                .removePrefix(matchingKey)
+                .removePrefix(secondaryFlagToken)
                 .let { if (it.startsWith("=")) it.removePrefix("=") else it }
                 .trim()
         }
 
     return if (value.isNotEmpty()) {
-        Pair(secondary.long, value)
+        Pair(matchingSecondaryFlag.option, value)
     } else {
         null
     }

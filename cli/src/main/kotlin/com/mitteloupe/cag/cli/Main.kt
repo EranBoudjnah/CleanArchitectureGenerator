@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.argument.AppArgumentProcessor
+import com.mitteloupe.cag.cli.configuration.ClientConfiguration
 import com.mitteloupe.cag.cli.configuration.ClientConfigurationLoader
 import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
 import com.mitteloupe.cag.cli.help.printHelpMessage
@@ -130,13 +132,7 @@ fun main(arguments: Array<String>) {
             generator.generateArchitecture(architectureRequest)
         }
 
-        if (request.enableGit || configuration.git.autoStage == true) {
-            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
-            if (!git.isAvailable(gitRoot)) {
-                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
-            }
-            runCatching { git.stageAll(gitRoot) }
-        }
+        stageToGitIfEnabled(request.enableGit, configuration, projectModel, projectRoot, git)
     }
 
     featureRequests.forEach { requestFeature ->
@@ -157,13 +153,7 @@ fun main(arguments: Array<String>) {
             generator.generateFeature(request)
         }
 
-        if (requestFeature.enableGit || configuration.git.autoStage == true) {
-            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
-            if (!git.isAvailable(gitRoot)) {
-                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
-            }
-            runCatching { git.stageAll(gitRoot) }
-        }
+        stageToGitIfEnabled(requestFeature.enableGit, configuration, projectModel, projectRoot, git)
     }
 
     dataSourceRequests.forEach { request ->
@@ -178,13 +168,7 @@ fun main(arguments: Array<String>) {
             )
         }
 
-        if (request.enableGit || configuration.git.autoStage == true) {
-            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
-            if (!git.isAvailable(gitRoot)) {
-                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
-            }
-            runCatching { git.stageAll(gitRoot) }
-        }
+        stageToGitIfEnabled(request.enableGit, configuration, projectModel, projectRoot, git)
     }
 
     useCaseRequests.forEach { request ->
@@ -203,6 +187,8 @@ fun main(arguments: Array<String>) {
             setVersionProvider(configuration.existingProjectVersions)
             generator.generateUseCase(useCaseRequest)
         }
+
+        stageToGitIfEnabled(request.enableGit, configuration, projectModel, projectRoot, git)
     }
 
     viewModelRequests.forEach { request ->
@@ -225,10 +211,23 @@ fun main(arguments: Array<String>) {
             generator.generateViewModel(viewModelRequest)
         }
 
-        if (request.enableGit || configuration.git.autoStage == true) {
-            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
-            runCatching { git.stageAll(gitRoot) }
+        stageToGitIfEnabled(request.enableGit, configuration, projectModel, projectRoot, git)
+    }
+}
+
+private fun stageToGitIfEnabled(
+    requestEnableGit: Boolean,
+    configuration: ClientConfiguration,
+    projectModel: FilesystemProjectModel,
+    projectRoot: File,
+    git: Git
+) {
+    if (requestEnableGit || configuration.git.autoStage == true) {
+        val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+        if (!git.isAvailable(gitRoot)) {
+            println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
         }
+        runCatching { git.stageAll(gitRoot) }
     }
 }
 

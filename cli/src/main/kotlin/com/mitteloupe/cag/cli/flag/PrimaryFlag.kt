@@ -1,63 +1,80 @@
 package com.mitteloupe.cag.cli.flag
 
-object SecondaryFlagConstants {
-    const val NAME = "--name"
-    const val PACKAGE = "--package"
-    const val NO_COMPOSE = "--no-compose"
-    const val KTLINT = "--ktlint"
-    const val DETEKT = "--detekt"
-    const val KTOR = "--ktor"
-    const val RETROFIT = "--retrofit"
-    const val WITH = "--with"
-    const val PATH = "--path"
-    const val INPUT_TYPE = "--input-type"
-    const val OUTPUT_TYPE = "--output-type"
-    const val HELP_TOPIC = "--topic"
-    const val HELP_FORMAT = "--format"
-    const val GIT = "--git"
+import com.mitteloupe.cag.cli.flag.SecondaryFlags.nameSecondaryFlag
+
+object SecondaryFlagOptions {
+    val NAME = FlagOption("--name", "-n")
+    val PACKAGE = FlagOption("--package", "-p")
+    val NO_COMPOSE = FlagOption("--no-compose", "-nc")
+    val KTLINT = FlagOption("--ktlint", "-kl")
+    val DETEKT = FlagOption("--detekt", "-d")
+    val KTOR = FlagOption("--ktor", "-kr")
+    val RETROFIT = FlagOption("--retrofit", "-rt")
+    val WITH = FlagOption("--with", "-w")
+    val PATH = FlagOption("--path", "-p")
+    val INPUT_TYPE = FlagOption("--input-type", "-it")
+    val OUTPUT_TYPE = FlagOption("--output-type", "-ot")
+    val HELP_TOPIC = FlagOption("--topic", "-t")
+    val HELP_FORMAT = FlagOption("--format", "-f")
+    val GIT = FlagOption("--git", "-g")
+    val DEPENDENCY_INJECTION = FlagOption("--dependency-injection", "-DI")
 }
 
-object SecondaryFlags {
-    val ktlint = SecondaryFlag(long = SecondaryFlagConstants.KTLINT, short = "-kl", isBoolean = true)
-    val detekt = SecondaryFlag(long = SecondaryFlagConstants.DETEKT, short = "-d", isBoolean = true)
+private object SecondaryFlags {
+    fun PrimaryFlag.nameSecondaryFlag(
+        typeName: String,
+        exampleValue: String
+    ) = SecondaryFlag(
+        option = SecondaryFlagOptions.NAME,
+        isMandatory = true,
+        missingErrorMessage = nameError(typeName = typeName, exampleValue = exampleValue)
+    )
+
+    val packageName = SecondaryFlag(option = SecondaryFlagOptions.PACKAGE)
+    val noCompose = SecondaryFlag(option = SecondaryFlagOptions.NO_COMPOSE, isBoolean = true)
+    val ktlint = SecondaryFlag(option = SecondaryFlagOptions.KTLINT, isBoolean = true)
+    val detekt = SecondaryFlag(option = SecondaryFlagOptions.DETEKT, isBoolean = true)
     val git =
         SecondaryFlag(
-            long = SecondaryFlagConstants.GIT,
-            short = "-g",
+            option = SecondaryFlagOptions.GIT,
             isBoolean = true,
             missingErrorMessage = "Git flag must be used without a value"
         )
+    val path = SecondaryFlag(option = SecondaryFlagOptions.PATH)
+    val dependencyInjection = SecondaryFlag(option = SecondaryFlagOptions.DEPENDENCY_INJECTION)
 }
 
 interface PrimaryFlag {
     val long: String
     val short: String
-    val secondaryFlags: List<SecondaryFlag>
+    val secondaryFlags: Set<SecondaryFlag>
+
+    fun nameError(
+        typeName: String,
+        exampleValue: String
+    ) = "$typeName name is required. Use ${SecondaryFlagOptions.NAME.long}=$exampleValue or " +
+        "${SecondaryFlagOptions.NAME.short}=$exampleValue"
 
     data object VersionPrimary : PrimaryFlag {
         override val long = "--version"
         override val short = "-v"
-        override val secondaryFlags = emptyList<SecondaryFlag>()
+        override val secondaryFlags = emptySet<SecondaryFlag>()
     }
 
     data object NewProjectPrimary : PrimaryFlag {
         override val long = "--new-project"
         override val short = "-np"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(
-                    SecondaryFlagConstants.NAME,
-                    "-n",
-                    isMandatory = true,
-                    missingErrorMessage = "Project name is required. Use --name=ProjectName or -n=ProjectName"
-                ),
-                SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p"),
-                SecondaryFlag(SecondaryFlagConstants.NO_COMPOSE, "-nc", isBoolean = true),
+            linkedSetOf(
+                nameSecondaryFlag(typeName = "Project", exampleValue = "ProjectName"),
+                SecondaryFlags.packageName,
+                SecondaryFlags.noCompose,
                 SecondaryFlags.ktlint,
                 SecondaryFlags.detekt,
-                SecondaryFlag(SecondaryFlagConstants.KTOR, "-kt", isBoolean = true),
-                SecondaryFlag(SecondaryFlagConstants.RETROFIT, "-rt", isBoolean = true),
-                SecondaryFlags.git
+                SecondaryFlag(option = SecondaryFlagOptions.KTOR, isBoolean = true),
+                SecondaryFlag(option = SecondaryFlagOptions.RETROFIT, isBoolean = true),
+                SecondaryFlags.git,
+                SecondaryFlags.dependencyInjection
             )
     }
 
@@ -65,26 +82,16 @@ interface PrimaryFlag {
         override val long = "--new-architecture"
         override val short = "-na"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(SecondaryFlagConstants.NO_COMPOSE, "-nc", isBoolean = true),
-                SecondaryFlags.ktlint,
-                SecondaryFlags.detekt,
-                SecondaryFlags.git
-            )
+            linkedSetOf(SecondaryFlags.noCompose, SecondaryFlags.ktlint, SecondaryFlags.detekt, SecondaryFlags.git)
     }
 
     data object NewFeaturePrimary : PrimaryFlag {
         override val long = "--new-feature"
         override val short = "-nf"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(
-                    SecondaryFlagConstants.NAME,
-                    "-n",
-                    isMandatory = true,
-                    missingErrorMessage = "Feature name is required. Use --name=FeatureName or -n=FeatureName"
-                ),
-                SecondaryFlag(SecondaryFlagConstants.PACKAGE, "-p"),
+            linkedSetOf(
+                nameSecondaryFlag(typeName = "Feature", exampleValue = "FeatureName"),
+                SecondaryFlags.packageName,
                 SecondaryFlags.ktlint,
                 SecondaryFlags.detekt,
                 SecondaryFlags.git
@@ -95,14 +102,9 @@ interface PrimaryFlag {
         override val long = "--new-datasource"
         override val short = "-nds"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(
-                    SecondaryFlagConstants.NAME,
-                    "-n",
-                    isMandatory = true,
-                    missingErrorMessage = "Data source name is required. Use --name=DataSourceName or -n=DataSourceName"
-                ),
-                SecondaryFlag(SecondaryFlagConstants.WITH, "-w"),
+            linkedSetOf(
+                nameSecondaryFlag(typeName = "Data source", exampleValue = "DataSourceName"),
+                SecondaryFlag(option = SecondaryFlagOptions.WITH),
                 SecondaryFlags.git
             )
     }
@@ -111,16 +113,12 @@ interface PrimaryFlag {
         override val long = "--new-use-case"
         override val short = "-nuc"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(
-                    SecondaryFlagConstants.NAME,
-                    "-n",
-                    isMandatory = true,
-                    missingErrorMessage = "Use case name is required. Use --name=UseCaseName or -n=UseCaseName"
-                ),
-                SecondaryFlag(SecondaryFlagConstants.PATH, "-p"),
-                SecondaryFlag(SecondaryFlagConstants.INPUT_TYPE, "-it"),
-                SecondaryFlag(SecondaryFlagConstants.OUTPUT_TYPE, "-ot")
+            linkedSetOf(
+                nameSecondaryFlag(typeName = "Use case", exampleValue = "UseCaseName"),
+                SecondaryFlags.path,
+                SecondaryFlag(option = SecondaryFlagOptions.INPUT_TYPE),
+                SecondaryFlag(option = SecondaryFlagOptions.OUTPUT_TYPE),
+                SecondaryFlags.git
             )
     }
 
@@ -128,14 +126,9 @@ interface PrimaryFlag {
         override val long = "--new-view-model"
         override val short = "-nvm"
         override val secondaryFlags =
-            listOf(
-                SecondaryFlag(
-                    SecondaryFlagConstants.NAME,
-                    "-n",
-                    isMandatory = true,
-                    missingErrorMessage = "ViewModel name is required. Use ${SecondaryFlagConstants.NAME}=ViewModelName or -n=ViewModelName"
-                ),
-                SecondaryFlag(SecondaryFlagConstants.PATH, "-p"),
+            linkedSetOf(
+                nameSecondaryFlag(typeName = "ViewModel", exampleValue = "ViewModelName"),
+                SecondaryFlags.path,
                 SecondaryFlags.git
             )
     }
@@ -143,10 +136,10 @@ interface PrimaryFlag {
     data object HelpPrimary : PrimaryFlag {
         override val long = "--help"
         override val short = "-h"
-        override val secondaryFlags: List<SecondaryFlag> =
-            listOf(
-                SecondaryFlag(SecondaryFlagConstants.HELP_TOPIC, "-t"),
-                SecondaryFlag(SecondaryFlagConstants.HELP_FORMAT, "-f")
+        override val secondaryFlags =
+            linkedSetOf(
+                SecondaryFlag(option = SecondaryFlagOptions.HELP_TOPIC),
+                SecondaryFlag(option = SecondaryFlagOptions.HELP_FORMAT)
             )
     }
 }

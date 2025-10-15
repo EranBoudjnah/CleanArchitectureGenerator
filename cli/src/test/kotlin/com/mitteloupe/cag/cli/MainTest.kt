@@ -16,7 +16,7 @@ import java.io.PrintStream
 import java.nio.file.Files
 
 private const val NEW_PROJECT_SYNTAX =
-    "[--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git]]"
+    "[--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git] [--dependency-injection=hilt|koin|none]]"
 private const val NEW_ARCHITECTURE_SYNTAX = "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git]]"
 private const val NEW_FEATURE_SYNTAX = "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
 private const val NEW_DATASOURCE_SYNTAX = "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
@@ -122,23 +122,29 @@ Options:
     --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
         Specify the package name (required)
     --no-compose | -nc
-      Disable Compose support for the project
+        Disable Compose support for the project
     --ktlint | -kl
-      Enable ktlint for the project
+        Enable ktlint for the project
     --detekt | -d
-      Enable detekt for the project
-    --ktor | -kt
-      Enable Ktor for data sources
+        Enable detekt for the project
+    --ktor | -kr
+        Enable Ktor for data sources
     --retrofit | -rt
-      Enable Retrofit for data sources
+        Enable Retrofit for data sources
+    --git | -g
+        Automatically initialize git repository and stage changes
+    --dependency-injection=hilt[default]|koin|none | -DI hilt[default]|koin|none
+        Specify the dependency injection library
   --new-architecture | -na
       Generate a new Clean Architecture package with domain, presentation, and UI layers
     --no-compose | -nc
-      Disable Compose support for the preceding architecture package
+        Disable Compose support for the preceding architecture package
     --ktlint | -kl
-      Enable ktlint for the preceding architecture package
+        Enable ktlint for the preceding architecture package
     --detekt | -d
-      Enable detekt for the preceding architecture package
+        Enable detekt for the preceding architecture package
+    --git | -g
+        Automatically stage changes to git repository
   --new-feature | -nf
       Generate a new feature
     --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
@@ -146,27 +152,35 @@ Options:
     --package=PackageName | --package PackageName | -p=PackageName | -p PackageName | -pPackageName
         Override the feature package for the preceding feature
     --ktlint | -kl
-      Enable ktlint for the preceding feature (adds plugin and .editorconfig if missing)
+        Enable ktlint for the preceding feature (adds plugin and .editorconfig if missing)
     --detekt | -d
-      Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
+        Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
+    --git | -g
+        Automatically stage changes to git repository
   --new-datasource | -nds
       Generate a new data source
     --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
         Specify the data source name (required, DataSource suffix will be added automatically)
     --with=ktor|retrofit|ktor,retrofit | -w=ktor|retrofit|ktor,retrofit
         Attach dependencies to the preceding new data source
+    --git | -g
+        Automatically stage changes to git repository
   --new-use-case | -nuc
       Generate a new use case
     --name=UseCaseName | -n=UseCaseName | -n UseCaseName | -nUseCaseName
         Specify the use case name (required)
     --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
         Specify the target directory for the preceding use case
+    --git | -g
+        Automatically stage changes to git repository
   --new-view-model | -nvm
       Generate a new ViewModel
     --name=ViewModelName | -n=ViewModelName | -n ViewModelName | -nViewModelName
         Specify the ViewModel name (required)
     --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
         Specify the target directory for the preceding ViewModel
+    --git | -g
+        Automatically stage changes to git repository
   --help, -h
       Show this help message and exit
 """

@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.argument.AppArgumentProcessor
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 import com.mitteloupe.cag.cli.request.FeatureRequest
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
@@ -592,49 +593,94 @@ class AppArgumentProcessorTest {
         @Test
         fun `Given use case with all optional parameters when getNewUseCases then returns complete request`() {
             // Given
-            val givenArguments = arrayOf("--new-use-case", "--name=GetUser", "--path=user", "--input-type=String", "--output-type=User")
+            val givenArguments =
+                arrayOf("--new-use-case", "--name=GetUser", "--path=user", "--input-type=String", "--output-type=User", "--git")
+            val expectedRequest =
+                UseCaseRequest(
+                    useCaseName = "GetUser",
+                    targetPath = "user",
+                    inputDataType = "String",
+                    outputDataType = "User",
+                    enableGit = true
+                )
+            val expectedRequests = listOf(expectedRequest)
 
             // When
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            assertEquals(listOf(UseCaseRequest("GetUser", "user", "String", "User")), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
         fun `Given use case with short flags when getNewUseCases then parses correctly`() {
             // Given
-            val givenArguments = arrayOf("-nuc", "-n=CreateUser", "-p", "user", "-it", "UserData", "-ot", "User")
+            val givenArguments = arrayOf("-nuc", "-n=CreateUser", "-p", "user", "-it", "UserData", "-ot", "User", "-g")
+            val expectedRequest =
+                UseCaseRequest(
+                    useCaseName = "CreateUser",
+                    targetPath = "user",
+                    inputDataType = "UserData",
+                    outputDataType = "User",
+                    enableGit = true
+                )
+            val expectedRequests = listOf(expectedRequest)
 
             // When
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            assertEquals(listOf(UseCaseRequest("CreateUser", "user", "UserData", "User")), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
         fun `Given use case with only name when getNewUseCases then returns request with null optional parameters`() {
             // Given
             val givenArguments = arrayOf("--new-use-case", "--name=DeleteUser")
+            val expectedRequest =
+                UseCaseRequest(
+                    useCaseName = "DeleteUser",
+                    targetPath = null,
+                    inputDataType = null,
+                    outputDataType = null,
+                    enableGit = false
+                )
+            val expectedRequests = listOf(expectedRequest)
 
             // When
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            assertEquals(listOf(UseCaseRequest("DeleteUser", null, null, null)), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
         fun `Given multiple use cases when getNewUseCases then returns all requests`() {
             // Given
             val givenArguments = arrayOf("--new-use-case", "--name=First", "--new-use-case", "--name=Second", "--path=test")
+            val expectedRequest1 =
+                UseCaseRequest(
+                    useCaseName = "First",
+                    targetPath = null,
+                    inputDataType = null,
+                    outputDataType = null,
+                    enableGit = false
+                )
+            val expectedRequest2 =
+                UseCaseRequest(
+                    useCaseName = "Second",
+                    targetPath = "test",
+                    inputDataType = null,
+                    outputDataType = null,
+                    enableGit = false
+                )
+            val expectedRequests = listOf(expectedRequest1, expectedRequest2)
 
             // When
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            assertEquals(listOf(UseCaseRequest("First", null, null, null), UseCaseRequest("Second", "test", null, null)), result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -770,7 +816,7 @@ class AppArgumentProcessorTest {
         @Test
         fun `Given project template with short flags when getNewProjectTemplate then parses correctly`() {
             // Given
-            val givenArguments = arrayOf("-np", "-n=TestApp", "-p", "com.test", "-nc", "-kl", "-d", "-kt", "-rt")
+            val givenArguments = arrayOf("-np", "-n=TestApp", "-p", "com.test", "-nc", "-kl", "-d", "-kr", "-rt")
             val expectedRequest =
                 ProjectTemplateRequest(
                     projectName = "TestApp",

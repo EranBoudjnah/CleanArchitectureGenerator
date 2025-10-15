@@ -1,5 +1,7 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.argument.ArgumentParser
+import com.mitteloupe.cag.cli.flag.FlagOption
 import com.mitteloupe.cag.cli.flag.PrimaryFlag
 import com.mitteloupe.cag.cli.flag.SecondaryFlag
 import org.junit.Assert.assertEquals
@@ -18,7 +20,7 @@ class ArgumentParserTest {
     private fun createPrimaryFlag(
         long: String,
         short: String,
-        secondaryFlags: List<SecondaryFlag>
+        secondaryFlags: Set<SecondaryFlag>
     ): PrimaryFlag =
         object : PrimaryFlag {
             override val long = long
@@ -30,22 +32,38 @@ class ArgumentParserTest {
     fun `Given no arguments when parsePrimaryWithSecondaries then returns empty list`() {
         // Given
         val givenArguments = emptyArray<String>()
+        val secondaryOption = FlagOption("--beta", "-b")
+        val expectedParsedArguments = emptyList<Map<FlagOption, String>>()
 
         // When
         val result =
             classUnderTest.parsePrimaryWithSecondaries(
                 arguments = givenArguments,
-                primaryFlag = createPrimaryFlag("--alpha", "-a", listOf(SecondaryFlag("--beta", "-b")))
+                primaryFlag =
+                    createPrimaryFlag(
+                        long = "--alpha",
+                        short = "-a",
+                        secondaryFlags = setOf(SecondaryFlag(secondaryOption))
+                    )
             )
 
         // Then
-        assertEquals(emptyList<Map<String, String>>(), result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
     fun `Given valueless primary with secondaries when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=x", "--gamma", "y", "--alpha", "--beta", "z")
+        val secondaryOption1 = FlagOption("--beta", "-b")
+        val secondaryOption2 = FlagOption("--gamma", "-g")
+        val primaryLong = "--primary"
+        val givenArguments =
+            arrayOf(primaryLong, "${secondaryOption1.long}=x", secondaryOption2.long, "y", primaryLong, secondaryOption1.long, "z")
+        val expectedParsedArguments =
+            listOf(
+                mapOf(secondaryOption1 to "x", secondaryOption2 to "y"),
+                mapOf(secondaryOption1 to "z")
+            )
 
         // When
         val result =
@@ -53,26 +71,29 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
-                        short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                        long = primaryLong,
+                        short = "-p",
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption1), SecondaryFlag(secondaryOption2))
                     )
             )
 
         // Then
-        assertEquals(
-            listOf(
-                mapOf("--beta" to "x", "--gamma" to "y"),
-                mapOf("--beta" to "z")
-            ),
-            result
-        )
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
     fun `Given valueless primary with equals syntax when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=x", "--gamma=y", "--alpha", "--beta=z")
+        val primaryLong = "--alpha"
+        val secondaryOption1 = FlagOption("--beta", "-b")
+        val secondaryOption2 = FlagOption("--gamma", "-g")
+        val givenArguments =
+            arrayOf(primaryLong, "${secondaryOption1.long}=x", "${secondaryOption2.long}=y", primaryLong, "${secondaryOption1.long}=z")
+        val expectedParsedArguments =
+            listOf(
+                mapOf(secondaryOption1 to "x", secondaryOption2 to "y"),
+                mapOf(secondaryOption1 to "z")
+            )
 
         // When
         val result =
@@ -80,26 +101,24 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption1), SecondaryFlag(secondaryOption2))
                     )
             )
 
         // Then
-        assertEquals(
-            listOf(
-                mapOf("--beta" to "x", "--gamma" to "y"),
-                mapOf("--beta" to "z")
-            ),
-            result
-        )
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
     fun `Given mandatory flag is provided when parsePrimaryWithSecondaries then succeeds`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=x")
+        val secondaryOption = FlagOption(long = "--beta", short = "-b")
+        val primaryLong = "--alpha"
+        val secondaryValue = "x"
+        val givenArguments = arrayOf(primaryLong, "${secondaryOption.long}=$secondaryValue")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to secondaryValue))
 
         // When
         val result =
@@ -107,13 +126,12 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    option = secondaryOption,
                                     isMandatory = true,
                                     missingErrorMessage = "Beta is required"
                                 )
@@ -122,16 +140,14 @@ class ArgumentParserTest {
             )
 
         // Then
-        assertEquals(
-            listOf(mapOf("--beta" to "x")),
-            result
-        )
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
     fun `Given mandatory flag is missing when parsePrimaryWithSecondaries then throws exception`() {
         // Given
         val givenArguments = arrayOf("--alpha")
+        val expectedErrorMessage = "Beta is required"
 
         // When
         try {
@@ -142,12 +158,11 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
-                                    missingErrorMessage = "Beta is required"
+                                    missingErrorMessage = expectedErrorMessage
                                 )
                             )
                     )
@@ -155,7 +170,7 @@ class ArgumentParserTest {
             fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            assertEquals("Beta is required", exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -163,6 +178,7 @@ class ArgumentParserTest {
     fun `Given multiple mandatory flags when parsePrimaryWithSecondaries then validates all`() {
         // Given
         val givenArguments = arrayOf("--alpha", "--beta=x")
+        val expectedErrorMessage = "Gamma is required"
 
         // When
         try {
@@ -173,18 +189,16 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
                                     missingErrorMessage = "Beta is required"
                                 ),
                                 SecondaryFlag(
-                                    long = "--gamma",
-                                    short = "-g",
+                                    FlagOption(long = "--gamma", short = "-g"),
                                     isMandatory = true,
-                                    missingErrorMessage = "Gamma is required"
+                                    missingErrorMessage = expectedErrorMessage
                                 )
                             )
                     )
@@ -192,7 +206,7 @@ class ArgumentParserTest {
             fail("Expected IllegalArgumentException to be thrown")
         } catch (e: IllegalArgumentException) {
             // Then
-            assertEquals("Gamma is required", e.message)
+            assertEquals(expectedErrorMessage, e.message)
         }
     }
 
@@ -200,6 +214,7 @@ class ArgumentParserTest {
     fun `Given mandatory flag with empty value when parsePrimaryWithSecondaries then throws exception`() {
         // Given
         val givenArguments = arrayOf("--alpha", "--beta=")
+        val expectedErrorMessage = "Beta is required"
 
         // When
         try {
@@ -210,12 +225,11 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
-                                    missingErrorMessage = "Beta is required"
+                                    missingErrorMessage = expectedErrorMessage
                                 )
                             )
                     )
@@ -223,7 +237,7 @@ class ArgumentParserTest {
             fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            assertEquals("Beta is required", exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -231,6 +245,7 @@ class ArgumentParserTest {
     fun `Given mandatory flag with default error message when parsePrimaryWithSecondaries then uses default message`() {
         // Given
         val givenArguments = arrayOf("--alpha")
+        val expectedErrorMessage = "Missing mandatory flag: --beta"
 
         // When
         try {
@@ -241,10 +256,9 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true
                                 )
                             )
@@ -253,7 +267,7 @@ class ArgumentParserTest {
             fail("Expected IllegalArgumentException to be thrown")
         } catch (e: IllegalArgumentException) {
             // Then
-            assertEquals("Missing mandatory flag: --beta", e.message)
+            assertEquals(expectedErrorMessage, e.message)
         }
     }
 
@@ -272,7 +286,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -296,7 +310,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
             fail("Expected IllegalArgumentException to be thrown")
@@ -309,8 +323,10 @@ class ArgumentParserTest {
     @Test
     fun `Given long primary with matching long secondaries when parsePrimaryWithSecondaries then processes correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "value")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, secondaryOption.long, "value")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "value"))
 
         // When
         val result =
@@ -318,9 +334,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -331,8 +347,11 @@ class ArgumentParserTest {
     @Test
     fun `Given short primary with matching short secondaries when parsePrimaryWithSecondaries then processes correctly`() {
         // Given
-        val givenArguments = arrayOf("-a", "-b", "value")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryShort = "-a"
+        val secondaryValue = "value"
+        val givenArguments = arrayOf(primaryShort, secondaryOption.short, secondaryValue)
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to secondaryValue))
 
         // When
         val result =
@@ -341,8 +360,8 @@ class ArgumentParserTest {
                 primaryFlag =
                     createPrimaryFlag(
                         long = "--alpha",
-                        short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        short = primaryShort,
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -354,7 +373,7 @@ class ArgumentParserTest {
     fun `Given primary without secondaries when parsePrimaryWithSecondaries then returns empty map`() {
         // Given
         val givenArguments = arrayOf("--alpha")
-        val expectedParsedArguments = listOf(emptyMap<String, String>())
+        val expectedParsedArguments = listOf(emptyMap<FlagOption, String>())
 
         // When
         val result =
@@ -364,7 +383,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
 
@@ -375,8 +394,9 @@ class ArgumentParserTest {
     @Test
     fun `Given boolean flag when parsePrimaryWithSecondaries then sets empty value`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta")
-        val expectedParsedArguments = listOf(mapOf("--beta" to ""))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val givenArguments = arrayOf("--alpha", secondaryOption.long)
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to ""))
 
         // When
         val result =
@@ -386,7 +406,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption, isBoolean = true))
                     )
             )
 
@@ -397,8 +417,10 @@ class ArgumentParserTest {
     @Test
     fun `Given boolean flag with value when parsePrimaryWithSecondaries then ignores value`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "ignored")
-        val expectedParsedArguments = listOf(mapOf("--beta" to ""))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, secondaryOption.long, "ignored")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to ""))
 
         // When
         val result =
@@ -406,9 +428,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption, isBoolean = true))
                     )
             )
 
@@ -420,7 +442,8 @@ class ArgumentParserTest {
     fun `Given short form boolean flag when parsePrimaryWithSecondaries then sets empty value`() {
         // Given
         val givenArguments = arrayOf("-a", "-b")
-        val expectedParsedArguments = listOf(mapOf("--beta" to ""))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to ""))
 
         // When
         val result =
@@ -430,7 +453,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b", isBoolean = true))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption, isBoolean = true))
                     )
             )
 
@@ -441,8 +464,11 @@ class ArgumentParserTest {
     @Test
     fun `Given inline long form argument when parsePrimaryWithSecondaries then parses correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta=value")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val secondaryValue = "value"
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, "${secondaryOption.long}=$secondaryValue")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to secondaryValue))
 
         // When
         val result =
@@ -450,9 +476,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -463,8 +489,10 @@ class ArgumentParserTest {
     @Test
     fun `Given inline short form argument when parsePrimaryWithSecondaries then parses correctly`() {
         // Given
-        val givenArguments = arrayOf("-a", "-bvalue")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryShort = "-a"
+        val givenArguments = arrayOf(primaryShort, "${secondaryOption.short}value")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "value"))
 
         // When
         val result =
@@ -473,8 +501,8 @@ class ArgumentParserTest {
                 primaryFlag =
                     createPrimaryFlag(
                         long = "--alpha",
-                        short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        short = primaryShort,
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -485,8 +513,10 @@ class ArgumentParserTest {
     @Test
     fun `Given inline short form with equals when parsePrimaryWithSecondaries then parses correctly`() {
         // Given
-        val givenArguments = arrayOf("-a", "-b=value")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryShort = "-a"
+        val givenArguments = arrayOf(primaryShort, "${secondaryOption.short}=value")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "value"))
 
         // When
         val result =
@@ -495,8 +525,8 @@ class ArgumentParserTest {
                 primaryFlag =
                     createPrimaryFlag(
                         long = "--alpha",
-                        short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        short = primaryShort,
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -508,7 +538,7 @@ class ArgumentParserTest {
     fun `Given empty inline value when parsePrimaryWithSecondaries then ignores flag`() {
         // Given
         val givenArguments = arrayOf("--alpha", "--beta=")
-        val expectedParsedArguments = emptyList<Map<String, String>>()
+        val expectedParsedArguments = emptyList<Map<FlagOption, String>>()
 
         // When
         val result =
@@ -518,7 +548,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
 
@@ -529,8 +559,10 @@ class ArgumentParserTest {
     @Test
     fun `Given whitespace in values when parsePrimaryWithSecondaries then trims values`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "  value  ")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, secondaryOption.long, "  value  ")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "value"))
 
         // When
         val result =
@@ -538,9 +570,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -551,8 +583,11 @@ class ArgumentParserTest {
     @Test
     fun `Given special characters in values when parsePrimaryWithSecondaries then preserves values`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "value-with-special.chars@123")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value-with-special.chars@123"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val secondaryValue = "value-with-special.chars@123"
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, secondaryOption.long, secondaryValue)
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to secondaryValue))
 
         // When
         val result =
@@ -560,9 +595,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -573,11 +608,17 @@ class ArgumentParserTest {
     @Test
     fun `Given multiple primaries with mixed secondaries when parsePrimaryWithSecondaries then groups correctly`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "x", "--alpha", "--gamma", "y", "--alpha")
+        val primaryLong = "--alpha"
+        val secondaryOption1 = FlagOption("--beta", "-b")
+        val secondaryOption2 = FlagOption("--gamma", "-g")
+        val secondaryValue1 = "x"
+        val secondaryValue2 = "y"
+        val givenArguments =
+            arrayOf(primaryLong, secondaryOption1.long, secondaryValue1, primaryLong, secondaryOption2.long, secondaryValue2, primaryLong)
         val expectedParsedArguments =
             listOf(
-                mapOf("--beta" to "x"),
-                mapOf("--gamma" to "y"),
+                mapOf(secondaryOption1 to secondaryValue1),
+                mapOf(secondaryOption2 to secondaryValue2),
                 emptyMap()
             )
 
@@ -589,7 +630,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption1), SecondaryFlag(secondaryOption2))
                     )
             )
 
@@ -600,8 +641,9 @@ class ArgumentParserTest {
     @Test
     fun `Given unknown flags when parsePrimaryWithSecondaries then ignores unknown flags`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--unknown", "value", "--beta", "x")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "x"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val givenArguments = arrayOf("--alpha", "--unknown", "value", secondaryOption.long, "x")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "x"))
 
         // When
         val result =
@@ -611,7 +653,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
@@ -623,7 +665,7 @@ class ArgumentParserTest {
     fun `Given flags without primary when parsePrimaryWithSecondaries then returns empty list`() {
         // Given
         val givenArguments = arrayOf("--beta", "value", "--gamma", "other")
-        val expectedParsedArguments = emptyList<Map<String, String>>()
+        val expectedParsedArguments = emptyList<Map<FlagOption, String>>()
 
         // When
         val result =
@@ -633,7 +675,7 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"), SecondaryFlag("--gamma", "-g"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")), SecondaryFlag(FlagOption("--gamma", "-g")))
                     )
             )
 
@@ -644,8 +686,10 @@ class ArgumentParserTest {
     @Test
     fun `Given multiple mandatory flags when all provided when parsePrimaryWithSecondaries then succeeds`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta", "x", "--gamma", "y")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "x", "--gamma" to "y"))
+        val secondaryOption1 = FlagOption("--beta", "-b")
+        val secondaryOption2 = FlagOption("--gamma", "-g")
+        val givenArguments = arrayOf("--alpha", secondaryOption1.long, "x", secondaryOption2.long, "y")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption1 to "x", secondaryOption2 to "y"))
 
         // When
         val result =
@@ -656,16 +700,14 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    "--beta",
-                                    "-b",
+                                    secondaryOption1,
                                     isMandatory = true,
                                     missingErrorMessage = "Beta required"
                                 ),
                                 SecondaryFlag(
-                                    "--gamma",
-                                    "-g",
+                                    secondaryOption2,
                                     isMandatory = true,
                                     missingErrorMessage = "Gamma required"
                                 )
@@ -674,10 +716,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        assertEquals(
-            expectedParsedArguments,
-            result
-        )
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -697,22 +736,19 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
                                     missingErrorMessage = "Beta required"
                                 ),
                                 SecondaryFlag(
-                                    long = "--gamma",
-                                    short = "-g",
+                                    FlagOption(long = "--gamma", short = "-g"),
                                     isMandatory = true,
                                     missingErrorMessage = expectedFirstErrorMessage
                                 ),
                                 SecondaryFlag(
-                                    long = "--delta",
-                                    short = "-d",
+                                    FlagOption(long = "--delta", short = "-d"),
                                     isMandatory = true,
                                     missingErrorMessage = expectedSecondErrorMessage
                                 )
@@ -729,8 +765,10 @@ class ArgumentParserTest {
     @Test
     fun `Given boolean mandatory flag when provided when parsePrimaryWithSecondaries then succeeds`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--beta")
-        val expectedParsedArguments = listOf(mapOf("--beta" to ""))
+        val secondaryOption = FlagOption(long = "--beta", short = "-b")
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, secondaryOption.long)
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to ""))
 
         // When
         val result =
@@ -738,13 +776,12 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    secondaryOption,
                                     isMandatory = true,
                                     isBoolean = true,
                                     missingErrorMessage = "Beta required"
@@ -754,10 +791,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        assertEquals(
-            expectedParsedArguments,
-            result
-        )
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -775,10 +809,9 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
                                     isBoolean = true,
                                     missingErrorMessage = expectedErrorMessage
@@ -796,22 +829,26 @@ class ArgumentParserTest {
     @Test
     fun `Given complex mixed scenario when parsePrimaryWithSecondaries then handles correctly`() {
         // Given
+        val secondaryOption1 = FlagOption("--beta", "-b")
+        val secondaryOption2 = FlagOption("--gamma", "-g")
+        val secondaryOption3 = FlagOption("--delta", "-d")
+        val primaryLong = "--alpha"
         val givenArguments =
             arrayOf(
-                "--alpha",
-                "--beta=inline",
-                "--gamma",
+                primaryLong,
+                "${secondaryOption1.long}=inline",
+                secondaryOption2.long,
                 "separate",
-                "--delta",
-                "--alpha",
-                "--beta",
+                secondaryOption3.long,
+                primaryLong,
+                secondaryOption1.long,
                 "separate",
-                "--gamma=inline"
+                "${secondaryOption2.long}=inline"
             )
         val expectedParsedArguments =
             listOf(
-                mapOf("--beta" to "inline", "--gamma" to "separate", "--delta" to ""),
-                mapOf("--beta" to "separate", "--gamma" to "inline")
+                mapOf(secondaryOption1 to "inline", secondaryOption2 to "separate", secondaryOption3 to ""),
+                mapOf(secondaryOption1 to "separate", secondaryOption2 to "inline")
             )
 
         // When
@@ -820,13 +857,13 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
                         secondaryFlags =
-                            listOf(
-                                SecondaryFlag("--beta", "-b"),
-                                SecondaryFlag("--gamma", "-g"),
-                                SecondaryFlag("--delta", "-d", isBoolean = true)
+                            linkedSetOf(
+                                SecondaryFlag(secondaryOption1),
+                                SecondaryFlag(secondaryOption2),
+                                SecondaryFlag(secondaryOption3, isBoolean = true)
                             )
                     )
             )
@@ -852,10 +889,9 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
                                     missingErrorMessage = "Beta is required"
                                 )
@@ -885,10 +921,9 @@ class ArgumentParserTest {
                         long = "--alpha",
                         short = "-a",
                         secondaryFlags =
-                            listOf(
+                            linkedSetOf(
                                 SecondaryFlag(
-                                    long = "--beta",
-                                    short = "-b",
+                                    FlagOption(long = "--beta", short = "-b"),
                                     isMandatory = true,
                                     missingErrorMessage = "Beta is required"
                                 )
@@ -905,8 +940,10 @@ class ArgumentParserTest {
     @Test
     fun `Given mixed invalid and valid flags when parsePrimaryWithSecondaries then ignores invalid flags`() {
         // Given
-        val givenArguments = arrayOf("--alpha", "--invalid", "--beta", "value", "-unknown", "test")
-        val expectedParsedArguments = listOf(mapOf("--beta" to "value"))
+        val secondaryOption = FlagOption("--beta", "-b")
+        val primaryLong = "--alpha"
+        val givenArguments = arrayOf(primaryLong, "--invalid", secondaryOption.long, "value", "-unknown", "test")
+        val expectedParsedArguments = listOf(mapOf(secondaryOption to "value"))
 
         // When
         val result =
@@ -914,9 +951,9 @@ class ArgumentParserTest {
                 arguments = givenArguments,
                 primaryFlag =
                     createPrimaryFlag(
-                        long = "--alpha",
+                        long = primaryLong,
                         short = "-a",
-                        secondaryFlags = listOf(SecondaryFlag("--beta", "-b"))
+                        secondaryFlags = linkedSetOf(SecondaryFlag(secondaryOption))
                     )
             )
 
