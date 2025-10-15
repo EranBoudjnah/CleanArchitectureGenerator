@@ -198,17 +198,6 @@ private fun parseInlineArgument(
 
     val secondaryFlagToken = matchingSecondaryFlag.value(isLongForm)
 
-//    val isMixedForm =
-//        if (isLongForm) {
-//            matchingSecondaryFlag.startsWith("-") && !matchingSecondaryFlag.startsWith("--")
-//        } else {
-//            matchingSecondaryFlag.startsWith("--")
-//        }
-//
-//    if (isMixedForm) {
-//        return null
-//    }
-
     val value =
         if (isLongForm) {
             token.substringAfter("=").trim()
