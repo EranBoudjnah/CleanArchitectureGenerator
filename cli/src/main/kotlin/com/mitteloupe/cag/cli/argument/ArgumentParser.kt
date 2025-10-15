@@ -150,14 +150,9 @@ class ArgumentParser {
             throw IllegalArgumentException(errorMessage)
         }
 
-        val matchingSecondary =
-            secondaryFlags.firstOrNull { flag ->
-                token == if (isLongForm) flag.short else flag.long
-            }
-
-        if (matchingSecondary != null) {
-            mixedFormError(isLongForm, primary, matchingSecondary)
-        }
+        secondaryFlags
+            .firstOrNull { flag -> token == if (isLongForm) flag.short else flag.long }
+            ?.let { matchingSecondary -> mixedFormError(isLongForm, primary, matchingSecondary) }
 
         val inlineMatchingSecondary =
             secondaryFlags.firstOrNull { flag ->
