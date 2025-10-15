@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli
 
+import com.mitteloupe.cag.cli.argument.AppArgumentProcessor
 import com.mitteloupe.cag.cli.configuration.ClientConfigurationLoader
 import com.mitteloupe.cag.cli.filesystem.CliFileSystemBridge
 import com.mitteloupe.cag.cli.help.printHelpMessage
@@ -202,6 +203,14 @@ fun main(arguments: Array<String>) {
         executeAndReport {
             setVersionProvider(configuration.existingProjectVersions)
             generator.generateUseCase(useCaseRequest)
+        }
+
+        if (request.enableGit || configuration.git.autoStage == true) {
+            val gitRoot = projectModel.selectedModuleRootDir() ?: projectRoot
+            if (!git.isAvailable(gitRoot)) {
+                println("Warning: Git is not available. Configure [git].path in .cagrc or install git.")
+            }
+            runCatching { git.stageAll(gitRoot) }
         }
     }
 

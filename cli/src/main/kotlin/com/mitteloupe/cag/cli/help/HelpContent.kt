@@ -3,7 +3,7 @@ package com.mitteloupe.cag.cli.help
 object HelpContent {
     private const val NEW_PROJECT_SYNTAX =
         "[--new-project --name=ProjectName --package=PackageName " +
-            "[--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git]]"
+            "[--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git] [--dependency-injection=hilt|koin|none]]"
     private const val NEW_ARCHITECTURE_SYNTAX = "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git]]"
     private const val NEW_FEATURE_SYNTAX = "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
     private const val NEW_DATASOURCE_SYNTAX = "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
@@ -36,18 +36,21 @@ object HelpContent {
                         Enable ktlint for the project
                     --detekt | -d
                         Enable detekt for the project
-                    --ktor | -kt
+                    --ktor | -kr
                         Enable Ktor for data sources
                     --retrofit | -rt
                         Enable Retrofit for data sources
                     --git | -g
                         Automatically initialize git repository and stage changes
+                    --dependency-injection=hilt[default]|koin|none | -di hilt[default]|koin|none
+                        Specify the dependency injection library
 
                 Examples:
                   cag --new-project --name=MyApp --package=com.example.myapp
                   cag --new-project --name=MyApp --package=com.example.myapp --no-compose --ktlint --detekt
                   cag --new-project --name=MyApp --package=com.example.myapp --ktor --retrofit
                   cag --new-project --name=MyApp --package=com.example.myapp --git
+                  cag --new-project --name=MyApp --package=com.example.myapp -DI koin
                 """.trimIndent()
             )
             put(
@@ -124,6 +127,8 @@ object HelpContent {
                         Specify the use case name (required)
                     --path=TargetPath | --path TargetPath | -p=TargetPath | -p TargetPath | -pTargetPath
                         Specify the target directory for the preceding use case
+                    --git | -g
+                        Automatically stage changes to git repository
 
                 Examples:
                   cag --new-use-case --name=FetchUser
