@@ -25,6 +25,14 @@ class ArgumentParser {
         )
     }
 
+    inline fun <T> ArgumentParser.parsePrimaryWithSecondaries(
+        arguments: Array<String>,
+        primaryFlag: PrimaryFlag,
+        transform: (Map<FlagOption, String>) -> T
+    ): List<T> =
+        parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = primaryFlag)
+            .map(transform)
+
     private fun determineForm(
         arguments: Array<String>,
         primaryLong: String,

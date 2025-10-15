@@ -1,13 +1,12 @@
 package com.mitteloupe.cag.cli.argument.feature
 
 import com.mitteloupe.cag.cli.argument.ArgumentParser
-import com.mitteloupe.cag.cli.argument.parseWithNameFlag
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewDataSourcePrimary
 import com.mitteloupe.cag.cli.flag.SecondaryFlagOptions
 import com.mitteloupe.cag.cli.request.DataSourceRequest
 
 fun ArgumentParser.parseNewDataSourcesArgument(arguments: Array<String>): List<DataSourceRequest> =
-    parseWithNameFlag(arguments = arguments, primaryFlag = NewDataSourcePrimary) { secondaries ->
+    parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewDataSourcePrimary) { secondaries ->
         val rawName = secondaries[SecondaryFlagOptions.NAME].orEmpty()
         val name = ensureDataSourceSuffix(rawName)
         val libraries = parseLibraries(secondaries[SecondaryFlagOptions.WITH])

@@ -1,14 +1,13 @@
 package com.mitteloupe.cag.cli.argument.feature
 
 import com.mitteloupe.cag.cli.argument.ArgumentParser
-import com.mitteloupe.cag.cli.argument.parseWithNameFlag
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewProjectPrimary
 import com.mitteloupe.cag.cli.flag.SecondaryFlagOptions
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.core.option.DependencyInjection
 
 fun ArgumentParser.parseNewProjectArguments(arguments: Array<String>) =
-    parseWithNameFlag(arguments = arguments, primaryFlag = NewProjectPrimary) { secondaries ->
+    parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewProjectPrimary) { secondaries ->
         ProjectTemplateRequest(
             projectName = secondaries[SecondaryFlagOptions.NAME].orEmpty(),
             packageName = secondaries[SecondaryFlagOptions.PACKAGE].orEmpty(),
