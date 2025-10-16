@@ -29,7 +29,7 @@ object ManPagePrinter {
                 appendLine("cag generates Android Clean Architecture scaffolding and components.")
                 topicsToRender.forEach { (key, value) ->
                     appendLine(".SH ${key.uppercase()}")
-                    value.lines().forEach { line ->
+                    "$value".lines().forEach { line ->
                         if (line.isBlank()) {
                             appendLine(".PP")
                         } else {

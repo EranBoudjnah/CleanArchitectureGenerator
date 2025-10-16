@@ -1,10 +1,10 @@
 package com.mitteloupe.cag.cli.argument.feature
 
 import com.mitteloupe.cag.cli.argument.ArgumentParser
+import com.mitteloupe.cag.cli.argument.feature.mapper.toDependencyInjection
 import com.mitteloupe.cag.cli.flag.PrimaryFlag.NewProjectPrimary
 import com.mitteloupe.cag.cli.flag.SecondaryFlagOptions
 import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
-import com.mitteloupe.cag.core.option.DependencyInjection
 
 fun ArgumentParser.parseNewProjectArguments(arguments: Array<String>) =
     parsePrimaryWithSecondaries(arguments = arguments, primaryFlag = NewProjectPrimary) { secondaries ->
@@ -19,12 +19,4 @@ fun ArgumentParser.parseNewProjectArguments(arguments: Array<String>) =
             enableRetrofit = secondaries.containsKey(SecondaryFlagOptions.RETROFIT),
             enableGit = secondaries.containsKey(SecondaryFlagOptions.GIT)
         )
-    }
-
-private fun String?.toDependencyInjection() =
-    when (this?.lowercase()) {
-        null, "hilt" -> DependencyInjection.Hilt
-        "koin" -> DependencyInjection.Koin
-        "none" -> DependencyInjection.None
-        else -> throw IllegalArgumentException("Unknown dependency injection value: $this")
     }

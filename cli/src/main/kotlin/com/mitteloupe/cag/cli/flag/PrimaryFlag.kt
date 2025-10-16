@@ -82,7 +82,13 @@ interface PrimaryFlag {
         override val long = "--new-architecture"
         override val short = "-na"
         override val secondaryFlags =
-            linkedSetOf(SecondaryFlags.noCompose, SecondaryFlags.ktlint, SecondaryFlags.detekt, SecondaryFlags.git)
+            linkedSetOf(
+                SecondaryFlags.noCompose,
+                SecondaryFlags.ktlint,
+                SecondaryFlags.detekt,
+                SecondaryFlags.git,
+                SecondaryFlags.dependencyInjection
+            )
     }
 
     data object NewFeaturePrimary : PrimaryFlag {

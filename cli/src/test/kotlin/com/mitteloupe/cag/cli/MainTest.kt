@@ -17,7 +17,8 @@ import java.nio.file.Files
 
 private const val NEW_PROJECT_SYNTAX =
     "[--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git] [--dependency-injection=hilt|koin|none]]"
-private const val NEW_ARCHITECTURE_SYNTAX = "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git]]"
+private const val NEW_ARCHITECTURE_SYNTAX =
+    "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git] [--dependency-injection=hilt|koin|none]]"
 private const val NEW_FEATURE_SYNTAX = "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
 private const val NEW_DATASOURCE_SYNTAX = "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
 private const val NEW_USE_CASE_SYNTAX = "[--new-use-case --name=UseCaseName [--path=TargetPath] [--git]]"
@@ -145,6 +146,8 @@ Options:
         Enable detekt for the preceding architecture package
     --git | -g
         Automatically stage changes to git repository
+    --dependency-injection=hilt[default]|koin|none | -DI hilt[default]|koin|none
+        Specify the dependency injection library
   --new-feature | -nf
       Generate a new feature
     --name=FeatureName | -n=FeatureName | -n FeatureName | -nFeatureName
@@ -181,6 +184,8 @@ Options:
         Specify the target directory for the preceding ViewModel
     --git | -g
         Automatically stage changes to git repository
+  --version | -v
+      Show the current version
   --help, -h
       Show this help message and exit
 """
