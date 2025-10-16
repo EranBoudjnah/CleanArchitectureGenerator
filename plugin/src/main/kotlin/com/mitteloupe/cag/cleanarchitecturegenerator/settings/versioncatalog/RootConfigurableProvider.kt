@@ -5,11 +5,14 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.BoundSearchableConfigurable
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurableProvider
+import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
+import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
 import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.git.Git
 import java.io.File
@@ -26,26 +29,41 @@ private class RootConfigurable :
         CleanArchitectureGeneratorBundle.message("settings.display.name"),
         "com.mitteloupe.cag.settings.Settings"
     ) {
+    val appSettingsService = AppSettingsService.getInstance()
     private val serviceAutoAddToGit: Boolean
-        get() = AppSettingsService.getInstance().autoAddGeneratedFilesToGit
+        get() = appSettingsService.autoAddGeneratedFilesToGit
     private val serviceGitPath: String?
-        get() = AppSettingsService.getInstance().gitPath
+        get() = appSettingsService.gitPath
+    private val serviceDefaultDependencyInjection: DependencyInjection
+        get() = DependencyInjection.fromString(appSettingsService.defaultDependencyInjection)
 
     private var autoAddToGit: Boolean = serviceAutoAddToGit
     private var gitPath: String = serviceGitPath.orEmpty()
+    private var defaultDependencyInjection: DependencyInjection = serviceDefaultDependencyInjection
+
+    private val autoAddToGitChanged: Boolean
+        get() = autoAddToGit != serviceAutoAddToGit
+    private val gitPathChanged: Boolean
+        get() = gitPath != serviceGitPath.orEmpty()
+    private val defaultDependencyInjectionChanged: Boolean
+        get() = defaultDependencyInjection != serviceDefaultDependencyInjection
 
     override fun createPanel() =
         panel {
-            var warningLabel: JLabel? = null
+            var gitWarningLabel: JLabel? = null
+            var dependencyInjectionWarningLabel: JLabel? = null
 
             fun isGitAvailableForState(pathText: String): Boolean =
                 Git(gitBinaryPath = pathText.nullIfEmpty()).isAvailable(File(System.getProperty("user.home")))
 
-            fun updateWarning(currentPath: String) {
-                val showWarning = !isGitAvailableForState(currentPath.trim())
-                warningLabel?.isVisible = showWarning
+            fun updateWarnings(currentPath: String) {
+                val showGitWarning = !isGitAvailableForState(currentPath.trim())
+                gitWarningLabel?.isVisible = showGitWarning
+                dependencyInjectionWarningLabel?.isVisible = defaultDependencyInjectionChanged
             }
+
             row {
+                @Suppress("DialogTitleCapitalization")
                 text(CleanArchitectureGeneratorBundle.message("settings.root.description"))
             }
 
@@ -53,7 +71,7 @@ private class RootConfigurable :
                 checkBox(CleanArchitectureGeneratorBundle.message("settings.auto.add.to.git.label"))
                     .applyToComponent {
                         toolTipText = CleanArchitectureGeneratorBundle.message("settings.auto.add.to.git.tooltip")
-                        addChangeListener { updateWarning(gitPath) }
+                        addChangeListener { updateWarnings(gitPath) }
                     }.bindSelected(::autoAddToGit)
             }
 
@@ -68,15 +86,15 @@ private class RootConfigurable :
                     textField.document.addDocumentListener(
                         object : DocumentListener {
                             override fun insertUpdate(event: DocumentEvent) {
-                                updateWarning(text)
+                                updateWarnings(text)
                             }
 
                             override fun removeUpdate(event: DocumentEvent) {
-                                updateWarning(text)
+                                updateWarnings(text)
                             }
 
                             override fun changedUpdate(evenet: DocumentEvent) {
-                                updateWarning(text)
+                                updateWarnings(text)
                             }
                         }
                     )
@@ -86,32 +104,54 @@ private class RootConfigurable :
             row {
                 label(CleanArchitectureGeneratorBundle.message("settings.git.not.found.warning")).applyToComponent {
                     icon = AllIcons.General.Warning
-                    warningLabel = this
+                    gitWarningLabel = this
+                    isVisible = false
+                }
+            }
+
+            row(CleanArchitectureGeneratorBundle.message("settings.dependency.injection.label")) {
+                @Suppress("UnstableApiUsage")
+                comboBox(DependencyInjection.entries)
+                    .whenItemSelectedFromUi {
+                        defaultDependencyInjection = it
+                        updateWarnings(gitPath)
+                    }.bindItem(
+                        { defaultDependencyInjection },
+                        { _ -> }
+                    )
+            }
+
+            row {
+                label(CleanArchitectureGeneratorBundle.message("settings.dependency.injection.warning")).applyToComponent {
+                    icon = AllIcons.General.Warning
+                    dependencyInjectionWarningLabel = this
                     isVisible = false
                 }
             }
 
             onApply {
-                updateWarning(gitPath)
+                updateWarnings(gitPath)
             }
             onReset {
-                updateWarning(gitPath)
+                updateWarnings(gitPath)
             }
             onIsModified {
-                updateWarning(gitPath)
+                updateWarnings(gitPath)
                 false
             }
 
             onApply {
                 AppSettingsService.getInstance().autoAddGeneratedFilesToGit = autoAddToGit
                 AppSettingsService.getInstance().gitPath = gitPath.ifBlank { null }
+                AppSettingsService.getInstance().defaultDependencyInjection = defaultDependencyInjection.name
             }
             onReset {
                 autoAddToGit = serviceAutoAddToGit
-                gitPath = serviceGitPath ?: ""
+                gitPath = serviceGitPath.orEmpty()
+                defaultDependencyInjection = serviceDefaultDependencyInjection
             }
             onIsModified {
-                autoAddToGit != serviceAutoAddToGit || gitPath != (serviceGitPath ?: "")
+                autoAddToGitChanged || gitPathChanged || defaultDependencyInjectionChanged
             }
         }
 }
