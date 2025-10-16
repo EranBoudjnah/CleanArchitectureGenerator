@@ -6,15 +6,18 @@ import com.mitteloupe.cag.cli.request.ProjectTemplateRequest
 import com.mitteloupe.cag.cli.request.UseCaseRequest
 import com.mitteloupe.cag.cli.request.ViewModelRequest
 import com.mitteloupe.cag.core.option.DependencyInjection
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
-import org.junit.runners.Suite
+import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Enclosed::class)
-@Suite.SuiteClasses(
+@SuiteClasses(
     AppArgumentProcessorTest.Features::class,
     AppArgumentProcessorTest.Help::class,
     AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
@@ -42,7 +45,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.isHelpRequested(givenArguments)
 
             // Then
-            Assert.assertEquals(true, result)
+            assertEquals(true, result)
         }
 
         @Test
@@ -54,7 +57,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.isHelpRequested(givenArguments)
 
             // Then
-            Assert.assertEquals(true, result)
+            assertEquals(true, result)
         }
 
         @Test
@@ -75,7 +78,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -96,7 +99,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
     }
 
@@ -133,7 +136,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -160,7 +163,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -171,10 +174,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewFeatures(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Feature name is required. Use --name=FeatureName or -n=FeatureName",
                     exception.message
                 )
@@ -189,10 +192,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewFeatures(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-feature) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -207,10 +210,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewFeatures(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nf) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -225,10 +228,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewFeatures(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-feature) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -243,10 +246,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewFeatures(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nf) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -270,7 +273,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewFeatures(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
     }
 
@@ -291,8 +294,8 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(true, result[0].enableCompose)
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
         }
 
         @Test
@@ -304,8 +307,8 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(false, result[0].enableCompose)
+            assertEquals(1, result.size)
+            assertEquals(false, result[0].enableCompose)
         }
 
         @Test
@@ -317,8 +320,8 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(false, result[0].enableCompose)
+            assertEquals(1, result.size)
+            assertEquals(false, result[0].enableCompose)
         }
 
         @Test
@@ -330,10 +333,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(true, result[0].enableCompose)
-            Assert.assertEquals(false, result[0].enableKtlint)
-            Assert.assertEquals(true, result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
         }
 
         @Test
@@ -345,10 +348,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(false, result[0].enableCompose)
-            Assert.assertEquals(false, result[0].enableKtlint)
-            Assert.assertEquals(true, result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertEquals(false, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
         }
 
         @Test
@@ -360,10 +363,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(true, result[0].enableCompose)
-            Assert.assertEquals(false, result[0].enableKtlint)
-            Assert.assertEquals(true, result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(false, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
         }
 
         @Test
@@ -375,10 +378,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertTrue(result[0].enableCompose)
-            Assert.assertTrue(result[0].enableKtlint)
-            Assert.assertFalse(result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertTrue(result[0].enableCompose)
+            assertTrue(result[0].enableKtlint)
+            assertFalse(result[0].enableDetekt)
         }
 
         @Test
@@ -390,10 +393,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(true, result[0].enableCompose)
-            Assert.assertEquals(true, result[0].enableKtlint)
-            Assert.assertEquals(true, result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(true, result[0].enableKtlint)
+            assertEquals(true, result[0].enableDetekt)
         }
 
         @Test
@@ -405,10 +408,10 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertEquals(true, result[0].enableCompose)
-            Assert.assertEquals(true, result[0].enableKtlint)
-            Assert.assertEquals(false, result[0].enableDetekt)
+            assertEquals(1, result.size)
+            assertEquals(true, result[0].enableCompose)
+            assertEquals(true, result[0].enableKtlint)
+            assertEquals(false, result[0].enableDetekt)
         }
 
         @Test
@@ -420,8 +423,8 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewArchitecture(givenArguments)
 
             // Then
-            Assert.assertEquals(1, result.size)
-            Assert.assertTrue(result[0].enableGit)
+            assertEquals(1, result.size)
+            assertTrue(result[0].enableGit)
         }
     }
 
@@ -442,7 +445,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewDataSources(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(DataSourceRequest("MyDataSource", useKtor = true, useRetrofit = false)), result)
+            assertEquals(listOf(DataSourceRequest("MyDataSource", useKtor = true, useRetrofit = false)), result)
         }
 
         @Test
@@ -454,7 +457,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewDataSources(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(DataSourceRequest("MyDataSource", useKtor = false, useRetrofit = true)), result)
+            assertEquals(listOf(DataSourceRequest("MyDataSource", useKtor = false, useRetrofit = true)), result)
         }
 
         @Test
@@ -466,7 +469,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewDataSources(givenArguments)
 
             // Then
-            Assert.assertEquals(
+            assertEquals(
                 listOf(DataSourceRequest("YourDataSource", useKtor = false, useRetrofit = false)),
                 result
             )
@@ -481,7 +484,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewDataSources(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(DataSourceRequest("YourDataSource", useKtor = true, useRetrofit = true)), result)
+            assertEquals(listOf(DataSourceRequest("YourDataSource", useKtor = true, useRetrofit = true)), result)
         }
 
         @Test
@@ -492,10 +495,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewDataSources(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Data source name is required. Use --name=DataSourceName or -n=DataSourceName",
                     exception.message
                 )
@@ -510,10 +513,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewDataSources(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-datasource) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -528,10 +531,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewDataSources(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nds) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -547,10 +550,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewDataSources(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-datasource) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -566,10 +569,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewDataSources(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nds) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -586,7 +589,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewDataSources(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expected), result)
+            assertEquals(listOf(expected), result)
         }
     }
 
@@ -617,7 +620,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -638,7 +641,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -659,7 +662,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -688,7 +691,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewUseCases(givenArguments)
 
             // Then
-            Assert.assertEquals(expectedRequests, result)
+            assertEquals(expectedRequests, result)
         }
 
         @Test
@@ -699,10 +702,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Use case name is required. Use --name=UseCaseName or -n=UseCaseName",
                     exception.message
                 )
@@ -717,10 +720,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Use case name is required. Use --name=UseCaseName or -n=UseCaseName",
                     exception.message
                 )
@@ -735,10 +738,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-use-case) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -753,10 +756,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nuc) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -771,10 +774,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-use-case) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -789,10 +792,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewUseCases(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nuc) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -830,7 +833,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
@@ -854,7 +857,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
@@ -878,7 +881,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
@@ -902,7 +905,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
 
         @Test
@@ -938,7 +941,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest1, expectedRequest2), result)
+            assertEquals(listOf(expectedRequest1, expectedRequest2), result)
         }
 
         @Test
@@ -949,10 +952,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Project name is required. Use --name=ProjectName or -n=ProjectName",
                     exception.message
                 )
@@ -967,10 +970,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Project name is required. Use --name=ProjectName or -n=ProjectName",
                     exception.message
                 )
@@ -985,10 +988,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-project) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -1003,10 +1006,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -1022,10 +1025,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix long form (--new-project) with short form secondary flags (-n). Use --name instead.",
                     exception.message
                 )
@@ -1041,10 +1044,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewProjectTemplate(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-np) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -1072,7 +1075,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewProjectTemplate(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expectedRequest), result)
+            assertEquals(listOf(expectedRequest), result)
         }
     }
 
@@ -1094,7 +1097,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewViewModels(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(ViewModelRequest("First", "/path1"), ViewModelRequest("Second", null)), result)
+            assertEquals(listOf(ViewModelRequest("First", "/path1"), ViewModelRequest("Second", null)), result)
         }
 
         @Test
@@ -1106,7 +1109,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewViewModels(givenArguments)
 
             // Then
-            Assert.assertEquals(
+            assertEquals(
                 listOf(ViewModelRequest("Third", "/path3"), ViewModelRequest("Fourth", "/path4")),
                 result
             )
@@ -1120,10 +1123,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewViewModels(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "ViewModel name is required. Use --name=ViewModelName or -n=ViewModelName",
                     exception.message
                 )
@@ -1140,10 +1143,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewViewModels(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(expectedErrorMessage, exception.message)
+                assertEquals(expectedErrorMessage, exception.message)
             }
         }
 
@@ -1155,10 +1158,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.getNewViewModels(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals(
+                assertEquals(
                     "Cannot mix short form (-nvm) with long form secondary flags (--name). Use -n instead.",
                     exception.message
                 )
@@ -1175,7 +1178,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewViewModels(givenArguments)
 
             // Then
-            Assert.assertEquals(listOf(expected), result)
+            assertEquals(listOf(expected), result)
         }
     }
 
@@ -1222,10 +1225,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.validateNoUnknownFlags(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals("Unknown flags: --unknown-flag", exception.message)
+                assertEquals("Unknown flags: --unknown-flag", exception.message)
             }
         }
 
@@ -1237,10 +1240,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.validateNoUnknownFlags(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals("Unknown flags: --unknown-flag1, --unknown-flag2", exception.message)
+                assertEquals("Unknown flags: --unknown-flag1, --unknown-flag2", exception.message)
             }
         }
 
@@ -1252,10 +1255,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.validateNoUnknownFlags(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals("Unknown flags: --unknown-flag", exception.message)
+                assertEquals("Unknown flags: --unknown-flag", exception.message)
             }
         }
 
@@ -1267,10 +1270,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.validateNoUnknownFlags(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals("Unknown flags: -unknown", exception.message)
+                assertEquals("Unknown flags: -unknown", exception.message)
             }
         }
 
@@ -1282,10 +1285,10 @@ class AppArgumentProcessorTest {
             // When
             try {
                 classUnderTest.validateNoUnknownFlags(givenArguments)
-                Assert.fail("Expected IllegalArgumentException to be thrown")
+                fail("Expected IllegalArgumentException to be thrown")
             } catch (exception: IllegalArgumentException) {
                 // Then
-                Assert.assertEquals("Unknown flags: --unknown", exception.message)
+                assertEquals("Unknown flags: --unknown", exception.message)
             }
         }
 

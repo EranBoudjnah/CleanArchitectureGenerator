@@ -3,7 +3,8 @@ package com.mitteloupe.cag.cli.argument
 import com.mitteloupe.cag.cli.flag.FlagOption
 import com.mitteloupe.cag.cli.flag.PrimaryFlag
 import com.mitteloupe.cag.cli.flag.SecondaryFlag
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -46,7 +47,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -76,7 +77,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -106,7 +107,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -138,7 +139,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -165,10 +166,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -201,10 +202,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (e: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, e.message)
+            assertEquals(expectedErrorMessage, e.message)
         }
     }
 
@@ -232,10 +233,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -262,10 +263,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (e: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, e.message)
+            assertEquals(expectedErrorMessage, e.message)
         }
     }
 
@@ -287,10 +288,10 @@ class ArgumentParserTest {
                         secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -311,10 +312,10 @@ class ArgumentParserTest {
                         secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")))
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -339,7 +340,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -364,7 +365,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -386,7 +387,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -409,7 +410,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -433,7 +434,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -456,7 +457,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -481,7 +482,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -505,7 +506,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -529,7 +530,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -551,7 +552,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -575,7 +576,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -600,7 +601,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -633,7 +634,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -656,7 +657,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -682,7 +683,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -718,7 +719,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -757,10 +758,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (e: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedMessage, e.message)
+            assertEquals(expectedMessage, e.message)
         }
     }
 
@@ -793,7 +794,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -821,10 +822,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -871,7 +872,7 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 
     @Test
@@ -900,10 +901,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -932,10 +933,10 @@ class ArgumentParserTest {
                             )
                     )
             )
-            Assert.fail("Expected IllegalArgumentException to be thrown")
+            fail("Expected IllegalArgumentException to be thrown")
         } catch (exception: IllegalArgumentException) {
             // Then
-            Assert.assertEquals(expectedErrorMessage, exception.message)
+            assertEquals(expectedErrorMessage, exception.message)
         }
     }
 
@@ -960,6 +961,6 @@ class ArgumentParserTest {
             )
 
         // Then
-        Assert.assertEquals(expectedParsedArguments, result)
+        assertEquals(expectedParsedArguments, result)
     }
 }
