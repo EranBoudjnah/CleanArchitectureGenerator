@@ -5,6 +5,7 @@ import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 import org.junit.runners.Suite.SuiteClasses
 import java.io.File
 
@@ -50,7 +51,7 @@ class PackageNameDeriverTest {
     ) {
         companion object {
             @JvmStatic
-            @Parameterized.Parameters(name = "{2}: Given ''{0}'' then returns {1}")
+            @Parameters(name = "{2}: Given ''{0}'' then returns {1}")
             fun parameters(): Collection<Array<Any>> =
                 listOf(
                     testCase(
@@ -123,7 +124,7 @@ class PackageNameDeriverTest {
     ) {
         companion object {
             @JvmStatic
-            @Parameterized.Parameters(name = "{2}: Given ''{0}'' then returns {1}")
+            @Parameters(name = "{2}: Given ''{0}'' then returns {1}")
             fun parameters(): Collection<Array<Any>> =
                 listOf(
                     testCase(

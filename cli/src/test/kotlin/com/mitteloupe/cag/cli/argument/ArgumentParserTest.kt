@@ -1,6 +1,5 @@
-package com.mitteloupe.cag.cli
+package com.mitteloupe.cag.cli.argument
 
-import com.mitteloupe.cag.cli.argument.ArgumentParser
 import com.mitteloupe.cag.cli.flag.FlagOption
 import com.mitteloupe.cag.cli.flag.PrimaryFlag
 import com.mitteloupe.cag.cli.flag.SecondaryFlag
@@ -675,7 +674,11 @@ class ArgumentParserTest {
                     createPrimaryFlag(
                         long = "--alpha",
                         short = "-a",
-                        secondaryFlags = linkedSetOf(SecondaryFlag(FlagOption("--beta", "-b")), SecondaryFlag(FlagOption("--gamma", "-g")))
+                        secondaryFlags =
+                            linkedSetOf(
+                                SecondaryFlag(FlagOption("--beta", "-b")),
+                                SecondaryFlag(FlagOption("--gamma", "-g"))
+                            )
                     )
             )
 
