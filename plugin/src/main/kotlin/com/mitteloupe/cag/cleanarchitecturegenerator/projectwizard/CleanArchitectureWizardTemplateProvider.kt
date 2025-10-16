@@ -33,7 +33,8 @@ private val MEERKAT_PREFIX = "^(?:.* )?2024\\.3\\..*$".toRegex()
 class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
-    private val git = Git(gitBinaryPath = AppSettingsService.getInstance().gitPath)
+    private val appSettingsService = AppSettingsService.getInstance()
+    private val git = Git(gitBinaryPath = appSettingsService.gitPath)
 
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
@@ -49,9 +50,9 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
 
             val dependencyInjectionOption =
                 enumParameter<WizardDependencyInjection> {
-                    name = "Dependency Injection"
-                    default = WizardDependencyInjection.Hilt
-                    help = "Select the dependency injection library to use in the generated project"
+                    name = CleanArchitectureGeneratorBundle.message("wizard.parameter.dependency.injection.name")
+                    default = WizardDependencyInjection.fromString(appSettingsService.defaultDependencyInjection)
+                    help = CleanArchitectureGeneratorBundle.message("wizard.parameter.dependency.injection.help")
                 }
 
             val enableKtlint =
@@ -192,7 +193,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
             git.initializeRepository(projectRootDirectory)
         }
 
-        if (AppSettingsService.getInstance().autoAddGeneratedFilesToGit) {
+        if (appSettingsService.autoAddGeneratedFilesToGit) {
             val gitDirectory = File(projectRootDirectory, ".git")
             if (gitDirectory.exists()) {
                 runCatching { git.stageAll(projectRootDirectory) }

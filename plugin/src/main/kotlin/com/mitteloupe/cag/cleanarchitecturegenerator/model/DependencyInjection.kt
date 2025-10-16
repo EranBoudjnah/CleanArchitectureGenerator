@@ -7,5 +7,12 @@ enum class DependencyInjection(
 ) {
     Hilt(DependencyInjection.Hilt),
     Koin(DependencyInjection.Koin),
-    None(DependencyInjection.None)
+    None(DependencyInjection.None);
+
+    companion object {
+        fun fromString(value: String) =
+            entries
+                .firstOrNull { it.name.equals(value, ignoreCase = true) }
+                ?: throw IllegalArgumentException("Unexpected value $value")
+    }
 }

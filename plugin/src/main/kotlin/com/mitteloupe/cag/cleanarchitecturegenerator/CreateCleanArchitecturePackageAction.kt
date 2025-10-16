@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
 import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
@@ -18,6 +19,7 @@ class CreateCleanArchitecturePackageAction : AnAction() {
     private val ideBridge = IdeBridge()
     private val generatorProvider = GeneratorProvider()
     private val appModuleDirectoryFinder = AppModuleDirectoryFinder()
+    private val appSettingsService = AppSettingsService.getInstance()
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -27,7 +29,8 @@ class CreateCleanArchitecturePackageAction : AnAction() {
         val basePackage = NamespaceResolver().determineBasePackage(projectModel)
         val projectRootDirectory = project.basePath?.let { File(it) } ?: File(".")
         val appModuleDirectories = appModuleDirectoryFinder.findAndroidAppModuleDirectories(projectRootDirectory)
-        val dialog = CreateCleanArchitecturePackageDialog(project, appModuleDirectories, DependencyInjection.Hilt)
+        val defaultDependencyInjection = DependencyInjection.fromString(appSettingsService.defaultDependencyInjection)
+        val dialog = CreateCleanArchitecturePackageDialog(project, appModuleDirectories, defaultDependencyInjection)
         if (dialog.showAndGet()) {
             val defaultBasePackage = "com.example"
             val architecturePackageName =
