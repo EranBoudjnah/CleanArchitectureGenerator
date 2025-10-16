@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli.configuration
 
+import com.mitteloupe.cag.cli.configuration.model.DependencyInjection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -67,6 +68,23 @@ class VersionConfigLoaderTest {
         // Then
         assertTrue(actualConfiguration.git.autoInitialize!!)
         assertFalse(actualConfiguration.git.autoStage!!)
+    }
+
+    @Test
+    fun `Given INI with injection section when parse then parses git booleans`() {
+        // Given
+        val text =
+            """
+            [dependencyInjection]
+            library=Koin
+            """.trimIndent()
+        val expectedLibrary = DependencyInjection.Koin
+
+        // When
+        val actualConfiguration = classUnderTest.parse(text)
+
+        // Then
+        assertEquals(expectedLibrary, actualConfiguration.dependencyInjection.library)
     }
 
     @Test

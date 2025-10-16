@@ -5,7 +5,7 @@ import java.io.File
 
 data class ArchitectureRequest(
     val appModuleDirectory: File?,
-    val dependencyInjection: DependencyInjection,
+    val dependencyInjection: DependencyInjection?,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,

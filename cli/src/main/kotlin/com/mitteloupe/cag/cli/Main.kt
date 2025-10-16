@@ -12,6 +12,7 @@ import com.mitteloupe.cag.core.GeneratorFactory
 import com.mitteloupe.cag.core.NamespaceResolver
 import com.mitteloupe.cag.core.findGradleProjectRoot
 import com.mitteloupe.cag.core.generation.versioncatalog.VersionCatalogSettingsAccessor
+import com.mitteloupe.cag.core.option.DependencyInjection
 import com.mitteloupe.cag.core.request.GenerateArchitectureRequest
 import com.mitteloupe.cag.core.request.GenerateFeatureRequestBuilder
 import com.mitteloupe.cag.core.request.GenerateProjectTemplateRequest
@@ -90,7 +91,7 @@ fun main(arguments: Array<String>) {
                 packageName = request.packageName,
                 overrideMinimumAndroidSdk = null,
                 overrideAndroidGradlePluginVersion = null,
-                dependencyInjection = request.dependencyInjection,
+                dependencyInjection = request.dependencyInjection.orDefault(configuration),
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt,
@@ -122,7 +123,7 @@ fun main(arguments: Array<String>) {
                 destinationRootDirectory = destinationRootDirectory,
                 appModuleDirectory = request.appModuleDirectory,
                 architecturePackageName = architecturePackageName,
-                dependencyInjection = request.dependencyInjection,
+                dependencyInjection = request.dependencyInjection.orDefault(configuration),
                 enableCompose = request.enableCompose,
                 enableKtlint = request.enableKtlint,
                 enableDetekt = request.enableDetekt
@@ -214,6 +215,9 @@ fun main(arguments: Array<String>) {
         stageToGitIfEnabled(request.enableGit, configuration, projectModel, projectRoot, git)
     }
 }
+
+private fun DependencyInjection?.orDefault(configuration: ClientConfiguration) =
+    this ?: configuration.dependencyInjection.library?.coreValue ?: DependencyInjection.Hilt
 
 private fun stageToGitIfEnabled(
     requestEnableGit: Boolean,

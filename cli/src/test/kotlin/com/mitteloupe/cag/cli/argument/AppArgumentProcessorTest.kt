@@ -45,7 +45,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.isHelpRequested(givenArguments)
 
             // Then
-            assertEquals(true, result)
+            assertTrue(result)
         }
 
         @Test
@@ -57,7 +57,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.isHelpRequested(givenArguments)
 
             // Then
-            assertEquals(true, result)
+            assertTrue(result)
         }
 
         @Test
@@ -287,7 +287,7 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
+            assertTrue(result[0].enableCompose)
         }
 
         @Test
@@ -300,7 +300,7 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(false, result[0].enableCompose)
+            assertFalse(result[0].enableCompose)
         }
 
         @Test
@@ -313,7 +313,7 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(false, result[0].enableCompose)
+            assertFalse(result[0].enableCompose)
         }
 
         @Test
@@ -326,9 +326,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
-            assertEquals(false, result[0].enableKtlint)
-            assertEquals(true, result[0].enableDetekt)
+            assertTrue(result[0].enableCompose)
+            assertFalse(result[0].enableKtlint)
+            assertTrue(result[0].enableDetekt)
         }
 
         @Test
@@ -341,9 +341,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(false, result[0].enableCompose)
-            assertEquals(false, result[0].enableKtlint)
-            assertEquals(true, result[0].enableDetekt)
+            assertFalse(result[0].enableCompose)
+            assertFalse(result[0].enableKtlint)
+            assertTrue(result[0].enableDetekt)
         }
 
         @Test
@@ -356,9 +356,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
-            assertEquals(false, result[0].enableKtlint)
-            assertEquals(true, result[0].enableDetekt)
+            assertTrue(result[0].enableCompose)
+            assertFalse(result[0].enableKtlint)
+            assertTrue(result[0].enableDetekt)
         }
 
         @Test
@@ -386,9 +386,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
-            assertEquals(true, result[0].enableKtlint)
-            assertEquals(true, result[0].enableDetekt)
+            assertTrue(result[0].enableCompose)
+            assertTrue(result[0].enableKtlint)
+            assertTrue(result[0].enableDetekt)
         }
 
         @Test
@@ -401,9 +401,9 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(1, result.size)
-            assertEquals(true, result[0].enableCompose)
-            assertEquals(true, result[0].enableKtlint)
-            assertEquals(false, result[0].enableDetekt)
+            assertTrue(result[0].enableCompose)
+            assertTrue(result[0].enableKtlint)
+            assertFalse(result[0].enableDetekt)
         }
 
         @Test
@@ -417,6 +417,20 @@ class AppArgumentProcessorTest {
             // Then
             assertEquals(1, result.size)
             assertTrue(result[0].enableGit)
+        }
+
+        @Test
+        fun `Given --new-architecture --dependency-injection Koin when getNewArchitecture then returns request with Koin`() {
+            // Given
+            val givenArguments = arrayOf("--new-architecture", "--dependency-injection", "Koin")
+            val expectedDependencyInjection = DependencyInjection.Koin
+
+            // When
+            val result = classUnderTest.getNewArchitecture(givenArguments)
+
+            // Then
+            assertEquals(1, result.size)
+            assertEquals(expectedDependencyInjection, result[0].dependencyInjection)
         }
     }
 
@@ -787,7 +801,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MyApp",
                     packageName = "com.example",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = true,
                     enableKtlint = true,
                     enableDetekt = true,
@@ -811,7 +825,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "TestApp",
                     packageName = "com.test",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = false,
                     enableKtlint = true,
                     enableDetekt = true,
@@ -835,7 +849,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "MinimalApp",
                     packageName = "",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -852,15 +866,41 @@ class AppArgumentProcessorTest {
         }
 
         @Test
-        fun `Given project template with no compose when getNewProjectTemplate then disables compose`() {
+        fun `Given project template with no Compose when getNewProjectTemplate then disables Compose`() {
             // Given
-            val givenArguments = arrayOf("--new-project", "--name=NoComposeApp", "--no-compose")
+            val projectName = "NoComposeApp"
+            val givenArguments = arrayOf("--new-project", "--name=$projectName", "--no-compose")
             val expectedRequest =
                 ProjectTemplateRequest(
-                    projectName = "NoComposeApp",
+                    projectName = projectName,
+                    packageName = "",
+                    dependencyInjection = null,
+                    enableCompose = false,
+                    enableKtlint = false,
+                    enableDetekt = false,
+                    enableKtor = false,
+                    enableRetrofit = false,
+                    enableGit = false
+                )
+
+            // When
+            val result = classUnderTest.getNewProjectTemplate(givenArguments)
+
+            // Then
+            assertEquals(listOf(expectedRequest), result)
+        }
+
+        @Test
+        fun `Given project template with Hilt when getNewProjectTemplate then disables compose`() {
+            // Given
+            val projectName = "HiltApp"
+            val givenArguments = arrayOf("--new-project", "--name=$projectName", "--dependency-injection=Hilt")
+            val expectedRequest =
+                ProjectTemplateRequest(
+                    projectName = projectName,
                     packageName = "",
                     dependencyInjection = DependencyInjection.Hilt,
-                    enableCompose = false,
+                    enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
                     enableKtor = false,
@@ -883,7 +923,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "First",
                     packageName = "com.first",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -895,7 +935,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "Second",
                     packageName = "",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -1019,7 +1059,7 @@ class AppArgumentProcessorTest {
                 ProjectTemplateRequest(
                     projectName = "GitApp",
                     packageName = "",
-                    dependencyInjection = DependencyInjection.Hilt,
+                    dependencyInjection = null,
                     enableCompose = true,
                     enableKtlint = false,
                     enableDetekt = false,
@@ -1071,10 +1111,7 @@ class AppArgumentProcessorTest {
             val result = classUnderTest.getNewViewModels(givenArguments)
 
             // Then
-            assertEquals(
-                expectedRequests,
-                result
-            )
+            assertEquals(expectedRequests, result)
         }
 
         @Test

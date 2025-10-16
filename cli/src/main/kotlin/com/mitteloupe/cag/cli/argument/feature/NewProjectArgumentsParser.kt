@@ -11,7 +11,7 @@ fun ArgumentParser.parseNewProjectArguments(arguments: Array<String>) =
         ProjectTemplateRequest(
             projectName = secondaries[SecondaryFlagOptions.NAME].orEmpty(),
             packageName = secondaries[SecondaryFlagOptions.PACKAGE].orEmpty(),
-            dependencyInjection = secondaries[SecondaryFlagOptions.DEPENDENCY_INJECTION].toDependencyInjection(),
+            dependencyInjection = secondaries[SecondaryFlagOptions.DEPENDENCY_INJECTION]?.toDependencyInjection(),
             enableCompose = !secondaries.containsKey(SecondaryFlagOptions.NO_COMPOSE),
             enableKtlint = secondaries.containsKey(SecondaryFlagOptions.KTLINT),
             enableDetekt = secondaries.containsKey(SecondaryFlagOptions.DETEKT),

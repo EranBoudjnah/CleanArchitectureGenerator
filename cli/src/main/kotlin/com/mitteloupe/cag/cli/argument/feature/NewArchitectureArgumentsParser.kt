@@ -11,7 +11,7 @@ fun ArgumentParser.parseNewArchitectureArguments(arguments: Array<String>): List
         .map { secondaries ->
             ArchitectureRequest(
                 appModuleDirectory = null,
-                dependencyInjection = secondaries[SecondaryFlagOptions.DEPENDENCY_INJECTION].toDependencyInjection(),
+                dependencyInjection = secondaries[SecondaryFlagOptions.DEPENDENCY_INJECTION]?.toDependencyInjection(),
                 enableCompose = !secondaries.containsKey(SecondaryFlagOptions.NO_COMPOSE),
                 enableKtlint = secondaries.containsKey(SecondaryFlagOptions.KTLINT),
                 enableDetekt = secondaries.containsKey(SecondaryFlagOptions.DETEKT),

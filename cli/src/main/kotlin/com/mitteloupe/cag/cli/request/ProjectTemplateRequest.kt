@@ -5,7 +5,7 @@ import com.mitteloupe.cag.core.option.DependencyInjection
 data class ProjectTemplateRequest(
     val projectName: String,
     val packageName: String,
-    val dependencyInjection: DependencyInjection,
+    val dependencyInjection: DependencyInjection?,
     val enableCompose: Boolean,
     val enableKtlint: Boolean,
     val enableDetekt: Boolean,
