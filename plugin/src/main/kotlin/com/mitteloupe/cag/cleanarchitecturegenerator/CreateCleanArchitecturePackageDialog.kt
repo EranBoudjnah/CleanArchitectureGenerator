@@ -6,18 +6,22 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
+import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
 import java.io.File
 import javax.swing.JComponent
 
 class CreateCleanArchitecturePackageDialog(
     project: Project,
-    private val appModuleDirectories: List<File>
+    private val appModuleDirectories: List<File>,
+    defaultDependencyInjection: DependencyInjection
 ) : DialogWrapper(project) {
     private var enableCompose: Boolean = true
     private var enableKtlint: Boolean = false
     private var enableDetekt: Boolean = false
 
     private var appModuleSelectedIndex: Int = 0
+
+    private var dependencyInjection = defaultDependencyInjection
 
     val selectedAppModuleDirectory: File?
         get() =
@@ -30,6 +34,9 @@ class CreateCleanArchitecturePackageDialog(
                     null
                 }
             }
+
+    val selectedDependencyInjection: DependencyInjection
+        get() = dependencyInjection
 
     init {
         title = CleanArchitectureGeneratorBundle.message("info.architecture.generator.title")
@@ -48,7 +55,15 @@ class CreateCleanArchitecturePackageDialog(
                         )
                 }
             }
+            row(CleanArchitectureGeneratorBundle.message("dialog.architecture.dependency.injection.label")) {
+                comboBox(DependencyInjection.entries)
+                    .bindItem(
+                        { dependencyInjection },
+                        { value -> value?.let { dependencyInjection = it } }
+                    )
+            }
             row {
+                @Suppress("DialogTitleCapitalization")
                 checkBox(CleanArchitectureGeneratorBundle.message("dialog.architecture.compose.label"))
                     .bindSelected(::enableCompose)
             }
