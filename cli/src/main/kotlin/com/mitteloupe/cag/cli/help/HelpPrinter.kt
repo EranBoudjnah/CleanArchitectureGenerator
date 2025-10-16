@@ -11,7 +11,7 @@ import com.mitteloupe.cag.cli.help.HelpContent.USAGE_SYNTAX
 fun printUsageMessage() {
     println(
         """
-        $USAGE_SYNTAX
+        usage: $USAGE_SYNTAX
 
         Run with --help or -h for more options.
         """.trimIndent()
@@ -22,7 +22,7 @@ fun printHelpMessage() {
     val helpSections = HelpContent.helpSections()
 
     println(
-        """$USAGE_SYNTAX
+        """usage: $USAGE_SYNTAX
 
 Note: You must use either long form (--flag) or short form (-f) arguments consistently throughout your command. Mixing both forms is not allowed.
 

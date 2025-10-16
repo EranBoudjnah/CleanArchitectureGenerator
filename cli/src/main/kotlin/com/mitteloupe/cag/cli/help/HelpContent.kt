@@ -22,7 +22,7 @@ object HelpContent {
     private const val NEW_USE_CASE_SYNTAX = "[--new-use-case --name=UseCaseName [--path=TargetPath] [--git]]"
     private const val NEW_VIEW_MODEL_SYNTAX = "[--new-view-model --name=ViewModelName [--path=TargetPath] [--git]]"
     const val USAGE_SYNTAX: String =
-        "usage: cag " +
+        "cag " +
             "$NEW_PROJECT_SYNTAX... " +
             "$NEW_ARCHITECTURE_SYNTAX... " +
             "$NEW_FEATURE_SYNTAX... " +
