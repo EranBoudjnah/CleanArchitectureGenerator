@@ -189,15 +189,18 @@ object HelpContent {
     - [new.versions] - applied when generating new projects (e.g., --new-project)
     - [existing.versions] - applied when generating into an existing project (e.g., new architecture, feature, data source, use case, or view model)
     - [git] - configuration for git integration
+    - [dependencyInjection] - configuration for dependency injection generation
 
   Version Keys:
     - Keys in [new.versions] and [existing.versions] correspond to version keys used by the generator, 
       for example: kotlin, androidGradlePlugin, composeBom, composeNavigation, retrofit, ktor, okhttp3, etc.
 
   Git Configuration:
-    - autoInitialize=true|false - Whether to automatically initialize a git repository for new projects (default: false)
-    - autoStage=true|false - Whether to automatically stage changes after generation (default: false)
-    - path=/absolute/path/to/git - Optional path to the git executable (default: resolved via PATH)""",
+    - autoInitialize=true|false - whether to automatically initialize a git repository for new projects (default: false)
+    - autoStage=true|false - whether to automatically stage changes after generation (default: false)
+    - path=/absolute/path/to/git - optional path to the git executable (default: resolved via PATH)
+  Dependency Injection Configuration:
+    - library=hilt|koin|none - which library to use when generating dependency injection code""",
                     examples =
                         """
                         Example ~/.cagrc:
@@ -214,16 +217,8 @@ object HelpContent {
                           autoStage=true
                           path=/usr/bin/git
 
-                        Example ./.cagrc (project overrides):
-                          [new.versions]
-                          composeBom=2025.09.01
-
-                          [existing.versions]
-                          okhttp3=4.12.0
-
-                          [git]
-                          autoInitialize=false
-                          path=/opt/homebrew/bin/git
+                          [dependencyInjection]
+                          library=Koin
                         """.trimIndent()
                 ),
             KEY_GENERAL to

@@ -1,5 +1,6 @@
 package com.mitteloupe.cag.cli.configuration
 
+import com.mitteloupe.cag.cli.configuration.model.DependencyInjection
 import java.io.File
 
 private const val FILE_NAME = ".cagrc"
@@ -42,6 +43,10 @@ class ClientConfigurationLoader {
                     autoInitialize = override.git.autoInitialize ?: baseConfiguration.git.autoInitialize,
                     autoStage = override.git.autoStage ?: baseConfiguration.git.autoStage,
                     path = override.git.path ?: baseConfiguration.git.path
+                ),
+            dependencyInjection =
+                DependencyInjectionConfiguration(
+                    library = override.dependencyInjection.library ?: baseConfiguration.dependencyInjection.library
                 )
         )
 
@@ -49,65 +54,80 @@ class ClientConfigurationLoader {
         ClientConfiguration(
             newProjectVersions = extractProjectVersions(text, "new.versions"),
             existingProjectVersions = extractProjectVersions(text, "existing.versions"),
-            git = extractGitConfiguration(text)
+            git = extractGitConfiguration(text),
+            dependencyInjection = extractDependencyInjectionConfiguration(text)
         )
 
     private fun extractProjectVersions(
         text: String,
         versionLabel: String
-    ): Map<String, String> {
-        val currentVersionsMap = mutableMapOf<String, String>()
-        var isUnderLabel = false
-
-        text.lineSequence().forEach { rawLine ->
-            val line = rawLine.trim()
-            if (line.isEmpty() || line.startsWith("#") || line.startsWith(";")) return@forEach
-
-            if (line.startsWith("[") && line.endsWith("]")) {
-                isUnderLabel = line.substring(1, line.length - 1).equals(versionLabel, true)
-                return@forEach
-            }
-
-            if (isUnderLabel) {
+    ): Map<String, String> =
+        buildMap {
+            visitLinesInSection(text, versionLabel) { line ->
                 val index = line.indexOf('=')
                 if (index > 0) {
                     val key = line.take(index).trim()
                     val value = line.substring(index + 1).trim()
                     if (key.isNotEmpty() && value.isNotEmpty()) {
-                        currentVersionsMap[key] = value
+                        this@buildMap[key] = value
                     }
                 }
             }
         }
 
-        return currentVersionsMap
-    }
-
     private fun extractGitConfiguration(text: String): GitConfiguration {
-        var isInGitSection = false
         var autoInitializeGit: Boolean? = null
         var autoStageGit: Boolean? = null
         var gitPath: String? = null
+        visitLinesInSection(text, "git") { line ->
+            if (line.containsKey("autoInitialize")) {
+                autoInitializeGit = line.substringAfter('=', "false").trim().toBoolean()
+            } else if (line.containsKey("autoStage")) {
+                autoStageGit = line.substringAfter('=', "true").trim().toBoolean()
+            } else if (line.containsKey("path")) {
+                gitPath = line.substringAfter('=', "").trim().ifEmpty { null }
+            }
+        }
+
+        return GitConfiguration(autoInitialize = autoInitializeGit, autoStage = autoStageGit, path = gitPath)
+    }
+
+    private fun extractDependencyInjectionConfiguration(text: String): DependencyInjectionConfiguration {
+        var library: DependencyInjection? = null
+
+        visitLinesInSection(text, "dependencyInjection") { line ->
+            if (line.containsKey("library")) {
+                library =
+                    DependencyInjection.fromString(
+                        line.substringAfter('=', "").trim()
+                    )
+            }
+        }
+
+        return DependencyInjectionConfiguration(library)
+    }
+
+    private fun visitLinesInSection(
+        text: String,
+        section: String,
+        visitLineInSection: (String) -> Unit
+    ) {
+        var isInSection = false
 
         text.lineSequence().forEach { rawLine ->
             val line = rawLine.trim()
             if (line.isEmpty() || line.startsWith("#") || line.startsWith(";")) return@forEach
 
             if (line.startsWith("[") && line.endsWith("]")) {
-                isInGitSection = line.substring(1, line.length - 1).equals("git", ignoreCase = true)
+                isInSection = line.substring(1, line.length - 1).equals(section, ignoreCase = true)
                 return@forEach
             }
 
-            if (!isInGitSection) return@forEach
+            if (!isInSection) return@forEach
 
-            if (line.startsWith("autoInitialize", ignoreCase = true)) {
-                autoInitializeGit = line.substringAfter('=', "false").trim().toBoolean()
-            } else if (line.startsWith("autoStage", ignoreCase = true)) {
-                autoStageGit = line.substringAfter('=', "true").trim().toBoolean()
-            } else if (line.startsWith("path", ignoreCase = true)) {
-                gitPath = line.substringAfter('=', "").trim().ifEmpty { null }
-            }
+            visitLineInSection(line)
         }
-        return GitConfiguration(autoInitialize = autoInitializeGit, autoStage = autoStageGit, path = gitPath)
     }
+
+    private fun String.containsKey(key: String) = matches("^\\s*$key\\s*=.*".toRegex(RegexOption.IGNORE_CASE))
 }
