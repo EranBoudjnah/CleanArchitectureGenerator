@@ -100,7 +100,8 @@ interface PrimaryFlag {
                 SecondaryFlags.packageName,
                 SecondaryFlags.ktlint,
                 SecondaryFlags.detekt,
-                SecondaryFlags.git
+                SecondaryFlags.git,
+                SecondaryFlags.dependencyInjection
             )
     }
 

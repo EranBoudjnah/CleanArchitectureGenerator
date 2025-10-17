@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses
 @SuiteClasses(
     AppArgumentProcessorTest.Features::class,
     AppArgumentProcessorTest.Help::class,
+    AppArgumentProcessorTest.NewFeature::class,
     AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorDataSourcesTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorUseCasesTest::class,
@@ -59,6 +60,15 @@ class AppArgumentProcessorTest {
             // Then
             assertTrue(result)
         }
+    }
+
+    class NewFeature {
+        private lateinit var classUnderTest: AppArgumentProcessor
+
+        @Before
+        fun setUp() {
+            classUnderTest = AppArgumentProcessor()
+        }
 
         @Test
         fun `Given --new-feature with --ktlint when getNewFeatures then returns FeatureRequest with ktlint enabled`() {
@@ -70,7 +80,30 @@ class AppArgumentProcessorTest {
                         featureName = "Quality",
                         packageName = null,
                         enableKtlint = true,
-                        enableDetekt = false
+                        enableDetekt = false,
+                        dependencyInjection = null
+                    )
+                )
+
+            // When
+            val result = classUnderTest.getNewFeatures(givenArguments)
+
+            // Then
+            assertEquals(expectedRequests, result)
+        }
+
+        @Test
+        fun `Given --new-feature with --dependency-injection=Hilt when getNewFeatures then returns FeatureRequest with Hilt enabled`() {
+            // Given
+            val givenArguments = arrayOf("--new-feature", "--name=Quality", "--dependency-injection=Hilt")
+            val expectedRequests =
+                listOf(
+                    FeatureRequest(
+                        featureName = "Quality",
+                        packageName = null,
+                        enableKtlint = false,
+                        enableDetekt = false,
+                        dependencyInjection = DependencyInjection.Hilt
                     )
                 )
 
@@ -91,7 +124,8 @@ class AppArgumentProcessorTest {
                         featureName = "Quality",
                         packageName = null,
                         enableKtlint = true,
-                        enableDetekt = true
+                        enableDetekt = true,
+                        dependencyInjection = null
                     )
                 )
 
@@ -122,13 +156,15 @@ class AppArgumentProcessorTest {
                         featureName = "First",
                         packageName = "com.first",
                         enableKtlint = false,
-                        enableDetekt = false
+                        enableDetekt = false,
+                        dependencyInjection = null
                     ),
                     FeatureRequest(
                         featureName = "Second",
                         packageName = null,
                         enableKtlint = false,
-                        enableDetekt = false
+                        enableDetekt = false,
+                        dependencyInjection = null
                     )
                 )
 
@@ -149,13 +185,15 @@ class AppArgumentProcessorTest {
                         featureName = "Third",
                         packageName = "com.third",
                         enableKtlint = false,
-                        enableDetekt = false
+                        enableDetekt = false,
+                        dependencyInjection = null
                     ),
                     FeatureRequest(
                         featureName = "Fourth",
                         packageName = "com.fourth",
                         enableKtlint = false,
-                        enableDetekt = false
+                        enableDetekt = false,
+                        dependencyInjection = null
                     )
                 )
 
@@ -258,7 +296,8 @@ class AppArgumentProcessorTest {
                     packageName = null,
                     enableKtlint = false,
                     enableDetekt = false,
-                    enableGit = true
+                    enableGit = true,
+                    dependencyInjection = null
                 )
 
             // When

@@ -19,7 +19,8 @@ private const val PLACEHOLDER = "FEATURE_NAME"
 class CreateCleanArchitectureFeatureDialog(
     project: Project?,
     private val defaultPackagePrefix: String? = null,
-    private val appModuleDirectories: List<File>
+    private val appModuleDirectories: List<File>,
+    defaultDependencyInjection: DependencyInjection
 ) : DialogWrapper(project) {
     private val featureNameTextField = JBTextField()
     private val featurePackageTextField = JBTextField()
@@ -45,7 +46,7 @@ class CreateCleanArchitectureFeatureDialog(
                 }
             }
 
-    val dependencyInjection: DependencyInjection = DependencyInjection.None
+    var dependencyInjection: DependencyInjection = defaultDependencyInjection
 
     val enableCompose: Boolean = true
 
@@ -119,6 +120,13 @@ class CreateCleanArchitectureFeatureDialog(
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.package.label")) {
                 cell(featurePackageTextField)
+            }
+            row(CleanArchitectureGeneratorBundle.message("dialog.feature.dependency.injection.label")) {
+                comboBox(DependencyInjection.entries)
+                    .bindItem(
+                        { dependencyInjection },
+                        { value -> value?.let { dependencyInjection = it } }
+                    )
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.code.quality.label")) {
                 checkBox("ktlint").bindSelected(::enableKtlintInternal)

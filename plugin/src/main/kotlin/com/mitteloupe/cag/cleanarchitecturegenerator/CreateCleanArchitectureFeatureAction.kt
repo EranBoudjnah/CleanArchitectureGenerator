@@ -6,6 +6,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.Messages
 import com.mitteloupe.cag.cleanarchitecturegenerator.filesystem.GeneratorProvider
 import com.mitteloupe.cag.cleanarchitecturegenerator.git.GitAddQueueService
+import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
+import com.mitteloupe.cag.cleanarchitecturegenerator.settings.AppSettingsService
 import com.mitteloupe.cag.core.AppModuleDirectoryFinder
 import com.mitteloupe.cag.core.GenerationException
 import com.mitteloupe.cag.core.NamespaceResolver
@@ -16,6 +18,7 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
     private val ideBridge = IdeBridge()
     private val appModuleDirectoryFinder = AppModuleDirectoryFinder()
     private val generatorProvider = GeneratorProvider()
+    private val appSettingsService = AppSettingsService.getInstance()
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
@@ -23,7 +26,9 @@ class CreateCleanArchitectureFeatureAction : AnAction() {
         val defaultNamespace = NamespaceResolver().determineBasePackage(projectModel)
         val projectRootDirectory = project.basePath?.let { File(it) } ?: File(".")
         val appModuleDirectories = appModuleDirectoryFinder.findAndroidAppModuleDirectories(projectRootDirectory)
-        val dialog = CreateCleanArchitectureFeatureDialog(project, defaultNamespace, appModuleDirectories)
+        val defaultDependencyInjection = DependencyInjection.fromString(appSettingsService.defaultDependencyInjection)
+        val dialog =
+            CreateCleanArchitectureFeatureDialog(project, defaultNamespace, appModuleDirectories, defaultDependencyInjection)
         if (dialog.showAndGet()) {
             val featureName = dialog.featureName
             val featurePackageName = dialog.featurePackageName
