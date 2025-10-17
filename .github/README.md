@@ -1,14 +1,10 @@
-<table style="border: none">
-  <tr>
-    <td><img src="./assets/cag-icon.png" alt="CAG Icon" width="80" height="80" /></td>
-    <td><div><h1 style="margin-top: 0">Clean Architecture Generator ✨</h1></div></td>
-  </tr>
-</table>
+<img src="./assets/cag-icon.png" alt="Aimeos logo" title="Aimeos" align="right" width="80" height="80" />
+
+# Clean Architecture Generator ✨
 
 A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 
 ## Table of Contents
-<hr />
 
 - [Key features](#key-features)
 - [Android Studio plugin](#android-studio-plugin)
