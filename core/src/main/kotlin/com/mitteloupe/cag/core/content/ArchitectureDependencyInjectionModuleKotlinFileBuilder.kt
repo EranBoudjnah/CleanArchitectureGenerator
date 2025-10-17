@@ -25,7 +25,7 @@ $commonImports
             }
 @Module
 @InstallIn(SingletonComponent::class)
-object ArchitectureModule {
+internal object ArchitectureModule {
     @Provides
     fun providesUseCaseExecutor(): UseCaseExecutor = UseCaseExecutor()
 }

@@ -103,25 +103,25 @@ abstract class BaseTest {
     private val hiltAndroidRule by lazy { HiltAndroidRule(this) }
 
     @Inject
-    lateinit var mockDispatcher: MockDispatcher
+    internal lateinit var mockDispatcher: MockDispatcher
 
     @Inject
-    lateinit var responseStore: ResponseStore
+    internal lateinit var responseStore: ResponseStore
 
     @Inject
-    lateinit var mockWebServerProvider: MockWebServerProvider
+    internal lateinit var mockWebServerProvider: MockWebServerProvider
 
     @Inject
-    lateinit var sharedPreferences: SharedPreferences
+    internal lateinit var sharedPreferences: SharedPreferences
 
     @Inject
-    lateinit var keyValueStore: KeyValueStore
+    internal lateinit var keyValueStore: KeyValueStore
 
     @Inject
-    lateinit var espressoIdlingResources: @JvmSuppressWildcards Collection<EspressoIdlingResource>
+    internal lateinit var espressoIdlingResources: @JvmSuppressWildcards Collection<EspressoIdlingResource>
 
     @Inject
-    lateinit var composeIdlingResources: @JvmSuppressWildcards Collection<ComposeIdlingResource>
+    internal lateinit var composeIdlingResources: @JvmSuppressWildcards Collection<ComposeIdlingResource>
 
     private val webServerRule = WebServerRule(
         lazy { mockDispatcher },
