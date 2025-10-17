@@ -21,7 +21,7 @@ import $dataSourcePackageName.${dataSourceName}Impl
     }
 @Module
 @InstallIn(SingletonComponent::class)
-object ${dataSourceName}Module {
+internal object ${dataSourceName}Module {
     @Provides
     fun provides$dataSourceName(): $dataSourceName = ${dataSourceName}Impl()
 }

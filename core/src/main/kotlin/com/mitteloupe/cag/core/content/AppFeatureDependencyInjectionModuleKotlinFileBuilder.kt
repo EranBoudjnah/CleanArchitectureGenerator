@@ -38,7 +38,7 @@ $providedImports""".optimizeImports()
             }
 @Module
 @InstallIn(SingletonComponent::class)
-object ${className}Module {
+internal object ${className}Module {
     @Provides
     fun providesStubDomainMapper(): StubDomainMapper = StubDomainMapper()
 
