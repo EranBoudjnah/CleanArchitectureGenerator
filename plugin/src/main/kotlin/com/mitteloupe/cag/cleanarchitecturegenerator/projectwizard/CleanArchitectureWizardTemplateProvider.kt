@@ -15,7 +15,6 @@ import com.android.tools.idea.wizard.template.WizardUiContext
 import com.android.tools.idea.wizard.template.booleanParameter
 import com.android.tools.idea.wizard.template.enumParameter
 import com.android.tools.idea.wizard.template.impl.activities.common.MIN_API
-import com.android.tools.idea.wizard.template.template
 import com.intellij.openapi.application.ApplicationInfo
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.IdeBridge
@@ -39,7 +38,7 @@ class CleanArchitectureWizardTemplateProvider : WizardTemplateProvider() {
     override fun getTemplates(): List<Template> = listOf(cleanArchitectureTemplate)
 
     private val cleanArchitectureTemplate =
-        template {
+        ReloadableTemplate {
             name = CleanArchitectureGeneratorBundle.message("wizard.template.name")
             description = CleanArchitectureGeneratorBundle.message("wizard.template.description")
             category = Category.Application
