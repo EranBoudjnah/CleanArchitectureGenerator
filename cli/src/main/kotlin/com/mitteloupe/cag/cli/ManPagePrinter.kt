@@ -76,8 +76,9 @@ object ManPagePrinter {
                 "[${bold("--dependency-injection=hilt")}|${bold("koin")}|${bold("none")}]]... " +
                 "[${bold("--new-feature")} [${bold("--name=") + italic("FeatureName")} " +
                 "[${bold("--package=") + italic("PackageName")}] [${bold("--ktlint")}] " +
-                "[${bold("--detekt")}] [${bold("--git")}]]... [${bold("--new-datasource")} " +
-                "[${bold("--name=") + italic("DataSourceName")} " +
+                "[${bold("--detekt")}] [${bold("--git")}] " +
+                "[${bold("--dependency-injection=hilt")}|${bold("koin")}|${bold("none")}]]... " +
+                "[${bold("--new-datasource")} [${bold("--name=") + italic("DataSourceName")} " +
                 "[${bold("--with=ktor")}|${bold("retrofit")}|${bold("ktor,retrofit")}] " +
                 "[${bold("--git")}]]... [${bold("--new-use-case")} " +
                 "[${bold("--name=") + italic("UseCaseName")} [${bold("--path=") + italic("TargetPath")}] " +

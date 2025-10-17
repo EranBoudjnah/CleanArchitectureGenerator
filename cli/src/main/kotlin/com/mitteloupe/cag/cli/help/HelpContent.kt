@@ -16,7 +16,7 @@ object HelpContent {
     private const val NEW_ARCHITECTURE_SYNTAX =
         "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git] [--dependency-injection=hilt|koin|none]]"
     private const val NEW_FEATURE_SYNTAX =
-        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
+        "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git] [--dependency-injection=hilt|koin|none]]]"
     private const val NEW_DATASOURCE_SYNTAX =
         "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
     private const val NEW_USE_CASE_SYNTAX = "[--new-use-case --name=UseCaseName [--path=TargetPath] [--git]]"
@@ -106,7 +106,9 @@ object HelpContent {
     --detekt | -d
         Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
     --git | -g
-        Automatically stage changes to git repository""",
+        Automatically stage changes to git repository
+    --dependency-injection=hilt[default]|koin|none | -DI hilt[default]|koin|none
+        Specify the dependency injection library""",
                     examples =
                         """
                         Examples:

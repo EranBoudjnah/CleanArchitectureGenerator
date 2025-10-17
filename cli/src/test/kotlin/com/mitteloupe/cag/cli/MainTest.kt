@@ -19,7 +19,8 @@ private const val NEW_PROJECT_SYNTAX =
     "[--new-project --name=ProjectName --package=PackageName [--no-compose] [--ktlint] [--detekt] [--ktor] [--retrofit] [--git] [--dependency-injection=hilt|koin|none]]"
 private const val NEW_ARCHITECTURE_SYNTAX =
     "[--new-architecture [--no-compose] [--ktlint] [--detekt] [--git] [--dependency-injection=hilt|koin|none]]"
-private const val NEW_FEATURE_SYNTAX = "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git]]"
+private const val NEW_FEATURE_SYNTAX =
+    "[--new-feature --name=FeatureName [--package=PackageName] [--ktlint] [--detekt] [--git] [--dependency-injection=hilt|koin|none]]]"
 private const val NEW_DATASOURCE_SYNTAX = "[--new-datasource --name=DataSourceName [--with=ktor|retrofit|ktor,retrofit] [--git]]"
 private const val NEW_USE_CASE_SYNTAX = "[--new-use-case --name=UseCaseName [--path=TargetPath] [--git]]"
 private const val NEW_VIEW_MODEL_SYNTAX = "[--new-view-model --name=ViewModelName [--path=TargetPath] [--git]]"
@@ -160,6 +161,8 @@ Options:
         Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
     --git | -g
         Automatically stage changes to git repository
+    --dependency-injection=hilt[default]|koin|none | -DI hilt[default]|koin|none
+        Specify the dependency injection library
   --new-datasource | -nds
       Generate a new data source
     --name=DataSourceName | -n=DataSourceName | -n DataSourceName | -nDataSourceName
