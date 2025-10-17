@@ -16,7 +16,7 @@ private const val HEADER =
 cag - generate Clean Architecture Android code
 .SH SYNOPSIS
 .B cag
-[\fB--new-project\fR \fB--name=\fR\fIProjectName\fR \fB--package=\fR\fIPackageName\fR [\fB--no-compose\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--ktor\fR] [\fB--retrofit\fR] [\fB--git\fR] [\fB--dependency-injection=hilt\fR|\fBkoin\fR|\fBnone\fR]]... [\fB--new-architecture\fR [\fB--no-compose\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--git\fR] [\fB--dependency-injection=hilt\fR|\fBkoin\fR|\fBnone\fR]]... [\fB--new-feature\fR [\fB--name=\fR\fIFeatureName\fR [\fB--package=\fR\fIPackageName\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--git\fR]]... [\fB--new-datasource\fR [\fB--name=\fR\fIDataSourceName\fR [\fB--with=ktor\fR|\fBretrofit\fR|\fBktor,retrofit\fR] [\fB--git\fR]]... [\fB--new-use-case\fR [\fB--name=\fR\fIUseCaseName\fR [\fB--path=\fR\fITargetPath\fR] [\fB--git\fR]]... [\fB--new-view-model\fR [\fB--name=\fR\fIViewModelName\fR [\fB--path=\fR\fITargetPath\fR] [\fB--git\fR]]...
+[\fB--new-project\fR \fB--name=\fR\fIProjectName\fR \fB--package=\fR\fIPackageName\fR [\fB--no-compose\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--ktor\fR] [\fB--retrofit\fR] [\fB--git\fR] [\fB--dependency-injection=hilt\fR|\fBkoin\fR|\fBnone\fR]]... [\fB--new-architecture\fR [\fB--no-compose\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--git\fR] [\fB--dependency-injection=hilt\fR|\fBkoin\fR|\fBnone\fR]]... [\fB--new-feature\fR [\fB--name=\fR\fIFeatureName\fR [\fB--package=\fR\fIPackageName\fR] [\fB--ktlint\fR] [\fB--detekt\fR] [\fB--git\fR] [\fB--dependency-injection=hilt\fR|\fBkoin\fR|\fBnone\fR]]... [\fB--new-datasource\fR [\fB--name=\fR\fIDataSourceName\fR [\fB--with=ktor\fR|\fBretrofit\fR|\fBktor,retrofit\fR] [\fB--git\fR]]... [\fB--new-use-case\fR [\fB--name=\fR\fIUseCaseName\fR [\fB--path=\fR\fITargetPath\fR] [\fB--git\fR]]... [\fB--new-view-model\fR [\fB--name=\fR\fIViewModelName\fR [\fB--path=\fR\fITargetPath\fR] [\fB--git\fR]]...
 .SH DESCRIPTION
 .B cag
 generates Android Clean Architecture scaffolding and components.
@@ -85,6 +85,8 @@ private val FULL_HELP =
             Enable detekt for the preceding feature (adds plugin and detekt.yml if missing)
         --git | -g
             Automatically stage changes to git repository
+        --dependency-injection=hilt[default]|koin|none | -DI hilt[default]|koin|none
+            Specify the dependency injection library
     Examples:
       cag --new-feature --name=Profile
       cag --new-feature --name=Profile --package=com.example.feature.profile

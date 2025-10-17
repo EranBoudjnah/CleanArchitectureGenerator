@@ -18,14 +18,13 @@ import org.junit.runners.Suite.SuiteClasses
 
 @RunWith(Enclosed::class)
 @SuiteClasses(
-    AppArgumentProcessorTest.Features::class,
     AppArgumentProcessorTest.Help::class,
-    AppArgumentProcessorTest.NewFeature::class,
     AppArgumentProcessorTest.AppArgumentProcessorArchitectureTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorDataSourcesTest::class,
+    AppArgumentProcessorTest.AppArgumentProcessorFeatures::class,
+    AppArgumentProcessorTest.AppArgumentProcessorProjectTemplateTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorUseCasesTest::class,
     AppArgumentProcessorTest.AppArgumentProcessorViewModelsTest::class,
-    AppArgumentProcessorTest.AppArgumentProcessorProjectTemplateTest::class,
     AppArgumentProcessorTest.UnknownFlagsValidation::class
 )
 class AppArgumentProcessorTest {
@@ -62,7 +61,7 @@ class AppArgumentProcessorTest {
         }
     }
 
-    class NewFeature {
+    class AppArgumentProcessorFeatures {
         private lateinit var classUnderTest: AppArgumentProcessor
 
         @Before
@@ -134,15 +133,6 @@ class AppArgumentProcessorTest {
 
             // Then
             assertEquals(expectedRequests, result)
-        }
-    }
-
-    class Features {
-        private lateinit var classUnderTest: AppArgumentProcessor
-
-        @Before
-        fun setUp() {
-            classUnderTest = AppArgumentProcessor()
         }
 
         @Test
