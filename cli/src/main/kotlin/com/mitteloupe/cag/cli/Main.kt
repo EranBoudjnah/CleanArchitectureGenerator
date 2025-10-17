@@ -148,6 +148,7 @@ fun main(arguments: Array<String>) {
                 .enableCompose(true)
                 .enableKtlint(requestFeature.enableKtlint)
                 .enableDetekt(requestFeature.enableDetekt)
+                .setDependencyInjection(requestFeature.dependencyInjection.orDefault(configuration))
                 .build()
         executeAndReport {
             setVersionProvider(configuration.existingProjectVersions)
