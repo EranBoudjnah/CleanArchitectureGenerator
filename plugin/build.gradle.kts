@@ -18,10 +18,10 @@ repositories {
 intellijPlatform {
     pluginVerification {
         ides {
-            ide(IntelliJPlatformType.AndroidStudio, "2024.3.1.13")
-            ide(IntelliJPlatformType.AndroidStudio, "2025.1.2.11")
-            ide(IntelliJPlatformType.AndroidStudio, "2025.1.3.7")
-            ide(IntelliJPlatformType.AndroidStudio, libs.versions.androidStudio.get())
+            create(IntelliJPlatformType.AndroidStudio, "2024.3.1.13")
+            create(IntelliJPlatformType.AndroidStudio, "2025.1.2.11")
+            create(IntelliJPlatformType.AndroidStudio, "2025.1.3.7")
+            create(IntelliJPlatformType.AndroidStudio, libs.versions.androidStudio.get())
         }
     }
 }
@@ -45,9 +45,27 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         changeNotes =
-            """
-            Initial version.
-            """.trimIndent()
+            """## [0.4.0]
+
+### Added
+
+- Added dependency injection (DI) support across CLI, plugin, and templates, including options for Hilt and Koin (#39, #40, #41, #42, #43, #44, #45, #49, #50)
+- Added hot-reload functionality to new project template (#48)
+- Added plugin icon to README.md (#46, #47)
+
+### Changed
+
+- Polished and updated generated MainActivity and Application files (#34)
+- Consolidated and improved help contents (#43)
+- Broke down code generator for better maintainability (#36)
+- Tightened Hilt integration and decoupled it from core libraries (#35, #37)
+- Updated all dependencies and reformatted codebase (#33)
+- Tidied and updated version catalog in generated projects (#32)
+
+### Fixed
+
+- Limited visibility of DI-related code (#49)
+"""
     }
 }
 
