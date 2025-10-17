@@ -1,4 +1,9 @@
-# Clean Architecture Generator ✨
+<table style="border: none">
+  <tr>
+    <td><img src="./assets/cag-icon.png" alt="CAG Icon" width="80" height="80" /></td>
+    <td><div><h1 style="margin-top: 0">Clean Architecture Generator ✨</h1></div></td>
+  </tr>
+</table>
 
 A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 
