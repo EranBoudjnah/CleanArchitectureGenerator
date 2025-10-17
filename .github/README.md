@@ -1,4 +1,4 @@
-<img src="./assets/cag-icon.png" alt="Aimeos logo" title="Aimeos" align="right" width="80" height="80" />
+<img src="./assets/cag-icon.png" alt="Aimeos logo" title="Aimeos" align="right" width="64" height="64" />
 
 # Clean Architecture Generator ✨
 
