@@ -9,7 +9,6 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.whenItemSelectedFromUi
 import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import com.mitteloupe.cag.cleanarchitecturegenerator.CleanArchitectureGeneratorBundle
 import com.mitteloupe.cag.cleanarchitecturegenerator.model.DependencyInjection
@@ -51,7 +50,6 @@ private class RootConfigurable :
     override fun createPanel() =
         panel {
             var gitWarningLabel: JLabel? = null
-            var dependencyInjectionWarningLabel: JLabel? = null
 
             fun isGitAvailableForState(pathText: String): Boolean =
                 Git(gitBinaryPath = pathText.nullIfEmpty()).isAvailable(File(System.getProperty("user.home")))
@@ -59,7 +57,6 @@ private class RootConfigurable :
             fun updateWarnings(currentPath: String) {
                 val showGitWarning = !isGitAvailableForState(currentPath.trim())
                 gitWarningLabel?.isVisible = showGitWarning
-                dependencyInjectionWarningLabel?.isVisible = defaultDependencyInjectionChanged
             }
 
             row {
@@ -110,23 +107,15 @@ private class RootConfigurable :
             }
 
             row(CleanArchitectureGeneratorBundle.message("settings.dependency.injection.label")) {
-                @Suppress("UnstableApiUsage")
                 comboBox(DependencyInjection.entries)
-                    .whenItemSelectedFromUi {
-                        defaultDependencyInjection = it
-                        updateWarnings(gitPath)
-                    }.bindItem(
+                    .bindItem(
                         { defaultDependencyInjection },
-                        { _ -> }
+                        { newValue ->
+                            if (newValue != null) {
+                                defaultDependencyInjection = newValue
+                            }
+                        }
                     )
-            }
-
-            row {
-                label(CleanArchitectureGeneratorBundle.message("settings.dependency.injection.warning")).applyToComponent {
-                    icon = AllIcons.General.Warning
-                    dependencyInjectionWarningLabel = this
-                    isVisible = false
-                }
             }
 
             onApply {
