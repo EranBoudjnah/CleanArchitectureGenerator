@@ -4,6 +4,8 @@
 
 A CLI and Android Studio plugin for generating Clean Architecture boilerplate.
 
+Follows the principles presented in my book, [Clean Architecture for Android](https://amzn.to./47hrZTD).
+
 ## Table of Contents
 
 - [Key features](#key-features)
