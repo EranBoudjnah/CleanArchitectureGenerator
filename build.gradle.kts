@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.intellij.platform) apply false
@@ -5,16 +7,13 @@ plugins {
     alias(libs.plugins.shadow) apply false
 }
 
-group = "com.mitteloupe.cag"
-version = "1.0-SNAPSHOT"
-
 subprojects {
     repositories {
         mavenCentral()
     }
 
     plugins.withId("org.jlleitschuh.gradle.ktlint") {
-        extensions.configure(org.jlleitschuh.gradle.ktlint.KtlintExtension::class.java) {
+        extensions.configure(KtlintExtension::class.java) {
             android.set(false)
             ignoreFailures.set(false)
             filter {

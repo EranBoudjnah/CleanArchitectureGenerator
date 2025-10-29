@@ -67,7 +67,7 @@ The project consists of three main modules:
 ├── automation/             # Build and development automation
 ├── gradle/                 # Gradle configuration
 ├── build.gradle.kts        # Root build configuration
-└── README.md               # Project documentation
+└── .github/README.md       # Project documentation
 ```
 
 ## Code Style and Standards
