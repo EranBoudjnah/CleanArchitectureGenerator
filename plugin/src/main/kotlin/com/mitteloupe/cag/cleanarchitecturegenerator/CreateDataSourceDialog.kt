@@ -42,6 +42,7 @@ class CreateDataSourceDialog(
             row(CleanArchitectureGeneratorBundle.message("dialog.datasource.name.label")) {
                 textField()
                     .bindText({ dataSourceName }, { dataSourceName = it })
+                    .onChanged { dataSourceName = it.text }
                     .applyToComponent {
                         (document as AbstractDocument).documentFilter =
                             PredicateDocumentFilter { !it.isWhitespace() }
