@@ -477,7 +477,6 @@ dependencies {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
-
 }
 
 android {

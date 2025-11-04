@@ -26,7 +26,7 @@ fun buildArchitectureUiGradleScript(
 
     val composePluginLine =
         if (catalog.isPluginAvailable(PluginConstants.COMPOSE_COMPILER)) {
-            "\n    alias(libs.plugins.$pluginAliasComposeCompiler)\n"
+            "\n    alias(libs.plugins.$pluginAliasComposeCompiler)"
         } else {
             ""
         }
