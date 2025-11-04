@@ -583,6 +583,48 @@ class SettingsFileUpdaterTest {
     }
 
     @Test
+    fun `Given kotlin settings file when updateModuleSettingsIfPresent then appends one include`() {
+        // Given
+        val (projectRoot, _) =
+            createProjectWithKotlinSettings(
+                initialContent = "rootProject.name = \"app\"\n"
+            )
+        val expectedTail =
+            """
+            include(":coroutines")
+            
+            """.trimIndent()
+
+        // When
+        classUnderTest.updateModuleSettingsIfPresent(projectRoot, ":coroutines")
+
+        // Then
+        val content = File(projectRoot, "settings.gradle.kts").readText()
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
+    fun `Given groovy settings file when updateModuleSettingsIfPresent then appends one include`() {
+        // Given
+        val (projectRoot, _) =
+            createProjectWithGroovySettings(
+                initialContent = "rootProject.name = 'app'\n"
+            )
+        val expectedTail =
+            """
+            include ":coroutines"
+            
+            """.trimIndent()
+
+        // When
+        classUnderTest.updateModuleSettingsIfPresent(projectRoot, ":coroutines")
+
+        // Then
+        val content = File(projectRoot, "settings.gradle").readText()
+        assertThat(content, endsWith(expectedTail))
+    }
+
+    @Test
     fun `Given no settings files when updateArchitectureSettingsIfPresent then does nothing`() {
         // Given
         val projectRoot = createTempDirectory(prefix = "noSettings").toFile()

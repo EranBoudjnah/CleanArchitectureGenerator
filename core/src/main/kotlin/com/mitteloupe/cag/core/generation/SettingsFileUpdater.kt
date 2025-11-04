@@ -15,7 +15,7 @@ class SettingsFileUpdater(
     ) {
         updateSettingsIfPresent(
             startDirectory = startDirectory,
-            groupPrefix = ":features:$featureNameLowerCase",
+            moduleNamesPrefix = ":features:$featureNameLowerCase",
             moduleNames = listOf("ui", "presentation", "domain", "data")
         )
     }
@@ -23,7 +23,7 @@ class SettingsFileUpdater(
     fun updateDataSourceSettingsIfPresent(startDirectory: File) {
         updateSettingsIfPresent(
             startDirectory = startDirectory,
-            groupPrefix = ":datasource",
+            moduleNamesPrefix = ":datasource",
             moduleNames = listOf("source", "implementation")
         )
     }
@@ -31,18 +31,29 @@ class SettingsFileUpdater(
     fun updateArchitectureSettingsIfPresent(projectRoot: File) {
         updateSettingsIfPresent(
             startDirectory = projectRoot,
-            groupPrefix = ":architecture",
+            moduleNamesPrefix = ":architecture",
             moduleNames = listOf("ui", "instrumentation-test", "presentation", "presentation-test", "domain")
+        )
+    }
+
+    fun updateModuleSettingsIfPresent(
+        projectRoot: File,
+        moduleName: String
+    ) {
+        updateSettingsIfPresent(
+            startDirectory = projectRoot,
+            moduleNamesPrefix = moduleName,
+            moduleNames = emptyList()
         )
     }
 
     private fun updateSettingsIfPresent(
         startDirectory: File,
-        groupPrefix: String,
+        moduleNamesPrefix: String,
         moduleNames: List<String>
     ) {
         val settingsFile = findSettingsFile(startDirectory) ?: return
-        updateIncludes(settingsFile, groupPrefix, moduleNames)
+        updateIncludes(settingsFile, moduleNamesPrefix, moduleNames)
     }
 
     private fun findSettingsFile(startDirectory: File): File? {
@@ -66,7 +77,7 @@ class SettingsFileUpdater(
 
     private fun updateIncludes(
         settingsFile: File,
-        groupPrefix: String,
+        moduleNamesPrefix: String,
         moduleNames: List<String>
     ) {
         val originalFileContent =
@@ -75,9 +86,9 @@ class SettingsFileUpdater(
                     throw GenerationException("Failed to read ${settingsFile.name}: ${it.message}")
                 }
 
-        val groupedIncludeKts = $$"include(\"$$groupPrefix:$module\")"
-        val groupedIncludeGroovyDouble = $$"include \"$$groupPrefix:$module\""
-        val groupedIncludeGroovySingle = $$"include '$$groupPrefix:$module'"
+        val groupedIncludeKts = $$"include(\"$$moduleNamesPrefix:$module\")"
+        val groupedIncludeGroovyDouble = $$"include \"$$moduleNamesPrefix:$module\""
+        val groupedIncludeGroovySingle = $$"include '$$moduleNamesPrefix:$module'"
 
         val hasGroupedInclude =
             originalFileContent.contains(groupedIncludeKts) ||
@@ -88,7 +99,7 @@ class SettingsFileUpdater(
             return
         }
 
-        val modulePaths = moduleNames.map { moduleName -> "$groupPrefix:$moduleName" }
+        val modulePaths = moduleNames.map { moduleName -> "$moduleNamesPrefix:$moduleName" }
 
         fun includeRegexesFor(path: String): List<Regex> =
             listOf(
@@ -97,13 +108,14 @@ class SettingsFileUpdater(
             )
 
         fun isModuleIncludedIndividually(moduleName: String): Boolean {
-            val pathWithRoot = "$groupPrefix:$moduleName"
+            val pathWithRoot = "$moduleNamesPrefix:$moduleName"
             val pathWithoutRoot = pathWithRoot.removePrefix(":")
             val regexes = includeRegexesFor(pathWithRoot) + includeRegexesFor(pathWithoutRoot)
             return regexes.any { regex -> originalFileContent.contains(regex) }
         }
 
-        val allIncludedIndividually = moduleNames.all { moduleName -> isModuleIncludedIndividually(moduleName) }
+        val allIncludedIndividually =
+            moduleNames.isNotEmpty() && moduleNames.all { moduleName -> isModuleIncludedIndividually(moduleName) }
 
         if (allIncludedIndividually) {
             return
@@ -115,36 +127,42 @@ class SettingsFileUpdater(
                 .filterNot { line ->
                     modulePaths.any { pathWithRoot ->
                         val pathWithoutRoot = pathWithRoot.removePrefix(":")
-                        line.contains("include(\"$pathWithRoot\")") ||
-                            line.contains("include '$pathWithRoot'") ||
-                            line.contains("include \"$pathWithRoot\"") ||
-                            line.contains("include(\"$pathWithoutRoot\")") ||
-                            line.contains("include '$pathWithoutRoot'") ||
-                            line.contains("include \"$pathWithoutRoot\"")
+                        line.contains("include\\s*\\(\\s*(['\"]):?$pathWithoutRoot\\1\\s*\\)".toRegex()) ||
+                            line.contains("include\\s+(['\"]):?$pathWithoutRoot\\1".toRegex())
                     }
                 }.joinToString(separator = "\n", postfix = if (originalFileContent.endsWith("\n")) "\n" else "")
 
         val contentToAppend =
             buildString {
-                if (!filteredContent.endsWith("\n")) append('\n')
-                val modulesKtsBlock = moduleNames.joinToString(",\n") { "    \"$it\"" }
-                val modulesGroovyBlock = moduleNames.joinToString(",\n") { "    '$it'" }
+                if (!filteredContent.endsWith("\n")) {
+                    append('\n')
+                }
                 if (settingsFile.name.endsWith(".kts")) {
-                    append(
-                        "setOf(\n" +
-                            modulesKtsBlock +
-                            "\n).forEach { module ->\n" +
-                            $$"    include(\"$$groupPrefix:$module\")\n" +
-                            "}"
-                    )
+                    if (moduleNames.isEmpty()) {
+                        append("include(\"$moduleNamesPrefix\")\n")
+                    } else {
+                        val modulesKtsBlock = moduleNames.joinToString(",\n") { "    \"$it\"" }
+                        append(
+                            "setOf(\n" +
+                                modulesKtsBlock +
+                                "\n).forEach { module ->\n" +
+                                $$"    include(\"$$moduleNamesPrefix:$module\")\n" +
+                                "}"
+                        )
+                    }
                 } else {
-                    append(
-                        "[\n" +
-                            modulesGroovyBlock +
-                            "\n].each { module ->\n" +
-                            $$"    include \"$$groupPrefix:$module\"\n" +
-                            "}"
-                    )
+                    if (moduleNames.isEmpty()) {
+                        append("include \"$moduleNamesPrefix\"\n")
+                    } else {
+                        val modulesGroovyBlock = moduleNames.joinToString(",\n") { "    '$it'" }
+                        append(
+                            "[\n" +
+                                modulesGroovyBlock +
+                                "\n].each { module ->\n" +
+                                $$"    include \"$$moduleNamesPrefix:$module\"\n" +
+                                "}"
+                        )
+                    }
                 }
             }
 
