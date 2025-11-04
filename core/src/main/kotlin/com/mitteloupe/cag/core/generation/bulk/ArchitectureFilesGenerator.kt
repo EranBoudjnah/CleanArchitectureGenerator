@@ -11,6 +11,8 @@ import com.mitteloupe.cag.core.kotlinpackage.toSegments
 import com.mitteloupe.cag.core.option.DependencyInjection
 import java.io.File
 
+private const val COROUTINE_MODULE_NAME = "coroutine"
+
 class ArchitectureFilesGenerator(
     private val coroutineModuleContentGenerator: CoroutineModuleContentGenerator,
     private val architectureModulesContentGenerator: ArchitectureModulesContentGenerator,
@@ -58,7 +60,7 @@ class ArchitectureFilesGenerator(
         coroutineModuleContentGenerator
             .generate(
                 projectRoot = destinationRootDirectory,
-                coroutinePackageName = architecturePackageName.replaceAfterLast(".", "coroutine")
+                coroutinePackageName = architecturePackageName.replaceAfterLast(".", COROUTINE_MODULE_NAME)
             )
 
         architectureModulesContentGenerator
@@ -72,6 +74,7 @@ class ArchitectureFilesGenerator(
             )
 
         settingsFileUpdater.updateArchitectureSettingsIfPresent(destinationRootDirectory)
+        settingsFileUpdater.updateModuleSettingsIfPresent(destinationRootDirectory, COROUTINE_MODULE_NAME)
 
         buildSrcContentCreator.writeGradleFile(destinationRootDirectory)
         buildSrcContentCreator.writeSettingsGradleFile(destinationRootDirectory)
