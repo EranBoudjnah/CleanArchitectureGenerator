@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.1]
+
+### Added
+
+- Added missing dynamic version catalog dependencies. (#59)
+- Added coroutine module to Gradle settings when generating architecture module. (#58)
+- Created `FUNDING.yml`. (#55)
+
+### Changed
+
+- Updated `README.md` with reference to the 2nd Edition of Clean Architecture for Android. (#53)
+- Corrected the README path in `CONTRIBUTING.md`.
+
+### Fixed
+
+- Removed redundant generated blank line. (#57)
+- Update data source name on edit. (#56)
+
 ## [0.4.0]
 
 ### Added
