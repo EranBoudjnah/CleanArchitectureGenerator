@@ -129,7 +129,9 @@ class CreateCleanArchitectureFeatureDialog(
                     )
             }
             row(CleanArchitectureGeneratorBundle.message("dialog.feature.code.quality.label")) {
+                @Suppress("DialogTitleCapitalization")
                 checkBox("ktlint").bindSelected(::enableKtlintInternal)
+                @Suppress("DialogTitleCapitalization")
                 checkBox("detekt").bindSelected(::enableDetektInternal)
             }
         }

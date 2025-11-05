@@ -9,6 +9,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 fun buildArchitecturePresentationTestGradleScript(catalog: VersionCatalogReader): String {
     val pluginAliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
 
+    val aliasCoroutinesCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.KOTLINX_COROUTINES_CORE).asAccessor
     val aliasTestJunit = catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_JUNIT).asAccessor
     val aliasTestKotlinxCoroutines =
         catalog.getResolvedLibraryAliasForModule(LibraryConstants.TEST_KOTLINX_COROUTINES).asAccessor
@@ -38,7 +39,7 @@ dependencies {
     implementation(projects.architecture.presentation)
     implementation(projects.architecture.domain)
 
-    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.$aliasCoroutinesCore)
 
     implementation(libs.$aliasTestJunit)
     implementation(libs.$aliasTestKotlinxCoroutines)

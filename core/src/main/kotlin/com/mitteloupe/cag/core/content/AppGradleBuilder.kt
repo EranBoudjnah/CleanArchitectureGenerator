@@ -32,6 +32,7 @@ fun buildAppGradleScript(
                     ).asAccessor
             val aliasComposeMaterial3 = catalog.getResolvedLibraryAliasForModule(LibraryConstants.COMPOSE_MATERIAL3).asAccessor
             val aliasComposeUiTooling = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_UI_TOOLING).asAccessor
+            val aliasComposeUiTestManifest = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_UI_TEST_MANIFEST).asAccessor
 
             val aliasActivityCompose = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_ACTIVITY_COMPOSE).asAccessor
             """
@@ -41,7 +42,7 @@ fun buildAppGradleScript(
             implementation(libs.$aliasComposeUiToolingPreview)
             implementation(libs.$aliasComposeMaterial3)
             debugImplementation(libs.$aliasComposeUiTooling)
-            debugImplementation(libs.compose.ui.test.manifest)
+            debugImplementation(libs.$aliasComposeUiTestManifest)
 """
         } else {
             val aliasAndroidxAppcompat = catalog.getResolvedLibraryAliasForModule(LibraryConstants.ANDROIDX_APPCOMPAT).asAccessor

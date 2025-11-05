@@ -8,6 +8,7 @@ import com.mitteloupe.cag.core.generation.versioncatalog.asAccessor
 
 fun buildArchitecturePresentationGradleScript(catalog: VersionCatalogReader): String {
     val pluginAliasKotlinJvm = catalog.getResolvedPluginAliasFor(PluginConstants.KOTLIN_JVM).asAccessor
+    val libraryAliasCoroutinesCore = catalog.getResolvedLibraryAliasForModule(LibraryConstants.KOTLINX_COROUTINES_CORE).asAccessor
 
     val gradleFileExtender = GradleFileExtender()
     val ktlintPluginLine = gradleFileExtender.buildKtlintPluginLine(catalog)
@@ -35,7 +36,7 @@ ${ if (configurations.isEmpty()) {
     }
 dependencies {
     implementation(projects.architecture.domain)
-    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.$libraryAliasCoroutinesCore)
     testImplementation(libs.$aliasTestJunit)
 }
 """
